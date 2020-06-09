@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
-import com.lifejourney.engine2d.MessageBox;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -12,10 +11,8 @@ import com.lifejourney.engine2d.RectF;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.View;
-import com.lifejourney.engine2d.Widget;
 import com.lifejourney.engine2d.World;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
