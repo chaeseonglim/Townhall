@@ -37,7 +37,7 @@ class TownView implements View, MessageBox.Event, Button.Event {
         world.addWidget(messageBox);
 
         Button okButton =
-                new Button.Builder(this, new Rect(380, 380, 150, 80),
+                new Button.Builder(this, new Rect(400, 380, 150, 80),
                         "확인").fontSize(35.0f).layer(10)
                         .textColor(Color.rgb(0, 0, 0)).build();
         okButton.show();

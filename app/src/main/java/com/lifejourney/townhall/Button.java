@@ -2,17 +2,13 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 
-import com.lifejourney.engine2d.CollidableObject;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Widget;
-
-import java.util.ArrayList;
 
 public class Button extends Widget {
 
@@ -72,6 +68,9 @@ public class Button extends Widget {
                 .smooth(false).depth(0.2f)
                 .gridSize(new Size(2, 1))
                 .layer(builder.layer).visible(false).build();
+        bg.clearAnimationIndex();
+        bg.addAnimationIndex(new Point(0, 0), 10);
+        bg.addAnimationIndex(new Point(1, 0), 10);
         shadow = new Sprite.Builder(builder.bgAsset)
                 .size(getRegion().size())
                 .smooth(false).depth(0.1f).opaque(0.2f)
