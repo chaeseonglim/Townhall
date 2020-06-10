@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Trace;
 import android.util.Log;
@@ -16,6 +18,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Rect;
+import com.lifejourney.engine2d.Sprite;
 
 import java.util.Locale;
 
@@ -128,8 +131,9 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
     public void doFrame(long frameTimeNanos) {
         Trace.beginSection("doFrame");
 
-        TextView fpsView = findViewById(R.id.fps);
-        fpsView.setText(String.format(Locale.US, "FPS: %.1f", Engine2D.GetInstance().getAverageFps()));
+        if (fpsMarkerCount++%120 == 0) {
+            Log.i(LOG_TAG, String.format(Locale.US, "FPS: %.1f", Engine2D.GetInstance().getAverageFps()));
+        }
 
         if (isRunning) {
             if (isEngine2DSurfacePrepared) {
@@ -154,7 +158,6 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        Log.e(LOG_TAG, "Touch");
         return world.onTouchEvent(event);
     }
 
@@ -204,4 +207,5 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
     private GameWorld world;
     private boolean isRunning;
     private boolean isEngine2DSurfacePrepared = false;
+    private int fpsMarkerCount = 0;
 }

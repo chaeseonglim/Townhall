@@ -15,14 +15,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <EditText
-            android:id="@+id/fps"
-            android:layout_width="213dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
