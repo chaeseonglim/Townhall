@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Trace;
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -49,7 +52,10 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
         Engine2D.GetInstance().initEngine(this);
 
         // Set resolution of Engine
-        Engine2D.GetInstance().setViewport(new Rect(0, 0, 1280, 720));
+        Point size = new Point();
+        display.getSize(size);
+        float ratio = 1280.0f / size.x;
+        Engine2D.GetInstance().setViewport(new Rect(0, 0, 1280, (int)(size.y*ratio)));
     }
 
     /**
@@ -69,7 +75,10 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
         Log.i(LOG_TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Initialize display & engine

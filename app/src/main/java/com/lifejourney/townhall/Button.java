@@ -68,9 +68,6 @@ public class Button extends Widget {
                 .smooth(false).depth(0.2f)
                 .gridSize(new Size(2, 1))
                 .layer(builder.layer).visible(false).build();
-        bg.clearAnimationIndex();
-        bg.addAnimationIndex(new Point(0, 0), 10);
-        bg.addAnimationIndex(new Point(1, 0), 10);
         shadow = new Sprite.Builder(builder.bgAsset)
                 .size(getRegion().size())
                 .smooth(false).depth(0.1f).opaque(0.2f)

@@ -11,7 +11,7 @@ public class GameWorld extends World {
         setDesiredFPS(20.0f);
 
         TownData town = new TownData("map.png");
-        TownView view = new TownView(this, town, 2.0f);
+        TownView view = new TownView(this, town);
         view.show();
 
         addView(view);

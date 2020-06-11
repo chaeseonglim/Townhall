@@ -16,9 +16,10 @@ class TownData {
     private static final String LOG_TAG = "TownData";
 
     enum TileType {
-        GRASS((byte)0xff, false),
-        ROAD((byte)0x00, true),
-        UNKNOWN((byte)0x0fe, false);
+        GRASS((byte)0xe0, true),
+        SOIL((byte)0xd0, true),
+        WATER((byte)0x00, false),
+        UNKNOWN((byte)0xff, false);
 
         TileType(byte code, boolean movable) {
             this.code = code;
