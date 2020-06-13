@@ -6,7 +6,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Point;
+import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
+import com.lifejourney.engine2d.RectF;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Widget;
@@ -113,15 +115,18 @@ public class MessageBox extends Widget {
 
         super.commit();
 
+        RectF screenRegion = getScreenRegion();
+        PointF screenPt = screenRegion.center();
+
         if (currentPage < pages.size()) {
-            pages.get(currentPage).setPos(new Point(getScreenRegion().center().offset(TEXT_MARGIN, TEXT_MARGIN)));
+            pages.get(currentPage).setPos(new Point(screenPt).offset(TEXT_MARGIN, TEXT_MARGIN));
             pages.get(currentPage).commit();
         }
 
-        bg.setPos(new Point(getScreenRegion().center()));
+        bg.setPos(new Point(screenPt));
         bg.commit();
 
-        shadow.setPos(new Point(getScreenRegion().center()).offset(5, 5));
+        shadow.setPos(new Point(screenPt).offset(5, 5));
         shadow.commit();
     }
 
@@ -140,11 +145,21 @@ public class MessageBox extends Widget {
         int eventAction = event.getAction();
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
+            touched = true;
             currentPage++;
             currentPage %= pages.size();
             if (eventHandler != null) {
                 eventHandler.onMessageBoxTouched(this);
             }
+        }
+        else if (eventAction == MotionEvent.ACTION_MOVE) {
+            if (!touched) {
+                return false;
+            }
+        }
+        else if (eventAction == MotionEvent.ACTION_UP ||
+            eventAction == MotionEvent.ACTION_CANCEL) {
+            touched = false;
         }
 
         return true;
@@ -184,10 +199,11 @@ public class MessageBox extends Widget {
         return currentPage;
     }
 
-    private final int TEXT_MARGIN = 15;
+    private final int TEXT_MARGIN = 12;
 
     private Event eventHandler;
     private Sprite bg, shadow;
     private ArrayList<Sprite> pages;
     private int currentPage = 0;
+    private boolean touched = false;
 }

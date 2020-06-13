@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Trace;
@@ -13,15 +11,12 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Rect;
-import com.lifejourney.engine2d.Sprite;
 
 import java.util.Locale;
 
@@ -153,7 +148,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
         }
 
         if (isRunning) {
-            if (isEngine2DSurfacePrepared) {
+            if (surfacePrepared) {
                 // Update world
                 world.update();
                 world.commit();
@@ -201,9 +196,9 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
         Surface surface = holder.getSurface();
         Engine2D.GetInstance().setSurface(surface, width, height);
 
-        if (!isEngine2DSurfacePrepared) {
+        if (!surfacePrepared) {
             onEngine2DPrepared();
-            isEngine2DSurfacePrepared = true;
+            surfacePrepared = true;
         }
     }
 
@@ -227,6 +222,6 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
 
     private GameWorld world;
     private boolean isRunning;
-    private boolean isEngine2DSurfacePrepared = false;
+    private boolean surfacePrepared = false;
     private int fpsMarkerCount = 0;
 }
