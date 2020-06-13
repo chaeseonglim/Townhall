@@ -5,32 +5,29 @@ import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Rect;
-import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.View;
 import com.lifejourney.engine2d.World;
-
-import java.util.HashMap;
 
 class TownView implements View, MessageBox.Event, Button.Event {
 
     private String LOG_TAG = "TownView";
 
-    TownView(World world, TownData townData) {
-        this.world = world;
-        this.townData = townData;
-        this.hexTileMap = new HexTileMap(townData, 4.0f);
+    TownView(World world, String mapAsset) {
 
-        messageBox =
-                new MessageBox.Builder(this, new Rect(100, 100, 500, 400),
-                        "한글은?\ntest\ntest").fontSize(35.0f).layer(9)
-                        .textColor(Color.rgb(0, 0, 0))
-                        .build();
+        this.world = world;
+        this.scale = 4.0f;
+        this.townMap = new TownMap(mapAsset, scale);
+
+        messageBox = new MessageBox.Builder(this,
+                new Rect(100, 100, 500, 400),"한글은?\ntest\ntest")
+                .fontSize(35.0f).layer(9).textColor(Color.rgb(0, 0, 0))
+                .build();
         world.addWidget(messageBox);
 
-        Button okButton =
-                new Button.Builder(this, new Rect(400, 380, 150, 80),
-                        "확인").fontSize(35.0f).layer(10)
-                        .textColor(Color.rgb(0, 0, 0)).build();
+        Button okButton = new Button.Builder(this,
+                new Rect(400, 380, 150, 80), "확인")
+                .fontSize(35.0f).layer(10).textColor(Color.rgb(0, 0, 0))
+                .build();
         world.addWidget(okButton);
     }
 
@@ -39,8 +36,9 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void close() {
-        townData = null;
-        hexTileMap.close();
+
+        townMap.close();
+        townMap = null;
     }
 
     /**
@@ -48,10 +46,12 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void update() {
-        if (!visible)
-            return;
 
-        hexTileMap.update();
+        if (!visible) {
+            return;
+        }
+
+        townMap.update();
         updateViewport();
     }
 
@@ -60,10 +60,12 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void commit() {
-        if (!visible)
-            return;
 
-        hexTileMap.commit();
+        if (!visible) {
+            return;
+        }
+
+        townMap.commit();
     }
 
     /**
@@ -71,6 +73,7 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void show() {
+
         setVisible(true);
     }
 
@@ -79,6 +82,7 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void hide() {
+
         setVisible(false);
     }
 
@@ -88,6 +92,7 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void onMessageBoxTouched(MessageBox messageBox) {
+
         messageBox.hide();
     }
 
@@ -97,6 +102,7 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public void onButtonPressed(Button button) {
+
         messageBox.show();
     }
 
@@ -106,8 +112,8 @@ class TownView implements View, MessageBox.Event, Button.Event {
      * @return
      */
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
+
         return false;
     }
 
@@ -116,21 +122,23 @@ class TownView implements View, MessageBox.Event, Button.Event {
      * @param visible
      */
     private void setVisible(boolean visible) {
+
         this.visible = visible;
-        hexTileMap.setVisible(visible);
+        townMap.setVisible(visible);
     }
 
     /**
      *
      */
     private void updateViewport() {
+
         Rect viewport = Engine2D.GetInstance().getViewport();
         Engine2D.GetInstance().setViewport(viewport);
     }
 
     private World world;
-    private TownData townData;
-    private HexTileMap hexTileMap;
+    private TownMap townMap;
     private MessageBox messageBox;
     private boolean visible;
+    private float scale;
 }

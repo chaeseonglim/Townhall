@@ -36,6 +36,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      *
      */
     protected void initEngine() {
+
         // Get display metrics
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
@@ -62,6 +63,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      *
      */
     protected void finalizeEngine() {
+
         // Finalize Engine
         Engine2D.GetInstance().finalizeEngine();
         Log.i(LOG_TAG, "Engine finalized: " + Engine2D.GetInstance().isInitialized());
@@ -72,6 +74,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         Log.i(LOG_TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
@@ -87,6 +90,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
 
     @Override
     protected void onDestroy() {
+
         Log.i(LOG_TAG, "onDestroy");
 
         super.onDestroy();
@@ -101,6 +105,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      *
      */
     protected void onEngine2DPrepared() {
+
         // Initialize resources
         initResources();
     }
@@ -110,6 +115,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     protected void onStart() {
+
         Log.i(LOG_TAG, "onStart");
 
         super.onStart();
@@ -124,6 +130,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     protected void onStop() {
+
         Log.i(LOG_TAG, "onStop");
 
         super.onStop();
@@ -138,6 +145,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     public void doFrame(long frameTimeNanos) {
+
         Trace.beginSection("doFrame");
 
         if (fpsMarkerCount++%120 == 0) {
@@ -165,8 +173,8 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      * @return
      */
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
+
         return world.onTouchEvent(event);
     }
 
@@ -176,6 +184,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+
         // Do nothing here, waiting for surfaceChanged instead
     }
 
@@ -188,6 +197,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
         Surface surface = holder.getSurface();
         Engine2D.GetInstance().setSurface(surface, width, height);
 
@@ -203,6 +213,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+
         Engine2D.GetInstance().clearSurface();
     }
 
@@ -210,6 +221,7 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
      *
      */
     protected void initResources() {
+
         world = new GameWorld();
     }
 

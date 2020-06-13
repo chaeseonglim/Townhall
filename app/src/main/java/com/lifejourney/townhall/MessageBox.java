@@ -18,10 +18,12 @@ public class MessageBox extends Widget {
     private final String LOG_TAG = "MessageBox";
 
     interface Event {
+
         void onMessageBoxTouched(MessageBox messageBox);
     }
 
     public static class Builder {
+
         private Event eventHandler;
         private Rect region;
         private ArrayList<String> messages;
@@ -94,6 +96,7 @@ public class MessageBox extends Widget {
      */
     @Override
     public void close() {
+
         for (Sprite sprite: pages) {
             sprite.close();
         }
@@ -107,6 +110,7 @@ public class MessageBox extends Widget {
      */
     @Override
     public void commit() {
+
         super.commit();
 
         if (currentPage < pages.size()) {
@@ -152,6 +156,7 @@ public class MessageBox extends Widget {
      */
     @Override
     public void setVisible(boolean visible) {
+
         super.setVisible(visible);
 
         if (currentPage < pages.size()) {
@@ -166,6 +171,7 @@ public class MessageBox extends Widget {
      * @return
      */
     public int getTotalPage() {
+
         return pages.size();
     }
 
@@ -174,6 +180,7 @@ public class MessageBox extends Widget {
      * @return
      */
     public int getCurrentPage() {
+
         return currentPage;
     }
 
