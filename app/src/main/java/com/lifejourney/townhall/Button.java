@@ -126,14 +126,14 @@ public class Button extends Widget {
         super.commit();
 
         if (bg.getGridIndex().equals(new Point(1, 0))) {
-            msg.setPos(new Point(getScreenRegion().center().offset(3, 3)));
-            bg.setPos(new Point(getScreenRegion().center().offset(3, 3)));
+            msg.setPosition(new Point(getScreenRegion().center().offset(3, 3)));
+            bg.setPosition(new Point(getScreenRegion().center().offset(3, 3)));
         }
         else {
-            msg.setPos(new Point(getScreenRegion().center()));
-            bg.setPos(new Point(getScreenRegion().center()));
+            msg.setPosition(new Point(getScreenRegion().center()));
+            bg.setPosition(new Point(getScreenRegion().center()));
         }
-        shadow.setPos(new Point(getScreenRegion().center().offset(3, 3)));
+        shadow.setPosition(new Point(getScreenRegion().center().offset(3, 3)));
         msg.commit();
         bg.commit();
         shadow.commit();

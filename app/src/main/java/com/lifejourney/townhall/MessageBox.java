@@ -2,7 +2,6 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Point;
@@ -68,18 +67,22 @@ public class MessageBox extends Widget {
     }
 
     private MessageBox(Builder builder) {
+
         super(builder.region, builder.layer);
 
         eventHandler = builder.eventHandler;
 
         bg = new Sprite.Builder(builder.bgAsset)
                 .size(getRegion().size())
-                .smooth(false).depth(0.2f)
-                .layer(builder.layer).visible(false).build();
+                .smooth(false).layer(builder.layer).depth(0.2f)
+                .gridSize(new Size(2, 1))
+                .visible(false).build();
         shadow = new Sprite.Builder(builder.bgAsset)
                 .size(getRegion().size())
-                .smooth(false).depth(0.1f).opaque(0.2f)
-                .layer(builder.layer).visible(false).build();
+                .smooth(false).layer(builder.layer).depth(0.1f).opaque(0.2f)
+                .gridSize(new Size(2, 1))
+                .visible(false).build();
+        shadow.setGridIndex(new Point(1, 0));
 
         pages = new ArrayList<>();
         for (int i = 0; i < builder.messages.size(); ++i) {
@@ -119,14 +122,14 @@ public class MessageBox extends Widget {
         PointF screenPt = screenRegion.center();
 
         if (currentPage < pages.size()) {
-            pages.get(currentPage).setPos(new Point(screenPt).offset(TEXT_MARGIN, TEXT_MARGIN));
+            pages.get(currentPage).setPosition(new Point(screenPt).offset(TEXT_MARGIN, TEXT_MARGIN));
             pages.get(currentPage).commit();
         }
 
-        bg.setPos(new Point(screenPt));
+        bg.setPosition(new Point(screenPt));
         bg.commit();
 
-        shadow.setPos(new Point(screenPt).offset(5, 5));
+        shadow.setPosition(new Point(screenPt).offset(5, 5));
         shadow.commit();
     }
 
@@ -153,9 +156,7 @@ public class MessageBox extends Widget {
             }
         }
         else if (eventAction == MotionEvent.ACTION_MOVE) {
-            if (!touched) {
-                return false;
-            }
+            return touched;
         }
         else if (eventAction == MotionEvent.ACTION_UP ||
             eventAction == MotionEvent.ACTION_CANCEL) {
@@ -186,7 +187,6 @@ public class MessageBox extends Widget {
      * @return
      */
     public int getTotalPage() {
-
         return pages.size();
     }
 
@@ -195,7 +195,6 @@ public class MessageBox extends Widget {
      * @return
      */
     public int getCurrentPage() {
-
         return currentPage;
     }
 

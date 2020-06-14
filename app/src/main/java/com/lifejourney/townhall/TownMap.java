@@ -7,6 +7,7 @@ import com.lifejourney.engine2d.HexTileMap;
 import com.lifejourney.engine2d.InfoBitmap;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
+import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
@@ -19,6 +20,7 @@ class TownMap extends HexTileMap {
         GRASS((byte)0xe0, true),
         SOIL((byte)0xd0, true),
         WATER((byte)0x00, false),
+        CAPITAL((byte)0xb0, true),
         UNKNOWN((byte)0xff, false);
 
         TileType(byte code, boolean movable) {
@@ -45,11 +47,26 @@ class TownMap extends HexTileMap {
 
         super((int) (HEX_SIZE * scale));
 
+        setCacheMargin(4);
+        this.scale = scale;
+
         // Load map data from bitmap (grayscale png)
         ResourceManager resourceManager = Engine2D.GetInstance().getResourceManager();
         InfoBitmap bitmap = resourceManager.loadGrayscaleBitmap(mapBitmap);
         setMapData(bitmap.get2DByteArray());
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
+
+        // Check where capital city is
+        Size mapSize = getMapSize();
+        for (int y = 0; y < mapSize.height; ++y) {
+            for (int x = 0; x < mapSize.width; ++x) {
+                OffsetCoord offsetCoord = new OffsetCoord(x, y);
+                TileType tileType = getTileType(offsetCoord);
+                if (tileType == TileType.CAPITAL) {
+                    capitalOffset = offsetCoord;
+                }
+            }
+        }
     }
 
     private Point getTextureGridForTile(OffsetCoord offsetCoord) {
@@ -62,6 +79,8 @@ class TownMap extends HexTileMap {
                 return new Point(0, 1);
             case WATER:
                 return new Point(0, 2);
+            case CAPITAL:
+                return new Point(0, 3);
             default:
                 return new Point(0, 0);
         }
@@ -69,11 +88,12 @@ class TownMap extends HexTileMap {
 
     @Override
     protected Sprite getTileSprite(OffsetCoord offsetCoord) {
+
         Sprite.Builder spriteBuilder =
             new Sprite.Builder("tiles.png")
                 .position(offsetCoord.toScreenCoord())
                 .size(getTileSize())
-                .gridSize(new Size(2, 3)).smooth(false)
+                .gridSize(new Size(2, 4)).smooth(false)
                 .layer(MAP_LAYER).visible(true);
         Sprite sprite = spriteBuilder.build();
         sprite.setGridIndex(getTextureGridForTile(offsetCoord));
@@ -98,7 +118,6 @@ class TownMap extends HexTileMap {
             }
         }
 
-        Log.e(LOG_TAG, "Unknown tile type!!! " + code);
         return TileType.UNKNOWN;
     }
 
@@ -130,6 +149,17 @@ class TownMap extends HexTileMap {
         return getTileType(offsetCoord).movable();
     }
 
+    /**
+     *
+     * @return
+     */
+    public OffsetCoord getCapitalOffset() {
+        return capitalOffset;
+    }
+
     private final static int MAP_LAYER = 0;
     private final static int HEX_SIZE = 16;
+
+    private float scale;
+    private OffsetCoord capitalOffset;
 }

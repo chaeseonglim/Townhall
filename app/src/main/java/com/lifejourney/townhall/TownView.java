@@ -1,14 +1,20 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.CollidableObject;
 import com.lifejourney.engine2d.Engine2D;
+import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
+import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.View;
 import com.lifejourney.engine2d.World;
+
+import java.util.ArrayList;
 
 class TownView implements View, MessageBox.Event, Button.Event {
 
@@ -33,6 +39,13 @@ class TownView implements View, MessageBox.Event, Button.Event {
                 .build();
         okButton.show();
         world.addWidget(okButton);
+
+        Squad squad =
+                new Squad.Builder(new PointF(townMap.getCapitalOffset().toScreenCoord()), scale, townMap)
+                        .build();
+        squad.show();
+        squads.add(squad);
+        world.addObject(squad);
     }
 
     /**
@@ -117,32 +130,40 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // Handle squad touch event first
+        for (Squad squad: squads) {
+            if (squad.onTouchEvent(event)) {
+                return true;
+            }
+        }
+
+        // Dragging map
         int eventAction = event.getAction();
-        PointF touchingPoint = new PointF(event.getX(), event.getY());
+        PointF touchingScreenCoord = new PointF(event.getX(), event.getY());
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             dragging = true;
-            touchedPoint = touchingPoint;
+            touchedPoint = touchingScreenCoord;
+            return true;
         }
-        else if (eventAction == MotionEvent.ACTION_MOVE) {
-            if (dragging) {
-                Rect viewport = Engine2D.GetInstance().getViewport();
-                PointF delta = new PointF(touchingPoint);
-                delta.subtract(touchedPoint).multiply(-1.0f);
-                viewport.offset(new Point(delta));
-                Engine2D.GetInstance().setViewport(viewport);
-                touchedPoint = touchingPoint;
-            }
+        else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            PointF delta = new PointF(touchingScreenCoord);
+            delta.subtract(touchedPoint).multiply(-1.0f);
+            viewport.offset(new Point(delta));
+            Engine2D.GetInstance().setViewport(viewport);
+
+            touchedPoint = touchingScreenCoord;
+            return true;
         }
-        else if (eventAction == MotionEvent.ACTION_UP ||
-                eventAction == MotionEvent.ACTION_CANCEL) {
+        else if ((eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL)
+                && dragging) {
             dragging = false;
+            return true;
         }
         else {
             return false;
         }
-
-        return true;
     }
 
     /**
@@ -160,8 +181,10 @@ class TownView implements View, MessageBox.Event, Button.Event {
      */
     private void updateViewport() {
 
+        /*
         Rect viewport = Engine2D.GetInstance().getViewport();
         Engine2D.GetInstance().setViewport(viewport);
+         */
     }
 
     private World world;
@@ -171,4 +194,6 @@ class TownView implements View, MessageBox.Event, Button.Event {
     private float scale;
     private boolean dragging = false;
     private PointF touchedPoint;
+
+    private ArrayList<Squad> squads = new ArrayList<>();
 }
