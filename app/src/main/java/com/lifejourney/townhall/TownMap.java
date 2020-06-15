@@ -1,6 +1,7 @@
 package com.lifejourney.townhall;
 
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.HexTileMap;
@@ -8,11 +9,13 @@ import com.lifejourney.engine2d.InfoBitmap;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
+import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
+import com.lifejourney.engine2d.View;
 
-class TownMap extends HexTileMap {
+class TownMap extends HexTileMap implements View {
 
     private static final String LOG_TAG = "TownMap";
 
@@ -68,6 +71,43 @@ class TownMap extends HexTileMap {
             }
         }
     }
+
+    /**
+     *
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // Dragging map
+        int eventAction = event.getAction();
+        PointF touchingScreenCoord = new PointF(event.getX(), event.getY());
+
+        if (eventAction == MotionEvent.ACTION_DOWN) {
+            dragging = true;
+            touchedPoint = touchingScreenCoord;
+            return true;
+        }
+        else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            PointF delta = new PointF(touchingScreenCoord);
+            delta.subtract(touchedPoint).multiply(-1.0f);
+            viewport.offset(new Point(delta));
+            Engine2D.GetInstance().setViewport(viewport);
+
+            touchedPoint = touchingScreenCoord;
+            return true;
+        }
+        else if ((eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL)
+                && dragging) {
+            dragging = false;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 
     private Point getTextureGridForTile(OffsetCoord offsetCoord) {
 
@@ -162,4 +202,6 @@ class TownMap extends HexTileMap {
 
     private float scale;
     private OffsetCoord capitalOffset;
+    private boolean dragging = false;
+    private PointF touchedPoint;
 }

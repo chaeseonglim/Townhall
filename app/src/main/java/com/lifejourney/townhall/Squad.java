@@ -3,6 +3,7 @@ package com.lifejourney.townhall;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Object;
 import com.lifejourney.engine2d.OffsetCoord;
@@ -14,7 +15,7 @@ import com.lifejourney.engine2d.Sprite;
 
 import java.util.ArrayList;
 
-public class Squad extends Object{
+public class Squad extends Object implements Controllable {
 
     private final static String LOG_TAG = "Squad";
 
@@ -37,9 +38,6 @@ public class Squad extends Object{
             squadIcon.setPositionOffset(new Point(0, (int) (-10 * scale)));
             Sprite squadIconDragging = squadIcon.clone();
             squadIconDragging.setOpaque(0.0f);
-            ArrayList<Sprite> sprites = new ArrayList<>();
-            sprites.add(squadIcon);
-            sprites.add(squadIconDragging);
             return (Squad) new PrivateBuilder<>(position, scale, map).priority(-1)
                     .sprite(squadIcon, true)
                     .sprite(squadIconDragging, false).build();
@@ -75,6 +73,7 @@ public class Squad extends Object{
      * @param event
      * @return
      */
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
 
         int eventAction = event.getAction();
@@ -88,9 +87,11 @@ public class Squad extends Object{
             return false;
         }
 
+        Sprite iconSprite = getSprite(0);
         Sprite draggingSprite = getSprite(1);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
+            iconSprite.setOpaque(0.2f);
             draggingSprite.setOpaque(0.5f);
             draggingSprite.setPosition(new Point(touchingGameCoord));
             draggingSprite.setVisible(true);
@@ -114,6 +115,13 @@ public class Squad extends Object{
                 && dragging) {
             draggingSprite.setVisible(false);
             dragging = false;
+            iconSprite.setOpaque(1.0f);
+
+            Point draggingPoint = new Point(touchingGameCoord);
+            OffsetCoord offsetCoord = new OffsetCoord(draggingPoint);
+            if (eventAction == MotionEvent.ACTION_UP && map.getTileType(offsetCoord).movable()) {
+                setPosition(touchingGameCoord);
+            }
             return true;
         }
         else {

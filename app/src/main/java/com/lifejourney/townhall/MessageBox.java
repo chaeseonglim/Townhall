@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Point;
@@ -33,6 +34,7 @@ public class MessageBox extends Widget {
         private float fontSize = 35.0f;
         private int textColor = Color.argb(255, 255, 255, 255);
         private int layer = 0;
+        private float depth = 0.0f;
 
         Builder(Event eventHandler, Rect region, String message) {
             this.eventHandler = eventHandler;
@@ -61,6 +63,10 @@ public class MessageBox extends Widget {
             this.layer = layer;
             return this;
         }
+        Builder depth(float depth) {
+            this.depth = depth;
+            return this;
+        }
         MessageBox build() {
             return new MessageBox(this);
         }
@@ -68,7 +74,7 @@ public class MessageBox extends Widget {
 
     private MessageBox(Builder builder) {
 
-        super(builder.region, builder.layer);
+        super(builder.region, builder.layer, builder.depth);
 
         eventHandler = builder.eventHandler;
 
@@ -141,29 +147,41 @@ public class MessageBox extends Widget {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (!super.onTouchEvent(event)) {
-            return false;
-        }
-
         int eventAction = event.getAction();
 
-        if (eventAction == MotionEvent.ACTION_DOWN) {
-            touched = true;
-            currentPage++;
-            currentPage %= pages.size();
-            if (eventHandler != null) {
-                eventHandler.onMessageBoxTouched(this);
-            }
+        switch (eventAction) {
+            case MotionEvent.ACTION_DOWN:
+                if (checkIfInputEventInRegion(event)) {
+                    touched = true;
+                    currentPage++;
+                    currentPage %= pages.size();
+                    if (eventHandler != null) {
+                        eventHandler.onMessageBoxTouched(this);
+                    }
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            case MotionEvent.ACTION_MOVE:
+                if (touched) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (touched) {
+                    touched = false;
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            default:
+                return false;
         }
-        else if (eventAction == MotionEvent.ACTION_MOVE) {
-            return touched;
-        }
-        else if (eventAction == MotionEvent.ACTION_UP ||
-            eventAction == MotionEvent.ACTION_CANCEL) {
-            touched = false;
-        }
-
-        return true;
     }
 
     /**
