@@ -98,6 +98,9 @@ public class Button extends Widget {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isVisible()) {
+            return false;
+        }
 
         int eventAction = event.getAction();
         boolean result;

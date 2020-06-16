@@ -20,6 +20,12 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addView(map);
         map.show();
 
+        /*
+        initCollisionPool(map.getMapSize().clone()
+                .multiply(map.getTileSize().width, map.getTileSize().height), false);
+        */
+
+        /*
         messageBox = new MessageBox.Builder(this,
                 new Rect(100, 100, 500, 400),"한글은?\ntest\ntest")
                 .fontSize(35.0f).layer(9).textColor(Color.rgb(0, 0, 0))
@@ -33,13 +39,23 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
                 .build();
         okButton.show();
         addWidget(okButton);
+         */
 
-        Squad squad =
-                new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()), scale, map)
-                        .build();
-        squad.show();
-        squads.add(squad);
-        addObject(squad);
+        Squad squadA = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
+                scale, map).build();
+        addSquad(squadA);
+        squadA.show();
+
+        addUnit(squadA.spawnUnit(Unit.Class.SWORD));
+        addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
+
+        Squad squadB = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
+                scale, map).build();
+        addSquad(squadB);
+        squadB.show();
+
+        addUnit(squadB.spawnUnit(Unit.Class.SWORD));
+        addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
     }
 
     /**
@@ -102,8 +118,45 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         this.map = map;
     }
 
-    private float scale = 4.0f;
+    /**
+     *
+     * @param squad
+     */
+    public void addSquad(Squad squad) {
+        squads.add(squad);
+        addObject(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    public void removeSquad(Squad squad) {
+        squads.remove(squad);
+        removeObject(squad);
+    }
+
+    /**
+     *
+     * @param unit
+     */
+    public void addUnit(Unit unit) {
+        units.add(unit);
+        addObject(unit);
+    }
+
+    /**
+     *
+     * @param unit
+     */
+    public void removeUnit(Unit unit) {
+        units.remove(unit);
+        removeObject(unit);
+    }
+
+    private float scale = 1.0f;
     private TownMap map;
     private MessageBox messageBox;
     private ArrayList<Squad> squads = new ArrayList<>();
+    private ArrayList<Unit> units = new ArrayList<>();
 }

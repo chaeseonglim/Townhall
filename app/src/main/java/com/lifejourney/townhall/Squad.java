@@ -33,11 +33,12 @@ public class Squad extends Object implements Controllable {
         public Squad build() {
             Sprite squadIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
                     .size(SPRITE_BASE_SIZE.clone().multiply(scale)).smooth(false).visible(true)
-                    .gridSize(new Size(2, 1))
+                    .gridSize(new Size(2, 1)).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
-            squadIcon.setPositionOffset(new Point(0, (int) (-10 * scale)));
+            squadIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET.clone().multiply(scale));
             Sprite squadIconDragging = squadIcon.clone();
-            squadIconDragging.setOpaque(0.0f);
+            squadIconDragging.setOpaque(DRAGGING_SPRITE_OPAQUE_NORMAL);
+            squadIconDragging.setVisible(false);
             return (Squad) new PrivateBuilder<>(position, scale, map).priority(-1)
                     .sprite(squadIcon, true)
                     .sprite(squadIconDragging, false).build();
@@ -75,6 +76,9 @@ public class Squad extends Object implements Controllable {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isVisible()) {
+            return false;
+        }
 
         int eventAction = event.getAction();
         PointF touchingScreenCoord = new PointF(event.getX(), event.getY());
@@ -91,8 +95,8 @@ public class Squad extends Object implements Controllable {
         Sprite draggingSprite = getSprite(1);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            iconSprite.setOpaque(0.2f);
-            draggingSprite.setOpaque(0.5f);
+            iconSprite.setOpaque(ICON_SPRITE_OPAQUE_DRAGGING);
+            draggingSprite.setOpaque(DRAGGING_SPRITE_OPAQUE_DRAGGING);
             draggingSprite.setPosition(new Point(touchingGameCoord));
             draggingSprite.setVisible(true);
             draggingSprite.setGridIndex(new Point(0, 0));
@@ -115,12 +119,12 @@ public class Squad extends Object implements Controllable {
                 && dragging) {
             draggingSprite.setVisible(false);
             dragging = false;
-            iconSprite.setOpaque(1.0f);
+            iconSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
 
             Point draggingPoint = new Point(touchingGameCoord);
             OffsetCoord offsetCoord = new OffsetCoord(draggingPoint);
             if (eventAction == MotionEvent.ACTION_UP && map.getTileType(offsetCoord).movable()) {
-                setPosition(touchingGameCoord);
+                setPosition(new PointF(offsetCoord.toScreenCoord()));
             }
             return true;
         }
@@ -136,6 +140,11 @@ public class Squad extends Object implements Controllable {
     public void update() {
 
         super.update();
+
+        OffsetCoord currentMapCoord = new OffsetCoord(new Point(getPosition()));
+        for(Unit unit: units) {
+            unit.setTargetMapPosition(currentMapCoord);
+        }
     }
 
     /**
@@ -154,6 +163,32 @@ public class Squad extends Object implements Controllable {
     void addUnit(Unit unit) {
 
         units.add(unit);
+    }
+
+    /**
+     *
+     * @param unitClass
+     */
+    Unit spawnUnit(Unit.Class unitClass) {
+
+        Unit unit = new Unit.Builder(unitClass, scale).position(getPosition().clone()).build();
+        unit.setVisible(isVisible());
+        unit.setSquadMembers(units);
+        addUnit(unit);
+        return unit;
+    }
+
+    /**
+     *
+     * @param visible
+     */
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+
+        for (Unit unit: units) {
+            unit.setVisible(visible);
+        }
     }
 
     /**
@@ -179,7 +214,12 @@ public class Squad extends Object implements Controllable {
     }
 
     private final static int SPRITE_LAYER = 5;
-    private final static Size SPRITE_BASE_SIZE = new Size(32, 32);
+    private final static Size SPRITE_BASE_SIZE = new Size(80, 80);
+    private final static Point SPRITE_HOTSPOT_OFFSET = new Point(0, -25);
+    private final static float ICON_SPRITE_OPAQUE_NORMAL = 0.8f;
+    private final static float ICON_SPRITE_OPAQUE_DRAGGING = 0.2f;
+    private final static float DRAGGING_SPRITE_OPAQUE_NORMAL = 0.0f;
+    private final static float DRAGGING_SPRITE_OPAQUE_DRAGGING = 0.5f;
 
     private TownMap map;
     private float scale;

@@ -198,7 +198,7 @@ class TownMap extends HexTileMap implements View {
     }
 
     private final static int MAP_LAYER = 0;
-    private final static int HEX_SIZE = 16;
+    private final static int HEX_SIZE = 64;
 
     private float scale;
     private OffsetCoord capitalOffset;
