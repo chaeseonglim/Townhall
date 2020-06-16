@@ -42,20 +42,31 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
          */
 
         Squad squadA = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
-                scale, map).build();
+                scale, map, Town.Side.TOWN).build();
         addSquad(squadA);
         squadA.show();
 
         addUnit(squadA.spawnUnit(Unit.Class.SWORD));
         addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
+        addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
 
         Squad squadB = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
-                scale, map).build();
+                scale, map, Town.Side.BANDIT).build();
         addSquad(squadB);
         squadB.show();
 
         addUnit(squadB.spawnUnit(Unit.Class.SWORD));
         addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
+        addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
+
+        Squad squadC = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
+                scale, map, Town.Side.TOWN).build();
+        addSquad(squadC);
+        squadC.show();
+
+        addUnit(squadC.spawnUnit(Unit.Class.SWORD));
+        addUnit(squadC.spawnUnit(Unit.Class.LONGBOW));
+        addUnit(squadC.spawnUnit(Unit.Class.LONGBOW));
     }
 
     /**

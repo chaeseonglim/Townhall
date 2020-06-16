@@ -3,6 +3,8 @@ package com.lifejourney.townhall;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import androidx.core.util.Pair;
+
 import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Object;
@@ -24,11 +26,13 @@ public class Squad extends Object implements Controllable {
         private PointF position;
         private float scale;
         private TownMap map;
+        private Town.Side side;
 
-        public Builder(PointF position, float scale, TownMap map) {
+        public Builder(PointF position, float scale, TownMap map, Town.Side side) {
             this.position = position;
             this.scale = scale;
             this.map = map;
+            this.side = side;
         }
         public Squad build() {
             Sprite squadIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
@@ -39,7 +43,7 @@ public class Squad extends Object implements Controllable {
             Sprite squadIconDragging = squadIcon.clone();
             squadIconDragging.setOpaque(DRAGGING_SPRITE_OPAQUE_NORMAL);
             squadIconDragging.setVisible(false);
-            return (Squad) new PrivateBuilder<>(position, scale, map).priority(-1)
+            return (Squad) new PrivateBuilder<>(position, scale, map, side).priority(-1)
                     .sprite(squadIcon, true)
                     .sprite(squadIconDragging, false).build();
         }
@@ -50,11 +54,13 @@ public class Squad extends Object implements Controllable {
 
         private float scale;
         private TownMap map;
+        private Town.Side side;
 
-        public PrivateBuilder(PointF position, float scale, TownMap map) {
+        public PrivateBuilder(PointF position, float scale, TownMap map, Town.Side side) {
             super(position);
             this.scale = scale;
             this.map = map;
+            this.side = side;
         }
         public Squad build() {
             return new Squad(this);
@@ -67,6 +73,10 @@ public class Squad extends Object implements Controllable {
         scale = builder.scale;
         spriteSize = SPRITE_BASE_SIZE.clone().multiply(scale);
         map = builder.map;
+        side = builder.side;
+
+        OffsetCoord offsetCoord = new OffsetCoord(getPosition());
+        map.addSquad(offsetCoord, this);
     }
 
     /**
@@ -76,6 +86,7 @@ public class Squad extends Object implements Controllable {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (!isVisible()) {
             return false;
         }
@@ -107,7 +118,7 @@ public class Squad extends Object implements Controllable {
             Point draggingPoint = new Point(touchingGameCoord);
             draggingSprite.setPosition(draggingPoint);
             OffsetCoord offsetCoord = new OffsetCoord(draggingPoint);
-            if (map.getTileType(offsetCoord).movable()) {
+            if (map.isMovable(offsetCoord, this)) {
                 draggingSprite.setGridIndex(new Point(0, 0));
             }
             else {
@@ -123,8 +134,10 @@ public class Squad extends Object implements Controllable {
 
             Point draggingPoint = new Point(touchingGameCoord);
             OffsetCoord offsetCoord = new OffsetCoord(draggingPoint);
-            if (eventAction == MotionEvent.ACTION_UP && map.getTileType(offsetCoord).movable()) {
+            if (eventAction == MotionEvent.ACTION_UP && map.isMovable(offsetCoord, this)) {
                 setPosition(new PointF(offsetCoord.toScreenCoord()));
+                map.removeSquad(offsetCoord, this);
+                map.addSquad(offsetCoord, this);
             }
             return true;
         }
@@ -171,7 +184,7 @@ public class Squad extends Object implements Controllable {
      */
     Unit spawnUnit(Unit.Class unitClass) {
 
-        Unit unit = new Unit.Builder(unitClass, scale).position(getPosition().clone()).build();
+        Unit unit = new Unit.Builder(unitClass, scale, side).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setSquadMembers(units);
         addUnit(unit);
@@ -208,9 +221,25 @@ public class Squad extends Object implements Controllable {
 
         this.scale = scale;
         this.spriteSize = SPRITE_BASE_SIZE.clone().multiply(scale);
-        for (Sprite sprite: getSprites()) {
-            sprite.setSize(spriteSize);
+        for (Pair<Sprite, Boolean> pair: getSprites()) {
+            pair.first.setSize(spriteSize);
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Town.Side getSide() {
+        return side;
+    }
+
+    /**
+     *
+     * @param side
+     */
+    public void setSide(Town.Side side) {
+        this.side = side;
     }
 
     private final static int SPRITE_LAYER = 5;
@@ -222,8 +251,10 @@ public class Squad extends Object implements Controllable {
     private final static float DRAGGING_SPRITE_OPAQUE_DRAGGING = 0.5f;
 
     private TownMap map;
+    private Town.Side side;
     private float scale;
     private Size spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean dragging = false;
+    private boolean moving = false;
 }

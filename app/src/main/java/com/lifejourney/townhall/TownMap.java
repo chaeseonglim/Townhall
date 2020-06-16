@@ -15,6 +15,9 @@ import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.View;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 class TownMap extends HexTileMap implements View {
 
     private static final String LOG_TAG = "TownMap";
@@ -50,8 +53,8 @@ class TownMap extends HexTileMap implements View {
 
         super((int) (HEX_SIZE * scale));
 
-        setCacheMargin(4);
         this.scale = scale;
+        setCacheMargin(4);
 
         // Load map data from bitmap (grayscale png)
         ResourceManager resourceManager = Engine2D.GetInstance().getResourceManager();
@@ -59,7 +62,7 @@ class TownMap extends HexTileMap implements View {
         setMapData(bitmap.get2DByteArray());
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
 
-        // Check where capital city is
+        // Add town information
         Size mapSize = getMapSize();
         for (int y = 0; y < mapSize.height; ++y) {
             for (int x = 0; x < mapSize.width; ++x) {
@@ -68,6 +71,9 @@ class TownMap extends HexTileMap implements View {
                 if (tileType == TileType.CAPITAL) {
                     capitalOffset = offsetCoord;
                 }
+
+                Town town = new Town();
+                towns.put(offsetCoord, town);
             }
         }
     }
@@ -127,7 +133,9 @@ class TownMap extends HexTileMap implements View {
     }
 
     @Override
-    protected Sprite getTileSprite(OffsetCoord offsetCoord) {
+    protected ArrayList<Sprite> getTileSprite(OffsetCoord offsetCoord) {
+
+        ArrayList<Sprite> sprites = new ArrayList<>();
 
         Sprite.Builder spriteBuilder =
             new Sprite.Builder("tiles.png")
@@ -137,7 +145,9 @@ class TownMap extends HexTileMap implements View {
                 .layer(MAP_LAYER).visible(true);
         Sprite sprite = spriteBuilder.build();
         sprite.setGridIndex(getTextureGridForTile(offsetCoord));
-        return sprite;
+
+        sprites.add(sprite);
+        return sprites;
     }
 
     /**
@@ -166,13 +176,24 @@ class TownMap extends HexTileMap implements View {
      * @param offsetCoord
      * @return
      */
-    public boolean isMovable(OffsetCoord offsetCoord) {
+    public boolean isMovable(OffsetCoord offsetCoord, Squad squad) {
 
         if (offsetCoord.getX() >= getMapSize().width || offsetCoord.getY() >= getMapSize().height) {
             return false;
         }
 
-        return getTileType(offsetCoord).movable();
+        if (!getTileType(offsetCoord).movable()) {
+            return false;
+        }
+
+        ArrayList<Squad> squads = towns.get(offsetCoord).getSquads();
+        for (Squad localSquad: squads) {
+            if (squad != localSquad && squad.getSide() == localSquad.getSide()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -180,13 +201,9 @@ class TownMap extends HexTileMap implements View {
      * @param offsetCoord
      * @return
      */
-    public boolean isSearchable(OffsetCoord offsetCoord) {
+    public boolean isSearchable(OffsetCoord offsetCoord, Squad squad) {
 
-        if (offsetCoord.getX() >= getMapSize().width || offsetCoord.getY() >= getMapSize().height) {
-            return false;
-        }
-
-        return getTileType(offsetCoord).movable();
+        return isMovable(offsetCoord, squad);
     }
 
     /**
@@ -197,11 +214,34 @@ class TownMap extends HexTileMap implements View {
         return capitalOffset;
     }
 
+    /**
+     *
+     * @param offsetCoord
+     * @param squad
+     */
+    public void addSquad(OffsetCoord offsetCoord, Squad squad) {
+        Town town = towns.get(offsetCoord);
+        ArrayList<Squad> squadList = town.getSquads();
+        squadList.add(squad);
+    }
+
+    /**
+     *
+     * @param offsetCoord
+     * @param squad
+     */
+    public void removeSquad(OffsetCoord offsetCoord, Squad squad) {
+        Town town = towns.get(offsetCoord);
+        ArrayList<Squad> squadList = town.getSquads();
+        squadList.remove(squad);
+    }
+
     private final static int MAP_LAYER = 0;
     private final static int HEX_SIZE = 64;
 
     private float scale;
     private OffsetCoord capitalOffset;
+    private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private boolean dragging = false;
     private PointF touchedPoint;
 }

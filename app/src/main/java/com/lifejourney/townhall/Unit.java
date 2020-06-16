@@ -22,7 +22,7 @@ public class Unit extends CollidableObject {
         }
 
         Sprite sprite(float scale) {
-            Sprite sprite = new Sprite.Builder("unit.png").gridSize(new Size(2,1))
+            Sprite sprite = new Sprite.Builder("unit.png").gridSize(new Size(4,2))
                     .size(new Size(16, 16).multiply(scale)).smooth(true).build();
             sprite.setGridIndex(spriteGridIndex());
             return sprite;
@@ -30,9 +30,9 @@ public class Unit extends CollidableObject {
         Point spriteGridIndex() {
             switch(this) {
                 case SWORD:
-                    return new Point(0, 0);
+                    return new Point(0, 1);
                 case LONGBOW:
-                    return new Point(1, 0);
+                    return new Point(1, 1);
                 default:
                     return null;
             }
@@ -61,23 +61,30 @@ public class Unit extends CollidableObject {
 
         private Class unitClass;
         private float scale;
+        private Town.Side side;
 
         private PointF position = new PointF();
 
-        public Builder(Class unitClass, float scale) {
+        public Builder(Class unitClass, float scale, Town.Side side) {
             this.unitClass = unitClass;
             this.scale = scale;
+            this.side = side;
         }
         public Builder position(PointF position) {
             this.position = position;
             return this;
         }
         public Unit build() {
+            Sprite spriteFrame = new Sprite.Builder("unit.png").gridSize(new Size(4,2))
+                    .size(new Size(16, 16).multiply(scale)).depth(1.0f).smooth(true).build();
+            spriteFrame.setGridIndex(new Point(side.ordinal(), 0));
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitClass.sprite(scale))
+                    .sprite(spriteFrame)
                     .maxForce(unitClass.maxForce(scale)).maxVelocity(unitClass.maxVelocity(scale))
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
                     .mass(unitClass.mass(scale)).friction(0.1f)
+                    .side(side)
                     .shape(unitClass.shape(scale)).layer(7).build();
         }
     }
@@ -86,10 +93,15 @@ public class Unit extends CollidableObject {
     private static class PrivateBuilder<T extends Unit.PrivateBuilder<T>> extends CollidableObject.Builder<T> {
 
         private Class unitClass;
+        private Town.Side side;
 
         public PrivateBuilder(PointF position, Class unitClass) {
             super(position);
             this.unitClass = unitClass;
+        }
+        public PrivateBuilder side(Town.Side side) {
+            this.side = side;
+            return this;
         }
         public Unit build() {
             return new Unit(this);
@@ -102,9 +114,13 @@ public class Unit extends CollidableObject {
 
         targetMapPosition = new OffsetCoord(getPosition());
         unitClass = builder.unitClass;
+        side = builder.side;
         level = 1;
     }
 
+    /**
+     *
+     */
     @Override
     public void update() {
 
@@ -131,18 +147,40 @@ public class Unit extends CollidableObject {
         super.update();
     }
 
+    @Override
+    public void commit() {
+
+        super.commit();
+    }
+
+    /**
+     *
+     * @return
+     */
     public OffsetCoord getTargetMapPosition() {
         return targetMapPosition;
     }
 
+    /**
+     *
+     * @param targetMapPosition
+     */
     public void setTargetMapPosition(OffsetCoord targetMapPosition) {
         this.targetMapPosition = targetMapPosition;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<Unit> getSquadMembers() {
         return squadMembers;
     }
 
+    /**
+     *
+     * @param squadMembers
+     */
     public void setSquadMembers(ArrayList<Unit> squadMembers) {
         this.squadMembers = squadMembers;
     }
@@ -160,6 +198,7 @@ public class Unit extends CollidableObject {
     private float maxHealth;
     private float health;
     private ArrayList<Unit> squadMembers;
+    private Town.Side side;
 
     private OffsetCoord targetMapPosition;
 }
