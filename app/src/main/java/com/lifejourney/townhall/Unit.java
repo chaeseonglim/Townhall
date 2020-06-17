@@ -165,7 +165,7 @@ public class Unit extends CollidableObject {
      *
      * @param targetMapPosition
      */
-    public void setTargetMapPosition(OffsetCoord targetMapPosition) {
+    public void setTargetMapOffset(OffsetCoord targetMapPosition) {
         this.targetMapPosition = targetMapPosition;
     }
 

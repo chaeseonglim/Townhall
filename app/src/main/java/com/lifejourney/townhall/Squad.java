@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -76,8 +75,7 @@ public class Squad extends Object implements Controllable {
         map = builder.map;
         side = builder.side;
 
-        OffsetCoord offsetCoord = new OffsetCoord(getPosition());
-        map.addSquad(offsetCoord, this);
+        map.addSquad(getMapOffsetCoord(), this);
     }
 
     /**
@@ -131,30 +129,72 @@ public class Squad extends Object implements Controllable {
         }
         else if ((eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL)
                 && dragging) {
-            draggingSprite.setVisible(false);
             dragging = false;
             iconSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
 
             Point targetGameCoord = new Point(touchedGameCoord);
             OffsetCoord targetOffset = new OffsetCoord(targetGameCoord);
             if (eventAction == MotionEvent.ACTION_UP && map.isMovable(targetOffset, this)) {
-                // Start moving squad
-                SquadPathFinder pathFinder = new SquadPathFinder(this, targetOffset);
-                ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
-
-                if (optimalPath != null) {
-                    OffsetCoord nextOffset =
-                            new OffsetCoord(optimalPath.get(1).getPosition().x,
-                                    optimalPath.get(1).getPosition().y);
-                    setPosition(new PointF(nextOffset.toGameCoord()));
-                    map.removeSquad(nextOffset, this);
-                    map.addSquad(nextOffset, this);
-                }
+                draggingSprite.setPosition(targetOffset.toGameCoord());
+                seek(targetOffset);
+            }
+            else {
+                finishMove();
             }
             return true;
         }
         else {
             return false;
+        }
+    }
+
+    private void move(OffsetCoord targetOffset) {
+
+        moving = true;
+        map.removeSquad(getMapOffsetCoord(), this);
+        setPosition(new PointF(targetOffset.toGameCoord()));
+    }
+
+    private void finishMove() {
+
+        moving = false;
+        targetOffsetToMove = null;
+        nextOffsetToMove = null;
+        Sprite draggingSprite = getSprite(1);
+        draggingSprite.setVisible(false);
+    }
+
+    private boolean seek(OffsetCoord targetOffset) {
+        targetOffsetToMove = targetOffset;
+
+        OffsetCoord currentMapCoord = getMapOffsetCoord();
+        if (currentMapCoord.equals(targetOffset)) {
+            // If it reached to target offset, done moving
+            finishMove();
+            return true;
+        }
+        else if (nextOffsetToMove == null || currentMapCoord.equals(nextOffsetToMove)) {
+            // Path finding
+            SquadPathFinder pathFinder = new SquadPathFinder(this, targetOffset);
+            ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
+
+            if (optimalPath == null) {
+                // if there's no path to target, cancel moving
+                finishMove();
+                return false;
+            }
+            else {
+                moving = true;
+                nextOffsetToMove = new OffsetCoord(
+                        optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
+                // pre-occupy map before moving to the tile
+                map.addSquad(nextOffsetToMove, this);
+                return true;
+            }
+
+        }
+        else {
+            return true;
         }
     }
 
@@ -166,9 +206,33 @@ public class Squad extends Object implements Controllable {
 
         super.update();
 
-        OffsetCoord currentMapCoord = new OffsetCoord(new Point(getPosition()));
-        for(Unit unit: units) {
-            unit.setTargetMapPosition(currentMapCoord);
+        OffsetCoord currentMapOffset = getMapOffsetCoord();
+        if (targetOffsetToMove!= null && !targetOffsetToMove.equals(currentMapOffset)) {
+            // If it's moving, send unit to next offset
+            for(Unit unit: units) {
+                unit.setTargetMapOffset(nextOffsetToMove);
+            }
+
+            // First check if all units are arrived
+            boolean allUnitArrived = true;
+            for (Unit unit: units) {
+                if (!new OffsetCoord(unit.getPosition()).equals(nextOffsetToMove)) {
+                    allUnitArrived = false;
+                    break;
+                }
+            }
+
+            // Then move again
+            if (allUnitArrived) {
+                move(nextOffsetToMove);
+                seek(targetOffsetToMove);
+            }
+        }
+        else {
+            // If it's not moving, send unit to current offset
+            for(Unit unit: units) {
+                unit.setTargetMapOffset(currentMapOffset);
+            }
         }
     }
 
@@ -262,6 +326,14 @@ public class Squad extends Object implements Controllable {
         return map;
     }
 
+    /**
+     *
+     * @return
+     */
+    public OffsetCoord getMapOffsetCoord() {
+        return new OffsetCoord(getPosition());
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static Size SPRITE_BASE_SIZE = new Size(80, 80);
     private final static Point SPRITE_HOTSPOT_OFFSET = new Point(0, -25);
@@ -277,4 +349,6 @@ public class Squad extends Object implements Controllable {
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean dragging = false;
     private boolean moving = false;
+    private OffsetCoord targetOffsetToMove;
+    private OffsetCoord nextOffsetToMove;
 }
