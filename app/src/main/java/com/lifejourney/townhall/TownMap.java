@@ -139,7 +139,7 @@ class TownMap extends HexTileMap implements View {
 
         Sprite.Builder spriteBuilder =
             new Sprite.Builder("tiles.png")
-                .position(offsetCoord.toScreenCoord())
+                .position(offsetCoord.toGameCoord())
                 .size(getTileSize())
                 .gridSize(new Size(2, 4)).smooth(false)
                 .layer(MAP_LAYER).visible(true);
@@ -176,13 +176,27 @@ class TownMap extends HexTileMap implements View {
      * @param offsetCoord
      * @return
      */
-    public boolean isMovable(OffsetCoord offsetCoord, Squad squad) {
+    public boolean isMovable(OffsetCoord offsetCoord) {
 
         if (offsetCoord.getX() >= getMapSize().width || offsetCoord.getY() >= getMapSize().height) {
             return false;
         }
 
         if (!getTileType(offsetCoord).movable()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * @param offsetCoord
+     * @return
+     */
+    public boolean isMovable(OffsetCoord offsetCoord, Squad squad) {
+
+        if (!isMovable(offsetCoord)) {
             return false;
         }
 

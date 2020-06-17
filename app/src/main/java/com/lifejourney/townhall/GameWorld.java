@@ -41,7 +41,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addWidget(okButton);
          */
 
-        Squad squadA = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
+        Squad squadA = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
                 scale, map, Town.Side.TOWN).build();
         addSquad(squadA);
         squadA.show();
@@ -50,7 +50,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
         addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
 
-        Squad squadB = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
+        Squad squadB = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
                 scale, map, Town.Side.BANDIT).build();
         addSquad(squadB);
         squadB.show();
@@ -59,7 +59,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
         addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
 
-        Squad squadC = new Squad.Builder(new PointF(map.getCapitalOffset().toScreenCoord()),
+        Squad squadC = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
                 scale, map, Town.Side.TOWN).build();
         addSquad(squadC);
         squadC.show();

@@ -125,7 +125,7 @@ public class Unit extends CollidableObject {
     public void update() {
 
         // Seek to target position
-        PointF targetPosition = new PointF(targetMapPosition.toScreenCoord());
+        PointF targetPosition = new PointF(targetMapPosition.toGameCoord());
         OffsetCoord currentMapOffset = new OffsetCoord(getPosition());
 
         if (!currentMapOffset.equals(targetMapPosition)) {
