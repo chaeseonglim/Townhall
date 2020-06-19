@@ -24,5 +24,22 @@ public class Town {
         this.squads = squads;
     }
 
+    public void addSquad(Squad squad) {
+        this.squads.add(squad);
+    }
+
+    public void removeSquad(Squad squad) {
+        this.squads.remove(squad);
+    }
+
+    public Battle getBattle() {
+        return battle;
+    }
+
+    public void setBattle(Battle battle) {
+        this.battle = battle;
+    }
+
+    private Battle battle;
     private ArrayList<Squad> squads = new ArrayList<>();
 }

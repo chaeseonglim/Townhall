@@ -17,6 +17,7 @@ import com.lifejourney.engine2d.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 class TownMap extends HexTileMap implements View {
 
@@ -182,11 +183,7 @@ class TownMap extends HexTileMap implements View {
             return false;
         }
 
-        if (!getTileType(offsetCoord).movable()) {
-            return false;
-        }
-
-        return true;
+        return getTileType(offsetCoord).movable();
     }
 
     /**
@@ -212,16 +209,6 @@ class TownMap extends HexTileMap implements View {
 
     /**
      *
-     * @param offsetCoord
-     * @return
-     */
-    public boolean isSearchable(OffsetCoord offsetCoord, Squad squad) {
-
-        return isMovable(offsetCoord, squad);
-    }
-
-    /**
-     *
      * @return
      */
     public OffsetCoord getCapitalOffset() {
@@ -234,9 +221,11 @@ class TownMap extends HexTileMap implements View {
      * @param squad
      */
     public void addSquad(OffsetCoord offsetCoord, Squad squad) {
+
+        Log.e(LOG_TAG, "addSquad " + offsetCoord.getX() + " " + offsetCoord.getY());
         Town town = towns.get(offsetCoord);
-        ArrayList<Squad> squadList = town.getSquads();
-        squadList.add(squad);
+        assert town != null;
+        town.addSquad(squad);
     }
 
     /**
@@ -245,10 +234,23 @@ class TownMap extends HexTileMap implements View {
      * @param squad
      */
     public void removeSquad(OffsetCoord offsetCoord, Squad squad) {
+
+        Log.e(LOG_TAG, "removeSquad " + offsetCoord.getX() + " " + offsetCoord.getY());
         Town town = towns.get(offsetCoord);
-        ArrayList<Squad> squadList = town.getSquads();
-        squadList.remove(squad);
+        assert town != null;
+        town.removeSquad(squad);
     }
+
+    /**
+     *
+     * @param offsetCoord
+     * @return
+     */
+    public ArrayList<Squad> getSquads(OffsetCoord offsetCoord) {
+
+        return Objects.requireNonNull(towns.get(offsetCoord)).getSquads();
+    }
+
 
     private final static int MAP_LAYER = 0;
     private final static int HEX_SIZE = 64;

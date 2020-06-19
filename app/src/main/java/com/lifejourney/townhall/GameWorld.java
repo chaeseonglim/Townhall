@@ -1,9 +1,7 @@
 package com.lifejourney.townhall;
 
-import android.graphics.Color;
-
+import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
-import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
@@ -46,27 +44,31 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addSquad(squadA);
         squadA.show();
 
-        addUnit(squadA.spawnUnit(Unit.Class.SWORD));
-        addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
-        addUnit(squadA.spawnUnit(Unit.Class.LONGBOW));
+        addUnit(squadA.spawnUnit(Unit.UnitClass.SWORD));
+        addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
+        addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
 
-        Squad squadB = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
+        OffsetCoord offsetB = map.getCapitalOffset().clone();
+        offsetB.offset(-1, 0);
+        Squad squadB = new Squad.Builder(new PointF(offsetB.toGameCoord()),
                 scale, map, Town.Side.BANDIT).build();
         addSquad(squadB);
         squadB.show();
 
-        addUnit(squadB.spawnUnit(Unit.Class.SWORD));
-        addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
-        addUnit(squadB.spawnUnit(Unit.Class.LONGBOW));
+        addUnit(squadB.spawnUnit(Unit.UnitClass.SWORD));
+        addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
+        addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
 
-        Squad squadC = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
+        OffsetCoord offsetC = map.getCapitalOffset().clone();
+        offsetC.offset(1, 0);
+        Squad squadC = new Squad.Builder(new PointF(offsetC.toGameCoord()),
                 scale, map, Town.Side.TOWN).build();
         addSquad(squadC);
         squadC.show();
 
-        addUnit(squadC.spawnUnit(Unit.Class.SWORD));
-        addUnit(squadC.spawnUnit(Unit.Class.LONGBOW));
-        addUnit(squadC.spawnUnit(Unit.Class.LONGBOW));
+        addUnit(squadC.spawnUnit(Unit.UnitClass.SWORD));
+        addUnit(squadC.spawnUnit(Unit.UnitClass.LONGBOW));
+        addUnit(squadC.spawnUnit(Unit.UnitClass.LONGBOW));
     }
 
     /**
@@ -77,6 +79,38 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         map.close();
         map = null;
     }
+
+    /**
+     *
+     */
+    @Override
+    public void update() {
+
+        super.update();
+
+        // Check if new battle is arisen
+        for (Squad squad: squads) {
+            ArrayList<Squad> squadsInSameMap = map.getSquads(squad.getMapOffsetCoord());
+            assert squadsInSameMap.size() <= 2;
+            if (!squad.isBattling() && squadsInSameMap.size() == 2 &&
+                    squadsInSameMap.get(0).getMapOffsetCoord()
+                            .equals(squadsInSameMap.get(1).getMapOffsetCoord())) {
+                addBattle(squadsInSameMap.get(0), squadsInSameMap.get(1));
+            }
+        }
+    }
+
+    /**
+     *
+     * @param a
+     * @param b
+     */
+    private void addBattle(Squad a, Squad b) {
+
+        Battle battle = new Battle(a, b);
+        battles.add(battle);
+    }
+
     /**
      *
      * @param messageBox
@@ -168,6 +202,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
     private float scale = 1.0f;
     private TownMap map;
     private MessageBox messageBox;
+    private ArrayList<Battle> battles = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Unit> units = new ArrayList<>();
 }
