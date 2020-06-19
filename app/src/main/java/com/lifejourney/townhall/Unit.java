@@ -21,9 +21,9 @@ public class Unit extends CollidableObject {
         UnitClass() {
         }
 
-        Sprite sprite(float scale) {
+        Sprite sprite() {
             Sprite sprite = new Sprite.Builder("unit.png").gridSize(new Size(4,2))
-                    .size(new Size(16, 16).multiply(scale)).smooth(true).build();
+                    .size(new Size(16, 16)).smooth(true).build();
             sprite.setGridIndex(spriteGridIndex());
             return sprite;
         }
@@ -37,62 +37,100 @@ public class Unit extends CollidableObject {
                     return null;
             }
         }
-        public Shape shape(float scale) {
+        public Shape shape() {
             switch (this) {
                 case SWORD:
                 case LONGBOW:
-                    return new Shape(8.0f).multiply(scale);
+                    return new Shape(8.0f);
                 default:
                     return null;
             }
         }
         public float favor(UnitClass unitClassType) {
-            float favor = 0.0f;
             switch (this) {
                 case SWORD:
                     if (unitClassType == SWORD) {
-                        favor = 0.1f;
+                        return 0.1f;
                     }
                     else if (unitClassType == LONGBOW) {
-                        favor = 0.5f;
+                        return 0.5f;
                     }
                     break;
                 case LONGBOW:
                     if (unitClassType == SWORD) {
-                        favor = -0.5f;
+                        return -0.5f;
                     }
                     else if (unitClassType == LONGBOW) {
-                        favor = 0.0f;
+                        return -0.1f;
                     }
                     break;
-                default:
-                    break;
             }
-
-            return favor;
+            return 0.0f;
         }
-        public float maxForce(float scale) {
-            return 2.0f * scale;
+        public float awareness() {
+            switch (this) {
+                case SWORD:
+                    return 96.0f;
+                case LONGBOW:
+                    return 64.0f;
+            }
+            return 0.0f;
         }
-        public float maxVelocity(float scale) {
-            return 1.0f * scale;
+        public float meleeAttackRange() {
+            switch (this) {
+                case SWORD:
+                case LONGBOW:
+                    return 24.0f;
+            }
+            return 0.0f;
         }
-        public float mass(float scale) {
-            return 5.0f * scale;
+        public float rangedAttackRange() {
+            switch (this) {
+                case SWORD:
+                    return 0.0f;
+                case LONGBOW:
+                    return 150.0f;
+            }
+            return 0.0f;
+        }
+        public int meleeAttackSpeed() {
+            switch (this) {
+                case SWORD:
+                    return 5;
+                case LONGBOW:
+                    return 7;
+            }
+            return 0;
+        }
+        public int rangeAttackSpeed() {
+            switch (this) {
+                case SWORD:
+                    return 0;
+                case LONGBOW:
+                    return 3;
+            }
+            return 0;
+        }
+        public float maxForce() {
+            return 2.0f;
+        }
+        public float maxVelocity() {
+            return 1.0f;
+        }
+        public float mass() {
+            return 5.0f;
         }
     }
 
     public static class Builder {
 
         private UnitClass unitClass;
-        private float scale;
         private Town.Side side;
 
         private PointF position = new PointF();
 
-        public Builder(UnitClass unitClass, float scale, Town.Side side) {
+        public Builder(UnitClass unitClass, Town.Side side) {
             this.unitClass = unitClass;
-            this.scale = scale;
             this.side = side;
         }
         public Builder position(PointF position) {
@@ -101,16 +139,16 @@ public class Unit extends CollidableObject {
         }
         public Unit build() {
             Sprite spriteFrame = new Sprite.Builder("unit.png").gridSize(new Size(4,2))
-                    .size(new Size(16, 16).multiply(scale)).depth(1.0f).smooth(true).build();
+                    .size(new Size(16, 16)).depth(1.0f).smooth(true).build();
             spriteFrame.setGridIndex(new Point(side.ordinal(), 0));
             return (Unit) new PrivateBuilder<>(position, unitClass)
-                    .sprite(unitClass.sprite(scale))
+                    .sprite(unitClass.sprite())
                     .sprite(spriteFrame)
-                    .maxForce(unitClass.maxForce(scale)).maxVelocity(unitClass.maxVelocity(scale))
+                    .maxForce(unitClass.maxForce()).maxVelocity(unitClass.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
-                    .mass(unitClass.mass(scale)).friction(0.1f)
+                    .mass(unitClass.mass()).friction(0.1f)
                     .side(side)
-                    .shape(unitClass.shape(scale)).layer(7).build();
+                    .shape(unitClass.shape()).layer(7).build();
         }
     }
 
@@ -149,20 +187,24 @@ public class Unit extends CollidableObject {
     @Override
     public void update() {
 
+        // If it's on battle
         if (getOpponents() != null) {
-            for (Unit opponent: opponents) {
-                float favor = getUnitClass().favor(opponent.getUnitClass());
-                if (favor > 0.0f) {
-                    seek(opponent.getPosition(), favor);
-                }
-                else if (favor < 0.0f) {
-                    flee(opponent.getPosition(), favor);
+            // Seek or flee enemies
+            for (Unit opponent : opponents) {
+                if (opponent.getPosition().distance(getPosition()) <= getUnitClass().awareness()) {
+                    float favor = getUnitClass().favor(opponent.getUnitClass());
+                    if (favor > 0.0f) {
+                        seek(opponent.getPosition(), favor);
+                    } else if (favor < 0.0f) {
+                        flee(opponent.getPosition(), -favor);
+                    }
                 }
             }
 
             // Wander a little
             wander(80.0f, 1.0f, 0.3f);
         }
+        // if it's at peace
         else {
             // Seek to target position
             PointF targetPosition = new PointF(targetMapPosition.toGameCoord());
@@ -170,9 +212,8 @@ public class Unit extends CollidableObject {
 
             if (!currentMapOffset.equals(targetMapPosition)) {
                 seek(targetPosition, 1.0f);
-            }
-            else {
-                seek(targetPosition, 0.3f);
+            } else {
+                seek(targetPosition, 0.5f);
             }
 
             // Wander a little
@@ -185,13 +226,24 @@ public class Unit extends CollidableObject {
         // Add gravity to target
         restrict(targetMapPosition);
 
+        // Update moving
         super.update();
+
+        // Fight
     }
 
     @Override
-    public void commit() {
+    public void onCollisionOccurred(CollidableObject targetObject) {
 
-        super.commit();
+        Unit collidedUnit = (Unit) targetObject;
+
+        // if collided unit is enemy, stop and fight
+        if (opponents.contains(collidedUnit)) {
+            if (closedOpponents == null) {
+                closedOpponents = new ArrayList<>();
+            }
+            closedOpponents.add(collidedUnit);
+        }
     }
 
     /**
@@ -255,15 +307,16 @@ public class Unit extends CollidableObject {
     private UnitClass unitClass;
     private int level;
     private float meleeDamage;
-    private float rangeDamage;
+    private float rangedDamage;
     private float meleeBlock;
-    private float rangeBlock;
+    private float rangedBlock;
     private float attackSpeed;
     private float armor;
     private float maxHealth;
     private float health;
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
+    private ArrayList<Unit> closedOpponents;
     private Town.Side side;
 
     private OffsetCoord targetMapPosition;

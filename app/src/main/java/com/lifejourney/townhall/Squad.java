@@ -24,27 +24,25 @@ public class Squad extends Object implements Controllable {
     public static class Builder {
 
         private PointF position;
-        private float scale;
         private TownMap map;
         private Town.Side side;
 
-        public Builder(PointF position, float scale, TownMap map, Town.Side side) {
+        public Builder(PointF position, TownMap map, Town.Side side) {
             this.position = position;
-            this.scale = scale;
             this.map = map;
             this.side = side;
         }
         public Squad build() {
             Sprite currentIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
-                    .size(SPRITE_BASE_SIZE.clone().multiply(scale)).smooth(false).visible(true)
+                    .size(SPRITE_BASE_SIZE).smooth(false).visible(true)
                     .gridSize(new Size(4, 2)).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
             currentIcon.setGridIndex(new Point(side.ordinal(), 0));
-            currentIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET.clone().multiply(scale));
+            currentIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET);
             Sprite targetIcon = currentIcon.clone();
             targetIcon.setOpaque(DRAGGING_SPRITE_OPAQUE_NORMAL);
             targetIcon.setVisible(false);
-            return (Squad) new PrivateBuilder<>(position, scale, map, side).priority(-1)
+            return (Squad) new PrivateBuilder<>(position, map, side).priority(-1)
                     .sprite(currentIcon, true)
                     .sprite(targetIcon, false).build();
         }
@@ -53,13 +51,11 @@ public class Squad extends Object implements Controllable {
     @SuppressWarnings("unchecked")
     private static class PrivateBuilder<T extends Squad.PrivateBuilder<T>> extends Object.Builder<T> {
 
-        private float scale;
         private TownMap map;
         private Town.Side side;
 
-        public PrivateBuilder(PointF position, float scale, TownMap map, Town.Side side) {
+        public PrivateBuilder(PointF position, TownMap map, Town.Side side) {
             super(position);
-            this.scale = scale;
             this.map = map;
             this.side = side;
         }
@@ -71,8 +67,7 @@ public class Squad extends Object implements Controllable {
     public Squad(PrivateBuilder builder) {
 
         super(builder);
-        scale = builder.scale;
-        spriteSize = SPRITE_BASE_SIZE.clone().multiply(scale);
+        spriteSize = SPRITE_BASE_SIZE;
         map = builder.map;
         side = builder.side;
 
@@ -279,7 +274,7 @@ public class Squad extends Object implements Controllable {
      */
     Unit spawnUnit(Unit.UnitClass unitClass) {
 
-        Unit unit = new Unit.Builder(unitClass, scale, side).position(getPosition().clone()).build();
+        Unit unit = new Unit.Builder(unitClass, side).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setCompanions(units);
         addUnit(unit);
@@ -296,6 +291,43 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
+     * @param opponent
+     */
+    public void enterBattle(Squad opponent) {
+
+        finishMove();
+
+        this.battle = true;
+        this.opponent = opponent;
+        for (Unit unit: units) {
+            unit.setOpponents(opponent.getUnits());
+        }
+
+        if (opponent.getSide().ordinal() > getSide().ordinal()) {
+            setPosition(getPosition().clone().offset(-map.getTileSize().width / 3.0f, 0));
+        }
+        else {
+            setPosition(getPosition().clone().offset(map.getTileSize().width / 3.0f, 0));
+        }
+    }
+
+    /**
+     *
+     */
+    public void leaveBattle() {
+
+        this.battle = false;
+        this.opponent = null;
+        for (Unit unit: units) {
+            unit.setOpponents(null);
+        }
+
+        setPosition(new PointF(getMapOffsetCoord().toGameCoord()));
+
+    }
+
+    /**
+     *
      * @param visible
      */
     @Override
@@ -304,28 +336,6 @@ public class Squad extends Object implements Controllable {
 
         for (Unit unit: units) {
             unit.setVisible(visible);
-        }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public float getScale() {
-
-        return scale;
-    }
-
-    /**
-     *
-     * @param scale
-     */
-    public void setScale(float scale) {
-
-        this.scale = scale;
-        this.spriteSize = SPRITE_BASE_SIZE.clone().multiply(scale);
-        for (Pair<Sprite, Boolean> pair: getSprites()) {
-            pair.first.setSize(spriteSize);
         }
     }
 
@@ -369,40 +379,6 @@ public class Squad extends Object implements Controllable {
         return battle;
     }
 
-    /**
-     *
-     * @param opponent
-     */
-    public void enterBattle(Squad opponent) {
-
-        finishMove();
-
-        this.battle = true;
-        this.opponent = opponent;
-        for (Unit unit: units) {
-            unit.setOpponents(opponent.getUnits());
-        }
-
-        if (opponent.getSide().ordinal() > getSide().ordinal()) {
-            setPosition(getPosition().clone().offset(-map.getTileSize().width / 3.0f, 0));
-        }
-        else {
-            setPosition(getPosition().clone().offset(map.getTileSize().width / 3.0f, 0));
-        }
-    }
-
-    public void leaveBattle() {
-
-        this.battle = false;
-        this.opponent = null;
-        for (Unit unit: units) {
-            unit.setOpponents(null);
-        }
-
-        setPosition(new PointF(getMapOffsetCoord().toGameCoord()));
-
-    }
-
     private final static int SPRITE_LAYER = 5;
     private final static Size SPRITE_BASE_SIZE = new Size(80, 80);
     private final static Point SPRITE_HOTSPOT_OFFSET = new Point(0, -25);
@@ -413,7 +389,6 @@ public class Squad extends Object implements Controllable {
 
     private TownMap map;
     private Town.Side side;
-    private float scale;
     private Size spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean dragging = false;

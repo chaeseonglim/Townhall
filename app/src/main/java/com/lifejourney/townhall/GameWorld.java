@@ -40,7 +40,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
          */
 
         Squad squadA = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
-                scale, map, Town.Side.TOWN).build();
+                map, Town.Side.TOWN).build();
         addSquad(squadA);
         squadA.show();
 
@@ -51,7 +51,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         OffsetCoord offsetB = map.getCapitalOffset().clone();
         offsetB.offset(-1, 0);
         Squad squadB = new Squad.Builder(new PointF(offsetB.toGameCoord()),
-                scale, map, Town.Side.BANDIT).build();
+                map, Town.Side.BANDIT).build();
         addSquad(squadB);
         squadB.show();
 
@@ -62,7 +62,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         OffsetCoord offsetC = map.getCapitalOffset().clone();
         offsetC.offset(1, 0);
         Squad squadC = new Squad.Builder(new PointF(offsetC.toGameCoord()),
-                scale, map, Town.Side.TOWN).build();
+                map, Town.Side.TOWN).build();
         addSquad(squadC);
         squadC.show();
 
@@ -97,6 +97,11 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
                             .equals(squadsInSameMap.get(1).getMapOffsetCoord())) {
                 addBattle(squadsInSameMap.get(0), squadsInSameMap.get(1));
             }
+        }
+
+        // Do battles
+        for (Battle battle: battles) {
+            battle.update();
         }
     }
 

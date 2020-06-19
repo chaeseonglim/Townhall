@@ -222,7 +222,6 @@ class TownMap extends HexTileMap implements View {
      */
     public void addSquad(OffsetCoord offsetCoord, Squad squad) {
 
-        Log.e(LOG_TAG, "addSquad " + offsetCoord.getX() + " " + offsetCoord.getY());
         Town town = towns.get(offsetCoord);
         assert town != null;
         town.addSquad(squad);
@@ -235,7 +234,6 @@ class TownMap extends HexTileMap implements View {
      */
     public void removeSquad(OffsetCoord offsetCoord, Squad squad) {
 
-        Log.e(LOG_TAG, "removeSquad " + offsetCoord.getX() + " " + offsetCoord.getY());
         Town town = towns.get(offsetCoord);
         assert town != null;
         town.removeSquad(squad);
