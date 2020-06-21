@@ -427,17 +427,9 @@ public class Unit extends CollidableObject {
     /**
      *
      */
-    public void setKilled() {
-
-        killed = true;
-    }
-
-    /**
-     *
-     */
     public boolean isKilled() {
 
-        return killed;
+        return health <= 0;
     }
 
     /**
@@ -467,6 +459,15 @@ public class Unit extends CollidableObject {
     public int getMaxHealth() {
 
         return adjustLevel(getUnitClass().maxHealth());
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getHealth() {
+
+        return health;
     }
 
     /**
@@ -577,15 +578,6 @@ public class Unit extends CollidableObject {
         return unitClass;
     }
 
-    /**
-     *
-     * @return
-     */
-    public int getHealth() {
-
-        return health;
-    }
-
     private final static int MAX_LEVEL = 10;
 
     private UnitClass unitClass;
@@ -597,7 +589,6 @@ public class Unit extends CollidableObject {
     private ArrayList<Unit> closedOpponents;
     private Town.Side side;
 
-    private boolean killed = false;
     private OffsetCoord targetMapPosition;
     private int meleeAttackLeft = 0;
     private int rangedAttackLeft = 0;

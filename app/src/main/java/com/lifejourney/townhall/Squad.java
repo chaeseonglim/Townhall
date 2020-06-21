@@ -67,10 +67,9 @@ public class Squad extends Object implements Controllable {
 
         super(builder);
         spriteSize = SPRITE_BASE_SIZE;
-        map = builder.map;
         side = builder.side;
-
-        map.addSquad(getMapOffsetCoord(), this);
+        map = builder.map;
+        map.getTown(getMapCoord()).addSquad(this);
     }
 
     /**
@@ -120,8 +119,8 @@ public class Squad extends Object implements Controllable {
                 // Move dragging icon
                 Point draggingPoint = new Point(touchedGameCoord);
                 targetSprite.setPosition(draggingPoint);
-                OffsetCoord offsetCoord = new OffsetCoord(draggingPoint);
-                if (map.isMovable(offsetCoord, this)) {
+                OffsetCoord mapCoord = new OffsetCoord(draggingPoint);
+                if (map.isMovable(mapCoord, this)) {
                     targetSprite.setGridIndex(new Point(side.ordinal(), 0));
                 }
                 else {
@@ -154,13 +153,13 @@ public class Squad extends Object implements Controllable {
     @Override
     public void close() {
 
-        map.removeSquad(getMapOffsetCoord(), this);
+        map.getTown(getMapCoord()).removeSquad(this);
         super.close();
     }
 
     private void move(OffsetCoord targetOffset) {
 
-        map.removeSquad(getMapOffsetCoord(), this);
+        map.getTown(getMapCoord()).removeSquad(this);
         setPosition(new PointF(targetOffset.toGameCoord()));
     }
 
@@ -171,8 +170,8 @@ public class Squad extends Object implements Controllable {
         currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         targetSprite.setVisible(false);
         dragging = false;
-        if (nextOffsetToMove != null && !nextOffsetToMove.equals(getMapOffsetCoord())) {
-            map.removeSquad(nextOffsetToMove, this);
+        if (nextOffsetToMove != null && !nextOffsetToMove.equals(getMapCoord())) {
+            map.getTown(nextOffsetToMove).removeSquad(this);
         }
         targetOffsetToMove = null;
         nextOffsetToMove = null;
@@ -188,7 +187,7 @@ public class Squad extends Object implements Controllable {
         dragging = false;
         targetOffsetToMove = targetOffset;
 
-        OffsetCoord currentMapCoord = getMapOffsetCoord();
+        OffsetCoord currentMapCoord = getMapCoord();
         if (currentMapCoord.equals(targetOffset)) {
             // If it reached to target offset, done moving
             finishMove();
@@ -208,7 +207,7 @@ public class Squad extends Object implements Controllable {
                 nextOffsetToMove = new OffsetCoord(
                         optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
                 // pre-occupy map before moving to the tile
-                map.addSquad(nextOffsetToMove, this);
+                map.getTown(nextOffsetToMove).addSquad(this);
                 return true;
             }
 
@@ -226,7 +225,7 @@ public class Squad extends Object implements Controllable {
 
         super.update();
 
-        OffsetCoord currentMapOffset = getMapOffsetCoord();
+        OffsetCoord currentMapOffset = getMapCoord();
         if (targetOffsetToMove!= null && !targetOffsetToMove.equals(currentMapOffset)) {
             // If it's moving, send unit to next offset
             for(Unit unit: units) {
@@ -340,8 +339,7 @@ public class Squad extends Object implements Controllable {
         ListIterator<Unit> iter = units.listIterator();
         while (iter.hasNext()) {
             Unit unit = iter.next();
-            if (unit.getHealth() <= 0) {
-                unit.setKilled();
+            if (unit.isKilled()) {
                 iter.remove();
             }
         }
@@ -358,9 +356,13 @@ public class Squad extends Object implements Controllable {
             unit.setOpponents(null);
         }
 
-        setPosition(new PointF(getMapOffsetCoord().toGameCoord()));
+        setPosition(new PointF(getMapCoord().toGameCoord()));
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isWillingToRetreat() {
 
         int totalUnitHealth = 0;
@@ -368,6 +370,15 @@ public class Squad extends Object implements Controllable {
             totalUnitHealth += unit.getHealth();
         }
         return (float) totalUnitHealth / totalHealthWhenEnteringBattle < RETREAT_THRESHOLD;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private OffsetCoord findRetreatableMapCoord() {
+
+        return new OffsetCoord();
     }
 
     /**
@@ -411,7 +422,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public OffsetCoord getMapOffsetCoord() {
+    public OffsetCoord getMapCoord() {
         return new OffsetCoord(getPosition());
     }
 
@@ -425,18 +436,10 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
-     * @param eliminated
-     */
-    public void setEliminated(boolean eliminated) {
-        this.eliminated = eliminated;
-    }
-
-    /**
-     *
      * @return
      */
     public boolean isEliminated() {
-        return eliminated;
+        return units.size() == 0;
     }
 
     private final static int SPRITE_LAYER = 5;
@@ -453,10 +456,9 @@ public class Squad extends Object implements Controllable {
     private Size spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean dragging = false;
-    private boolean battling = false;
     private OffsetCoord targetOffsetToMove;
     private OffsetCoord nextOffsetToMove;
+    private boolean battling = false;
     private Squad opponent;
     private int totalHealthWhenEnteringBattle;
-    private boolean eliminated = false;
 }

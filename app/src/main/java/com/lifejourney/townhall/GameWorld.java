@@ -91,12 +91,14 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
 
         // Check if new battle is arisen
         for (Squad squad: squads) {
-            ArrayList<Squad> squadsInSameMap = map.getSquads(squad.getMapOffsetCoord());
+            ArrayList<Squad> squadsInSameMap = map.getTown(squad.getMapCoord()).getSquads();
             assert squadsInSameMap.size() <= 2;
             if (!squad.isBattling() && squadsInSameMap.size() == 2 &&
-                    squadsInSameMap.get(0).getMapOffsetCoord()
-                            .equals(squadsInSameMap.get(1).getMapOffsetCoord())) {
-                addBattle(squadsInSameMap.get(1), squadsInSameMap.get(0));
+                    squadsInSameMap.get(0).getMapCoord()
+                            .equals(squadsInSameMap.get(1).getMapCoord())) {
+                Battle battle = new Battle(squadsInSameMap.get(1), squadsInSameMap.get(0));
+                battles.add(battle);
+                map.getTown(battle.getMapCoord()).setBattle(battle);
             }
         }
 
@@ -109,25 +111,13 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
             battle.update();
 
             // Check if a battle is finished
-            if (battle.isAttackerEliminated() || battle.isDefenderEliminated()) {
-                if (battle.isAttackerEliminated()) {
-                    battle.getAttacker().setEliminated(true);
-                }
-                else if (battle.isDefenderEliminated()) {
-                    battle.getDefender().setEliminated(true);
-                }
-                battle.finish();
+            if (battle.isFinished()) {
                 iterBattle.remove();
-            }
-            else if (battle.getAttacker().isWillingToRetreat()) {
-                // TODO: retreat attacker
-            }
-            else if (battle.getDefender().isWillingToRetreat()) {
-                // TODO: retreat defender
+                map.getTown(battle.getMapCoord()).setBattle(null);
             }
         }
 
-        // Remove killed unit and squads
+        // Remove killed units
         ListIterator<Unit> iterUnit = units.listIterator();
         while (iterUnit.hasNext()) {
             Unit unit = iterUnit.next();
@@ -137,6 +127,8 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
                 iterUnit.remove();
             }
         }
+
+        // Remove eliminated squads
         ListIterator<Squad> iterSquad = squads.listIterator();
         while (iterSquad.hasNext()) {
             Squad squad = iterSquad.next();
@@ -146,17 +138,6 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
                 iterSquad.remove();
             }
         }
-    }
-
-    /**
-     *
-     * @param attacker
-     * @param defender
-     */
-    private void addBattle(Squad attacker, Squad defender) {
-
-        Battle battle = new Battle(attacker, defender);
-        battles.add(battle);
     }
 
     /**

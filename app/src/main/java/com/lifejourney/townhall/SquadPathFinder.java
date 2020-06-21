@@ -22,43 +22,29 @@ public class SquadPathFinder extends PathFinder {
         this.squad = squad;
     }
 
+    /**
+     *
+     * @param waypoint
+     * @return
+     */
     @Override
     protected ArrayList<Waypoint> getNeighborWaypoints(Waypoint waypoint) {
         ArrayList<Waypoint> neighbors = new ArrayList<>();
-
-        int parity = waypoint.getPosition().y & 1;
-        if (parity == 0) {
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(1, 0), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(0, -1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(-1, -1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(-1, 0), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(-1, 1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(0, 1), waypoint,
+        ArrayList<OffsetCoord> neighborCoords =
+                new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y).getNeighbors();
+        for (OffsetCoord coord: neighborCoords) {
+            neighbors.add(new Waypoint(new Point(coord.getX(), coord.getY()), waypoint,
                     waypoint.getCostFromStart() + 1));
         }
-        else {
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(1, 0), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(1, -1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(0, -1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(-1, 0), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(0, 1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-            neighbors.add(new Waypoint(waypoint.getPosition().clone().offset(1, 1), waypoint,
-                    waypoint.getCostFromStart() + 1));
-        }
-
         return neighbors;
     }
 
+    /**
+     *
+     * @param current
+     * @param target
+     * @return
+     */
     @Override
     protected boolean isMovable(Point current, Point target) {
 
@@ -66,6 +52,12 @@ public class SquadPathFinder extends PathFinder {
         return squad.getMap().isMovable(targetOffset, squad);
     }
 
+    /**
+     *
+     * @param waypoint
+     * @param target
+     * @return
+     */
     @Override
     protected float calculateCostToTarget(Waypoint waypoint, Point target) {
 

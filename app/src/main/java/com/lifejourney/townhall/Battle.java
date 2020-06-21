@@ -3,10 +3,13 @@ package com.lifejourney.townhall;
 import com.lifejourney.engine2d.CollidableObject;
 import com.lifejourney.engine2d.CollisionDetector;
 import com.lifejourney.engine2d.Engine2D;
+import com.lifejourney.engine2d.OffsetCoord;
 
 import java.util.ArrayList;
 
 public class Battle {
+
+    private static final String LOG_TAG = "Battle";
 
     public Battle(Squad attacker, Squad defender) {
 
@@ -16,6 +19,7 @@ public class Battle {
         this.squads.add(defender);
         this.attacker.enterBattle(defender);
         this.defender.enterBattle(attacker);
+        this.mapCoord = defender.getMapCoord();
     }
 
     /**
@@ -23,8 +27,24 @@ public class Battle {
      */
     public void update() {
 
+        // Collistion detection between units first
         resolveCollision();
+
+        // Fight
         fight();
+
+        // Check if a battle is finished
+        if (attacker.isEliminated() || defender.isEliminated()) {
+            attacker.leaveBattle();
+            defender.leaveBattle();
+            finished = true;
+        }
+        else if (attacker.isWillingToRetreat()) {
+            // TODO: try retreating attacker
+        }
+        else if (defender.isWillingToRetreat()) {
+            // TODO: try retreating defender
+        }
     }
 
     /**
@@ -76,48 +96,23 @@ public class Battle {
 
     /**
      *
+     * @return
      */
-    public void finish() {
-
-        attacker.leaveBattle();
-        defender.leaveBattle();
+    public boolean isFinished() {
+        return finished;
     }
 
     /**
      *
      * @return
      */
-    public boolean isAttackerEliminated() {
-
-        return attacker.getUnits().size() == 0;
+    public OffsetCoord getMapCoord() {
+        return mapCoord;
     }
 
-    /**
-     *
-     * @return
-     */
-    public boolean isDefenderEliminated() {
-
-        return defender.getUnits().size() == 0;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Squad getAttacker() {
-        return attacker;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Squad getDefender() {
-        return defender;
-    }
-
+    private OffsetCoord mapCoord;
     private Squad attacker;
     private Squad defender;
     private ArrayList<Squad> squads = new ArrayList<>();
+    private boolean finished = false;
 }
