@@ -95,9 +95,9 @@ public class Unit extends CollidableObject {
         public int meleeAttackSpeed() {
             switch (this) {
                 case SWORD:
-                    return 10;
+                    return 8;
                 case LONGBOW:
-                    return 15;
+                    return 12;
             }
             return 0;
         }
@@ -106,7 +106,7 @@ public class Unit extends CollidableObject {
                 case SWORD:
                     return 0;
                 case LONGBOW:
-                    return 30;
+                    return 20;
             }
             return 0;
         }
@@ -174,7 +174,7 @@ public class Unit extends CollidableObject {
                 case SWORD:
                     return 0.2f;
                 case LONGBOW:
-                    return 0.1f;
+                    return 0.05f;
             }
             return 0.0f;
         }
@@ -261,7 +261,6 @@ public class Unit extends CollidableObject {
 
         // If it's on battle
         if (opponents != null) {
-
             // Seek or flee enemies
             float highestFavor = -Float.MAX_VALUE, lowestFavor = Float.MAX_VALUE;
             Unit highestFavorUnit = null, lowestFavorUnit = null;
@@ -296,6 +295,7 @@ public class Unit extends CollidableObject {
             // Wander a little
             wander(40.0f, 1.0f, 0.1f);
         }
+
         // if it's at peace
         else {
             // Seek to target position
@@ -348,6 +348,7 @@ public class Unit extends CollidableObject {
         // Search close enemies first
         Unit targetCandidate = null;
         float highestFavor = -Float.MAX_VALUE;
+        int highestHealth = Integer.MAX_VALUE;
         boolean closeEnemyExist = false;
         for (Unit opponent : opponents) {
             if (opponent.getPosition().distance(getPosition()) <= getUnitClass().meleeAttackRange()) {
@@ -357,8 +358,12 @@ public class Unit extends CollidableObject {
                 }
 
                 float favor = getUnitClass().favor(opponent.getUnitClass());
-                if (favor > highestFavor) {
-                    targetCandidate = opponent;
+                if (favor >= highestFavor) {
+                    if (favor > highestFavor || opponent.getHealth() < highestHealth) {
+                        targetCandidate = opponent;
+                        highestFavor = favor;
+                        highestHealth = opponent.getHealth();
+                    }
                 }
             }
         }
@@ -380,14 +385,19 @@ public class Unit extends CollidableObject {
             // Search distanced enemies
             targetCandidate = null;
             highestFavor = -Float.MAX_VALUE;
+            highestHealth = Integer.MAX_VALUE;
 
             // Select highest favor enemy
             for (Unit opponent : opponents) {
                 if (opponent.getPosition().distance(getPosition()) <=
                         getUnitClass().rangedAttackRange()) {
                     float favor = getUnitClass().favor(opponent.getUnitClass());
-                    if (favor > highestFavor) {
-                        targetCandidate = opponent;
+                    if (favor >= highestFavor) {
+                        if (favor > highestFavor || opponent.getHealth() < highestHealth) {
+                            targetCandidate = opponent;
+                            highestFavor = favor;
+                            highestHealth = opponent.getHealth();
+                        }
                     }
                 }
             }

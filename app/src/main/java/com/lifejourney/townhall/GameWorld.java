@@ -81,13 +81,8 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         map = null;
     }
 
-    /**
-     *
-     */
     @Override
-    public void update() {
-
-        super.update();
+    protected void postupdate() {
 
         // Check if new battle is arisen
         for (Squad squad: squads) {

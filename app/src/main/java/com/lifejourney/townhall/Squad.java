@@ -411,6 +411,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public Town.Side getSide() {
+
         return side;
     }
 
@@ -419,6 +420,7 @@ public class Squad extends Object implements Controllable {
      * @param side
      */
     public void setSide(Town.Side side) {
+
         this.side = side;
     }
 
@@ -427,6 +429,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public TownMap getMap() {
+
         return map;
     }
 
@@ -435,6 +438,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public OffsetCoord getMapCoord() {
+
         return new OffsetCoord(getPosition());
     }
 
@@ -443,6 +447,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isBattling() {
+
         return battling;
     }
 
@@ -451,6 +456,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isEliminated() {
+
         return units.size() == 0;
     }
 
