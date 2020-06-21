@@ -222,6 +222,7 @@ class TownMap extends HexTileMap implements View {
      * @return
      */
     public Battle getBattle(OffsetCoord mapCoord) {
+
         Town town = towns.get(mapCoord);
         assert town != null;
         return town.getBattle();
@@ -233,6 +234,7 @@ class TownMap extends HexTileMap implements View {
      * @return
      */
     public Town getTown(OffsetCoord mapCoord) {
+
         return towns.get(mapCoord);
     }
 
@@ -242,6 +244,7 @@ class TownMap extends HexTileMap implements View {
      * @return
      */
     protected ArrayList<Town> getNeighborTowns(OffsetCoord mapCoord) {
+
         ArrayList<Town> neighborTowns = new ArrayList<>();
         ArrayList<OffsetCoord> neighborCoords = mapCoord.getNeighbors();
         for (OffsetCoord coord: neighborCoords) {
@@ -249,6 +252,23 @@ class TownMap extends HexTileMap implements View {
         }
         return neighborTowns;
     }
+
+    /**
+     *
+     * @return
+     */
+    public OffsetCoord findRetreatableMapCoord(OffsetCoord mapCoord) {
+
+        ArrayList<Town> neighborTowns = getNeighborTowns(mapCoord);
+        for (Town town: neighborTowns) {
+            if (isMovable(town.getMapCoord()) && town.getSquads().size() == 0) {
+                return town.getMapCoord();
+            }
+        }
+
+        return null;
+    }
+
 
     private final static int MAP_LAYER = 0;
     private final static int HEX_SIZE = 64;

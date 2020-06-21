@@ -11,8 +11,9 @@ public class Battle {
 
     private static final String LOG_TAG = "Battle";
 
-    public Battle(Squad attacker, Squad defender) {
+    public Battle(TownMap map, Squad attacker, Squad defender) {
 
+        this.map = map;
         this.attacker = attacker;
         this.defender = defender;
         this.squads.add(attacker);
@@ -33,17 +34,35 @@ public class Battle {
         // Fight
         fight();
 
-        // Check if a battle is finished
         if (attacker.isEliminated() || defender.isEliminated()) {
+            // finish battle
             attacker.leaveBattle();
             defender.leaveBattle();
             finished = true;
         }
         else if (attacker.isWillingToRetreat()) {
-            // TODO: try retreating attacker
+            // try retreating attacker
+            OffsetCoord retreatableCoord = map.findRetreatableMapCoord(attacker.getMapCoord());
+            if (retreatableCoord != null) {
+                attacker.move(retreatableCoord);
+
+                // finish battle
+                attacker.leaveBattle();
+                defender.leaveBattle();
+                finished = true;
+            }
         }
         else if (defender.isWillingToRetreat()) {
-            // TODO: try retreating defender
+            // try retreating defender
+            OffsetCoord retreatableCoord = map.findRetreatableMapCoord(defender.getMapCoord());
+            if (retreatableCoord != null) {
+                defender.move(retreatableCoord);
+
+                // finish battle
+                attacker.leaveBattle();
+                defender.leaveBattle();
+                finished = true;
+            }
         }
     }
 
@@ -90,7 +109,13 @@ public class Battle {
 
         // Second count fight result
         for (Squad squad: squads) {
-            squad.countFightResult();
+            int expEarned = squad.countFightResult();
+            // Adding exp to opposite sided squads
+            for (Squad squad1: squads) {
+                if (squad1.getSide() != squad.getSide()) {
+                    squad1.addExp(expEarned);
+                }
+            }
         }
     }
 
@@ -111,6 +136,7 @@ public class Battle {
     }
 
     private OffsetCoord mapCoord;
+    private TownMap map;
     private Squad attacker;
     private Squad defender;
     private ArrayList<Squad> squads = new ArrayList<>();

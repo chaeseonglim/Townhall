@@ -96,7 +96,7 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
             if (!squad.isBattling() && squadsInSameMap.size() == 2 &&
                     squadsInSameMap.get(0).getMapCoord()
                             .equals(squadsInSameMap.get(1).getMapCoord())) {
-                Battle battle = new Battle(squadsInSameMap.get(1), squadsInSameMap.get(0));
+                Battle battle = new Battle(map, squadsInSameMap.get(1), squadsInSameMap.get(0));
                 battles.add(battle);
                 map.getTown(battle.getMapCoord()).setBattle(battle);
             }

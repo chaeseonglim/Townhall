@@ -150,6 +150,9 @@ public class Squad extends Object implements Controllable {
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void close() {
 
@@ -157,12 +160,20 @@ public class Squad extends Object implements Controllable {
         super.close();
     }
 
-    private void move(OffsetCoord targetOffset) {
+    /**
+     *
+     * @param targetOffset
+     */
+    public void move(OffsetCoord targetOffset) {
 
         map.getTown(getMapCoord()).removeSquad(this);
         setPosition(new PointF(targetOffset.toGameCoord()));
+        map.getTown(targetOffset).addSquad(this);
     }
 
+    /**
+     *
+     */
     private void finishMove() {
 
         Sprite currentSprite = getSprite(0);
@@ -177,6 +188,11 @@ public class Squad extends Object implements Controllable {
         nextOffsetToMove = null;
     }
 
+    /**
+     *
+     * @param targetOffset
+     * @return
+     */
     private boolean seek(OffsetCoord targetOffset) {
 
         Sprite currentSprite = getSprite(0);
@@ -333,16 +349,21 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    void countFightResult() {
+    int countFightResult() {
+
+        int expEarned = 0;
 
         // Remove killed units
         ListIterator<Unit> iter = units.listIterator();
         while (iter.hasNext()) {
             Unit unit = iter.next();
             if (unit.isKilled()) {
+                expEarned += unit.getUnitClass().expEarned(unit.getLevel());
                 iter.remove();
             }
         }
+
+        return expEarned;
     }
 
     /**
@@ -370,15 +391,6 @@ public class Squad extends Object implements Controllable {
             totalUnitHealth += unit.getHealth();
         }
         return (float) totalUnitHealth / totalHealthWhenEnteringBattle < RETREAT_THRESHOLD;
-    }
-
-    /**
-     *
-     * @return
-     */
-    private OffsetCoord findRetreatableMapCoord() {
-
-        return new OffsetCoord();
     }
 
     /**
@@ -442,6 +454,13 @@ public class Squad extends Object implements Controllable {
         return units.size() == 0;
     }
 
+    public void addExp(int expEarned) {
+
+        for (Unit unit: units) {
+            unit.addExp(expEarned);
+        }
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static Size SPRITE_BASE_SIZE = new Size(80, 80);
     private final static Point SPRITE_HOTSPOT_OFFSET = new Point(0, -25);
@@ -449,7 +468,7 @@ public class Squad extends Object implements Controllable {
     private final static float CURRENT_SPRITE_OPAQUE_DRAGGING = 0.2f;
     private final static float DRAGGING_SPRITE_OPAQUE_NORMAL = 0.0f;
     private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.5f;
-    private final static float RETREAT_THRESHOLD = 0.2f;
+    private final static float RETREAT_THRESHOLD = 0.3f;
 
     private TownMap map;
     private Town.Side side;

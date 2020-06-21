@@ -15,6 +15,7 @@ public class Town {
     }
 
     public Town(OffsetCoord mapCoord) {
+
         this.mapCoord = mapCoord;
     }
 
@@ -23,6 +24,7 @@ public class Town {
      * @return
      */
     public ArrayList<Squad> getSquads() {
+
         return squads;
     }
 
@@ -31,6 +33,7 @@ public class Town {
      * @param squads
      */
     public void setSquads(ArrayList<Squad> squads) {
+
         this.squads = squads;
     }
 
@@ -39,7 +42,10 @@ public class Town {
      * @param squad
      */
     public void addSquad(Squad squad) {
-        this.squads.add(squad);
+
+        if (!this.squads.contains(squad)) {
+            this.squads.add(squad);
+        }
     }
 
     /**
@@ -47,6 +53,7 @@ public class Town {
      * @param squad
      */
     public void removeSquad(Squad squad) {
+
         this.squads.remove(squad);
     }
 
@@ -55,6 +62,7 @@ public class Town {
      * @return
      */
     public Battle getBattle() {
+
         return battle;
     }
 
@@ -63,6 +71,7 @@ public class Town {
      * @param battle
      */
     public void setBattle(Battle battle) {
+
         this.battle = battle;
     }
 
@@ -71,6 +80,7 @@ public class Town {
      * @return
      */
     public OffsetCoord getMapCoord() {
+
         return mapCoord;
     }
 
@@ -79,6 +89,7 @@ public class Town {
      * @param mapCoord
      */
     public void setMapCoord(OffsetCoord mapCoord) {
+
         this.mapCoord = mapCoord;
     }
 
