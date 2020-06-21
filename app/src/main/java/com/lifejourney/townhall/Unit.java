@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.CollidableObject;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
@@ -22,7 +24,7 @@ public class Unit extends CollidableObject {
         }
 
         Sprite sprite() {
-            Sprite sprite = new Sprite.Builder("unit.png").gridSize(new Size(4,2))
+            Sprite sprite = new Sprite.Builder("unit_class.png").gridSize(new Size(4,1))
                     .size(new Size(16, 16)).smooth(true).build();
             sprite.setGridIndex(spriteGridIndex());
             return sprite;
@@ -30,9 +32,9 @@ public class Unit extends CollidableObject {
         Point spriteGridIndex() {
             switch (this) {
                 case SWORD:
-                    return new Point(0, 1);
+                    return new Point(0, 0);
                 case LONGBOW:
-                    return new Point(1, 1);
+                    return new Point(1, 0);
                 default:
                     return null;
             }
@@ -96,20 +98,88 @@ public class Unit extends CollidableObject {
         public int meleeAttackSpeed() {
             switch (this) {
                 case SWORD:
-                    return 5;
+                    return 10;
                 case LONGBOW:
-                    return 7;
+                    return 15;
             }
             return 0;
         }
-        public int rangeAttackSpeed() {
+        public int rangedAttackSpeed() {
             switch (this) {
                 case SWORD:
                     return 0;
                 case LONGBOW:
-                    return 3;
+                    return 30;
             }
             return 0;
+        }
+        public int expEarned(int level) {
+            int expEarned = 0;
+            switch (this) {
+                case SWORD:
+                    expEarned = 10;
+                    break;
+                case LONGBOW:
+                    expEarned = 10;
+                    break;
+            }
+            return (int) (expEarned * (1.0 + level*0.2));
+        }
+        public int expRequired(int level) {
+            return 100*level;
+        }
+        public int maxHealth() {
+            switch (this) {
+                case SWORD:
+                    return 100;
+                case LONGBOW:
+                    return 60;
+            }
+            return 0;
+        }
+        public float meleeDamage() {
+            switch (this) {
+                case SWORD:
+                    return 20.0f;
+                case LONGBOW:
+                    return 5.0f;
+            }
+            return 0.0f;
+        }
+        public float rangedDamage() {
+            switch (this) {
+                case SWORD:
+                    return 0.0f;
+                case LONGBOW:
+                    return 10.0f;
+            }
+            return 0.0f;
+        }
+        public float meleeEvade() {
+            switch (this) {
+                case SWORD:
+                    return 0.2f;
+                case LONGBOW:
+                    return 0.05f;
+            }
+            return 0.0f;
+        }
+        public float rangedEvade() {
+            switch (this) {
+                case SWORD:
+                case LONGBOW:
+                    return 0.1f;
+            }
+            return 0.0f;
+        }
+        public float armor() {
+            switch (this) {
+                case SWORD:
+                    return 0.2f;
+                case LONGBOW:
+                    return 0.1f;
+            }
+            return 0.0f;
         }
         public float maxForce() {
             return 2.0f;
@@ -138,12 +208,16 @@ public class Unit extends CollidableObject {
             return this;
         }
         public Unit build() {
-            Sprite spriteFrame = new Sprite.Builder("unit.png").gridSize(new Size(4,2))
+            Sprite unitFrameSprite = new Sprite.Builder("unit_frame.png").gridSize(new Size(4,1))
                     .size(new Size(16, 16)).depth(1.0f).smooth(true).build();
-            spriteFrame.setGridIndex(new Point(side.ordinal(), 0));
+            unitFrameSprite.setGridIndex(new Point(side.ordinal(), 0));
+            Sprite unitHealthSprite = new Sprite.Builder("unit_health.png").gridSize(new Size(5,1))
+                    .size(new Size(16, 16)).depth(1.0f).smooth(true).build();
+            unitFrameSprite.setGridIndex(new Point(side.ordinal(), 0));
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitClass.sprite())
-                    .sprite(spriteFrame)
+                    .sprite(unitFrameSprite)
+                    .sprite(unitHealthSprite)
                     .maxForce(unitClass.maxForce()).maxVelocity(unitClass.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
                     .mass(unitClass.mass()).friction(0.1f)
@@ -179,6 +253,7 @@ public class Unit extends CollidableObject {
         unitClass = builder.unitClass;
         side = builder.side;
         level = 1;
+        health = getUnitClass().maxHealth();
     }
 
     /**
@@ -188,7 +263,7 @@ public class Unit extends CollidableObject {
     public void update() {
 
         // If it's on battle
-        if (getOpponents() != null) {
+        if (opponents != null) {
             // Seek or flee enemies
             for (Unit opponent : opponents) {
                 if (opponent.getPosition().distance(getPosition()) <= getUnitClass().awareness()) {
@@ -228,10 +303,12 @@ public class Unit extends CollidableObject {
 
         // Update moving
         super.update();
-
-        // Fight
     }
 
+    /**
+     *
+     * @param targetObject
+     */
     @Override
     public void onCollisionOccurred(CollidableObject targetObject) {
 
@@ -248,9 +325,201 @@ public class Unit extends CollidableObject {
 
     /**
      *
+     */
+    public void fight() {
+
+        // Search close enemies first
+        Unit targetCandidate = null;
+        float highestFavor = -Float.MAX_VALUE;
+        boolean closeEnemyExist = false;
+        for (Unit opponent : opponents) {
+            if (opponent.getPosition().distance(getPosition()) <= getUnitClass().meleeAttackRange()) {
+                closeEnemyExist = true;
+                if (meleeAttackLeft > 0) {
+                    break;
+                }
+
+                float favor = getUnitClass().favor(opponent.getUnitClass());
+                if (favor > highestFavor) {
+                    targetCandidate = opponent;
+                }
+            }
+        }
+
+        // Check if melee attack is possible
+        if (meleeAttackLeft > 0) {
+            meleeAttackLeft--;
+        }
+        else if (targetCandidate != null) {
+            attackMelee(targetCandidate);
+            meleeAttackLeft = getUnitClass().meleeAttackSpeed();
+        }
+
+        // Check if ranged attack is possible
+        if (rangedAttackLeft > 0) {
+            rangedAttackLeft--;
+        }
+        else if (!closeEnemyExist && getUnitClass().rangedAttackRange() > 0.0f) {
+            // Search distanced enemies
+            targetCandidate = null;
+            highestFavor = -Float.MAX_VALUE;
+
+            for (Unit opponent : opponents) {
+                if (opponent.getPosition().distance(getPosition()) <=
+                        getUnitClass().rangedAttackRange()) {
+                    float favor = getUnitClass().favor(opponent.getUnitClass());
+                    if (favor > highestFavor) {
+                        targetCandidate = opponent;
+                    }
+                }
+            }
+
+            if (targetCandidate != null) {
+                attackRanged(targetCandidate);
+                meleeAttackLeft = getUnitClass().rangedAttackSpeed();
+            }
+        }
+    }
+
+    /**
+     *
+     * @param opponent
+     */
+    private void attackMelee(Unit opponent) {
+        if (Math.random() < opponent.getMeleeEvade()) {
+            // evaded
+            return;
+        }
+
+        int damage = (int) (getMeleeDamage() * opponent.getArmor());
+        opponent.gotDamage(damage);
+    }
+
+    /**
+     *
+     * @param opponent
+     */
+    private void attackRanged(Unit opponent) {
+        if (Math.random() < opponent.getRangedEvade()) {
+            // evaded
+            return;
+        }
+
+        int damage = (int) (getRangedDamage() * opponent.getArmor());
+        opponent.gotDamage(damage);
+    }
+
+    /**
+     *
+     * @param damage
+     */
+    private void gotDamage(int damage) {
+
+        health -= damage;
+        if (health < 0) {
+            health = 0;
+        }
+
+        Sprite healthSprite = getSprite(2);
+        healthSprite.setGridIndex(new Point((int)((1.0f - health / (float)getMaxHealth()) / 0.2f), 0));
+    }
+
+    /**
+     *
+     */
+    public void setKilled() {
+
+        killed = true;
+    }
+
+    /**
+     *
+     */
+    public boolean isKilled() {
+
+        return killed;
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    private int adjustLevel(int value) {
+
+        return (int) (value * (1.0f + 0.1f * level));
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    private float adjustLevel(float value) {
+
+        return value * (1.0f + 0.1f * level);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getMaxHealth() {
+
+        return adjustLevel(getUnitClass().maxHealth());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private float getMeleeDamage() {
+
+        return adjustLevel(getUnitClass().meleeDamage());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private float getRangedDamage() {
+
+        return adjustLevel(getUnitClass().rangedDamage());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private float getMeleeEvade() {
+
+        return adjustLevel(getUnitClass().meleeEvade());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private float getRangedEvade() {
+
+        return adjustLevel(getUnitClass().rangedEvade());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private float getArmor() {
+
+        return adjustLevel(getUnitClass().armor());
+    }
+
+    /**
+     *
      * @return
      */
     public OffsetCoord getTargetMapPosition() {
+
         return targetMapPosition;
     }
 
@@ -259,6 +528,7 @@ public class Unit extends CollidableObject {
      * @param targetMapPosition
      */
     public void setTargetMapOffset(OffsetCoord targetMapPosition) {
+
         this.targetMapPosition = targetMapPosition;
     }
 
@@ -267,6 +537,7 @@ public class Unit extends CollidableObject {
      * @return
      */
     public ArrayList<Unit> getCompanions() {
+
         return companions;
     }
 
@@ -275,6 +546,7 @@ public class Unit extends CollidableObject {
      * @param companions
      */
     public void setCompanions(ArrayList<Unit> companions) {
+
         this.companions = companions;
     }
 
@@ -283,6 +555,7 @@ public class Unit extends CollidableObject {
      * @return
      */
     public ArrayList<Unit> getOpponents() {
+
         return opponents;
     }
 
@@ -291,6 +564,7 @@ public class Unit extends CollidableObject {
      * @param opponents
      */
     public void setOpponents(ArrayList<Unit> opponents) {
+
         this.opponents = opponents;
     }
 
@@ -299,25 +573,32 @@ public class Unit extends CollidableObject {
      * @return
      */
     public UnitClass getUnitClass() {
+
         return unitClass;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getHealth() {
+
+        return health;
     }
 
     private final static int MAX_LEVEL = 10;
 
     private UnitClass unitClass;
     private int level;
-    private float meleeDamage;
-    private float rangedDamage;
-    private float meleeBlock;
-    private float rangedBlock;
-    private float attackSpeed;
-    private float armor;
-    private float maxHealth;
-    private float health;
+    private int exp;
+    private int health;
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private ArrayList<Unit> closedOpponents;
     private Town.Side side;
 
+    private boolean killed = false;
     private OffsetCoord targetMapPosition;
+    private int meleeAttackLeft = 0;
+    private int rangedAttackLeft = 0;
 }

@@ -8,17 +8,33 @@ import java.util.ArrayList;
 
 public class Battle {
 
-    public Battle(Squad squadA, Squad squadB) {
+    public Battle(Squad attacker, Squad defender) {
 
-        squadA.enterBattle(squadB);
-        squadB.enterBattle(squadA);
-        fighters.add(squadA);
-        fighters.add(squadB);
-        units.addAll(squadA.getUnits());
-        units.addAll(squadB.getUnits());
+        this.attacker = attacker;
+        this.defender = defender;
+        this.squads.add(attacker);
+        this.squads.add(defender);
+        this.attacker.enterBattle(defender);
+        this.defender.enterBattle(attacker);
     }
 
+    /**
+     *
+     */
     public void update() {
+
+        resolveCollision();
+        fight();
+    }
+
+    /**
+     *
+     */
+    private void resolveCollision() {
+        ArrayList<Unit> units = new ArrayList<>();
+        for (Squad squad: squads) {
+            units.addAll(squad.getUnits());
+        }
 
         // Collision detection
         CollisionDetector collisionDetector = Engine2D.GetInstance().getCollisionDetector();
@@ -42,6 +58,66 @@ public class Battle {
         }
     }
 
-    private ArrayList<Squad> fighters = new ArrayList<>();
-    private ArrayList<Unit> units = new ArrayList<>();
+    /**
+     *
+     */
+    private void fight() {
+
+        // First fight
+        for (Squad squad: squads) {
+            squad.fight();
+        }
+
+        // Second count fight result
+        for (Squad squad: squads) {
+            squad.countFightResult();
+        }
+    }
+
+    /**
+     *
+     */
+    public void finish() {
+
+        attacker.leaveBattle();
+        defender.leaveBattle();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isAttackerEliminated() {
+
+        return attacker.getUnits().size() == 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDefenderEliminated() {
+
+        return defender.getUnits().size() == 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Squad getAttacker() {
+        return attacker;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Squad getDefender() {
+        return defender;
+    }
+
+    private Squad attacker;
+    private Squad defender;
+    private ArrayList<Squad> squads = new ArrayList<>();
 }

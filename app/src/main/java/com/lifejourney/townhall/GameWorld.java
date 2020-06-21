@@ -5,6 +5,7 @@ import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 public class GameWorld extends World implements Button.Event, MessageBox.Event {
 
@@ -95,24 +96,66 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
             if (!squad.isBattling() && squadsInSameMap.size() == 2 &&
                     squadsInSameMap.get(0).getMapOffsetCoord()
                             .equals(squadsInSameMap.get(1).getMapOffsetCoord())) {
-                addBattle(squadsInSameMap.get(0), squadsInSameMap.get(1));
+                addBattle(squadsInSameMap.get(1), squadsInSameMap.get(0));
             }
         }
 
         // Do battles
-        for (Battle battle: battles) {
+        ListIterator<Battle> iterBattle = battles.listIterator();
+        while (iterBattle.hasNext()) {
+            Battle battle = iterBattle.next();
+
+            // Update battle status
             battle.update();
+
+            // Check if a battle is finished
+            if (battle.isAttackerEliminated() || battle.isDefenderEliminated()) {
+                if (battle.isAttackerEliminated()) {
+                    battle.getAttacker().setEliminated(true);
+                }
+                else if (battle.isDefenderEliminated()) {
+                    battle.getDefender().setEliminated(true);
+                }
+                battle.finish();
+                iterBattle.remove();
+            }
+            else if (battle.getAttacker().isWillingToRetreat()) {
+                // TODO: retreat attacker
+            }
+            else if (battle.getDefender().isWillingToRetreat()) {
+                // TODO: retreat defender
+            }
+        }
+
+        // Remove killed unit and squads
+        ListIterator<Unit> iterUnit = units.listIterator();
+        while (iterUnit.hasNext()) {
+            Unit unit = iterUnit.next();
+            if (unit.isKilled()) {
+                unit.close();
+                removeObject(unit);
+                iterUnit.remove();
+            }
+        }
+        ListIterator<Squad> iterSquad = squads.listIterator();
+        while (iterSquad.hasNext()) {
+            Squad squad = iterSquad.next();
+            if (squad.isEliminated()) {
+                squad.close();
+                removeObject(squad);
+                iterSquad.remove();
+            }
         }
     }
 
     /**
      *
-     * @param a
-     * @param b
+     * @param attacker
+     * @param defender
      */
-    private void addBattle(Squad a, Squad b) {
+    private void addBattle(Squad attacker, Squad defender) {
 
-        Battle battle = new Battle(a, b);
+        Battle battle = new Battle(attacker, defender);
         battles.add(battle);
     }
 

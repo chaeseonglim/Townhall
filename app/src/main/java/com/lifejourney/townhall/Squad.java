@@ -2,8 +2,6 @@ package com.lifejourney.townhall;
 
 import android.view.MotionEvent;
 
-import androidx.core.util.Pair;
-
 import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Object;
@@ -16,6 +14,7 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Waypoint;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 public class Squad extends Object implements Controllable {
 
@@ -101,7 +100,7 @@ public class Squad extends Object implements Controllable {
         Sprite targetSprite = getSprite(1);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            if (!battle) {
+            if (!battling) {
                 // Start dragging action
                 currentSprite.setOpaque(CURRENT_SPRITE_OPAQUE_DRAGGING);
                 targetSprite.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
@@ -113,7 +112,7 @@ public class Squad extends Object implements Controllable {
             return true;
         }
         else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
-            if (battle) {
+            if (battling) {
                 // Cancel dragging icon
                 finishMove();
             }
@@ -150,6 +149,13 @@ public class Squad extends Object implements Controllable {
         else {
             return false;
         }
+    }
+
+    @Override
+    public void close() {
+
+        map.removeSquad(getMapOffsetCoord(), this);
+        super.close();
     }
 
     private void move(OffsetCoord targetOffset) {
@@ -295,19 +301,49 @@ public class Squad extends Object implements Controllable {
      */
     public void enterBattle(Squad opponent) {
 
+        // Finish any moving action
         finishMove();
 
-        this.battle = true;
+        this.battling = true;
         this.opponent = opponent;
+
+        // Set opponents to each units
+        totalHealthWhenEnteringBattle = 0;
         for (Unit unit: units) {
             unit.setOpponents(opponent.getUnits());
+            totalHealthWhenEnteringBattle = unit.getHealth();
         }
 
-        if (opponent.getSide().ordinal() > getSide().ordinal()) {
-            setPosition(getPosition().clone().offset(-map.getTileSize().width / 3.0f, 0));
+        // Adjust squad icon to be battle position
+        setPosition(getPosition().clone().offset(
+                ((opponent.getSide().ordinal() > getSide().ordinal())? -1.0f : 1.0f) *
+                        map.getTileSize().width / 3.0f, 0));
+    }
+
+    /**
+     *
+     */
+    void fight() {
+
+        // Fight
+        for (Unit unit: units) {
+            unit.fight();
         }
-        else {
-            setPosition(getPosition().clone().offset(map.getTileSize().width / 3.0f, 0));
+    }
+
+    /**
+     *
+     */
+    void countFightResult() {
+
+        // Remove killed units
+        ListIterator<Unit> iter = units.listIterator();
+        while (iter.hasNext()) {
+            Unit unit = iter.next();
+            if (unit.getHealth() <= 0) {
+                unit.setKilled();
+                iter.remove();
+            }
         }
     }
 
@@ -316,14 +352,22 @@ public class Squad extends Object implements Controllable {
      */
     public void leaveBattle() {
 
-        this.battle = false;
+        this.battling = false;
         this.opponent = null;
         for (Unit unit: units) {
             unit.setOpponents(null);
         }
 
         setPosition(new PointF(getMapOffsetCoord().toGameCoord()));
+    }
 
+    public boolean isWillingToRetreat() {
+
+        int totalUnitHealth = 0;
+        for (Unit unit: units) {
+            totalUnitHealth += unit.getHealth();
+        }
+        return (float) totalUnitHealth / totalHealthWhenEnteringBattle < RETREAT_THRESHOLD;
     }
 
     /**
@@ -332,8 +376,8 @@ public class Squad extends Object implements Controllable {
      */
     @Override
     public void setVisible(boolean visible) {
-        super.setVisible(visible);
 
+        super.setVisible(visible);
         for (Unit unit: units) {
             unit.setVisible(visible);
         }
@@ -376,7 +420,23 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isBattling() {
-        return battle;
+        return battling;
+    }
+
+    /**
+     *
+     * @param eliminated
+     */
+    public void setEliminated(boolean eliminated) {
+        this.eliminated = eliminated;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEliminated() {
+        return eliminated;
     }
 
     private final static int SPRITE_LAYER = 5;
@@ -386,14 +446,17 @@ public class Squad extends Object implements Controllable {
     private final static float CURRENT_SPRITE_OPAQUE_DRAGGING = 0.2f;
     private final static float DRAGGING_SPRITE_OPAQUE_NORMAL = 0.0f;
     private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.5f;
+    private final static float RETREAT_THRESHOLD = 0.2f;
 
     private TownMap map;
     private Town.Side side;
     private Size spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean dragging = false;
-    private boolean battle = false;
+    private boolean battling = false;
     private OffsetCoord targetOffsetToMove;
     private OffsetCoord nextOffsetToMove;
     private Squad opponent;
+    private int totalHealthWhenEnteringBattle;
+    private boolean eliminated = false;
 }
