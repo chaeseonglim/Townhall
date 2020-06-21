@@ -79,7 +79,7 @@ public class Unit extends CollidableObject {
             switch (this) {
                 case SWORD:
                 case LONGBOW:
-                    return 24.0f;
+                    return 18.0f;
             }
             return 0.0f;
         }
@@ -286,14 +286,17 @@ public class Unit extends CollidableObject {
                 }
             }
             if (highestFavor > 0.0f && highestFavorUnit != null) {
-                seek(highestFavorUnit.getPosition(), 1.0f);
+                if (highestFavorDistance > getUnitClass().meleeAttackRange()) {
+                    seek(highestFavorUnit.getPosition(), 1.0f);
+                }
             }
             else if (lowestFavor < 0.0f && lowestFavorUnit != null) {
-                flee(lowestFavorUnit.getPosition(), 1.0f);
+                if (lowestFavorDistance < getUnitClass().rangedAttackRange()) {
+                    flee(lowestFavorUnit.getPosition(), 1.0f);
+                }
             }
 
-            // Wander a little
-            wander(40.0f, 1.0f, 0.1f);
+            wander(80.0f, 1.0f, 0.1f);
         }
 
         // if it's at peace

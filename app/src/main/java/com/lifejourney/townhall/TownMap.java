@@ -10,6 +10,7 @@ import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
+import com.lifejourney.engine2d.RectF;
 import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
@@ -78,6 +79,13 @@ class TownMap extends HexTileMap implements View {
                 towns.put(mapCoord, town);
             }
         }
+
+        // Calculate viewport clipping area
+        OffsetCoord bottomRightMapCoord = new OffsetCoord(mapSize.width-1, mapSize.height-1);
+        Point bottomRightGameCoord = bottomRightMapCoord.toGameCoord();
+        clippedViewport = new Rect(-getTileSize().width, -getTileSize().height,
+                bottomRightGameCoord.x + getTileSize().width*2,
+                bottomRightGameCoord.y + getTileSize().height*2);
     }
 
     /**
@@ -97,12 +105,9 @@ class TownMap extends HexTileMap implements View {
             return true;
         }
         else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
             PointF delta = new PointF(touchingScreenCoord);
             delta.subtract(touchedPoint).multiply(-1.0f);
-            viewport.offset(new Point(delta));
-            Engine2D.GetInstance().setViewport(viewport);
-
+            scroll(new Point(delta));
             touchedPoint = touchingScreenCoord;
             return true;
         }
@@ -180,7 +185,8 @@ class TownMap extends HexTileMap implements View {
      */
     public boolean isMovable(OffsetCoord mapCoord) {
 
-        if (mapCoord.getX() >= getMapSize().width || mapCoord.getY() >= getMapSize().height) {
+        if (mapCoord.getX() < 0 || mapCoord.getY() < 0 ||
+                mapCoord.getX() >= getMapSize().width || mapCoord.getY() >= getMapSize().height) {
             return false;
         }
 
@@ -248,7 +254,9 @@ class TownMap extends HexTileMap implements View {
         ArrayList<Town> neighborTowns = new ArrayList<>();
         ArrayList<OffsetCoord> neighborCoords = mapCoord.getNeighbors();
         for (OffsetCoord coord: neighborCoords) {
-            neighborTowns.add(towns.get(coord));
+            if (towns.get(coord) != null) {
+                neighborTowns.add(towns.get(coord));
+            }
         }
         return neighborTowns;
     }
@@ -269,6 +277,27 @@ class TownMap extends HexTileMap implements View {
         return null;
     }
 
+    /**
+     *
+     * @param offset
+     */
+    public void scroll(Point offset) {
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        viewport.offset(offset);
+        if (viewport.x < clippedViewport.x) {
+            viewport.x = clippedViewport.x;
+        }
+        if (viewport.y < clippedViewport.y) {
+            viewport.y = clippedViewport.y;
+        }
+        if (viewport.bottomRight().x > clippedViewport.bottomRight().x) {
+            viewport.x = clippedViewport.bottomRight().x - viewport.width;
+        }
+        if (viewport.bottomRight().y > clippedViewport.bottomRight().y) {
+            viewport.y = clippedViewport.bottomRight().y - viewport.height;
+        }
+        Engine2D.GetInstance().setViewport(viewport);
+    }
 
     private final static int MAP_LAYER = 0;
     private final static int HEX_SIZE = 64;
@@ -278,4 +307,5 @@ class TownMap extends HexTileMap implements View {
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private boolean dragging = false;
     private PointF touchedPoint;
+    private Rect clippedViewport;
 }

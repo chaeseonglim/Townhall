@@ -85,9 +85,9 @@ public class Squad extends Object implements Controllable {
         }
 
         int eventAction = event.getAction();
-        PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
+        lastTouchedScreenCoord = new PointF(event.getX(), event.getY());
         PointF touchedGameCoord =
-                Engine2D.GetInstance().translateScreenToGameCoord(touchedScreenCoord);
+                Engine2D.GetInstance().translateScreenToGameCoord(lastTouchedScreenCoord);
         RectF region = new RectF(getPosition(), spriteSize);
         region.offset(-(float)spriteSize.width/2, -(float)spriteSize.height/2);
 
@@ -99,7 +99,7 @@ public class Squad extends Object implements Controllable {
         Sprite targetSprite = getSprite(1);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            if (!battling) {
+            if (!fighting) {
                 // Start dragging action
                 currentSprite.setOpaque(CURRENT_SPRITE_OPAQUE_DRAGGING);
                 targetSprite.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
@@ -111,8 +111,8 @@ public class Squad extends Object implements Controllable {
             return true;
         }
         else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
-            if (battling) {
-                // Cancel dragging icon
+            if (fighting) {
+                // It battle begins, cancel dragging icon
                 finishMove();
             }
             else {
@@ -127,6 +127,25 @@ public class Squad extends Object implements Controllable {
                     targetSprite.setGridIndex(new Point(side.ordinal(), 1));
                 }
 
+                /*
+                // Scroll view if touch is going to boundary
+                Point scrollOffset = new Point();
+                PointF touchedWidgetCoord =
+                        Engine2D.GetInstance().translateScreenToWidgetCoord(touchedScreenCoord);
+                if (touchedWidgetCoord.x < 50) {
+                    scrollOffset.x = -15;
+                }
+                if (touchedWidgetCoord.y < 50) {
+                    scrollOffset.y = -15;
+                }
+                if (touchedWidgetCoord.x > Engine2D.GetInstance().getViewport().width - 50) {
+                    scrollOffset.x = 15;
+                }
+                if (touchedWidgetCoord.y > Engine2D.GetInstance().getViewport().height - 50) {
+                    scrollOffset.y = 15;
+                }
+                map.scroll(scrollOffset);
+                 */
             }
             return true;
         }
@@ -241,6 +260,7 @@ public class Squad extends Object implements Controllable {
 
         super.update();
 
+        // Movement on tiled view
         OffsetCoord currentMapOffset = getMapCoord();
         if (targetOffsetToMove!= null && !targetOffsetToMove.equals(currentMapOffset)) {
             // If it's moving, send unit to next offset
@@ -268,6 +288,26 @@ public class Squad extends Object implements Controllable {
             for(Unit unit: units) {
                 unit.setTargetMapOffset(currentMapOffset);
             }
+        }
+
+        // Scroll view if touch is going to boundary during dragging
+        if (dragging) {
+            Point scrollOffset = new Point();
+            PointF touchedWidgetCoord =
+                    Engine2D.GetInstance().translateScreenToWidgetCoord(lastTouchedScreenCoord);
+            if (touchedWidgetCoord.x < 50) {
+                scrollOffset.x = -40;
+            }
+            if (touchedWidgetCoord.y < 50) {
+                scrollOffset.y = -40;
+            }
+            if (touchedWidgetCoord.x > Engine2D.GetInstance().getViewport().width - 50) {
+                scrollOffset.x = 40;
+            }
+            if (touchedWidgetCoord.y > Engine2D.GetInstance().getViewport().height - 50) {
+                scrollOffset.y = 40;
+            }
+            map.scroll(scrollOffset);
         }
     }
 
@@ -314,12 +354,12 @@ public class Squad extends Object implements Controllable {
      *
      * @param opponent
      */
-    public void enterBattle(Squad opponent) {
+    public void beginFight(Squad opponent) {
 
         // Finish any moving action
         finishMove();
 
-        this.battling = true;
+        this.fighting = true;
         this.opponent = opponent;
 
         // Set opponents to each units
@@ -333,6 +373,20 @@ public class Squad extends Object implements Controllable {
         setPosition(getPosition().clone().offset(
                 ((opponent.getSide().ordinal() > getSide().ordinal())? -1.0f : 1.0f) *
                         map.getTileSize().width / 3.0f, 0));
+    }
+
+    /**
+     *
+     */
+    public void endFight() {
+
+        this.fighting = false;
+        this.opponent = null;
+        for (Unit unit: units) {
+            unit.setOpponents(null);
+        }
+
+        setPosition(new PointF(getMapCoord().toGameCoord()));
     }
 
     /**
@@ -364,20 +418,6 @@ public class Squad extends Object implements Controllable {
         }
 
         return expEarned;
-    }
-
-    /**
-     *
-     */
-    public void leaveBattle() {
-
-        this.battling = false;
-        this.opponent = null;
-        for (Unit unit: units) {
-            unit.setOpponents(null);
-        }
-
-        setPosition(new PointF(getMapCoord().toGameCoord()));
     }
 
     /**
@@ -446,9 +486,9 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public boolean isBattling() {
+    public boolean isFighting() {
 
-        return battling;
+        return fighting;
     }
 
     /**
@@ -483,7 +523,8 @@ public class Squad extends Object implements Controllable {
     private boolean dragging = false;
     private OffsetCoord targetOffsetToMove;
     private OffsetCoord nextOffsetToMove;
-    private boolean battling = false;
+    private boolean fighting = false;
     private Squad opponent;
     private int totalHealthWhenEnteringBattle;
+    private PointF lastTouchedScreenCoord = null;
 }
