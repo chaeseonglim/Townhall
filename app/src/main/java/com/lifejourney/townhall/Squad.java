@@ -34,16 +34,17 @@ public class Squad extends Object implements Controllable {
             this.side = side;
         }
         public Squad build() {
-            Sprite currentIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
+            Sprite currentIcon = new Sprite.Builder("SquadIcon", "squad.png").layer(SPRITE_LAYER)
                     .size(SPRITE_BASE_SIZE).smooth(false).visible(true)
                     .gridSize(4, 2).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
             currentIcon.setGridIndex(side.ordinal(), 0);
             currentIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET);
-            Sprite targetIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
+            Sprite targetIcon = new Sprite.Builder("SquadTarget", "squad.png").layer(SPRITE_LAYER)
                     .size(SPRITE_BASE_SIZE).smooth(false).visible(false)
                     .gridSize(4, 2).opaque(DRAGGING_SPRITE_OPAQUE_NORMAL)
                     .build();
+            targetIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET);
             return (Squad) new PrivateBuilder<>(position, map, side).priority(-1).layer(SPRITE_LAYER)
                     .sprite(currentIcon, true)
                     .sprite(targetIcon, false).build();
@@ -102,8 +103,8 @@ public class Squad extends Object implements Controllable {
             return false;
         }
 
-        Sprite currentSprite = getSprite(0);
-        Sprite targetSprite = getSprite(1);
+        Sprite currentIcon = getSprite(0);
+        Sprite targetIcon = getSprite(1);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             touching = true;
@@ -116,10 +117,10 @@ public class Squad extends Object implements Controllable {
             }
             else {
                 // Dragging
-                currentSprite.setOpaque(CURRENT_SPRITE_OPAQUE_DRAGGING);
-                targetSprite.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
-                targetSprite.setVisible(true);
-                targetSprite.setPosition(touchedGameCoord);
+                currentIcon.setOpaque(CURRENT_SPRITE_OPAQUE_DRAGGING);
+                targetIcon.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
+                targetIcon.setVisible(true);
+                targetIcon.setPosition(touchedGameCoord);
                 dragging = true;
             }
             result = true;
@@ -178,23 +179,29 @@ public class Squad extends Object implements Controllable {
         // Movement on tiled view
         OffsetCoord currentMapOffset = getMapCoord();
         if (targetOffsetToMove!= null && !targetOffsetToMove.equals(currentMapOffset)) {
-            // If it's moving, send unit to next offset
-            for(Unit unit: units) {
-                unit.setTargetMapOffset(nextOffsetToMove);
-            }
+            if (map.isMovable(nextOffsetToMove, this)) {
+                // If it's moving, send unit to next offset
+                for (Unit unit : units) {
+                    unit.setTargetMapOffset(nextOffsetToMove);
+                }
 
-            // First check if all units are arrived
-            boolean allUnitArrived = true;
-            for (Unit unit: units) {
-                if (!new OffsetCoord(unit.getPosition()).equals(nextOffsetToMove)) {
-                    allUnitArrived = false;
-                    break;
+                // First check if all units are arrived
+                boolean allUnitArrived = true;
+                for (Unit unit : units) {
+                    if (!new OffsetCoord(unit.getPosition()).equals(nextOffsetToMove)) {
+                        allUnitArrived = false;
+                        break;
+                    }
+                }
+
+                // Then move again
+                if (allUnitArrived) {
+                    move(nextOffsetToMove);
+                    seek(targetOffsetToMove);
                 }
             }
-
-            // Then move again
-            if (allUnitArrived) {
-                move(nextOffsetToMove);
+            else {
+                nextOffsetToMove = null;
                 seek(targetOffsetToMove);
             }
         }
@@ -229,14 +236,14 @@ public class Squad extends Object implements Controllable {
                     Engine2D.GetInstance().translateScreenToGameCoord(lastTouchedScreenCoord);
             OffsetCoord lastDraggingMapCoord = new OffsetCoord(new Point(lastTouchedGameCoord));
 
-            Sprite targetSprite = getSprite(1);
+            Sprite targetIcon = getSprite(1);
             if (!lastDraggingMapCoord.equals(getMapCoord()) &&
                 map.isMovable(lastDraggingMapCoord, this)) {
                 SquadPathFinder pathFinder = new SquadPathFinder(this, lastDraggingMapCoord);
                 ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
 
                 if (optimalPath == null) {
-                    targetSprite.setGridIndex(side.ordinal(), 1);
+                    targetIcon.setGridIndex(side.ordinal(), 1);
                 }
                 else {
                     ArrayList<OffsetCoord> glowingLine = new ArrayList<>();
@@ -244,12 +251,12 @@ public class Squad extends Object implements Controllable {
                         glowingLine.add(new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y));
                     }
                     map.setGlowingTiles(glowingLine);
-                    targetSprite.setGridIndex(side.ordinal(), 0);
+                    targetIcon.setGridIndex(side.ordinal(), 0);
                 }
             }
             else {
                 map.setGlowingTiles(null);
-                targetSprite.setGridIndex(side.ordinal(), 1);
+                targetIcon.setGridIndex(side.ordinal(), 1);
             }
         }
     }
@@ -279,10 +286,10 @@ public class Squad extends Object implements Controllable {
      */
     private void finishMove() {
 
-        Sprite currentSprite = getSprite(0);
-        Sprite targetSprite = getSprite(1);
-        currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetSprite.setVisible(false);
+        Sprite currentIcon = getSprite(0);
+        Sprite targetIcon = getSprite(1);
+        currentIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        targetIcon.setVisible(false);
         dragging = false;
         if (nextOffsetToMove != null && !nextOffsetToMove.equals(getMapCoord())) {
             map.getTown(nextOffsetToMove).removeSquad(this);
@@ -298,11 +305,11 @@ public class Squad extends Object implements Controllable {
      */
     private boolean seek(OffsetCoord targetOffset) {
 
-        Sprite currentSprite = getSprite(0);
-        Sprite targetSprite = getSprite(1);
-        currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetSprite.setPosition(new PointF(targetOffset.toGameCoord()));
-        targetSprite.setVisible(true);
+        Sprite currentIcon = getSprite(0);
+        Sprite targetIcon = getSprite(1);
+        currentIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        targetIcon.setPosition(new PointF(targetOffset.toGameCoord()));
+        targetIcon.setVisible(true);
         dragging = false;
         targetOffsetToMove = targetOffset;
 
@@ -325,8 +332,6 @@ public class Squad extends Object implements Controllable {
             else {
                 nextOffsetToMove = new OffsetCoord(
                         optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
-                // pre-occupy map before moving to the tile
-                map.getTown(nextOffsetToMove).addSquad(this);
                 return true;
             }
         }
@@ -340,7 +345,7 @@ public class Squad extends Object implements Controllable {
      *
      * @param unit
      */
-    void addUnit(Unit unit) {
+    private void addUnit(Unit unit) {
 
         units.add(unit);
     }
@@ -362,7 +367,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public ArrayList<Unit> getUnits() {
+    ArrayList<Unit> getUnits() {
         return units;
     }
 
@@ -370,7 +375,7 @@ public class Squad extends Object implements Controllable {
      *
      * @param opponent
      */
-    public void beginFight(Squad opponent) {
+    void beginFight(Squad opponent) {
 
         // Finish any moving action
         finishMove();
@@ -394,7 +399,7 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    public void endFight() {
+    void endFight() {
 
         this.fighting = false;
         this.opponent = null;
@@ -440,7 +445,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public boolean isWillingToRetreat() {
+    boolean isWillingToRetreat() {
 
         int totalUnitHealth = 0;
         for (Unit unit: units) {

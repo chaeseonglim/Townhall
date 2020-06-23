@@ -146,7 +146,7 @@ class TownMap extends HexTileMap implements View {
         ArrayList<Sprite> sprites = new ArrayList<>();
 
         Sprite baseSprite =
-            new Sprite.Builder("tiles.png")
+            new Sprite.Builder("Base", "tiles.png")
                 .position(new PointF(mapCoord.toGameCoord()))
                 .size(getTileSize()).gridSize(2, 5).smooth(false)
                 .layer(SPRITE_LAYER).visible(true).build();
@@ -156,7 +156,7 @@ class TownMap extends HexTileMap implements View {
 
         if (glowingTiles != null && glowingTiles.contains(mapCoord)) {
             Sprite glowingSprite =
-                    new Sprite.Builder("tiles.png")
+                    new Sprite.Builder("GlowingLine", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(getTileSize()).gridSize(2, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
@@ -292,6 +292,7 @@ class TownMap extends HexTileMap implements View {
      * @param offset
      */
     public void scroll(Point offset) {
+
         Rect viewport = Engine2D.GetInstance().getViewport();
         viewport.offset(offset);
         if (viewport.x < clippedViewport.x) {
