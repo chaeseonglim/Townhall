@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Controllable;
@@ -10,6 +11,7 @@ import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.RectF;
 import com.lifejourney.engine2d.Size;
+import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Waypoint;
 
@@ -34,14 +36,15 @@ public class Squad extends Object implements Controllable {
         public Squad build() {
             Sprite currentIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
                     .size(SPRITE_BASE_SIZE).smooth(false).visible(true)
-                    .gridSize(new Size(4, 2)).opaque(ICON_SPRITE_OPAQUE_NORMAL)
+                    .gridSize(4, 2).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
-            currentIcon.setGridIndex(new Point(side.ordinal(), 0));
+            currentIcon.setGridIndex(side.ordinal(), 0);
             currentIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET);
-            Sprite targetIcon = currentIcon.clone();
-            targetIcon.setOpaque(DRAGGING_SPRITE_OPAQUE_NORMAL);
-            targetIcon.setVisible(false);
-            return (Squad) new PrivateBuilder<>(position, map, side).priority(-1)
+            Sprite targetIcon = new Sprite.Builder("squad.png").layer(SPRITE_LAYER)
+                    .size(SPRITE_BASE_SIZE).smooth(false).visible(false)
+                    .gridSize(4, 2).opaque(DRAGGING_SPRITE_OPAQUE_NORMAL)
+                    .build();
+            return (Squad) new PrivateBuilder<>(position, map, side).priority(-1).layer(SPRITE_LAYER)
                     .sprite(currentIcon, true)
                     .sprite(targetIcon, false).build();
         }
@@ -80,17 +83,21 @@ public class Squad extends Object implements Controllable {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        boolean result = false;
+
         if (!isVisible()) {
             return false;
         }
 
+        // Get current touched coord
         int eventAction = event.getAction();
-        lastTouchedScreenCoord = new PointF(event.getX(), event.getY());
+        PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
         PointF touchedGameCoord =
-                Engine2D.GetInstance().translateScreenToGameCoord(lastTouchedScreenCoord);
+                Engine2D.GetInstance().translateScreenToGameCoord(touchedScreenCoord);
         RectF region = new RectF(getPosition(), spriteSize);
         region.offset(-(float)spriteSize.width/2, -(float)spriteSize.height/2);
 
+        // If it goes out of region without dragging, ignore touch
         if (!region.includes(touchedGameCoord) && !dragging) {
             return false;
         }
@@ -99,74 +106,55 @@ public class Squad extends Object implements Controllable {
         Sprite targetSprite = getSprite(1);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            if (!fighting) {
-                // Start dragging action
+            touching = true;
+            result = true;
+        }
+        else if (eventAction == MotionEvent.ACTION_MOVE && touching) {
+            if (fighting) {
+                // It battle begins, cancel dragging
+                finishMove();
+            }
+            else {
+                // Dragging
                 currentSprite.setOpaque(CURRENT_SPRITE_OPAQUE_DRAGGING);
                 targetSprite.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
-                targetSprite.setPosition(new Point(touchedGameCoord));
                 targetSprite.setVisible(true);
-                targetSprite.setGridIndex(new Point(side.ordinal(), 0));
+                targetSprite.setPosition(touchedGameCoord);
                 dragging = true;
             }
-            return true;
+            result = true;
         }
-        else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
-            if (fighting) {
-                // It battle begins, cancel dragging icon
-                finishMove();
-            }
-            else {
-                // Move dragging icon
-                Point draggingPoint = new Point(touchedGameCoord);
-                targetSprite.setPosition(draggingPoint);
-                OffsetCoord mapCoord = new OffsetCoord(draggingPoint);
-                if (map.isMovable(mapCoord, this)) {
-                    targetSprite.setGridIndex(new Point(side.ordinal(), 0));
-                }
-                else {
-                    targetSprite.setGridIndex(new Point(side.ordinal(), 1));
-                }
+        else if (eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL) {
+            if (dragging) {
+                // Finish dragging
+                Point targetGameCoord = new Point(touchedGameCoord);
+                OffsetCoord targetOffset = new OffsetCoord(targetGameCoord);
+                if (targetOffset.equals(getMapCoord())) {
+                    finishMove();
 
-                /*
-                // Scroll view if touch is going to boundary
-                Point scrollOffset = new Point();
-                PointF touchedWidgetCoord =
-                        Engine2D.GetInstance().translateScreenToWidgetCoord(touchedScreenCoord);
-                if (touchedWidgetCoord.x < 50) {
-                    scrollOffset.x = -15;
+                    Log.e(LOG_TAG, "Select squad");
+
+                    // TODO: Select squad
                 }
-                if (touchedWidgetCoord.y < 50) {
-                    scrollOffset.y = -15;
+                else if (eventAction == MotionEvent.ACTION_UP && map.isMovable(targetOffset, this)) {
+                    // If movable tile is target, go there
+                    finishMove();
+                    seek(targetOffset);
+                } else {
+                    // Cancel move
+                    finishMove();
                 }
-                if (touchedWidgetCoord.x > Engine2D.GetInstance().getViewport().width - 50) {
-                    scrollOffset.x = 15;
-                }
-                if (touchedWidgetCoord.y > Engine2D.GetInstance().getViewport().height - 50) {
-                    scrollOffset.y = 15;
-                }
-                map.scroll(scrollOffset);
-                 */
             }
-            return true;
-        }
-        else if ((eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL)
-                && dragging) {
-            Point targetGameCoord = new Point(touchedGameCoord);
-            OffsetCoord targetOffset = new OffsetCoord(targetGameCoord);
-            if (eventAction == MotionEvent.ACTION_UP && map.isMovable(targetOffset, this)) {
-                // If movable tile is target, go there
-                finishMove();
-                seek(targetOffset);
-            }
-            else {
-                // Cancel move
-                finishMove();
-            }
-            return true;
+            touching = false;
+            map.setGlowingTiles(null);
+            result = true;
         }
         else {
-            return false;
+            result = false;
         }
+
+        lastTouchedScreenCoord = touchedScreenCoord;
+        return result;
     }
 
     /**
@@ -177,79 +165,6 @@ public class Squad extends Object implements Controllable {
 
         map.getTown(getMapCoord()).removeSquad(this);
         super.close();
-    }
-
-    /**
-     *
-     * @param targetOffset
-     */
-    public void move(OffsetCoord targetOffset) {
-
-        map.getTown(getMapCoord()).removeSquad(this);
-        setPosition(new PointF(targetOffset.toGameCoord()));
-        map.getTown(targetOffset).addSquad(this);
-    }
-
-    /**
-     *
-     */
-    private void finishMove() {
-
-        Sprite currentSprite = getSprite(0);
-        Sprite targetSprite = getSprite(1);
-        currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetSprite.setVisible(false);
-        dragging = false;
-        if (nextOffsetToMove != null && !nextOffsetToMove.equals(getMapCoord())) {
-            map.getTown(nextOffsetToMove).removeSquad(this);
-        }
-        targetOffsetToMove = null;
-        nextOffsetToMove = null;
-    }
-
-    /**
-     *
-     * @param targetOffset
-     * @return
-     */
-    private boolean seek(OffsetCoord targetOffset) {
-
-        Sprite currentSprite = getSprite(0);
-        Sprite targetSprite = getSprite(1);
-        currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetSprite.setPosition(targetOffset.toGameCoord());
-        targetSprite.setVisible(true);
-        dragging = false;
-        targetOffsetToMove = targetOffset;
-
-        OffsetCoord currentMapCoord = getMapCoord();
-        if (currentMapCoord.equals(targetOffset)) {
-            // If it reached to target offset, done moving
-            finishMove();
-            return true;
-        }
-        else if (nextOffsetToMove == null || currentMapCoord.equals(nextOffsetToMove)) {
-            // Path finding
-            SquadPathFinder pathFinder = new SquadPathFinder(this, targetOffset);
-            ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
-
-            if (optimalPath == null) {
-                // if there's no path to target, cancel moving
-                finishMove();
-                return false;
-            }
-            else {
-                nextOffsetToMove = new OffsetCoord(
-                        optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
-                // pre-occupy map before moving to the tile
-                map.getTown(nextOffsetToMove).addSquad(this);
-                return true;
-            }
-
-        }
-        else {
-            return true;
-        }
     }
 
     /**
@@ -290,24 +205,52 @@ public class Squad extends Object implements Controllable {
             }
         }
 
-        // Scroll view if touch is going to boundary during dragging
         if (dragging) {
+            // Scroll view if touch is going to boundary during dragging
             Point scrollOffset = new Point();
             PointF touchedWidgetCoord =
                     Engine2D.GetInstance().translateScreenToWidgetCoord(lastTouchedScreenCoord);
-            if (touchedWidgetCoord.x < 50) {
+            if (touchedWidgetCoord.x < 60) {
                 scrollOffset.x = -40;
             }
-            if (touchedWidgetCoord.y < 50) {
+            if (touchedWidgetCoord.y < 60) {
                 scrollOffset.y = -40;
             }
-            if (touchedWidgetCoord.x > Engine2D.GetInstance().getViewport().width - 50) {
+            if (touchedWidgetCoord.x > Engine2D.GetInstance().getViewport().width - 60) {
                 scrollOffset.x = 40;
             }
-            if (touchedWidgetCoord.y > Engine2D.GetInstance().getViewport().height - 50) {
+            if (touchedWidgetCoord.y > Engine2D.GetInstance().getViewport().height - 60) {
                 scrollOffset.y = 40;
             }
             map.scroll(scrollOffset);
+
+            // Show glowing line while dragging
+            PointF lastTouchedGameCoord =
+                    Engine2D.GetInstance().translateScreenToGameCoord(lastTouchedScreenCoord);
+            OffsetCoord lastDraggingMapCoord = new OffsetCoord(new Point(lastTouchedGameCoord));
+
+            Sprite targetSprite = getSprite(1);
+            if (!lastDraggingMapCoord.equals(getMapCoord()) &&
+                map.isMovable(lastDraggingMapCoord, this)) {
+                SquadPathFinder pathFinder = new SquadPathFinder(this, lastDraggingMapCoord);
+                ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
+
+                if (optimalPath == null) {
+                    targetSprite.setGridIndex(side.ordinal(), 1);
+                }
+                else {
+                    ArrayList<OffsetCoord> glowingLine = new ArrayList<>();
+                    for (Waypoint waypoint : optimalPath) {
+                        glowingLine.add(new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y));
+                    }
+                    map.setGlowingTiles(glowingLine);
+                    targetSprite.setGridIndex(side.ordinal(), 0);
+                }
+            }
+            else {
+                map.setGlowingTiles(null);
+                targetSprite.setGridIndex(side.ordinal(), 1);
+            }
         }
     }
 
@@ -319,6 +262,79 @@ public class Squad extends Object implements Controllable {
 
         super.commit();
     }
+
+    /**
+     *
+     * @param targetOffset
+     */
+    public void move(OffsetCoord targetOffset) {
+
+        map.getTown(getMapCoord()).removeSquad(this);
+        setPosition(new PointF(targetOffset.toGameCoord()));
+        map.getTown(targetOffset).addSquad(this);
+    }
+
+    /**
+     *
+     */
+    private void finishMove() {
+
+        Sprite currentSprite = getSprite(0);
+        Sprite targetSprite = getSprite(1);
+        currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        targetSprite.setVisible(false);
+        dragging = false;
+        if (nextOffsetToMove != null && !nextOffsetToMove.equals(getMapCoord())) {
+            map.getTown(nextOffsetToMove).removeSquad(this);
+        }
+        targetOffsetToMove = null;
+        nextOffsetToMove = null;
+    }
+
+    /**
+     *
+     * @param targetOffset
+     * @return
+     */
+    private boolean seek(OffsetCoord targetOffset) {
+
+        Sprite currentSprite = getSprite(0);
+        Sprite targetSprite = getSprite(1);
+        currentSprite.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        targetSprite.setPosition(new PointF(targetOffset.toGameCoord()));
+        targetSprite.setVisible(true);
+        dragging = false;
+        targetOffsetToMove = targetOffset;
+
+        OffsetCoord currentMapCoord = getMapCoord();
+        if (currentMapCoord.equals(targetOffset)) {
+            // If it reached to target offset, done moving
+            finishMove();
+            return true;
+        }
+        else if (nextOffsetToMove == null || currentMapCoord.equals(nextOffsetToMove)) {
+            // Path finding
+            SquadPathFinder pathFinder = new SquadPathFinder(this, targetOffset);
+            ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
+
+            if (optimalPath == null) {
+                // if there's no path to target, cancel moving
+                finishMove();
+                return false;
+            }
+            else {
+                nextOffsetToMove = new OffsetCoord(
+                        optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
+                // pre-occupy map before moving to the tile
+                map.getTown(nextOffsetToMove).addSquad(this);
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+
 
     /**
      *
@@ -508,8 +524,8 @@ public class Squad extends Object implements Controllable {
     }
 
     private final static int SPRITE_LAYER = 5;
-    private final static Size SPRITE_BASE_SIZE = new Size(80, 80);
-    private final static Point SPRITE_HOTSPOT_OFFSET = new Point(0, -25);
+    private final static SizeF SPRITE_BASE_SIZE = new SizeF(80, 80);
+    private final static PointF SPRITE_HOTSPOT_OFFSET = new PointF(0, -25);
     private final static float ICON_SPRITE_OPAQUE_NORMAL = 0.8f;
     private final static float CURRENT_SPRITE_OPAQUE_DRAGGING = 0.2f;
     private final static float DRAGGING_SPRITE_OPAQUE_NORMAL = 0.0f;
@@ -518,8 +534,9 @@ public class Squad extends Object implements Controllable {
 
     private TownMap map;
     private Town.Side side;
-    private Size spriteSize;
+    private SizeF spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
+    private boolean touching = false;
     private boolean dragging = false;
     private OffsetCoord targetOffsetToMove;
     private OffsetCoord nextOffsetToMove;

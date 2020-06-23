@@ -8,6 +8,7 @@ import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Shape;
 import com.lifejourney.engine2d.Size;
+import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ public class Unit extends CollidableObject {
         LONGBOW;
 
         Sprite sprite() {
-            Sprite sprite = new Sprite.Builder("unit_class.png").gridSize(new Size(4,1))
-                    .size(new Size(16, 16)).smooth(true).build();
-            sprite.setGridIndex(spriteGridIndex());
+            Sprite sprite = new Sprite.Builder("unit_class.png").gridSize(4,1)
+                    .size(new SizeF(16, 16)).smooth(true).build();
+            sprite.setGridIndex(spriteGridIndex().x, spriteGridIndex().y);
             return sprite;
         }
         Point spriteGridIndex() {
@@ -205,12 +206,12 @@ public class Unit extends CollidableObject {
             return this;
         }
         public Unit build() {
-            Sprite unitFrameSprite = new Sprite.Builder("unit_frame.png").gridSize(new Size(4,1))
-                    .size(new Size(16, 16)).depth(1.0f).smooth(true).build();
-            unitFrameSprite.setGridIndex(new Point(side.ordinal(), 0));
-            Sprite unitHealthSprite = new Sprite.Builder("unit_health.png").gridSize(new Size(5,1))
-                    .size(new Size(16, 16)).depth(1.0f).smooth(true).build();
-            unitFrameSprite.setGridIndex(new Point(side.ordinal(), 0));
+            Sprite unitFrameSprite = new Sprite.Builder("unit_frame.png").gridSize(4,1)
+                    .size(new SizeF(16, 16)).depth(1.0f).smooth(true).build();
+            unitFrameSprite.setGridIndex(side.ordinal(), 0);
+            Sprite unitHealthSprite = new Sprite.Builder("unit_health.png").gridSize(5,1)
+                    .size(new SizeF(16, 16)).depth(1.0f).smooth(true).build();
+            unitFrameSprite.setGridIndex(side.ordinal(), 0);
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitClass.sprite())
                     .sprite(unitFrameSprite)
@@ -452,7 +453,7 @@ public class Unit extends CollidableObject {
         }
 
         Sprite healthSprite = getSprite(2);
-        healthSprite.setGridIndex(new Point((int)((1.0f - health / (float)getMaxHealth()) / 0.25f), 0));
+        healthSprite.setGridIndex((int)((1.0f - health / (float)getMaxHealth()) / 0.25f), 0);
     }
 
     /**

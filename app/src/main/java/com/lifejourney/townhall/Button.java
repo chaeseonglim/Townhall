@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Point;
+import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.Size;
+import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Widget;
 
@@ -72,19 +74,19 @@ public class Button extends Widget {
         eventHandler = builder.eventHandler;
 
         bg = new Sprite.Builder(builder.bgAsset)
-                .size(getRegion().size())
+                .size(new SizeF(getRegion().size()))
                 .smooth(false).depth(0.2f)
-                .gridSize(new Size(2, 1))
+                .gridSize(2, 1)
                 .layer(builder.layer).visible(false).build();
         shadow = new Sprite.Builder(builder.bgAsset)
-                .size(getRegion().size())
+                .size(new SizeF(getRegion().size()))
                 .smooth(false).depth(0.1f).opaque(0.2f)
-                .gridSize(new Size(2, 1))
+                .gridSize(2, 1)
                 .layer(builder.layer).visible(false).build();
 
         msg = new Sprite.Builder("button"+uid++, builder.message, builder.fontSize,
                 builder.textColor, Color.argb(0, 0, 0, 0), Paint.Align.CENTER)
-                .size(builder.region.size())
+                .size(new SizeF(builder.region.size()))
                 .smooth(true).depth(0.3f)
                 .layer(builder.layer).visible(false).build();
     }
@@ -109,7 +111,7 @@ public class Button extends Widget {
         {
             case MotionEvent.ACTION_DOWN:
                 if (checkIfInputEventInRegion(event)) {
-                    bg.setGridIndex(new Point(1, 0));
+                    bg.setGridIndex(1, 0);
                     pressed = true;
                     result = true;
                 }
@@ -128,7 +130,7 @@ public class Button extends Widget {
             case MotionEvent.ACTION_CANCEL:
                 if (pressed) {
                     pressed = false;
-                    bg.setGridIndex(new Point(0, 0));
+                    bg.setGridIndex(0, 0);
                     result = true;
                 }
                 else {
@@ -138,7 +140,7 @@ public class Button extends Widget {
             case MotionEvent.ACTION_UP:
                 if (pressed) {
                     pressed = false;
-                    bg.setGridIndex(new Point(0, 0));
+                    bg.setGridIndex(0, 0);
                     if (checkIfInputEventInRegion(event) && eventHandler != null) {
                         eventHandler.onButtonPressed(this);
                     }
@@ -162,14 +164,14 @@ public class Button extends Widget {
         super.commit();
 
         if (bg.getGridIndex().equals(new Point(1, 0))) {
-            msg.setPosition(new Point(getScreenRegion().center().offset(3, 3)));
-            bg.setPosition(new Point(getScreenRegion().center().offset(3, 3)));
+            msg.setPosition(new PointF(getScreenRegion().center().offset(3, 3)));
+            bg.setPosition(new PointF(getScreenRegion().center().offset(3, 3)));
         }
         else {
-            msg.setPosition(new Point(getScreenRegion().center()));
-            bg.setPosition(new Point(getScreenRegion().center()));
+            msg.setPosition(new PointF(getScreenRegion().center()));
+            bg.setPosition(new PointF(getScreenRegion().center()));
         }
-        shadow.setPosition(new Point(getScreenRegion().center().offset(3, 3)));
+        shadow.setPosition(new PointF(getScreenRegion().center().offset(3, 3)));
         msg.commit();
         bg.commit();
         shadow.commit();

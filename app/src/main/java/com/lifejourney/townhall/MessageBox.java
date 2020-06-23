@@ -10,6 +10,7 @@ import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.RectF;
 import com.lifejourney.engine2d.Size;
+import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Widget;
 
@@ -79,23 +80,21 @@ public class MessageBox extends Widget {
         eventHandler = builder.eventHandler;
 
         bg = new Sprite.Builder(builder.bgAsset)
-                .size(getRegion().size())
+                .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(builder.layer).depth(0.2f)
-                .gridSize(new Size(2, 1))
-                .visible(false).build();
+                .gridSize(2, 1).visible(false).build();
         shadow = new Sprite.Builder(builder.bgAsset)
-                .size(getRegion().size())
+                .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(builder.layer).depth(0.1f).opaque(0.2f)
-                .gridSize(new Size(2, 1))
-                .visible(false).build();
-        shadow.setGridIndex(new Point(1, 0));
+                .gridSize(2, 1).visible(false).build();
+        shadow.setGridIndex(1, 0);
 
         pages = new ArrayList<>();
         for (int i = 0; i < builder.messages.size(); ++i) {
             Sprite sprite =
                     new Sprite.Builder("messagebox"+i, builder.messages.get(i), builder.fontSize,
                             builder.textColor, Color.argb(0, 0, 0, 0), Paint.Align.LEFT)
-                            .size(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2))
+                            .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
                             .smooth(true).depth(0.3f)
                             .layer(builder.layer).visible(false).build();
             pages.add(sprite);
@@ -128,14 +127,14 @@ public class MessageBox extends Widget {
         PointF screenPt = screenRegion.center();
 
         if (currentPage < pages.size()) {
-            pages.get(currentPage).setPosition(new Point(screenPt).offset(TEXT_MARGIN, TEXT_MARGIN));
+            pages.get(currentPage).setPosition(screenPt.clone().offset(TEXT_MARGIN, TEXT_MARGIN));
             pages.get(currentPage).commit();
         }
 
-        bg.setPosition(new Point(screenPt));
+        bg.setPosition(screenPt);
         bg.commit();
 
-        shadow.setPosition(new Point(screenPt).offset(5, 5));
+        shadow.setPosition(screenPt.offset(5, 5));
         shadow.commit();
     }
 

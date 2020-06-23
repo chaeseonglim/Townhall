@@ -82,8 +82,8 @@ class TownMap extends HexTileMap implements View {
 
         // Calculate viewport clipping area
         OffsetCoord bottomRightMapCoord = new OffsetCoord(mapSize.width-1, mapSize.height-1);
-        Point bottomRightGameCoord = bottomRightMapCoord.toGameCoord();
-        clippedViewport = new Rect(-getTileSize().width, -getTileSize().height,
+        PointF bottomRightGameCoord = bottomRightMapCoord.toGameCoord();
+        clippedViewport = new RectF(-getTileSize().width, -getTileSize().height,
                 bottomRightGameCoord.x + getTileSize().width*2,
                 bottomRightGameCoord.y + getTileSize().height*2);
     }
@@ -95,6 +95,7 @@ class TownMap extends HexTileMap implements View {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         // Dragging map
         int eventAction = event.getAction();
         PointF touchingScreenCoord = new PointF(event.getX(), event.getY());
@@ -144,16 +145,25 @@ class TownMap extends HexTileMap implements View {
 
         ArrayList<Sprite> sprites = new ArrayList<>();
 
-        Sprite.Builder spriteBuilder =
+        Sprite baseSprite =
             new Sprite.Builder("tiles.png")
-                .position(mapCoord.toGameCoord())
-                .size(getTileSize())
-                .gridSize(new Size(2, 4)).smooth(false)
-                .layer(MAP_LAYER).visible(true);
-        Sprite sprite = spriteBuilder.build();
-        sprite.setGridIndex(getTextureGridForTile(mapCoord));
+                .position(new PointF(mapCoord.toGameCoord()))
+                .size(getTileSize()).gridSize(2, 5).smooth(false)
+                .layer(SPRITE_LAYER).visible(true).build();
+        Point textureGridForTile = getTextureGridForTile(mapCoord);
+        baseSprite.setGridIndex(textureGridForTile.x, textureGridForTile.y);
+        sprites.add(baseSprite);
 
-        sprites.add(sprite);
+        if (glowingTiles != null && glowingTiles.contains(mapCoord)) {
+            Sprite glowingSprite =
+                    new Sprite.Builder("tiles.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(getTileSize()).gridSize(2, 5).smooth(false)
+                            .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
+            glowingSprite.setGridIndex(0, 4);
+            sprites.add(glowingSprite);
+        }
+
         return sprites;
     }
 
@@ -285,27 +295,51 @@ class TownMap extends HexTileMap implements View {
         Rect viewport = Engine2D.GetInstance().getViewport();
         viewport.offset(offset);
         if (viewport.x < clippedViewport.x) {
-            viewport.x = clippedViewport.x;
+            viewport.x = (int) clippedViewport.x;
         }
         if (viewport.y < clippedViewport.y) {
-            viewport.y = clippedViewport.y;
+            viewport.y = (int) clippedViewport.y;
         }
         if (viewport.bottomRight().x > clippedViewport.bottomRight().x) {
-            viewport.x = clippedViewport.bottomRight().x - viewport.width;
+            viewport.x = (int) (clippedViewport.bottomRight().x - viewport.width);
         }
         if (viewport.bottomRight().y > clippedViewport.bottomRight().y) {
-            viewport.y = clippedViewport.bottomRight().y - viewport.height;
+            viewport.y = (int) (clippedViewport.bottomRight().y - viewport.height);
         }
         Engine2D.GetInstance().setViewport(viewport);
     }
 
-    private final static int MAP_LAYER = 0;
+    /**
+     *
+     * @param glowingTiles
+     */
+    public void setGlowingTiles(ArrayList<OffsetCoord> glowingTiles) {
+
+        if (this.glowingTiles != null) {
+            for (OffsetCoord tileOffset: this.glowingTiles) {
+                if (glowingTiles == null || !glowingTiles.contains(tileOffset)) {
+                    flushTileSprite(tileOffset);
+                }
+            }
+        }
+        if (glowingTiles != null) {
+            for (OffsetCoord tileOffset: glowingTiles) {
+                if (this.glowingTiles == null || !this.glowingTiles.contains(tileOffset)) {
+                    flushTileSprite(tileOffset);
+                }
+            }
+        }
+        this.glowingTiles = glowingTiles;
+    }
+
+    private final static int SPRITE_LAYER = 0;
     private final static int HEX_SIZE = 64;
 
     private float scale;
     private OffsetCoord capitalOffset;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
+    private ArrayList<OffsetCoord> glowingTiles = null;
     private boolean dragging = false;
     private PointF touchedPoint;
-    private Rect clippedViewport;
+    private RectF clippedViewport;
 }
