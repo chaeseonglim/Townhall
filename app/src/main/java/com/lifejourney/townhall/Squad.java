@@ -4,13 +4,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Controllable;
+import com.lifejourney.engine2d.CubeCoord;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Object;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.RectF;
-import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Waypoint;
@@ -35,19 +35,26 @@ public class Squad extends Object implements Controllable {
         }
         public Squad build() {
             Sprite currentIcon = new Sprite.Builder("SquadIcon", "squad.png").layer(SPRITE_LAYER)
-                    .size(SPRITE_BASE_SIZE).smooth(false).visible(true)
+                    .size(ICON_SPRITE_SIZE).smooth(false).visible(true)
                     .gridSize(4, 2).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
             currentIcon.setGridIndex(side.ordinal(), 0);
             currentIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET);
             Sprite targetIcon = new Sprite.Builder("SquadTarget", "squad.png").layer(SPRITE_LAYER)
-                    .size(SPRITE_BASE_SIZE).smooth(false).visible(false)
-                    .gridSize(4, 2).opaque(DRAGGING_SPRITE_OPAQUE_NORMAL)
+                    .size(ICON_SPRITE_SIZE).smooth(false).visible(false)
+                    .gridSize(4, 2).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
                     .build();
             targetIcon.setPositionOffset(SPRITE_HOTSPOT_OFFSET);
+            Sprite movingArrow = new Sprite.Builder("SquadMovingArrow", "squad_moving_arrow.png")
+                    .layer(SPRITE_LAYER - 1)
+                    .size(MOVING_ARROW_SIZE).smooth(true).visible(false)
+                    .gridSize(4, 6).opaque(MOVING_ARROW_SPRITE_OPAQUE_NORMAL)
+                    .build();
             return (Squad) new PrivateBuilder<>(position, map, side).priority(-1).layer(SPRITE_LAYER)
                     .sprite(currentIcon, true)
-                    .sprite(targetIcon, false).build();
+                    .sprite(targetIcon, false)
+                    .sprite(movingArrow, false)
+                    .build();
         }
     }
 
@@ -70,7 +77,7 @@ public class Squad extends Object implements Controllable {
     public Squad(PrivateBuilder builder) {
 
         super(builder);
-        spriteSize = SPRITE_BASE_SIZE;
+        spriteSize = ICON_SPRITE_SIZE;
         side = builder.side;
         map = builder.map;
         map.getTown(getMapCoord()).addSquad(this);
@@ -105,6 +112,7 @@ public class Squad extends Object implements Controllable {
 
         Sprite currentIcon = getSprite(0);
         Sprite targetIcon = getSprite(1);
+        Sprite movingArrow = getSprite(2);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             touching = true;
@@ -117,7 +125,7 @@ public class Squad extends Object implements Controllable {
             }
             else {
                 // Dragging
-                currentIcon.setOpaque(CURRENT_SPRITE_OPAQUE_DRAGGING);
+                currentIcon.setOpaque(ICON_SPRITE_OPAQUE_DRAGGING);
                 targetIcon.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
                 targetIcon.setVisible(true);
                 targetIcon.setPosition(touchedGameCoord);
@@ -198,6 +206,7 @@ public class Squad extends Object implements Controllable {
                 if (allUnitArrived) {
                     move(nextOffsetToMove);
                     seek(targetOffsetToMove);
+                    map.setGlowingTiles(null);
                 }
             }
             else {
@@ -288,8 +297,10 @@ public class Squad extends Object implements Controllable {
 
         Sprite currentIcon = getSprite(0);
         Sprite targetIcon = getSprite(1);
+        Sprite movingArrow = getSprite(2);
         currentIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         targetIcon.setVisible(false);
+        movingArrow.setVisible(false);
         dragging = false;
         if (nextOffsetToMove != null && !nextOffsetToMove.equals(getMapCoord())) {
             map.getTown(nextOffsetToMove).removeSquad(this);
@@ -307,8 +318,9 @@ public class Squad extends Object implements Controllable {
 
         Sprite currentIcon = getSprite(0);
         Sprite targetIcon = getSprite(1);
+        Sprite movingArrow = getSprite(2);
         currentIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetIcon.setPosition(new PointF(targetOffset.toGameCoord()));
+        targetIcon.setPosition(targetOffset.toGameCoord());
         targetIcon.setVisible(true);
         dragging = false;
         targetOffsetToMove = targetOffset;
@@ -332,6 +344,19 @@ public class Squad extends Object implements Controllable {
             else {
                 nextOffsetToMove = new OffsetCoord(
                         optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
+
+                // Set moving arrow
+                PointF thisGameCoord = getMapCoord().toGameCoord();
+                PointF nextGameCoord = nextOffsetToMove.toGameCoord();
+                thisGameCoord.add(nextGameCoord).divide(2);
+                movingArrow.setPosition(thisGameCoord);
+                CubeCoord.Direction tileDirection = getMapCoord().getDirection(nextOffsetToMove);
+                movingArrow.clearAnimation();
+                movingArrow.addAnimationFrame(0, tileDirection.ordinal(), 10);
+                movingArrow.addAnimationFrame(1, tileDirection.ordinal(), 10);
+                movingArrow.addAnimationFrame(2, tileDirection.ordinal(), 10);
+                movingArrow.addAnimationFrame(3, tileDirection.ordinal(), 10);
+                movingArrow.setVisible(true);
                 return true;
             }
         }
@@ -529,12 +554,14 @@ public class Squad extends Object implements Controllable {
     }
 
     private final static int SPRITE_LAYER = 5;
-    private final static SizeF SPRITE_BASE_SIZE = new SizeF(80, 80);
+    private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
+    private final static SizeF MOVING_ARROW_SIZE = new SizeF(32, 32);
     private final static PointF SPRITE_HOTSPOT_OFFSET = new PointF(0, -25);
     private final static float ICON_SPRITE_OPAQUE_NORMAL = 0.8f;
-    private final static float CURRENT_SPRITE_OPAQUE_DRAGGING = 0.2f;
-    private final static float DRAGGING_SPRITE_OPAQUE_NORMAL = 0.0f;
+    private final static float ICON_SPRITE_OPAQUE_DRAGGING = 0.2f;
+    private final static float TARGET_SPRITE_OPAQUE_NORMAL = 0.0f;
     private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.5f;
+    private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
 
     private TownMap map;
