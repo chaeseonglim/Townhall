@@ -1,6 +1,10 @@
 package com.lifejourney.townhall;
 
 import com.lifejourney.engine2d.OffsetCoord;
+import com.lifejourney.engine2d.Point;
+import com.lifejourney.engine2d.PointF;
+import com.lifejourney.engine2d.SizeF;
+import com.lifejourney.engine2d.Sprite;
 
 import java.util.ArrayList;
 
@@ -14,9 +18,56 @@ public class Town {
         NEUTRAL
     }
 
-    public Town(OffsetCoord mapCoord) {
+    private static SizeF TileSize;
+
+    /**
+     *
+     * @param tileSize
+     */
+    public static void SetTileSize(SizeF tileSize) {
+
+        TileSize = tileSize;
+    }
+
+    public Town(OffsetCoord mapCoord, TownMap.TileType type) {
 
         this.mapCoord = mapCoord;
+        this.type = type;
+    }
+
+    private Point getTextureGridForTile() {
+        switch (type) {
+            case GRASS:
+                return new Point(0, 0);
+            case BADLAND:
+                return new Point(0, 1);
+            case WATER:
+                return new Point(0, 2);
+            case TOWNHALL:
+                return new Point(0, 3);
+            default:
+                return new Point(0, 0);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ArrayList<Sprite> getTileSprite() {
+
+        ArrayList<Sprite> sprites = new ArrayList<>();
+
+        Sprite baseSprite =
+                new Sprite.Builder("Base", "tiles.png")
+                        .position(new PointF(mapCoord.toGameCoord()))
+                        .size(TileSize).gridSize(2, 5).smooth(false)
+                        .layer(SPRITE_LAYER).visible(true).build();
+        Point textureGridForTile = getTextureGridForTile();
+        baseSprite.setGridIndex(textureGridForTile.x, textureGridForTile.y);
+        sprites.add(baseSprite);
+
+        return sprites;
     }
 
     /**
@@ -93,7 +144,28 @@ public class Town {
         this.mapCoord = mapCoord;
     }
 
+    /**
+     *
+     * @param focused
+     */
+    public void setFocus(boolean focused) {
+        this.focused = focused;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean getFocus() {
+        return focused;
+    }
+
+    private final static int SPRITE_LAYER = 0;
+
+    private OffsetCoord mapCoord;
+    private TownMap.TileType type;
+    private SizeF tileSize;
     private Battle battle;
     private ArrayList<Squad> squads = new ArrayList<>();
-    private OffsetCoord mapCoord;
+    private boolean focused = false;
 }

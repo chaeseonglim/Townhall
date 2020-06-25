@@ -1,13 +1,13 @@
 package com.lifejourney.townhall;
 
 import com.lifejourney.engine2d.OffsetCoord;
-import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-public class GameWorld extends World implements Button.Event, MessageBox.Event {
+public class GameWorld extends World
+        implements Squad.Event, TownMap.Event, Button.Event, MessageBox.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -15,9 +15,9 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         super();
         setDesiredFPS(20.0f);
 
-        map = new TownMap("map.png", scale);
-        addView(map);
+        map = new TownMap(this, "map.png", scale);
         map.show();
+        addView(map);
 
         /*
         initCollisionPool(map.getMapSize().clone()
@@ -40,8 +40,8 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addWidget(okButton);
          */
 
-        Squad squadA = new Squad.Builder(new PointF(map.getCapitalOffset().toGameCoord()),
-                map, Town.Side.TOWN).build();
+        Squad squadA =
+                new Squad.Builder(this, map.getTownhallMapCoord().toGameCoord(), map, Town.Side.TOWN).build();
         addSquad(squadA);
         squadA.show();
 
@@ -49,10 +49,10 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
         addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
 
-        OffsetCoord offsetB = map.getCapitalOffset().clone();
+        OffsetCoord offsetB = map.getTownhallMapCoord().clone();
         offsetB.offset(-1, 0);
-        Squad squadB = new Squad.Builder(new PointF(offsetB.toGameCoord()),
-                map, Town.Side.BANDIT).build();
+        Squad squadB =
+                new Squad.Builder(this, offsetB.toGameCoord(), map, Town.Side.BANDIT).build();
         addSquad(squadB);
         squadB.show();
 
@@ -60,10 +60,10 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
         addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
         addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
 
-        OffsetCoord offsetC = map.getCapitalOffset().clone();
+        OffsetCoord offsetC = map.getTownhallMapCoord().clone();
         offsetC.offset(1, 0);
-        Squad squadC = new Squad.Builder(new PointF(offsetC.toGameCoord()),
-                map, Town.Side.TOWN).build();
+        Squad squadC =
+                new Squad.Builder(this, offsetC.toGameCoord(), map, Town.Side.TOWN).build();
         addSquad(squadC);
         squadC.show();
 
@@ -133,6 +133,86 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
                 iterSquad.remove();
             }
         }
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onMapCreated() {
+
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onMapDestroyed() {
+
+    }
+
+    /**
+     *
+     * @param town
+     */
+    @Override
+    public void onMapFocused(Town town) {
+        if (focusedTown == town) {
+            return;
+        }
+        if (focusedTown != null) {
+            focusedTown.setFocus(false);
+        }
+        if (focusedSquad != null) {
+            focusedSquad.setFocus(false);
+        }
+        focusedTown = town;
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    @Override
+    public void onSquadCreated(Squad squad) {
+
+        map.getTown(squad.getMapCoord()).addSquad(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    @Override
+    public void onSquadDestroyed(Squad squad) {
+
+        map.getTown(squad.getMapCoord()).removeSquad(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    @Override
+    public void onSquadFocused(Squad squad) {
+
+        if (focusedSquad == squad) {
+            return;
+        }
+        if (focusedSquad != null) {
+            focusedSquad.setFocus(false);
+        }
+        if (focusedTown != null) {
+            focusedTown.setFocus(false);
+        }
+        focusedSquad = squad;
+    }
+
+    @Override
+    public void onSquadMoved(Squad squad, OffsetCoord prevMapCoord, OffsetCoord newMapCoord) {
+
+        map.getTown(prevMapCoord).removeSquad(squad);
+        map.getTown(newMapCoord).addSquad(squad);
     }
 
     /**
@@ -229,4 +309,6 @@ public class GameWorld extends World implements Button.Event, MessageBox.Event {
     private ArrayList<Battle> battles = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Unit> units = new ArrayList<>();
+    private Squad focusedSquad = null;
+    private Town focusedTown = null;
 }

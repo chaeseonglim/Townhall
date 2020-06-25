@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -15,21 +14,28 @@ import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.View;
-import com.lifejourney.engine2d.Waypoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 class TownMap extends HexTileMap implements View {
 
     private static final String LOG_TAG = "TownMap";
 
+    public interface Event {
+
+        void onMapCreated();
+
+        void onMapDestroyed();
+
+        void onMapFocused(Town town);
+    }
+
     enum TileType {
         GRASS((byte)0xe0, true),
-        SOIL((byte)0xd0, true),
+        BADLAND((byte)0xd0, true),
         WATER((byte)0x00, false),
-        CAPITAL((byte)0xb0, true),
+        TOWNHALL((byte)0xb0, true),
         UNKNOWN((byte)0xff, false);
 
         TileType(byte code, boolean movable) {
@@ -52,10 +58,11 @@ class TownMap extends HexTileMap implements View {
      *
      * @param mapBitmap
      */
-    TownMap(String mapBitmap, float scale) {
+    TownMap(Event listener, String mapBitmap, float scale) {
 
         super((int) (HEX_SIZE * scale));
 
+        this.listener = listener;
         this.scale = scale;
         setCacheMargin(4);
 
@@ -66,16 +73,17 @@ class TownMap extends HexTileMap implements View {
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
 
         // Add town information
+        Town.SetTileSize(getTileSize());
         Size mapSize = getMapSize();
         for (int y = 0; y < mapSize.height; ++y) {
             for (int x = 0; x < mapSize.width; ++x) {
                 OffsetCoord mapCoord = new OffsetCoord(x, y);
                 TileType tileType = getTileType(mapCoord);
-                if (tileType == TileType.CAPITAL) {
+                if (tileType == TileType.TOWNHALL) {
                     capitalOffset = mapCoord;
                 }
 
-                Town town = new Town(mapCoord);
+                Town town = new Town(mapCoord, tileType);
                 towns.put(mapCoord, town);
             }
         }
@@ -86,6 +94,19 @@ class TownMap extends HexTileMap implements View {
         clippedViewport = new RectF(-getTileSize().width, -getTileSize().height,
                 bottomRightGameCoord.x + getTileSize().width*2,
                 bottomRightGameCoord.y + getTileSize().height*2);
+
+        listener.onMapCreated();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void close() {
+
+        super.close();
+
+        listener.onMapDestroyed();
     }
 
     /**
@@ -98,61 +119,44 @@ class TownMap extends HexTileMap implements View {
 
         // Dragging map
         int eventAction = event.getAction();
-        PointF touchingScreenCoord = new PointF(event.getX(), event.getY());
+        PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
+        PointF touchedGameCoord =
+                Engine2D.GetInstance().translateScreenToGameCoord(touchedScreenCoord);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            dragging = true;
-            touchedPoint = touchingScreenCoord;
+            setDragging(true);
+            lastTouchedScreenCoord = lastDraggingScreenCoord = touchedScreenCoord;
             return true;
-        }
-        else if (eventAction == MotionEvent.ACTION_MOVE && dragging) {
-            PointF delta = new PointF(touchingScreenCoord);
-            delta.subtract(touchedPoint).multiply(-1.0f);
-            scroll(new Point(delta));
-            touchedPoint = touchingScreenCoord;
+        } else if (isDragging()) {
+            if (eventAction == MotionEvent.ACTION_MOVE) {
+                PointF delta = new PointF(touchedScreenCoord);
+                delta.subtract(lastDraggingScreenCoord).multiply(-1.0f);
+                scroll(new Point(delta));
+                lastDraggingScreenCoord = touchedScreenCoord;
+            } else if (eventAction == MotionEvent.ACTION_UP) {
+                setDragging(false);
+
+                PointF lastTouchedWidgetCoord =
+                        Engine2D.GetInstance().translateScreenToWidgetCoord(lastTouchedScreenCoord);
+                PointF touchedWidgetCoord =
+                        Engine2D.GetInstance().translateScreenToWidgetCoord(touchedScreenCoord);
+                if (lastTouchedWidgetCoord.distance(touchedWidgetCoord) < 60.0f) {
+                    OffsetCoord touchedMapCoord = new OffsetCoord(touchedGameCoord);
+                    listener.onMapFocused(getTown(touchedMapCoord));
+                }
+            } else if (eventAction == MotionEvent.ACTION_CANCEL) {
+                setDragging(false);
+            }
             return true;
-        }
-        else if ((eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL)
-                && dragging) {
-            dragging = false;
-            return true;
-        }
-        else {
+        } else {
             return false;
-        }
-    }
-
-
-    private Point getTextureGridForTile(OffsetCoord mapCoord) {
-
-        TownMap.TileType tileType = getTileType(mapCoord);
-        switch (tileType) {
-            case GRASS:
-                return new Point(0, 0);
-            case SOIL:
-                return new Point(0, 1);
-            case WATER:
-                return new Point(0, 2);
-            case CAPITAL:
-                return new Point(0, 3);
-            default:
-                return new Point(0, 0);
         }
     }
 
     @Override
     protected ArrayList<Sprite> getTileSprite(OffsetCoord mapCoord) {
 
-        ArrayList<Sprite> sprites = new ArrayList<>();
-
-        Sprite baseSprite =
-            new Sprite.Builder("Base", "tiles.png")
-                .position(new PointF(mapCoord.toGameCoord()))
-                .size(getTileSize()).gridSize(2, 5).smooth(false)
-                .layer(SPRITE_LAYER).visible(true).build();
-        Point textureGridForTile = getTextureGridForTile(mapCoord);
-        baseSprite.setGridIndex(textureGridForTile.x, textureGridForTile.y);
-        sprites.add(baseSprite);
+        ArrayList<Sprite> sprites = getTown(mapCoord).getTileSprite();
 
         if (glowingTiles != null && glowingTiles.contains(mapCoord)) {
             Sprite glowingSprite =
@@ -228,7 +232,7 @@ class TownMap extends HexTileMap implements View {
      *
      * @return
      */
-    public OffsetCoord getCapitalOffset() {
+    public OffsetCoord getTownhallMapCoord() {
 
         return capitalOffset;
     }
@@ -333,14 +337,32 @@ class TownMap extends HexTileMap implements View {
         this.glowingTiles = glowingTiles;
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isDragging() {
+        return dragging;
+    }
+
+    /**
+     *
+     * @param dragging
+     */
+    public void setDragging(boolean dragging) {
+        this.dragging = dragging;
+    }
+
     private final static int SPRITE_LAYER = 0;
     private final static int HEX_SIZE = 64;
 
+    private Event listener;
     private float scale;
+    private boolean dragging = false;
     private OffsetCoord capitalOffset;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private ArrayList<OffsetCoord> glowingTiles = null;
-    private boolean dragging = false;
-    private PointF touchedPoint;
+    private PointF lastTouchedScreenCoord;
+    private PointF lastDraggingScreenCoord;
     private RectF clippedViewport;
 }

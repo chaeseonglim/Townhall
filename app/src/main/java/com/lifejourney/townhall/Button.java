@@ -19,7 +19,7 @@ public class Button extends Widget {
 
     private final String LOG_TAG = "Button";
 
-    interface Event {
+    public interface Event {
 
         void onButtonPressed(Button button);
 

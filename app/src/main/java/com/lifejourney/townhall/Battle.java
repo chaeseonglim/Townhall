@@ -18,8 +18,8 @@ public class Battle {
         this.defender = defender;
         this.squads.add(attacker);
         this.squads.add(defender);
-        this.attacker.beginFight(defender);
-        this.defender.beginFight(attacker);
+        this.attacker.startFight(defender);
+        this.defender.startFight(attacker);
         this.mapCoord = defender.getMapCoord();
     }
 
@@ -36,19 +36,19 @@ public class Battle {
 
         if (attacker.isEliminated() || defender.isEliminated()) {
             // finish battle
-            attacker.endFight();
-            defender.endFight();
+            attacker.finishFight();
+            defender.finishFight();
             finished = true;
         }
         else if (attacker.isWillingToRetreat()) {
             // try retreating attacker
             OffsetCoord retreatableCoord = map.findRetreatableMapCoord(attacker.getMapCoord());
             if (retreatableCoord != null) {
-                attacker.move(retreatableCoord);
+                attacker.moveTo(retreatableCoord);
 
                 // finish battle
-                attacker.endFight();
-                defender.endFight();
+                attacker.finishFight();
+                defender.finishFight();
                 finished = true;
             }
         }
@@ -56,11 +56,11 @@ public class Battle {
             // try retreating defender
             OffsetCoord retreatableCoord = map.findRetreatableMapCoord(defender.getMapCoord());
             if (retreatableCoord != null) {
-                defender.move(retreatableCoord);
+                defender.moveTo(retreatableCoord);
 
                 // finish battle
-                attacker.endFight();
-                defender.endFight();
+                attacker.finishFight();
+                defender.finishFight();
                 finished = true;
             }
         }

@@ -20,7 +20,7 @@ public class MessageBox extends Widget {
 
     private final String LOG_TAG = "MessageBox";
 
-    interface Event {
+    public interface Event {
 
         void onMessageBoxTouched(MessageBox messageBox);
     }
