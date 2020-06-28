@@ -268,7 +268,7 @@ public class Squad extends Object implements Controllable {
      */
     public void moveTo(OffsetCoord targetMapCoord) {
 
-        OffsetCoord prevMapCoord = getMapCoord().clone();
+        prevMapCoord = getMapCoord().clone();
         setPosition(targetMapCoord.toGameCoord());
         listener.onSquadMoved(this, prevMapCoord, targetMapCoord);
     }
@@ -339,6 +339,7 @@ public class Squad extends Object implements Controllable {
             PointF nextGameCoordToMove = nextMapCoordToMove.toGameCoord();
             currentGameCoord.add(nextGameCoordToMove).divide(2);
             movingArrow.setPosition(currentGameCoord);
+            movingArrow.setAnimationWrap(true);
             movingArrow.clearAnimation();
             CubeCoord.Direction tileDirection = getMapCoord().getDirection(nextMapCoordToMove);
             movingArrow.addAnimationFrame(0, tileDirection.ordinal(), 15);
@@ -442,7 +443,7 @@ public class Squad extends Object implements Controllable {
         while (iter.hasNext()) {
             Unit unit = iter.next();
             if (unit.isKilled()) {
-                expEarned += unit.getUnitClass().expEarned(unit.getLevel());
+                expEarned += unit.getUnitClass().earnedExp(unit.getLevel());
                 iter.remove();
             }
         }
@@ -558,7 +559,6 @@ public class Squad extends Object implements Controllable {
 
         Sprite currentIcon = getSprite(0);
         Sprite targetIcon = getSprite(1);
-        Sprite movingArrow = getSprite(2);
 
         this.focused = focused;
         if (this.focused) {
@@ -655,6 +655,14 @@ public class Squad extends Object implements Controllable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public OffsetCoord getPrevMapCoord() {
+        return prevMapCoord;
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
     private final static SizeF MOVING_ARROW_SIZE = new SizeF(32, 32);
@@ -677,6 +685,7 @@ public class Squad extends Object implements Controllable {
     private boolean dragging = false;
     private OffsetCoord targetMapCoordToMove;
     private OffsetCoord nextMapCoordToMove;
+    private OffsetCoord prevMapCoord;
     private boolean fighting = false;
     private Squad opponent;
     private int totalHealthWhenEnteringBattle;

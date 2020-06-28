@@ -42,11 +42,12 @@ public class Battle {
         }
         else if (attacker.isWillingToRetreat()) {
             // try retreating attacker
-            OffsetCoord retreatableCoord = map.findRetreatableMapCoord(attacker.getMapCoord());
-            if (retreatableCoord != null) {
-                attacker.moveTo(retreatableCoord);
+            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(attacker.getMapCoord());
+            if (retreatableCoords != null && retreatableCoords.size() > 0) {
+                // Retreat attacker
+                attacker.moveTo(retreatableCoords.get(0));
 
-                // finish battle
+                // Finish battle
                 attacker.finishFight();
                 defender.finishFight();
                 finished = true;
@@ -54,14 +55,20 @@ public class Battle {
         }
         else if (defender.isWillingToRetreat()) {
             // try retreating defender
-            OffsetCoord retreatableCoord = map.findRetreatableMapCoord(defender.getMapCoord());
-            if (retreatableCoord != null) {
-                defender.moveTo(retreatableCoord);
+            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(defender.getMapCoord());
+            if (retreatableCoords != null) {
+                for (OffsetCoord retreatableCoord: retreatableCoords) {
+                    if (!retreatableCoord.equals(attacker.getPrevMapCoord())) {
+                        // Retreat defender
+                        defender.moveTo(retreatableCoord);
 
-                // finish battle
-                attacker.finishFight();
-                defender.finishFight();
-                finished = true;
+                        // Finish battle
+                        attacker.finishFight();
+                        defender.finishFight();
+                        finished = true;
+                        break;
+                    }
+                }
             }
         }
     }

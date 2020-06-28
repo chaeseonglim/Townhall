@@ -1,19 +1,16 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import com.lifejourney.engine2d.CollidableObject;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Shape;
-import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 
 import java.util.ArrayList;
 
-public class Unit extends CollidableObject {
+public class Unit extends CollidableObject implements Projectile.Event {
 
     private static final String LOG_TAG = "Unit";
 
@@ -21,18 +18,12 @@ public class Unit extends CollidableObject {
         SWORD,
         LONGBOW;
 
-        Sprite sprite() {
-            Sprite sprite = new Sprite.Builder("unit_class.png").gridSize(4,1)
-                    .size(new SizeF(16, 16)).smooth(true).build();
-            sprite.setGridIndex(spriteGridIndex().x, spriteGridIndex().y);
-            return sprite;
-        }
         Point spriteGridIndex() {
             switch (this) {
                 case SWORD:
-                    return new Point(0, 0);
-                case LONGBOW:
                     return new Point(1, 0);
+                case LONGBOW:
+                    return new Point(2, 0);
                 default:
                     return null;
             }
@@ -76,11 +67,14 @@ public class Unit extends CollidableObject {
             }
             return 0.0f;
         }
+        public int closeApproachRange() {
+            return 20;
+        }
         public float meleeAttackRange() {
             switch (this) {
                 case SWORD:
                 case LONGBOW:
-                    return 18.0f;
+                    return 26.0f;
             }
             return 0.0f;
         }
@@ -96,9 +90,9 @@ public class Unit extends CollidableObject {
         public int meleeAttackSpeed() {
             switch (this) {
                 case SWORD:
-                    return 8;
+                    return 30;
                 case LONGBOW:
-                    return 12;
+                    return 40;
             }
             return 0;
         }
@@ -107,38 +101,14 @@ public class Unit extends CollidableObject {
                 case SWORD:
                     return 0;
                 case LONGBOW:
-                    return 20;
-            }
-            return 0;
-        }
-        public int expEarned(int level) {
-            int expEarned = 0;
-            switch (this) {
-                case SWORD:
-                    expEarned = 10;
-                    break;
-                case LONGBOW:
-                    expEarned = 10;
-                    break;
-            }
-            return (int) (expEarned * (1.0 + level*0.2));
-        }
-        public int expRequired(int level) {
-            return 100*level;
-        }
-        public int maxHealth() {
-            switch (this) {
-                case SWORD:
-                    return 100;
-                case LONGBOW:
-                    return 60;
+                    return 40;
             }
             return 0;
         }
         public float meleeDamage() {
             switch (this) {
                 case SWORD:
-                    return 5.0f;
+                    return 10.0f;
                 case LONGBOW:
                     return 3.0f;
             }
@@ -179,6 +149,36 @@ public class Unit extends CollidableObject {
             }
             return 0.0f;
         }
+        public int earnedExp(int level) {
+            int expEarned = 0;
+            switch (this) {
+                case SWORD:
+                    expEarned = 10;
+                    break;
+                case LONGBOW:
+                    expEarned = 10;
+                    break;
+            }
+            return (int) (expEarned * (1.0 + level*0.2));
+        }
+        public int requiredExp(int level) {
+            return 100*level;
+        }
+        public int maxHealth() {
+            switch (this) {
+                case SWORD:
+                    return 100;
+                case LONGBOW:
+                    return 60;
+            }
+            return 0;
+        }
+        public Projectile.ProjectileClass projectileClass() {
+            return Projectile.ProjectileClass.ARROW;
+        }
+        public float friction() {
+            return 0.1f;
+        }
         public float maxForce() {
             return 3.0f;
         }
@@ -206,21 +206,24 @@ public class Unit extends CollidableObject {
             return this;
         }
         public Unit build() {
-            Sprite unitFrameSprite = new Sprite.Builder("unit_frame.png").gridSize(4,1)
-                    .size(new SizeF(16, 16)).depth(1.0f).smooth(true).build();
+            Sprite unitClassSprite = new Sprite.Builder("class", "unit_class.png").gridSize(5,1)
+                    .size(new SizeF(16, 16)).smooth(true).build();
+            unitClassSprite.setGridIndex(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y);
+            Sprite unitFrameSprite = new Sprite.Builder("frame", "unit_frame.png").gridSize(4,1)
+                    .size(new SizeF(16, 16)).smooth(true).build();
             unitFrameSprite.setGridIndex(side.ordinal(), 0);
-            Sprite unitHealthSprite = new Sprite.Builder("unit_health.png").gridSize(5,1)
-                    .size(new SizeF(16, 16)).depth(1.0f).smooth(true).build();
+            Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(5,1)
+                    .size(new SizeF(16, 16)).smooth(true).build();
             unitFrameSprite.setGridIndex(side.ordinal(), 0);
             return (Unit) new PrivateBuilder<>(position, unitClass)
-                    .sprite(unitClass.sprite())
+                    .sprite(unitClassSprite)
                     .sprite(unitFrameSprite)
                     .sprite(unitHealthSprite)
                     .maxForce(unitClass.maxForce()).maxVelocity(unitClass.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
-                    .mass(unitClass.mass()).friction(0.1f)
+                    .mass(unitClass.mass()).friction(unitClass.friction())
                     .side(side)
-                    .shape(unitClass.shape()).layer(7).build();
+                    .shape(unitClass.shape()).layer(SPRITE_LAYER).build();
         }
     }
 
@@ -287,7 +290,7 @@ public class Unit extends CollidableObject {
                 }
             }
             if (highestFavor > 0.0f && highestFavorUnit != null) {
-                if (highestFavorDistance > getUnitClass().meleeAttackRange()) {
+                if (highestFavorDistance > getUnitClass().closeApproachRange()) {
                     seek(highestFavorUnit.getPosition(), 1.0f);
                 }
             }
@@ -324,6 +327,22 @@ public class Unit extends CollidableObject {
 
         // Update moving
         super.update();
+
+        if (projectile != null) {
+            projectile.update();
+        }
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void commit() {
+        super.commit();
+
+        if (projectile != null) {
+            projectile.commit();
+        }
     }
 
     /**
@@ -346,28 +365,38 @@ public class Unit extends CollidableObject {
 
     /**
      *
+     * @param projectile
+     */
+    @Override
+    public void onProjectileReached(Projectile projectile) {
+        this.projectile.close();
+        this.projectile = null;
+    }
+
+    /**
+     *
      */
     public void fight() {
 
-        // Search close enemies first
+        // Find favored enemy for attacking target
         Unit targetCandidate = null;
         float highestFavor = -Float.MAX_VALUE;
         int highestHealth = Integer.MAX_VALUE;
-        boolean closeEnemyExist = false;
+        boolean enemyExistInClosedArea = false;
         for (Unit opponent : opponents) {
-            if (opponent.getPosition().distance(getPosition()) <= getUnitClass().meleeAttackRange()) {
-                closeEnemyExist = true;
+            if (opponent.getPosition().distance(getPosition()) <=
+                    getUnitClass().meleeAttackRange()) {
+                enemyExistInClosedArea = true;
                 if (meleeAttackLeft > 0) {
                     break;
                 }
 
                 float favor = getUnitClass().favor(opponent.getUnitClass());
-                if (favor >= highestFavor) {
-                    if (favor > highestFavor || opponent.getHealth() < highestHealth) {
-                        targetCandidate = opponent;
-                        highestFavor = favor;
-                        highestHealth = opponent.getHealth();
-                    }
+                if (favor > highestFavor ||
+                        (favor == highestFavor && opponent.getHealth() < highestHealth)) {
+                    targetCandidate = opponent;
+                    highestFavor = favor;
+                    highestHealth = opponent.getHealth();
                 }
             }
         }
@@ -377,6 +406,7 @@ public class Unit extends CollidableObject {
             meleeAttackLeft--;
         }
         else if (targetCandidate != null) {
+            // Do melee attack
             attackMelee(targetCandidate);
             meleeAttackLeft = getUnitClass().meleeAttackSpeed();
         }
@@ -385,23 +415,22 @@ public class Unit extends CollidableObject {
         if (rangedAttackLeft > 0) {
             rangedAttackLeft--;
         }
-        else if (!closeEnemyExist && getUnitClass().rangedAttackRange() > 0.0f) {
-            // Search distanced enemies
+        else if (!enemyExistInClosedArea && getUnitClass().rangedAttackRange() > 0.0f) {
+            // Search enemy target for ranged attack
             targetCandidate = null;
             highestFavor = -Float.MAX_VALUE;
             highestHealth = Integer.MAX_VALUE;
 
-            // Select highest favor enemy
+            // Select highest favored enemy
             for (Unit opponent : opponents) {
                 if (opponent.getPosition().distance(getPosition()) <=
                         getUnitClass().rangedAttackRange()) {
                     float favor = getUnitClass().favor(opponent.getUnitClass());
-                    if (favor >= highestFavor) {
-                        if (favor > highestFavor || opponent.getHealth() < highestHealth) {
-                            targetCandidate = opponent;
-                            highestFavor = favor;
-                            highestHealth = opponent.getHealth();
-                        }
+                    if (favor > highestFavor ||
+                            (favor == highestFavor && opponent.getHealth() < highestHealth)) {
+                        targetCandidate = opponent;
+                        highestFavor = favor;
+                        highestHealth = opponent.getHealth();
                     }
                 }
             }
@@ -418,11 +447,22 @@ public class Unit extends CollidableObject {
      * @param opponent
      */
     private void attackMelee(Unit opponent) {
+
+        Sprite classSprite = getSprite(0);
+        classSprite.clearAnimation();
+        classSprite.addAnimationFrame(0, 0, 5);
+        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y,
+                5);
+        classSprite.addAnimationFrame(0, 0, 5);
+        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y,
+                5);
+
+        // Check evading
         if (Math.random() < opponent.getMeleeEvade()) {
-            // evaded
             return;
         }
 
+        // Deal damage
         int damage = Math.max((int) (getMeleeDamage() * opponent.getArmor()), 1);
         opponent.gotDamage(damage);
     }
@@ -432,11 +472,22 @@ public class Unit extends CollidableObject {
      * @param opponent
      */
     private void attackRanged(Unit opponent) {
+
+        // Create projectile for ranged attack
+        // Currently projectile is just an fake
+        if (projectile != null) {
+            projectile.close();
+        }
+        projectile = new Projectile.Builder(this, unitClass.projectileClass(), opponent).build();
+        projectile.setPosition(this.getPosition().clone());
+        projectile.setVisible(true);
+
+        // Check evading
         if (Math.random() < opponent.getRangedEvade()) {
-            // evaded
             return;
         }
 
+        // Deal damage
         int damage = Math.max((int) (getRangedDamage() * opponent.getArmor()), 1);
         opponent.gotDamage(damage);
     }
@@ -453,7 +504,7 @@ public class Unit extends CollidableObject {
         }
 
         Sprite healthSprite = getSprite(2);
-        healthSprite.setGridIndex((int)((1.0f - health / (float)getMaxHealth()) / 0.25f), 0);
+        healthSprite.setGridIndex((int) ((1.0f - health / (float)getMaxHealth()) / 0.25f), 0);
     }
 
     /**
@@ -469,7 +520,7 @@ public class Unit extends CollidableObject {
      * @param value
      * @return
      */
-    private int adjustLevel(int value) {
+    private int adjustStatByLevel(int value) {
 
         return (int) (value * (1.0f + 0.1f * level));
     }
@@ -479,7 +530,7 @@ public class Unit extends CollidableObject {
      * @param value
      * @return
      */
-    private float adjustLevel(float value) {
+    private float adjustStatByLevel(float value) {
 
         return value * (1.0f + 0.1f * level);
     }
@@ -490,7 +541,7 @@ public class Unit extends CollidableObject {
      */
     public int getMaxHealth() {
 
-        return adjustLevel(getUnitClass().maxHealth());
+        return adjustStatByLevel(getUnitClass().maxHealth());
     }
 
     /**
@@ -508,7 +559,7 @@ public class Unit extends CollidableObject {
      */
     private float getMeleeDamage() {
 
-        return adjustLevel(getUnitClass().meleeDamage());
+        return adjustStatByLevel(getUnitClass().meleeDamage());
     }
 
     /**
@@ -517,7 +568,7 @@ public class Unit extends CollidableObject {
      */
     private float getRangedDamage() {
 
-        return adjustLevel(getUnitClass().rangedDamage());
+        return adjustStatByLevel(getUnitClass().rangedDamage());
     }
 
     /**
@@ -526,7 +577,7 @@ public class Unit extends CollidableObject {
      */
     private float getMeleeEvade() {
 
-        return adjustLevel(getUnitClass().meleeEvade());
+        return adjustStatByLevel(getUnitClass().meleeEvade());
     }
 
     /**
@@ -535,7 +586,7 @@ public class Unit extends CollidableObject {
      */
     private float getRangedEvade() {
 
-        return adjustLevel(getUnitClass().rangedEvade());
+        return adjustStatByLevel(getUnitClass().rangedEvade());
     }
 
     /**
@@ -544,7 +595,7 @@ public class Unit extends CollidableObject {
      */
     private float getArmor() {
 
-        return adjustLevel(getUnitClass().armor());
+        return adjustStatByLevel(getUnitClass().armor());
     }
 
     /**
@@ -623,13 +674,14 @@ public class Unit extends CollidableObject {
      */
     public void addExp(int expEarned) {
         exp += expEarned;
-        if (level < MAX_LEVEL && exp > getUnitClass().expRequired(level)) {
+        if (level < MAX_LEVEL && exp > getUnitClass().requiredExp(level)) {
             exp = 0;
             level++;
         }
     }
 
     private final static int MAX_LEVEL = 10;
+    private final static int SPRITE_LAYER = 7;
 
     private UnitClass unitClass;
     private int level;
@@ -643,4 +695,5 @@ public class Unit extends CollidableObject {
     private OffsetCoord targetMapPosition;
     private int meleeAttackLeft = 0;
     private int rangedAttackLeft = 0;
+    private Projectile projectile;
 }

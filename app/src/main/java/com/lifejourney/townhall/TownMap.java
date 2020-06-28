@@ -80,7 +80,7 @@ class TownMap extends HexTileMap implements View {
                 OffsetCoord mapCoord = new OffsetCoord(x, y);
                 TileType tileType = getTileType(mapCoord);
                 if (tileType == TileType.TOWNHALL) {
-                    capitalOffset = mapCoord;
+                    townhallMapCoord = mapCoord;
                 }
 
                 Town town = new Town(mapCoord, tileType);
@@ -234,7 +234,7 @@ class TownMap extends HexTileMap implements View {
      */
     public OffsetCoord getTownhallMapCoord() {
 
-        return capitalOffset;
+        return townhallMapCoord;
     }
     /**
      *
@@ -279,16 +279,18 @@ class TownMap extends HexTileMap implements View {
      *
      * @return
      */
-    public OffsetCoord findRetreatableMapCoord(OffsetCoord mapCoord) {
+    public ArrayList<OffsetCoord> findRetreatableMapCoords(OffsetCoord mapCoord) {
+
+        ArrayList<OffsetCoord> retreatableMapCoords = new ArrayList<>();
 
         ArrayList<Town> neighborTowns = getNeighborTowns(mapCoord);
         for (Town town: neighborTowns) {
             if (isMovable(town.getMapCoord()) && town.getSquads().size() == 0) {
-                return town.getMapCoord();
+                retreatableMapCoords.add(town.getMapCoord());
             }
         }
 
-        return null;
+        return retreatableMapCoords;
     }
 
     /**
@@ -359,7 +361,7 @@ class TownMap extends HexTileMap implements View {
     private Event listener;
     private float scale;
     private boolean dragging = false;
-    private OffsetCoord capitalOffset;
+    private OffsetCoord townhallMapCoord;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;

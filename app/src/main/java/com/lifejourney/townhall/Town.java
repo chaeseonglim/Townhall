@@ -164,7 +164,6 @@ public class Town {
 
     private OffsetCoord mapCoord;
     private TownMap.TileType type;
-    private SizeF tileSize;
     private Battle battle;
     private ArrayList<Squad> squads = new ArrayList<>();
     private boolean focused = false;
