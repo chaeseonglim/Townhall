@@ -123,7 +123,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
             return 0.0f;
         }
-        public float meleeEvade() {
+        public float meleeEvasion() {
             switch (this) {
                 case SWORD:
                     return 0.2f;
@@ -132,7 +132,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
             return 0.0f;
         }
-        public float rangedEvade() {
+        public float rangedEvasion() {
             switch (this) {
                 case SWORD:
                 case LONGBOW:
@@ -458,7 +458,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5);
 
         // Check evading
-        if (Math.random() < opponent.getMeleeEvade()) {
+        if (Math.random() < opponent.getMeleeEvasion()) {
             return;
         }
 
@@ -483,7 +483,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         projectile.setVisible(true);
 
         // Check evading
-        if (Math.random() < opponent.getRangedEvade()) {
+        if (Math.random() < opponent.getRangedEvasion()) {
             return;
         }
 
@@ -520,7 +520,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param value
      * @return
      */
-    private int adjustStatByLevel(int value) {
+    private int adjustByLevel(int value) {
 
         return (int) (value * (1.0f + 0.1f * level));
     }
@@ -530,7 +530,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param value
      * @return
      */
-    private float adjustStatByLevel(float value) {
+    private float adjustByLevel(float value) {
 
         return value * (1.0f + 0.1f * level);
     }
@@ -541,7 +541,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public int getMaxHealth() {
 
-        return adjustStatByLevel(getUnitClass().maxHealth());
+        return adjustByLevel(getUnitClass().maxHealth());
     }
 
     /**
@@ -559,7 +559,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getMeleeDamage() {
 
-        return adjustStatByLevel(getUnitClass().meleeDamage());
+        return adjustByLevel(getUnitClass().meleeDamage());
     }
 
     /**
@@ -568,25 +568,25 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getRangedDamage() {
 
-        return adjustStatByLevel(getUnitClass().rangedDamage());
+        return adjustByLevel(getUnitClass().rangedDamage());
     }
 
     /**
      *
      * @return
      */
-    private float getMeleeEvade() {
+    private float getMeleeEvasion() {
 
-        return adjustStatByLevel(getUnitClass().meleeEvade());
+        return adjustByLevel(getUnitClass().meleeEvasion());
     }
 
     /**
      *
      * @return
      */
-    private float getRangedEvade() {
+    private float getRangedEvasion() {
 
-        return adjustStatByLevel(getUnitClass().rangedEvade());
+        return adjustByLevel(getUnitClass().rangedEvasion());
     }
 
     /**
@@ -595,7 +595,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getArmor() {
 
-        return adjustStatByLevel(getUnitClass().armor());
+        return adjustByLevel(getUnitClass().armor());
     }
 
     /**
