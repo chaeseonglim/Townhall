@@ -86,26 +86,24 @@ public class GameWorld extends World
 
         // Check if new battle is arisen
         for (Squad squad: squads) {
-            ArrayList<Squad> squadsInSameMap = map.getTown(squad.getMapCoord()).getSquads();
+            Town thisTown = map.getTown(squad.getMapCoord());
+            ArrayList<Squad> squadsInSameMap = thisTown.getSquads();
             assert squadsInSameMap.size() <= 2;
-            if (!squad.isFighting() && squadsInSameMap.size() == 2 &&
-                    squadsInSameMap.get(0).getMapCoord()
-                            .equals(squadsInSameMap.get(1).getMapCoord())) {
+            if (squadsInSameMap.size() == 2 && thisTown.getBattle() == null) {
                 Battle battle = new Battle(map, squadsInSameMap.get(1), squadsInSameMap.get(0));
                 battles.add(battle);
-                map.getTown(battle.getMapCoord()).setBattle(battle);
+                thisTown.setBattle(battle);
             }
         }
 
         // Do battles
         ListIterator<Battle> iterBattle = battles.listIterator();
         while (iterBattle.hasNext()) {
+            // Update battle
             Battle battle = iterBattle.next();
-
-            // Update battle status
             battle.update();
 
-            // Check if a battle is finished
+            // Remove if battle is finished
             if (battle.isFinished()) {
                 iterBattle.remove();
                 map.getTown(battle.getMapCoord()).setBattle(null);

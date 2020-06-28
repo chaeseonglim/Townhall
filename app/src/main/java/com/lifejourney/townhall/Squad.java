@@ -143,9 +143,11 @@ public class Squad extends Object implements Controllable {
         }
         else if (isTouching()) {
             if (eventAction == MotionEvent.ACTION_MOVE) {
-                if (isDragging() && isFighting()) {
-                    // If the battle begins during dragging, cancel dragging
-                    setDragging(false, touchedGameCoord);
+                if (isFighting()) {
+                    if (isDragging()) {
+                        // If the battle begins during dragging, cancel dragging
+                        setDragging(false, touchedGameCoord);
+                    }
                 } else if (isFocused()) {
                     // Keep dragging
                     setDragging(true, touchedGameCoord);
@@ -228,6 +230,23 @@ public class Squad extends Object implements Controllable {
             // If it's not moving, send unit to current offset
             for(Unit unit: units) {
                 unit.setTargetMapOffset(currentMapOffset);
+            }
+
+            // Find neighbor battles if it doesn't have own battles
+            if (!isFighting()) {
+                boolean isSupporting = false;
+                ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord());
+                for (Town neighborTown: neighborTowns) {
+                    if (neighborTown.getBattle() != null) {
+                        neighborTown.getBattle().addSupporter(this);
+                        isSupporting = true;
+                        break;
+                    }
+                }
+
+                if (!isSupporting) {
+                    peace();
+                }
             }
         }
 
@@ -400,7 +419,7 @@ public class Squad extends Object implements Controllable {
      *
      * @param opponent
      */
-    void startFight(Squad opponent) {
+    void beginFight(Squad opponent) {
 
         // Finish any moving action
         stopMoving();
@@ -409,28 +428,31 @@ public class Squad extends Object implements Controllable {
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_BATTLE);
-        squadIcon.setGridIndex(3, 0);
+        squadIcon.setAnimationWrap(true);
+        squadIcon.clearAnimation();
+        squadIcon.addAnimationFrame(3, 0, 8);
+        squadIcon.addAnimationFrame(0, 0, 8);
+        squadIcon.addAnimationFrame(3, 0, 200);
 
         this.fighting = true;
-        this.opponent = opponent;
 
-        // Set opponents to each units
-        totalHealthWhenEnteringBattle = 0;
+        // Set opponents to all units
+        totalHealthAtBeginningOfFight = 0;
         for (Unit unit: units) {
             unit.setOpponents(opponent.getUnits());
-            totalHealthWhenEnteringBattle = unit.getHealth();
+            totalHealthAtBeginningOfFight += unit.getHealth();
         }
 
         // Adjust squad icon to be battle position
         setPosition(getPosition().clone().offset(
                 ((opponent.getSide().ordinal() > getSide().ordinal())? -1.0f : 1.0f) *
-                        map.getTileSize().width / 3.0f, 0));
+                        map.getTileSize().width / 4.0f, 0));
     }
 
     /**
      *
      */
-    void finishFight() {
+    void endFight() {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
@@ -438,7 +460,6 @@ public class Squad extends Object implements Controllable {
         squadIcon.setGridIndex(0, 0);
 
         this.fighting = false;
-        this.opponent = null;
         for (Unit unit: units) {
             unit.setOpponents(null);
         }
@@ -460,7 +481,54 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    int countFightResult() {
+    void support(Squad companion, Squad opponent) {
+
+        // Set squad Icon
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        if (squadIcon.getAnimation().size() == 0 ||
+                !squadIcon.getAnimation().get(0).first.equals(new Point(4, 0))) {
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_BATTLE);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(4, 0, 8);
+            squadIcon.addAnimationFrame(0, 0, 8);
+            squadIcon.addAnimationFrame(4, 0, 200);
+        }
+
+        // Set companions and opponents to all units
+        ArrayList<Unit> companionUnits = new ArrayList<>();
+        companionUnits.addAll(companion.getUnits());
+        companionUnits.addAll(getUnits());
+        for (Unit unit: units) {
+            unit.setCompanions(companionUnits);
+            unit.setOpponents(opponent.getUnits());
+        }
+
+        // Let all units support
+        for (Unit unit: units) {
+            unit.support();
+        }
+
+        // Remove fight status
+        for (Unit unit: units) {
+            unit.setCompanions(getUnits());
+            unit.setOpponents(null);
+        }
+    }
+
+    void peace() {
+
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        squadIcon.setGridIndex(0, 0);
+        currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+    }
+
+    /**
+     *
+     */
+    int handleFightResult() {
 
         int expEarned = 0;
 
@@ -488,7 +556,7 @@ public class Squad extends Object implements Controllable {
         for (Unit unit: units) {
             totalUnitHealth += unit.getHealth();
         }
-        return (float) totalUnitHealth / totalHealthWhenEnteringBattle < RETREAT_THRESHOLD;
+        return (float) totalUnitHealth / totalHealthAtBeginningOfFight < RETREAT_THRESHOLD;
     }
 
     /**
@@ -725,7 +793,6 @@ public class Squad extends Object implements Controllable {
     private OffsetCoord nextMapCoordToMove;
     private OffsetCoord prevMapCoord;
     private boolean fighting = false;
-    private Squad opponent;
-    private int totalHealthWhenEnteringBattle;
+    private int totalHealthAtBeginningOfFight;
     private PointF lastTouchedScreenCoord = null;
 }

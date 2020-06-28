@@ -253,8 +253,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
         targetMapPosition = new OffsetCoord(getPosition());
         unitClass = builder.unitClass;
         side = builder.side;
-        level = 1;
         health = getUnitClass().maxHealth();
+        level = 1;
     }
 
     /**
@@ -263,9 +263,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
     @Override
     public void update() {
 
-        // If it's on battle
         if (opponents != null) {
-            // Seek or flee enemies
+            // If it's on battle,  seek or flee enemies
             float highestFavor = -Float.MAX_VALUE, lowestFavor = Float.MAX_VALUE;
             Unit highestFavorUnit = null, lowestFavorUnit = null;
             float highestFavorDistance = Float.MAX_VALUE, lowestFavorDistance = Float.MAX_VALUE;
@@ -293,8 +292,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 if (highestFavorDistance > getUnitClass().closeApproachRange()) {
                     seek(highestFavorUnit.getPosition(), 1.0f);
                 }
-            }
-            else if (lowestFavor < 0.0f && lowestFavorUnit != null) {
+            } else if (lowestFavor < 0.0f && lowestFavorUnit != null) {
                 if (lowestFavorDistance < getUnitClass().rangedAttackRange()) {
                     flee(lowestFavorUnit.getPosition(), 1.0f);
                 }
@@ -303,9 +301,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
             wander(80.0f, 1.0f, 0.1f);
         }
 
-        // if it's at peace
         else {
-            // Seek to target position
+            // If it's at peace, seek to target position
             PointF targetPosition = new PointF(targetMapPosition.toGameCoord());
             OffsetCoord currentMapOffset = new OffsetCoord(getPosition());
 
@@ -378,19 +375,46 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public void fight() {
 
-        // Find favored enemy for attacking target
+        // Do melee attack
+        Unit meleeTarget = searchFavoredMeleeTarget();
+        if (meleeTarget != null) {
+            attackMelee(meleeTarget);
+        }
+
+        if (meleeTarget == null) {
+            // Do ranged attack
+            Unit rangedTarget = searchFavoredRangedTarget();
+            if (rangedTarget != null) {
+                attackRanged(rangedTarget);
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    public void support() {
+
+        // Do ranged attack
+        Unit rangedTarget = searchFavoredRangedTarget();
+        if (rangedTarget != null) {
+            attackRanged(rangedTarget);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    private Unit searchFavoredMeleeTarget() {
+
+        // Find favored enemy for melee attack
         Unit targetCandidate = null;
         float highestFavor = -Float.MAX_VALUE;
         int highestHealth = Integer.MAX_VALUE;
-        boolean enemyExistInClosedArea = false;
         for (Unit opponent : opponents) {
             if (opponent.getPosition().distance(getPosition()) <=
                     getUnitClass().meleeAttackRange()) {
-                enemyExistInClosedArea = true;
-                if (meleeAttackLeft > 0) {
-                    break;
-                }
-
                 float favor = getUnitClass().favor(opponent.getUnitClass());
                 if (favor > highestFavor ||
                         (favor == highestFavor && opponent.getHealth() < highestHealth)) {
@@ -401,70 +425,69 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
         }
 
-        // Check if melee attack is possible
-        if (meleeAttackLeft > 0) {
-            meleeAttackLeft--;
-        }
-        else if (targetCandidate != null) {
-            // Do melee attack
-            attackMelee(targetCandidate);
-            meleeAttackLeft = getUnitClass().meleeAttackSpeed();
-        }
-
-        // Check if ranged attack is possible
-        if (rangedAttackLeft > 0) {
-            rangedAttackLeft--;
-        }
-        else if (!enemyExistInClosedArea && getUnitClass().rangedAttackRange() > 0.0f) {
-            // Search enemy target for ranged attack
-            targetCandidate = null;
-            highestFavor = -Float.MAX_VALUE;
-            highestHealth = Integer.MAX_VALUE;
-
-            // Select highest favored enemy
-            for (Unit opponent : opponents) {
-                if (opponent.getPosition().distance(getPosition()) <=
-                        getUnitClass().rangedAttackRange()) {
-                    float favor = getUnitClass().favor(opponent.getUnitClass());
-                    if (favor > highestFavor ||
-                            (favor == highestFavor && opponent.getHealth() < highestHealth)) {
-                        targetCandidate = opponent;
-                        highestFavor = favor;
-                        highestHealth = opponent.getHealth();
-                    }
-                }
-            }
-
-            if (targetCandidate != null) {
-                attackRanged(targetCandidate);
-                rangedAttackLeft = getUnitClass().rangedAttackSpeed();
-            }
-        }
+        return targetCandidate;
     }
 
+    /**
+     *
+     * @return
+     */
+    private Unit searchFavoredRangedTarget() {
+
+        if (getUnitClass().rangedAttackRange() == 0.0f) {
+            return null;
+        }
+
+        Unit targetCandidate = null;
+        float highestFavor = -Float.MAX_VALUE;
+        float highestHealth = Integer.MAX_VALUE;
+
+        // Select highest favored enemy for ranged attack
+        for (Unit opponent : opponents) {
+            if (opponent.getPosition().distance(getPosition()) <=
+                    getUnitClass().rangedAttackRange()) {
+                float favor = getUnitClass().favor(opponent.getUnitClass());
+                if (favor > highestFavor ||
+                        (favor == highestFavor && opponent.getHealth() < highestHealth)) {
+                    targetCandidate = opponent;
+                    highestFavor = favor;
+                    highestHealth = opponent.getHealth();
+                }
+            }
+        }
+
+        return targetCandidate;
+    }
     /**
      *
      * @param opponent
      */
     private void attackMelee(Unit opponent) {
 
-        Sprite classSprite = getSprite(0);
-        classSprite.clearAnimation();
-        classSprite.addAnimationFrame(0, 0, 5);
-        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y,
-                5);
-        classSprite.addAnimationFrame(0, 0, 5);
-        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y,
-                5);
+        if (meleeAttackLeft == 0) {
+            Sprite classSprite = getSprite(0);
+            classSprite.clearAnimation();
+            classSprite.addAnimationFrame(0, 0, 5);
+            classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
+                    unitClass.spriteGridIndex().y,5);
+            classSprite.addAnimationFrame(0, 0, 5);
+            classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
+                    unitClass.spriteGridIndex().y,5);
 
-        // Check evading
-        if (Math.random() < opponent.getMeleeEvasion()) {
-            return;
+            // Check evading
+            if (Math.random() < opponent.getMeleeEvasion()) {
+                return;
+            }
+
+            // Deal damage
+            int damage = Math.max((int) (getMeleeDamage() * opponent.getArmor()), 1);
+            opponent.gotDamage(damage);
+
+            meleeAttackLeft = getUnitClass().meleeAttackSpeed();
         }
-
-        // Deal damage
-        int damage = Math.max((int) (getMeleeDamage() * opponent.getArmor()), 1);
-        opponent.gotDamage(damage);
+        else {
+            meleeAttackLeft--;
+        }
     }
 
     /**
@@ -473,23 +496,29 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void attackRanged(Unit opponent) {
 
-        // Create projectile for ranged attack
-        // Currently projectile is just an fake
-        if (projectile != null) {
-            projectile.close();
-        }
-        projectile = new Projectile.Builder(this, unitClass.projectileClass(), opponent).build();
-        projectile.setPosition(this.getPosition().clone());
-        projectile.setVisible(true);
+        if (rangedAttackLeft == 0) {
+            // Create projectile for ranged attack
+            // NOTE: This is just an graphical effect yet
+            if (projectile != null) {
+                projectile.close();
+            }
+            projectile = new Projectile.Builder(this, unitClass.projectileClass(), opponent).build();
+            projectile.setPosition(this.getPosition().clone());
+            projectile.setVisible(true);
 
-        // Check evading
-        if (Math.random() < opponent.getRangedEvasion()) {
-            return;
-        }
+            // Check evading
+            if (Math.random() < opponent.getRangedEvasion()) {
+                return;
+            }
 
-        // Deal damage
-        int damage = Math.max((int) (getRangedDamage() * opponent.getArmor()), 1);
-        opponent.gotDamage(damage);
+            // Deal damage
+            int damage = Math.max((int) (getRangedDamage() * opponent.getArmor()), 1);
+            opponent.gotDamage(damage);
+
+            rangedAttackLeft = getUnitClass().rangedAttackSpeed();
+        } else {
+            rangedAttackLeft--;
+        }
     }
 
     /**

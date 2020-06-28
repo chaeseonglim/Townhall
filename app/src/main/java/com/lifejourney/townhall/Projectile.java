@@ -22,7 +22,7 @@ public class Projectile extends CollidableObject {
 
         Sprite sprite() {
             Sprite sprite = new Sprite.Builder("bullet.png").gridSize(1,1)
-                    .size(new SizeF(2, 2)).smooth(false).build();
+                    .size(new SizeF(3, 3)).smooth(false).build();
             sprite.setGridIndex(spriteGridIndex().x, spriteGridIndex().y);
             return sprite;
         }

@@ -16,10 +16,8 @@ public class Battle {
         this.map = map;
         this.attacker = attacker;
         this.defender = defender;
-        this.squads.add(attacker);
-        this.squads.add(defender);
-        this.attacker.startFight(defender);
-        this.defender.startFight(attacker);
+        this.attacker.beginFight(defender);
+        this.defender.beginFight(attacker);
         this.mapCoord = defender.getMapCoord();
     }
 
@@ -34,43 +32,11 @@ public class Battle {
         // Fight
         fight();
 
-        if (attacker.isEliminated() || defender.isEliminated()) {
-            // Finish battle
-            attacker.finishFight();
-            defender.finishFight();
-            finished = true;
-        }
-        else if (attacker.isWillingToRetreat()) {
-            // Try retreating attacker
-            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(attacker.getMapCoord());
-            if (retreatableCoords != null && retreatableCoords.size() > 0) {
-                // Retreat attacker
-                attacker.moveTo(retreatableCoords.get(0));
+        // Handle post fight situation
+        handlePostFight();
 
-                // Finish battle
-                attacker.finishFight();
-                defender.finishFight();
-                finished = true;
-            }
-        }
-        else if (defender.isWillingToRetreat()) {
-            // Try retreating defender
-            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(defender.getMapCoord());
-            if (retreatableCoords != null) {
-                for (OffsetCoord retreatableCoord: retreatableCoords) {
-                    if (!retreatableCoord.equals(attacker.getPrevMapCoord())) {
-                        // Retreat defender
-                        defender.moveTo(retreatableCoord);
-
-                        // Finish battle
-                        attacker.finishFight();
-                        defender.finishFight();
-                        finished = true;
-                        break;
-                    }
-                }
-            }
-        }
+        // Reset supporters
+        supporters.clear();
     }
 
     /**
@@ -78,9 +44,8 @@ public class Battle {
      */
     private void resolveCollision() {
         ArrayList<Unit> units = new ArrayList<>();
-        for (Squad squad: squads) {
-            units.addAll(squad.getUnits());
-        }
+        units.addAll(attacker.getUnits());
+        units.addAll(defender.getUnits());
 
         // Collision detection
         CollisionDetector collisionDetector = Engine2D.GetInstance().getCollisionDetector();
@@ -109,20 +74,96 @@ public class Battle {
      */
     private void fight() {
 
-        // First fight
-        for (Squad squad: squads) {
-            squad.fight();
+        // Fight each others
+        attacker.fight();
+        defender.fight();
+        for (Squad supporter: supporters) {
+            if (supporter.getSide().equals(attacker.getSide())) {
+                supporter.support(attacker, defender);
+            } else {
+                supporter.support(defender, attacker);
+            }
         }
 
-        // Second count fight result
+        // Handle fight result
+        ArrayList<Squad> squads = new ArrayList<>(supporters);
+        squads.add(attacker);
+        squads.add(defender);
+        int earnedExp = attacker.handleFightResult();
         for (Squad squad: squads) {
-            int expEarned = squad.countFightResult();
-            // Adding exp to opposite sided squads
-            for (Squad squad1: squads) {
-                if (squad1.getSide() != squad.getSide()) {
-                    squad1.addExp(expEarned);
+            if (squad.getSide() != attacker.getSide()) {
+                squad.addExp(earnedExp);
+            }
+        }
+        earnedExp = defender.handleFightResult();
+        for (Squad squad: squads) {
+            if (squad.getSide() != defender.getSide()) {
+                squad.addExp(earnedExp);
+            }
+        }
+
+        // Share exp to supporters
+        for (Squad supporter: supporters) {
+            supporter.addExp(SUPPORTER_EXP);
+        }
+    }
+
+    /**
+     *
+     */
+    public void handlePostFight() {
+
+        Squad winner = null;
+        if (attacker.isEliminated() || defender.isEliminated()) {
+            // If one or them is elimated, finish battle
+            attacker.endFight();
+            defender.endFight();
+            if (attacker.isEliminated()) {
+                winner = defender;
+            }
+            else if (defender.isEliminated()) {
+                winner = attacker;
+            }
+            finished = true;
+        }
+        else if (attacker.isWillingToRetreat()) {
+            // Try retreating attacker
+            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(attacker.getMapCoord());
+            if (retreatableCoords != null && retreatableCoords.size() > 0) {
+                // Retreat attacker
+                attacker.moveTo(retreatableCoords.get(0));
+
+                // Finish battle
+                attacker.endFight();
+                defender.endFight();
+                finished = true;
+
+                winner = defender;
+            }
+        }
+        else if (defender.isWillingToRetreat()) {
+            // Try retreating defender
+            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(defender.getMapCoord());
+            if (retreatableCoords != null) {
+                for (OffsetCoord retreatableCoord: retreatableCoords) {
+                    if (!retreatableCoord.equals(attacker.getPrevMapCoord())) {
+                        // Retreat defender
+                        defender.moveTo(retreatableCoord);
+
+                        // Finish battle
+                        attacker.endFight();
+                        defender.endFight();
+                        finished = true;
+
+                        winner = attacker;
+                        break;
+                    }
                 }
             }
+        }
+
+        if (winner != null) {
+            winner.addExp(WINNER_EXP);
         }
     }
 
@@ -142,10 +183,21 @@ public class Battle {
         return mapCoord;
     }
 
+    /**
+     *
+     * @param squad
+     */
+    public void addSupporter(Squad squad) {
+        supporters.add(squad);
+    }
+
+    private int WINNER_EXP = 50;
+    private int SUPPORTER_EXP  = 25;
+
     private OffsetCoord mapCoord;
     private TownMap map;
     private Squad attacker;
     private Squad defender;
-    private ArrayList<Squad> squads = new ArrayList<>();
+    private ArrayList<Squad> supporters = new ArrayList<>();
     private boolean finished = false;
 }
