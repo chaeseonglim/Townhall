@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -17,6 +18,7 @@ import com.lifejourney.engine2d.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 class TownMap extends HexTileMap implements View {
 
@@ -31,29 +33,6 @@ class TownMap extends HexTileMap implements View {
         void onMapFocused(Town town);
     }
 
-    enum TileType {
-        GRASS((byte)0xe0, true),
-        BADLAND((byte)0xd0, true),
-        WATER((byte)0x00, false),
-        TOWNHALL((byte)0xb0, true),
-        UNKNOWN((byte)0xff, false);
-
-        TileType(byte code, boolean movable) {
-            this.code = code;
-            this.movable = movable;
-        }
-
-        byte code() {
-            return code;
-        }
-        boolean movable() {
-            return movable;
-        }
-
-        private final byte code;
-        private final boolean movable;
-    }
-
     /**
      *
      * @param mapBitmap
@@ -66,10 +45,10 @@ class TownMap extends HexTileMap implements View {
         this.scale = scale;
         setCacheMargin(4);
 
-        // Load map data from bitmap (grayscale png)
+        // Load map data from bitmap file
         ResourceManager resourceManager = Engine2D.GetInstance().getResourceManager();
         InfoBitmap bitmap = resourceManager.loadGrayscaleBitmap(mapBitmap);
-        setMapData(bitmap.get2DByteArray());
+        setMapData(bitmap.getInfoArray());
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
 
         // Add town information
@@ -78,12 +57,19 @@ class TownMap extends HexTileMap implements View {
         for (int y = 0; y < mapSize.height; ++y) {
             for (int x = 0; x < mapSize.width; ++x) {
                 OffsetCoord mapCoord = new OffsetCoord(x, y);
-                TileType tileType = getTileType(mapCoord);
-                if (tileType == TileType.TOWNHALL) {
-                    townhallMapCoord = mapCoord;
+
+                // base type
+                int ordinal = (getMapData(mapCoord) & 0x00F00000) >> 20;
+                Town.Type type = Town.Type.values()[ordinal];
+                if (type == Town.Type.HEADQUATER) {
+                    headquaterMapCoord = mapCoord;
                 }
 
-                Town town = new Town(mapCoord, tileType);
+                // side
+                ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
+                Town.Side side = Town.Side.values()[ordinal];
+
+                Town town = new Town(mapCoord, type, side);
                 towns.put(mapCoord, town);
             }
         }
@@ -176,50 +162,16 @@ class TownMap extends HexTileMap implements View {
      * @param mapCoord
      * @return
      */
-    public TileType getTileType(OffsetCoord mapCoord) {
-
-        if (mapCoord.getX() >= getMapSize().width || mapCoord.getY() >= getMapSize().height) {
-            return TileType.UNKNOWN;
-        }
-
-        byte code = getMapData(mapCoord);
-        for (TileType type : TileType.values()) {
-            if (type.code() == code) {
-                return type;
-            }
-        }
-
-        return TileType.UNKNOWN;
-    }
-
-    /**
-     *
-     * @param mapCoord
-     * @return
-     */
-    public boolean isMovable(OffsetCoord mapCoord) {
-
-        if (mapCoord.getX() < 0 || mapCoord.getY() < 0 ||
-                mapCoord.getX() >= getMapSize().width || mapCoord.getY() >= getMapSize().height) {
-            return false;
-        }
-
-        return getTileType(mapCoord).movable();
-    }
-
-    /**
-     *
-     * @param mapCoord
-     * @return
-     */
     public boolean isMovable(OffsetCoord mapCoord, Squad squad) {
 
-        if (!isMovable(mapCoord)) {
+        Town town = towns.get(mapCoord);
+        assert town != null;
+        if (!town.getType().isMovable(squad)) {
             return false;
         }
 
-        ArrayList<Squad> squads = towns.get(mapCoord).getSquads();
-        for (Squad localSquad: squads) {
+        ArrayList<Squad> squads = Objects.requireNonNull(towns.get(mapCoord)).getSquads();
+        for (Squad localSquad : squads) {
             if (squad != localSquad && squad.getSide() == localSquad.getSide()) {
                 return false;
             }
@@ -232,9 +184,9 @@ class TownMap extends HexTileMap implements View {
      *
      * @return
      */
-    public OffsetCoord getTownhallMapCoord() {
+    public OffsetCoord getHeadquaterMapCoord() {
 
-        return townhallMapCoord;
+        return headquaterMapCoord;
     }
     /**
      *
@@ -279,13 +231,14 @@ class TownMap extends HexTileMap implements View {
      *
      * @return
      */
-    public ArrayList<OffsetCoord> findRetreatableMapCoords(OffsetCoord mapCoord) {
+    public ArrayList<OffsetCoord> findRetreatableMapCoords(Squad squad) {
 
+        OffsetCoord mapCoord = squad.getMapCoord();
         ArrayList<OffsetCoord> retreatableMapCoords = new ArrayList<>();
 
         ArrayList<Town> neighborTowns = getNeighborTowns(mapCoord);
         for (Town town: neighborTowns) {
-            if (isMovable(town.getMapCoord()) && town.getSquads().size() == 0) {
+            if (isMovable(town.getMapCoord(), squad) && town.getSquads().size() == 0) {
                 retreatableMapCoords.add(town.getMapCoord());
             }
         }
@@ -361,7 +314,7 @@ class TownMap extends HexTileMap implements View {
     private Event listener;
     private float scale;
     private boolean dragging = false;
-    private OffsetCoord townhallMapCoord;
+    private OffsetCoord headquaterMapCoord;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;

@@ -41,7 +41,7 @@ public class GameWorld extends World
          */
 
         Squad squadA =
-                new Squad.Builder(this, map.getTownhallMapCoord().toGameCoord(), map, Town.Side.TOWN).build();
+                new Squad.Builder(this, map.getHeadquaterMapCoord().toGameCoord(), map, Town.Side.TOWNER).build();
         addSquad(squadA);
         squadA.show();
 
@@ -49,7 +49,7 @@ public class GameWorld extends World
         addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
         addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
 
-        OffsetCoord offsetB = map.getTownhallMapCoord().clone();
+        OffsetCoord offsetB = map.getHeadquaterMapCoord().clone();
         offsetB.offset(-1, 0);
         Squad squadB =
                 new Squad.Builder(this, offsetB.toGameCoord(), map, Town.Side.BANDIT).build();
@@ -60,10 +60,10 @@ public class GameWorld extends World
         addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
         addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
 
-        OffsetCoord offsetC = map.getTownhallMapCoord().clone();
+        OffsetCoord offsetC = map.getHeadquaterMapCoord().clone();
         offsetC.offset(1, 0);
         Squad squadC =
-                new Squad.Builder(this, offsetC.toGameCoord(), map, Town.Side.TOWN).build();
+                new Squad.Builder(this, offsetC.toGameCoord(), map, Town.Side.TOWNER).build();
         addSquad(squadC);
         squadC.show();
 

@@ -209,12 +209,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
             Sprite unitClassSprite = new Sprite.Builder("class", "unit_class.png").gridSize(5,1)
                     .size(new SizeF(16, 16)).smooth(true).build();
             unitClassSprite.setGridIndex(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y);
-            Sprite unitFrameSprite = new Sprite.Builder("frame", "unit_frame.png").gridSize(4,1)
+            Sprite unitFrameSprite = new Sprite.Builder("frame", "unit_frame.png").gridSize(5,1)
                     .size(new SizeF(16, 16)).smooth(true).build();
             unitFrameSprite.setGridIndex(side.ordinal(), 0);
-            Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(5,1)
+            Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(9,1)
                     .size(new SizeF(16, 16)).smooth(true).build();
-            unitFrameSprite.setGridIndex(side.ordinal(), 0);
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitClassSprite)
                     .sprite(unitFrameSprite)
@@ -465,15 +464,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private void attackMelee(Unit opponent) {
 
         if (meleeAttackLeft == 0) {
-            Sprite classSprite = getSprite(0);
-            classSprite.clearAnimation();
-            classSprite.addAnimationFrame(0, 0, 5);
-            classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
-                    unitClass.spriteGridIndex().y,5);
-            classSprite.addAnimationFrame(0, 0, 5);
-            classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
-                    unitClass.spriteGridIndex().y,5);
-
             // Check evading
             if (Math.random() < opponent.getMeleeEvasion()) {
                 return;
@@ -533,7 +523,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         Sprite healthSprite = getSprite(2);
-        healthSprite.setGridIndex((int) ((1.0f - health / (float)getMaxHealth()) / 0.25f), 0);
+        healthSprite.setGridIndex((int) ((1.0f - health / (float)getMaxHealth()) / 0.1275f), 0);
+
+        // Blinking
+        Sprite classSprite = getSprite(0);
+        classSprite.clearAnimation();
+        classSprite.addAnimationFrame(0, 0, 5);
+        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
+                unitClass.spriteGridIndex().y,5);
+        classSprite.addAnimationFrame(0, 0, 5);
+        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
+                unitClass.spriteGridIndex().y,5);
+
     }
 
     /**

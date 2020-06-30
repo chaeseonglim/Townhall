@@ -2,6 +2,8 @@ package com.lifejourney.townhall;
 
 import android.view.MotionEvent;
 
+import androidx.core.util.Pair;
+
 import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.CubeCoord;
 import com.lifejourney.engine2d.Engine2D;
@@ -49,14 +51,14 @@ public class Squad extends Object implements Controllable {
             Sprite currentStick =
                 new Sprite.Builder("SquadStick", "squad.png").layer(SPRITE_LAYER)
                     .size(ICON_SPRITE_SIZE).smooth(false).visible(true)
-                    .gridSize(4, 3).opaque(ICON_SPRITE_OPAQUE_NORMAL)
+                    .gridSize(5, 3).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
             currentStick.setGridIndex(side.ordinal(), 0);
             currentStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
             Sprite targetStick =
                 new Sprite.Builder("SquadTarget", "squad.png").layer(SPRITE_LAYER)
                     .size(ICON_SPRITE_SIZE).smooth(false).visible(false).depth(-0.5f)
-                    .gridSize(4, 3).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
+                    .gridSize(5, 3).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
                     .build();
             targetStick.setGridIndex(side.ordinal(), 0);
             targetStick.setPositionOffset(TARGET_SPRITE_HOTSPOT_OFFSET);
@@ -228,7 +230,7 @@ public class Squad extends Object implements Controllable {
             }
         } else {
             // If it's not moving, send unit to current offset
-            for(Unit unit: units) {
+            for (Unit unit: units) {
                 unit.setTargetMapOffset(currentMapOffset);
             }
 
@@ -244,7 +246,8 @@ public class Squad extends Object implements Controllable {
                     }
                 }
 
-                if (!isSupporting) {
+                // Reset squad state at peace
+                if (!isSupporting && !isDragging()) {
                     peace();
                 }
             }
@@ -486,8 +489,8 @@ public class Squad extends Object implements Controllable {
         // Set squad Icon
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
-        if (squadIcon.getAnimation().size() == 0 ||
-                !squadIcon.getAnimation().get(0).first.equals(new Point(4, 0))) {
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
             currentStick.setOpaque(ICON_SPRITE_OPAQUE_BATTLE);
             squadIcon.setAnimationWrap(true);
             squadIcon.clearAnimation();
@@ -517,7 +520,7 @@ public class Squad extends Object implements Controllable {
         }
     }
 
-    void peace() {
+    private void peace() {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");

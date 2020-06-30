@@ -128,7 +128,7 @@ public class Battle {
         }
         else if (attacker.isWillingToRetreat()) {
             // Try retreating attacker
-            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(attacker.getMapCoord());
+            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(attacker);
             if (retreatableCoords != null && retreatableCoords.size() > 0) {
                 // Retreat attacker
                 attacker.moveTo(retreatableCoords.get(0));
@@ -143,7 +143,7 @@ public class Battle {
         }
         else if (defender.isWillingToRetreat()) {
             // Try retreating defender
-            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(defender.getMapCoord());
+            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(defender);
             if (retreatableCoords != null) {
                 for (OffsetCoord retreatableCoord: retreatableCoords) {
                     if (!retreatableCoord.equals(attacker.getPrevMapCoord())) {
