@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -62,14 +61,14 @@ class TownMap extends HexTileMap implements View {
                 int ordinal = (getMapData(mapCoord) & 0x00F00000) >> 20;
                 Town.Type type = Town.Type.values()[ordinal];
                 if (type == Town.Type.HEADQUATER) {
-                    headquaterMapCoord = mapCoord;
+                    headquarterMapCoord = mapCoord;
                 }
 
                 // side
                 ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
                 Town.Side side = Town.Side.values()[ordinal];
 
-                Town town = new Town(mapCoord, type, side);
+                Town town = new Town(this, mapCoord, type, side);
                 towns.put(mapCoord, town);
             }
         }
@@ -184,9 +183,9 @@ class TownMap extends HexTileMap implements View {
      *
      * @return
      */
-    public OffsetCoord getHeadquaterMapCoord() {
+    public OffsetCoord getHeadquarterMapChord() {
 
-        return headquaterMapCoord;
+        return headquarterMapCoord;
     }
     /**
      *
@@ -208,6 +207,15 @@ class TownMap extends HexTileMap implements View {
     public Town getTown(OffsetCoord mapCoord) {
 
         return towns.get(mapCoord);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ArrayList<Town> getTowns() {
+
+        return new ArrayList<>(this.towns.values());
     }
 
     /**
@@ -314,7 +322,7 @@ class TownMap extends HexTileMap implements View {
     private Event listener;
     private float scale;
     private boolean dragging = false;
-    private OffsetCoord headquaterMapCoord;
+    private OffsetCoord headquarterMapCoord;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;
