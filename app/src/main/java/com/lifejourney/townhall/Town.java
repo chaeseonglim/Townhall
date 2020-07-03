@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Town {
+
+    private final static String LOG_TAG = "Town";
 
     enum Type {
         GRASS,
@@ -110,6 +114,7 @@ public class Town {
     }
 
     public Town(TownMap map, OffsetCoord mapCoord, Type type, Side side) {
+
         this.map = map;
         this.mapCoord = mapCoord;
         this.type = type;
@@ -133,22 +138,23 @@ public class Town {
      */
     public void update() {
 
+        // If at peace
         if (getBattle() == null) {
-            // Check if there's pow squads
-            boolean powExist = false;
-            Side powSide = Side.NEUTRAL;
+            // Check if there's enemy squads
+            boolean enemyExist = false;
+            Side enemySide = Side.NEUTRAL;
             for (Squad squad : squads) {
-                if (squad.getSide() != getSide()) {
-                    powExist = true;
-                    powSide = squad.getSide();
+                if (squad.getSide() != getSide() && !squad.isMoving()) {
+                    enemyExist = true;
+                    enemySide = squad.getSide();
                 }
             }
 
-            if (powExist) {
-                // Conquering
-                updateConquer(powSide);
+            if (enemyExist) {
+                // If enemy squad is exist, conquer town
+                updateConquer(enemySide);
             } else {
-                // Update economy
+                // Else, update economy
                 resetConquer();
                 if (type != Type.HEADQUATER) {
                     updateEconomy();
@@ -167,16 +173,23 @@ public class Town {
             this.conqueringSide = conqueringSide;
             this.conqueringStep = 0;
             this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
-        } else {
-            if (--this.conqueringUpdateLeft == 0) {
-                if (++this.conqueringStep > CONQUER_TOTAL_STEP) {
-                    // Conquered!!
-                    this.side = conqueringSide;
-                    this.conqueringStep = 0;
-                    this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
-                } else {
-                    this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+            map.redrawTileSprite(mapCoord);
+        } else if (--this.conqueringUpdateLeft == 0) {
+            map.redrawTileSprite(mapCoord);
+            if (++this.conqueringStep > CONQUER_TOTAL_STEP) {
+                // Conquered!!
+                Side prevSide = this.side;
+                this.side = conqueringSide;
+                this.conqueringStep = 0;
+                this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+
+                // Update tiles
+                map.redrawTileSprite(this.side);
+                if (prevSide != Side.NEUTRAL) {
+                    map.redrawTileSprite(prevSide);
                 }
+            } else {
+                this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
             }
         }
     }
@@ -185,6 +198,10 @@ public class Town {
      *
      */
     private void resetConquer() {
+
+        if (this.conqueringStep > 0) {
+            map.redrawTileSprite(mapCoord);
+        }
         this.conqueringSide = Side.NEUTRAL;
         this.conqueringStep = 0;
         this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
@@ -198,7 +215,7 @@ public class Town {
             return;
         }
 
-        ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord);
+        ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord, false);
 
         // If it's towner town
         if (side == Side.TOWNER) {
@@ -229,7 +246,7 @@ public class Town {
                         }
                     }
                 } else if (neighborTown.getSide() != Side.NEUTRAL) {
-                    // Add exp delta from pow neighbor towns
+                    // Add exp delta from enemy neighbor towns
                     for (int i = 0; i < EconomyArea.values().length; ++i) {
                         if (EconomyArea.values()[i] != EconomyArea.FORTRESS) {
                             expDeltas[i] += BASE_ECONOMY_EXP_DELTA_FROM_NEIGHBOR;
@@ -311,7 +328,7 @@ public class Town {
      *
      * @return
      */
-    private Point getTextureGridForTile() {
+    private Point getBaseSpriteIndex() {
 
         switch (type) {
             case GRASS:
@@ -336,7 +353,7 @@ public class Town {
         this.type = type;
     }
 
-    public ArrayList<Sprite> getTileSprite() {
+    public ArrayList<Sprite> getTileSprite(boolean glowing, boolean showTerritories) {
 
         ArrayList<Sprite> sprites = new ArrayList<>();
 
@@ -345,9 +362,56 @@ public class Town {
                         .position(new PointF(mapCoord.toGameCoord()))
                         .size(TileSize).gridSize(2, 5).smooth(false)
                         .layer(SPRITE_LAYER).visible(true).build();
-        Point textureGridForTile = getTextureGridForTile();
+        Point textureGridForTile = getBaseSpriteIndex();
         baseSprite.setGridIndex(textureGridForTile.x, textureGridForTile.y);
         sprites.add(baseSprite);
+
+        if (showTerritories) {
+            Sprite sideBase =
+                    new Sprite.Builder("TerritoryBase", "tiles_territory.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(TileSize).gridSize(7, 5).smooth(false)
+                            .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
+            sideBase.setGridIndex(6, side.ordinal());
+            sprites.add(sideBase);
+
+            ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord, true);
+            int index = 0;
+            for (Town neighborTown : neighborTowns) {
+                if (neighborTown == null || neighborTown.getSide() != side) {
+                    Sprite border =
+                            new Sprite.Builder("TerritoryEdge", "tiles_territory.png")
+                                    .position(new PointF(mapCoord.toGameCoord()))
+                                    .size(TileSize).gridSize(7, 5).smooth(false)
+                                    .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
+                    border.setGridIndex(index, side.ordinal());
+                    sprites.add(border);
+                }
+
+                index++;
+            }
+        }
+
+        // If conquering is ongoing, show progress
+        if (conqueringStep > 0) {
+            Sprite conquer =
+                    new Sprite.Builder("TerritoryConquer", "tiles_conquer.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(TileSize).gridSize(6, 5).smooth(false)
+                            .layer(SPRITE_LAYER).depth(0.3f).visible(true).build();
+            conquer.setGridIndex(conqueringStep - 1, conqueringSide.ordinal());
+            sprites.add(conquer);
+        }
+
+        if (glowing) {
+            Sprite glowingSprite =
+                    new Sprite.Builder("GlowingLine", "tiles.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(TileSize).gridSize(2, 5).smooth(false)
+                            .layer(SPRITE_LAYER).depth(0.4f).visible(true).build();
+            glowingSprite.setGridIndex(0, 4);
+            sprites.add(glowingSprite);
+        }
 
         return sprites;
     }
@@ -484,7 +548,7 @@ public class Town {
     private final static int BASE_HAPPINESS_DELTA_FROM_TOWN_LEVEL = 2;
     private final static int BASE_HAPPINESS_DELTA_FROM_NEIGHBOR_TOWN = 1;
     private final static int BASE_HAPPINESS_DELTA_FROM_ENEMY_TOWN = -5;
-    private final static int CONQUER_TOTAL_STEP = 6;
+    private final static int CONQUER_TOTAL_STEP = 5;
     private final static int CONQUER_STEP_UPDATE_TIME = 30;
 
     private TownMap map;

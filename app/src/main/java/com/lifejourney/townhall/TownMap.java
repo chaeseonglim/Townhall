@@ -141,19 +141,8 @@ class TownMap extends HexTileMap implements View {
     @Override
     protected ArrayList<Sprite> getTileSprite(OffsetCoord mapCoord) {
 
-        ArrayList<Sprite> sprites = getTown(mapCoord).getTileSprite();
-
-        if (glowingTiles != null && glowingTiles.contains(mapCoord)) {
-            Sprite glowingSprite =
-                    new Sprite.Builder("GlowingLine", "tiles.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
-                            .size(getTileSize()).gridSize(2, 5).smooth(false)
-                            .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
-            glowingSprite.setGridIndex(0, 4);
-            sprites.add(glowingSprite);
-        }
-
-        return sprites;
+        boolean glowing = (glowingTiles != null && glowingTiles.contains(mapCoord));
+        return getTown(mapCoord).getTileSprite(glowing, showTerritories);
     }
 
     /**
@@ -223,13 +212,14 @@ class TownMap extends HexTileMap implements View {
      * @param mapCoord
      * @return
      */
-    protected ArrayList<Town> getNeighborTowns(OffsetCoord mapCoord) {
+    protected ArrayList<Town> getNeighborTowns(OffsetCoord mapCoord, boolean addNull) {
 
         ArrayList<Town> neighborTowns = new ArrayList<>();
         ArrayList<OffsetCoord> neighborCoords = mapCoord.getNeighbors();
         for (OffsetCoord coord: neighborCoords) {
-            if (towns.get(coord) != null) {
-                neighborTowns.add(towns.get(coord));
+            Town neighborTown = towns.get(coord);
+            if (addNull || neighborTown != null) {
+                neighborTowns.add(neighborTown);
             }
         }
         return neighborTowns;
@@ -244,7 +234,7 @@ class TownMap extends HexTileMap implements View {
         OffsetCoord mapCoord = squad.getMapCoord();
         ArrayList<OffsetCoord> retreatableMapCoords = new ArrayList<>();
 
-        ArrayList<Town> neighborTowns = getNeighborTowns(mapCoord);
+        ArrayList<Town> neighborTowns = getNeighborTowns(mapCoord, false);
         for (Town town: neighborTowns) {
             if (isMovable(town.getMapCoord(), squad) && town.getSquads().size() == 0) {
                 retreatableMapCoords.add(town.getMapCoord());
@@ -284,20 +274,33 @@ class TownMap extends HexTileMap implements View {
     public void setGlowingTiles(ArrayList<OffsetCoord> glowingTiles) {
 
         if (this.glowingTiles != null) {
-            for (OffsetCoord tileOffset: this.glowingTiles) {
-                if (glowingTiles == null || !glowingTiles.contains(tileOffset)) {
-                    flushTileSprite(tileOffset);
+            for (OffsetCoord mapCoord: this.glowingTiles) {
+                if (glowingTiles == null || !glowingTiles.contains(mapCoord)) {
+                    redrawTileSprite(mapCoord);
                 }
             }
         }
         if (glowingTiles != null) {
-            for (OffsetCoord tileOffset: glowingTiles) {
-                if (this.glowingTiles == null || !this.glowingTiles.contains(tileOffset)) {
-                    flushTileSprite(tileOffset);
+            for (OffsetCoord mapCoord: glowingTiles) {
+                if (this.glowingTiles == null || !this.glowingTiles.contains(mapCoord)) {
+                    redrawTileSprite(mapCoord);
                 }
             }
         }
         this.glowingTiles = glowingTiles;
+    }
+
+    /**
+     *
+     * @param side
+     */
+    public void redrawTileSprite(Town.Side side) {
+
+        for (Town town: towns.values()) {
+            if (town.getSide() == side) {
+                redrawTileSprite(town.getMapCoord());
+            }
+        }
     }
 
     /**
@@ -328,4 +331,5 @@ class TownMap extends HexTileMap implements View {
     private PointF lastTouchedScreenCoord;
     private PointF lastDraggingScreenCoord;
     private RectF clippedViewport;
+    private boolean showTerritories = true;
 }

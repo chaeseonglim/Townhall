@@ -237,7 +237,7 @@ public class Squad extends Object implements Controllable {
             // Find neighbor battles if it doesn't have own battles
             if (!isFighting()) {
                 boolean isSupporting = false;
-                ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord());
+                ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
                 for (Town neighborTown: neighborTowns) {
                     if (neighborTown.getBattle() != null) {
                         neighborTown.getBattle().addSupporter(this);
