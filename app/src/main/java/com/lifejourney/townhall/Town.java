@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
@@ -151,7 +149,7 @@ public class Town {
             }
 
             if (enemyExist) {
-                // If enemy squad is exist, conquer town
+                // If enemy squad is exist, occupation town
                 updateConquer(enemySide);
             } else {
                 // Else, update economy
@@ -166,22 +164,22 @@ public class Town {
     /**
      *
      */
-    private void updateConquer(Side conqueringSide) {
+    private void updateConquer(Side occupationingSide) {
 
-        if (this.conqueringSide != conqueringSide) {
-            // New conqueror coming
-            this.conqueringSide = conqueringSide;
-            this.conqueringStep = 0;
-            this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+        if (this.occupyingSide != occupationingSide) {
+            // New occupationor coming
+            this.occupyingSide = occupationingSide;
+            this.currentOccupationStep = 0;
+            this.currentOccupationUpdateLeft = CONQUER_STEP_UPDATE_TIME;
             map.redrawTileSprite(mapCoord);
-        } else if (--this.conqueringUpdateLeft == 0) {
+        } else if (--this.currentOccupationUpdateLeft == 0) {
             map.redrawTileSprite(mapCoord);
-            if (++this.conqueringStep > CONQUER_TOTAL_STEP) {
+            if (++this.currentOccupationStep > CONQUER_TOTAL_STEP) {
                 // Conquered!!
                 Side prevSide = this.side;
-                this.side = conqueringSide;
-                this.conqueringStep = 0;
-                this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+                this.side = occupationingSide;
+                this.currentOccupationStep = 0;
+                this.currentOccupationUpdateLeft = CONQUER_STEP_UPDATE_TIME;
 
                 // Update tiles
                 map.redrawTileSprite(this.side);
@@ -189,7 +187,7 @@ public class Town {
                     map.redrawTileSprite(prevSide);
                 }
             } else {
-                this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+                this.currentOccupationUpdateLeft = CONQUER_STEP_UPDATE_TIME;
             }
         }
     }
@@ -199,12 +197,12 @@ public class Town {
      */
     private void resetConquer() {
 
-        if (this.conqueringStep > 0) {
+        if (this.currentOccupationStep > 0) {
             map.redrawTileSprite(mapCoord);
         }
-        this.conqueringSide = Side.NEUTRAL;
-        this.conqueringStep = 0;
-        this.conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+        this.occupyingSide = Side.NEUTRAL;
+        this.currentOccupationStep = 0;
+        this.currentOccupationUpdateLeft = CONQUER_STEP_UPDATE_TIME;
     }
 
     /**
@@ -346,74 +344,153 @@ public class Town {
 
     /**
      *
-     * @return
      */
+    public void createTileSprites() {
 
-    public void setType(Type type) {
-        this.type = type;
-    }
+        if (baseSprite == null) {
+            baseSprite =
+                    new Sprite.Builder("Base", "tiles.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(TileSize).gridSize(2, 5).smooth(false)
+                            .layer(SPRITE_LAYER).visible(true).build();
+        }
 
-    public ArrayList<Sprite> getTileSprite(boolean glowing, boolean showTerritories) {
-
-        ArrayList<Sprite> sprites = new ArrayList<>();
-
-        Sprite baseSprite =
-                new Sprite.Builder("Base", "tiles.png")
-                        .position(new PointF(mapCoord.toGameCoord()))
-                        .size(TileSize).gridSize(2, 5).smooth(false)
-                        .layer(SPRITE_LAYER).visible(true).build();
-        Point textureGridForTile = getBaseSpriteIndex();
-        baseSprite.setGridIndex(textureGridForTile.x, textureGridForTile.y);
-        sprites.add(baseSprite);
-
-        if (showTerritories) {
-            Sprite sideBase =
+        if (sideSprite == null) {
+            sideSprite =
                     new Sprite.Builder("TerritoryBase", "tiles_territory.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(7, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
-            sideBase.setGridIndex(6, side.ordinal());
-            sprites.add(sideBase);
+        }
 
-            ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord, true);
-            int index = 0;
-            for (Town neighborTown : neighborTowns) {
-                if (neighborTown == null || neighborTown.getSide() != side) {
-                    Sprite border =
-                            new Sprite.Builder("TerritoryEdge", "tiles_territory.png")
-                                    .position(new PointF(mapCoord.toGameCoord()))
-                                    .size(TileSize).gridSize(7, 5).smooth(false)
-                                    .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
-                    border.setGridIndex(index, side.ordinal());
-                    sprites.add(border);
-                }
-
-                index++;
+        if (borderSprites == null) {
+            borderSprites = new ArrayList<>();
+            for (int i = 0; i < 6; ++i) {
+                Sprite border =
+                        new Sprite.Builder("TerritoryBorder", "tiles_territory.png")
+                                .position(new PointF(mapCoord.toGameCoord()))
+                                .size(TileSize).gridSize(7, 5).smooth(false)
+                                .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
+                border.setGridIndex(i, side.ordinal());
+                borderSprites.add(border);
             }
         }
 
-        // If conquering is ongoing, show progress
-        if (conqueringStep > 0) {
-            Sprite conquer =
-                    new Sprite.Builder("TerritoryConquer", "tiles_conquer.png")
+        if (occupationSprite == null) {
+            occupationSprite =
+                    new Sprite.Builder("TerritoryOccupation", "tiles_occupation.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(6, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.3f).visible(true).build();
-            conquer.setGridIndex(conqueringStep - 1, conqueringSide.ordinal());
-            sprites.add(conquer);
         }
 
-        if (glowing) {
-            Sprite glowingSprite =
+        if (glowingSprite == null) {
+            glowingSprite =
                     new Sprite.Builder("GlowingLine", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(2, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.4f).visible(true).build();
+        }
+    }
+
+    /**
+     *
+     * @param glowing
+     * @param showTerritories
+     * @return
+     */
+    public ArrayList<Sprite> getTileSprites(boolean glowing, boolean showTerritories) {
+
+        createTileSprites();
+
+        ArrayList<Sprite> sprites = new ArrayList<>();
+
+        Point baseSpriteIndex = getBaseSpriteIndex();
+        baseSprite.setGridIndex(baseSpriteIndex.x, baseSpriteIndex.y);
+        sprites.add(baseSprite);
+
+        if (showTerritories) {
+            sideSprite.setGridIndex(6, side.ordinal());
+            sideSprite.setVisible(true);
+            sprites.add(sideSprite);
+
+            ArrayList<Town> neighbors = map.getNeighborTowns(mapCoord, true);
+            int index = 0;
+            for (Town neighbor : neighbors) {
+                Sprite borderSprite = borderSprites.get(index);
+                if (neighbor == null || neighbor.getSide() != side) {
+                    borderSprite.setGridIndex(index, side.ordinal());
+                    borderSprite.setVisible(true);
+                    sprites.add(borderSprite);
+                } else {
+                    borderSprite.setVisible(false);
+                    borderSprite.commit();
+                }
+                index++;
+            }
+        } else {
+            sideSprite.setVisible(false);
+            sideSprite.commit();
+            for (Sprite border : borderSprites) {
+                border.setVisible(false);
+                border.commit();
+            }
+        }
+
+        // If occupation is ongoing, show progress
+        if (currentOccupationStep > 0) {
+            occupationSprite.setVisible(true);
+            occupationSprite.setGridIndex(currentOccupationStep - 1, occupyingSide.ordinal());
+            sprites.add(occupationSprite);
+        } else {
+            occupationSprite.setVisible(false);
+            occupationSprite.commit();
+        }
+
+        // Show glowing sprites
+        if (glowing) {
+            glowingSprite.setVisible(true);
             glowingSprite.setGridIndex(0, 4);
             sprites.add(glowingSprite);
+        } else {
+            glowingSprite.setVisible(false);
+            glowingSprite.commit();
         }
 
         return sprites;
+    }
+
+    /**
+     *
+     */
+    public void removeTileSprites() {
+
+        if (baseSprite != null) {
+            baseSprite.close();
+            baseSprite = null;
+        }
+
+        if (sideSprite != null) {
+            sideSprite.close();
+            sideSprite = null;
+        }
+
+        if (borderSprites != null) {
+            for (Sprite border: borderSprites) {
+                border.close();
+            }
+            borderSprites = null;
+        }
+
+        if (occupationSprite != null) {
+            occupationSprite.close();
+            occupationSprite = null;
+        }
+
+        if (glowingSprite != null) {
+            glowingSprite.close();
+            glowingSprite = null;
+        }
     }
 
     /**
@@ -555,10 +632,12 @@ public class Town {
     private OffsetCoord mapCoord;
     private Type type;
     private Side side;
+    private boolean focused = false;
 
-    private Side conqueringSide = Side.NEUTRAL;
-    private int conqueringStep = 0;
-    private int conqueringUpdateLeft = CONQUER_STEP_UPDATE_TIME;
+    // Occupation
+    private Side occupyingSide = Side.NEUTRAL;
+    private int currentOccupationStep = 0;
+    private int currentOccupationUpdateLeft = CONQUER_STEP_UPDATE_TIME;
 
     // Economy
     private int[] level;
@@ -572,5 +651,10 @@ public class Town {
     private ArrayList<Squad> squads = new ArrayList<>();
     private Battle battle;
 
-    private boolean focused = false;
+    // Sprite
+    Sprite baseSprite = null;
+    Sprite sideSprite = null;
+    ArrayList<Sprite> borderSprites = null;
+    Sprite occupationSprite = null;
+    Sprite glowingSprite = null;
 }

@@ -138,11 +138,38 @@ class TownMap extends HexTileMap implements View {
         }
     }
 
+    /**
+     *
+     * @param mapCoord
+     * @return
+     */
     @Override
     protected ArrayList<Sprite> getTileSprite(OffsetCoord mapCoord) {
 
         boolean glowing = (glowingTiles != null && glowingTiles.contains(mapCoord));
-        return getTown(mapCoord).getTileSprite(glowing, showTerritories);
+        return getTown(mapCoord).getTileSprites(glowing, showTerritories);
+    }
+
+    /**
+     *
+     * @param mapCoord
+     */
+    @Override
+    public void removeTileSprite(OffsetCoord mapCoord) {
+        getTown(mapCoord).removeTileSprites();
+    }
+
+    /**
+     *
+     * @param side
+     */
+    public void redrawTileSprite(Town.Side side) {
+
+        for (Town town: towns.values()) {
+            if (town.getSide() == side) {
+                redrawTileSprite(town.getMapCoord());
+            }
+        }
     }
 
     /**
@@ -288,19 +315,6 @@ class TownMap extends HexTileMap implements View {
             }
         }
         this.glowingTiles = glowingTiles;
-    }
-
-    /**
-     *
-     * @param side
-     */
-    public void redrawTileSprite(Town.Side side) {
-
-        for (Town town: towns.values()) {
-            if (town.getSide() == side) {
-                redrawTileSprite(town.getMapCoord());
-            }
-        }
     }
 
     /**
