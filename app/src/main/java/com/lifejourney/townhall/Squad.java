@@ -65,7 +65,7 @@ public class Squad extends Object implements Controllable {
             Sprite squadIcon =
                     new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
                             .size(ICON_SPRITE_SIZE).smooth(false).visible(false).depth(0.1f)
-                            .gridSize(5, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
+                            .gridSize(7, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                             .build();
             squadIcon.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
             Sprite movingArrow =
@@ -234,21 +234,28 @@ public class Squad extends Object implements Controllable {
                 unit.setTargetMapOffset(currentMapOffset);
             }
 
-            // Find neighbor battles if it doesn't have own battles
+            // If it's not fighting
             if (!isFighting()) {
-                boolean isSupporting = false;
-                ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
-                for (Town neighborTown: neighborTowns) {
-                    if (neighborTown.getBattle() != null) {
-                        neighborTown.getBattle().addSupporter(this);
-                        isSupporting = true;
-                        break;
+                // First checking that if it's occupying town
+                Town town = map.getTown(getMapCoord());
+                if (town.isOccupying()) {
+                    occupy();
+                } else {
+                    // And check if it's supporting others
+                    boolean isSupporting = false;
+                    ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
+                    for (Town neighborTown: neighborTowns) {
+                        if (neighborTown.getBattle() != null) {
+                            neighborTown.getBattle().addSupporter(this);
+                            isSupporting = true;
+                            break;
+                        }
                     }
-                }
 
-                // Reset squad state at peace
-                if (!isSupporting && !isDragging()) {
-                    peace();
+                    // Reset squad state at peace
+                    if (!isSupporting && !isDragging()) {
+                        peace();
+                    }
                 }
             }
         }
@@ -491,7 +498,7 @@ public class Squad extends Object implements Controllable {
         Sprite squadIcon = getSprite("SquadIcon");
         ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
         if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
-            currentStick.setOpaque(ICON_SPRITE_OPAQUE_BATTLE);
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
             squadIcon.setAnimationWrap(true);
             squadIcon.clearAnimation();
             squadIcon.addAnimationFrame(4, 0, 8);
@@ -520,6 +527,26 @@ public class Squad extends Object implements Controllable {
         }
     }
 
+    /**
+     *
+     */
+    private void occupy() {
+
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(5, 0))) {
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(5, 0, 40);
+            squadIcon.addAnimationFrame(6, 0, 40);
+        }
+    }
+
+    /**
+     *
+     */
     private void peace() {
 
         Sprite currentStick = getSprite("SquadStick");
@@ -792,10 +819,11 @@ public class Squad extends Object implements Controllable {
     private boolean focused = false;
     private boolean touching = false;
     private boolean dragging = false;
+    private boolean fighting = false;
+    private boolean occupying = false;
     private OffsetCoord targetMapCoordToMove;
     private OffsetCoord nextMapCoordToMove;
     private OffsetCoord prevMapCoord;
-    private boolean fighting = false;
     private int totalHealthAtBeginningOfFight;
     private PointF lastTouchedScreenCoord = null;
 }

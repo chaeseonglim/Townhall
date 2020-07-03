@@ -613,6 +613,14 @@ public class Town {
         return side;
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isOccupying() {
+        return occupyingSide != Side.NEUTRAL && getBattle() == null;
+    }
+
     private final static int SPRITE_LAYER = 0;
     private final static int ECONOMY_UPDATE_COUNT = 30;
     private final static int MAX_ECONOMY_LEVEL = 5;
