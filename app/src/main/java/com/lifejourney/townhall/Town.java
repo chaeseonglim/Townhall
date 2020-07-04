@@ -333,10 +333,16 @@ public class Town {
                 return new Point(0, 0);
             case BADLAND:
                 return new Point(0, 1);
-            case RIVER:
+            case FOREST:
                 return new Point(0, 2);
-            case HEADQUATER:
+            case HILL:
                 return new Point(0, 3);
+            case MOUNTAIN:
+                return new Point(0, 4);
+            case RIVER:
+                return new Point(0, 5);
+            case HEADQUATER:
+                return new Point(0, 6);
             default:
                 return new Point(0, 0);
         }
@@ -351,7 +357,7 @@ public class Town {
             baseSprite =
                     new Sprite.Builder("Base", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(2, 5).smooth(false)
+                            .size(TileSize).gridSize(2, 8).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
         }
 
@@ -388,8 +394,9 @@ public class Town {
             glowingSprite =
                     new Sprite.Builder("GlowingLine", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(2, 5).smooth(false)
+                            .size(TileSize).gridSize(2, 8).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.4f).visible(true).build();
+            glowingSprite.setGridIndex(0, 7);
         }
     }
 
@@ -450,7 +457,6 @@ public class Town {
         // Show glowing sprites
         if (glowing) {
             glowingSprite.setVisible(true);
-            glowingSprite.setGridIndex(0, 4);
             sprites.add(glowingSprite);
         } else {
             glowingSprite.setVisible(false);
