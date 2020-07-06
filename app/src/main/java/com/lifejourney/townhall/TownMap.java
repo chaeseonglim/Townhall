@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -180,7 +181,10 @@ class TownMap extends HexTileMap implements View {
     public boolean isMovable(OffsetCoord mapCoord, Squad squad) {
 
         Town town = towns.get(mapCoord);
-        assert town != null;
+        if (town == null) {
+            return false;
+        }
+
         if (!town.getType().isMovable(squad)) {
             return false;
         }
