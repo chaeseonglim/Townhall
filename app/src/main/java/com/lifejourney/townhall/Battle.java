@@ -89,16 +89,13 @@ public class Battle {
         ArrayList<Squad> squads = new ArrayList<>(supporters);
         squads.add(attacker);
         squads.add(defender);
-        int earnedExp = attacker.handleFightResult();
+        int defenderEarnedExp = attacker.handleFightResult(),
+                attackerEarnedExp = defender.handleFightResult();
         for (Squad squad: squads) {
-            if (squad.getSide() != attacker.getSide()) {
-                squad.addExp(earnedExp);
-            }
-        }
-        earnedExp = defender.handleFightResult();
-        for (Squad squad: squads) {
-            if (squad.getSide() != defender.getSide()) {
-                squad.addExp(earnedExp);
+            if (squad.getSide() == attacker.getSide()) {
+                squad.addExp(attackerEarnedExp);
+            } else if (squad.getSide() == defender.getSide()) {
+                squad.addExp(defenderEarnedExp);
             }
         }
 

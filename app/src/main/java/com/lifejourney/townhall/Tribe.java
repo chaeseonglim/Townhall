@@ -1,37 +1,147 @@
 package com.lifejourney.townhall;
+import com.lifejourney.engine2d.OffsetCoord;
+import com.lifejourney.engine2d.PointF;
 
-public class Tribe {
+import java.util.ArrayList;
 
-    public Tribe(Town.Side side, TownMap map) {
+public abstract class Tribe implements Squad.Event {
+
+    private static final String LOG_TAG = "Tribe";
+
+    public Tribe(Town.Side side, Squad.Event squadListener, TownMap map) {
+
         this.side = side;
         this.map = map;
-        this.maxPopulation = 0;
-        this.population = 0;
-        this.gold = 0;
+        this.squadListener = squadListener;
+        for (Town town: map.getTowns()) {
+            if (town.getType() == Town.Type.HEADQUARTER && town.getSide() == side) {
+                this.headquarterCoord = town.getMapCoord();
+            }
+        }
     }
 
     /**
      *
      */
-    void update() {
+    abstract void update();
+
+    /**
+     *
+     * @param squad
+     */
+    @Override
+    public void onSquadCreated(Squad squad) {
+
+        squadListener.onSquadCreated(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    @Override
+    public void onSquadDestroyed(Squad squad) {
+
+        squadListener.onSquadDestroyed(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    @Override
+    public void onSquadFocused(Squad squad) {
+
+        squadListener.onSquadFocused(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     * @param oldMapCoord
+     * @param newMapCoord
+     */
+    @Override
+    public void onSquadMoved(Squad squad, OffsetCoord oldMapCoord, OffsetCoord newMapCoord) {
+
+        squadListener.onSquadMoved(squad, oldMapCoord, newMapCoord);
+    }
+
+    /**
+     *
+     * @param squad
+     * @param unit
+     */
+    @Override
+    public void onSquadUnitSpawned(Squad squad, Unit unit) {
+
+        squadListener.onSquadUnitSpawned(squad, unit);
 
     }
 
-    public int getMaxPopulation() {
-        return maxPopulation;
+    /**
+     *
+     * @param squad
+     * @param unit
+     */
+    @Override
+    public void onSquadUnitKilled(Squad squad, Unit unit) {
+
+        squadListener.onSquadUnitKilled(squad, unit);
     }
 
-    public int getPopulation() {
-        return population;
+    /**
+     *
+     * @param position
+     * @param side
+     * @param unitClass
+     */
+    public void spawnSquad(PointF position, Town.Side side, Unit.UnitClass... unitClass) {
+
+        Squad squad = new Squad.Builder(this, position, map, side).build();
+        if (unitClass.length >= 1) {
+            squad.spawnUnit(unitClass[0]);
+        }
+        if (unitClass.length >= 2) {
+            squad.spawnUnit(unitClass[1]);
+        }
+        if (unitClass.length >= 3) {
+            squad.spawnUnit(unitClass[2]);
+        }
+        squad.show();
+        squads.add(squad);
     }
 
-    public int getGold() {
-        return gold;
+    /**
+     *
+     * @return
+     */
+    public OffsetCoord getHeadquarterCoord() {
+
+        return headquarterCoord;
     }
 
-    Town.Side side;
-    TownMap map;
-    int maxPopulation;
-    int population;
-    int gold;
+    /**
+     *
+     * @return
+     */
+    public Town.Side getSide() {
+
+        return side;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public TownMap getMap() {
+
+        return map;
+    }
+
+    private Town.Side side;
+    private Squad.Event squadListener;
+    private TownMap map;
+    private OffsetCoord headquarterCoord;
+    private ArrayList<Squad> squads = new ArrayList<>();
 }

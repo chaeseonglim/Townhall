@@ -32,6 +32,10 @@ public class Squad extends Object implements Controllable {
         void onSquadFocused(Squad squad);
 
         void onSquadMoved(Squad squad, OffsetCoord prevMapCoord, OffsetCoord newMapCoord);
+
+        void onSquadUnitSpawned(Squad squad, Unit unit);
+
+        void onSquadUnitKilled(Squad squad, Unit unit);
     }
 
     public static class Builder {
@@ -408,13 +412,14 @@ public class Squad extends Object implements Controllable {
      *
      * @param unitClass
      */
-    Unit spawnUnit(Unit.UnitClass unitClass) {
+    public void spawnUnit(Unit.UnitClass unitClass) {
 
         Unit unit = new Unit.Builder(unitClass, side).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setCompanions(units);
         addUnit(unit);
-        return unit;
+
+        listener.onSquadUnitSpawned(this, unit);
     }
 
     /**
@@ -569,6 +574,8 @@ public class Squad extends Object implements Controllable {
             if (unit.isKilled()) {
                 expEarned += unit.getUnitClass().earnedExp(unit.getLevel());
                 iter.remove();
+                listener.onSquadUnitKilled(this, unit);
+                unit.close();
             }
         }
 
@@ -796,6 +803,30 @@ public class Squad extends Object implements Controllable {
      */
     public OffsetCoord getNextMapCoordToMove() {
         return nextMapCoordToMove;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void show() {
+
+        super.show();
+        for (Unit unit: units) {
+            unit.show();
+        }
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void hide() {
+
+        super.hide();
+        for (Unit unit: units) {
+            unit.hide();
+        }
     }
 
     private final static int SPRITE_LAYER = 5;

@@ -1,6 +1,9 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.OffsetCoord;
+import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
@@ -18,6 +21,10 @@ public class GameWorld extends World
         map = new TownMap(this, "map.png", scale);
         map.show();
         addView(map);
+
+        tribes = new ArrayList<>();
+        tribes.add(new Towner(this, map));
+        tribes.add(new Bandit(this, map));
 
         /*
         initCollisionPool(map.getMapSize().clone()
@@ -39,37 +46,6 @@ public class GameWorld extends World
         okButton.show();
         addWidget(okButton);
          */
-
-        Squad squadA =
-                new Squad.Builder(this, map.getHeadquarterMapChord().toGameCoord(), map, Town.Side.TOWNER).build();
-        addSquad(squadA);
-        squadA.show();
-
-        addUnit(squadA.spawnUnit(Unit.UnitClass.SWORD));
-        addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
-        addUnit(squadA.spawnUnit(Unit.UnitClass.LONGBOW));
-
-        OffsetCoord offsetB = map.getHeadquarterMapChord().clone();
-        offsetB.offset(-1, 0);
-        Squad squadB =
-                new Squad.Builder(this, offsetB.toGameCoord(), map, Town.Side.BANDIT).build();
-        addSquad(squadB);
-        squadB.show();
-
-        addUnit(squadB.spawnUnit(Unit.UnitClass.SWORD));
-        addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
-        addUnit(squadB.spawnUnit(Unit.UnitClass.LONGBOW));
-
-        OffsetCoord offsetC = map.getHeadquarterMapChord().clone();
-        offsetC.offset(1, 0);
-        Squad squadC =
-                new Squad.Builder(this, offsetC.toGameCoord(), map, Town.Side.TOWNER).build();
-        addSquad(squadC);
-        squadC.show();
-
-        addUnit(squadC.spawnUnit(Unit.UnitClass.SWORD));
-        addUnit(squadC.spawnUnit(Unit.UnitClass.LONGBOW));
-        addUnit(squadC.spawnUnit(Unit.UnitClass.LONGBOW));
     }
 
     /**
@@ -110,25 +86,12 @@ public class GameWorld extends World
             }
         }
 
-        // Remove killed units
-        ListIterator<Unit> iterUnit = units.listIterator();
-        while (iterUnit.hasNext()) {
-            Unit unit = iterUnit.next();
-            if (unit.isKilled()) {
-                unit.close();
-                removeObject(unit);
-                iterUnit.remove();
-            }
-        }
-
         // Remove eliminated squads
         ListIterator<Squad> iterSquad = squads.listIterator();
         while (iterSquad.hasNext()) {
             Squad squad = iterSquad.next();
             if (squad.isEliminated()) {
                 squad.close();
-                removeObject(squad);
-                iterSquad.remove();
             }
         }
 
@@ -136,6 +99,11 @@ public class GameWorld extends World
         ArrayList<Town> towns = map.getTowns();
         for (Town town: towns) {
             town.update();
+        }
+
+        // Update tribes
+        for (Tribe tribe: tribes) {
+            tribe.update();
         }
     }
 
@@ -181,6 +149,7 @@ public class GameWorld extends World
     public void onSquadCreated(Squad squad) {
 
         map.getTown(squad.getMapCoord()).addSquad(squad);
+        addSquad(squad);
     }
 
     /**
@@ -191,6 +160,7 @@ public class GameWorld extends World
     public void onSquadDestroyed(Squad squad) {
 
         map.getTown(squad.getMapCoord()).removeSquad(squad);
+        removeSquad(squad);
     }
 
     /**
@@ -212,11 +182,39 @@ public class GameWorld extends World
         focusedSquad = squad;
     }
 
+    /**
+     *
+     * @param squad
+     * @param prevMapCoord
+     * @param newMapCoord
+     */
     @Override
     public void onSquadMoved(Squad squad, OffsetCoord prevMapCoord, OffsetCoord newMapCoord) {
 
         map.getTown(prevMapCoord).removeSquad(squad);
         map.getTown(newMapCoord).addSquad(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     * @param unit
+     */
+    @Override
+    public void onSquadUnitSpawned(Squad squad, Unit unit) {
+
+        addUnit(unit);
+    }
+
+    /**
+     *
+     * @param squad
+     * @param unit
+     */
+    @Override
+    public void onSquadUnitKilled(Squad squad, Unit unit) {
+
+        removeUnit(unit);
     }
 
     /**
@@ -244,6 +242,7 @@ public class GameWorld extends World
      * @return
      */
     public float getScale() {
+
         return scale;
     }
 
@@ -252,6 +251,7 @@ public class GameWorld extends World
      * @param scale
      */
     public void setScale(float scale) {
+
         this.scale = scale;
     }
 
@@ -260,6 +260,7 @@ public class GameWorld extends World
      * @return
      */
     public TownMap getMap() {
+
         return map;
     }
 
@@ -268,6 +269,7 @@ public class GameWorld extends World
      * @param map
      */
     public void setMap(TownMap map) {
+
         this.map = map;
     }
 
@@ -276,6 +278,7 @@ public class GameWorld extends World
      * @param squad
      */
     public void addSquad(Squad squad) {
+
         squads.add(squad);
         addObject(squad);
     }
@@ -285,6 +288,7 @@ public class GameWorld extends World
      * @param squad
      */
     public void removeSquad(Squad squad) {
+
         squads.remove(squad);
         removeObject(squad);
     }
@@ -294,6 +298,7 @@ public class GameWorld extends World
      * @param unit
      */
     public void addUnit(Unit unit) {
+
         units.add(unit);
         addObject(unit);
     }
@@ -303,6 +308,7 @@ public class GameWorld extends World
      * @param unit
      */
     public void removeUnit(Unit unit) {
+
         units.remove(unit);
         removeObject(unit);
     }
@@ -315,4 +321,5 @@ public class GameWorld extends World
     private ArrayList<Unit> units = new ArrayList<>();
     private Squad focusedSquad = null;
     private Town focusedTown = null;
+    private ArrayList<Tribe> tribes;
 }

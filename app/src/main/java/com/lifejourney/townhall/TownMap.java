@@ -61,9 +61,6 @@ class TownMap extends HexTileMap implements View {
                 // base type
                 int ordinal = (getMapData(mapCoord) & 0x00F00000) >> 20;
                 Town.Type type = Town.Type.values()[ordinal];
-                if (type == Town.Type.HEADQUATER) {
-                    headquarterMapCoord = mapCoord;
-                }
 
                 // side
                 ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
@@ -201,14 +198,6 @@ class TownMap extends HexTileMap implements View {
 
     /**
      *
-     * @return
-     */
-    public OffsetCoord getHeadquarterMapChord() {
-
-        return headquarterMapCoord;
-    }
-    /**
-     *
      * @param mapCoord
      * @return
      */
@@ -343,7 +332,6 @@ class TownMap extends HexTileMap implements View {
     private Event listener;
     private float scale;
     private boolean dragging = false;
-    private OffsetCoord headquarterMapCoord;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;
