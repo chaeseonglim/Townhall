@@ -65,7 +65,7 @@ public class Squad extends Object implements Controllable {
             Sprite squadIcon =
                     new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
                             .size(ICON_SPRITE_SIZE).smooth(false).visible(false).depth(0.1f)
-                            .gridSize(7, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
+                            .gridSize(8, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                             .build();
             squadIcon.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
             Sprite movingArrow =

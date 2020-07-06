@@ -13,7 +13,7 @@ public class GameWorld extends World
 
     GameWorld() {
         super();
-        setDesiredFPS(20.0f);
+        setDesiredFPS(15.0f);
 
         map = new TownMap(this, "map.png", scale);
         map.show();
