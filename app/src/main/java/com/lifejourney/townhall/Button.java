@@ -22,7 +22,6 @@ public class Button extends Widget {
     public interface Event {
 
         void onButtonPressed(Button button);
-
     }
 
     public static class Builder {
@@ -78,34 +77,47 @@ public class Button extends Widget {
                 .smooth(false).depth(0.2f)
                 .gridSize(2, 1)
                 .layer(builder.layer).visible(false).build();
-        shadow = new Sprite.Builder(builder.bgAsset)
+        addSprite(bg);
+
+        Sprite shadow = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).depth(0.1f).opaque(0.2f)
                 .gridSize(2, 1)
                 .layer(builder.layer).visible(false).build();
+        shadow.setPositionOffset(new PointF(3, 3));
+        addSprite(shadow);
 
         msg = new Sprite.Builder("button"+uid++, builder.message, builder.fontSize,
                 builder.textColor, Color.argb(0, 0, 0, 0), Paint.Align.CENTER)
                 .size(new SizeF(builder.region.size()))
                 .smooth(true).depth(0.3f)
                 .layer(builder.layer).visible(false).build();
+        addSprite(msg);
     }
 
+    /**
+     *
+     */
     @Override
     public void close() {
-        msg.close();
-        shadow.close();
-        bg.close();
+
+        super.close();
     }
 
+    /**
+     *
+     * @param event
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (!isVisible()) {
             return false;
         }
 
         int eventAction = event.getAction();
-        boolean result;
+        boolean handledResult;
 
         switch (eventAction)
         {
@@ -113,28 +125,23 @@ public class Button extends Widget {
                 if (checkIfInputEventInRegion(event)) {
                     bg.setGridIndex(1, 0);
                     pressed = true;
-                    result = true;
+                    handledResult = true;
                 }
                 else {
-                    result = false;
+                    handledResult = false;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (pressed) {
-                    result = true;
-                }
-                else {
-                    result = false;
-                }
+                handledResult = pressed;
                 break;
             case MotionEvent.ACTION_CANCEL:
                 if (pressed) {
                     pressed = false;
                     bg.setGridIndex(0, 0);
-                    result = true;
+                    handledResult = true;
                 }
                 else {
-                    result = false;
+                    handledResult = false;
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -144,53 +151,41 @@ public class Button extends Widget {
                     if (checkIfInputEventInRegion(event) && eventHandler != null) {
                         eventHandler.onButtonPressed(this);
                     }
-                    result = true;
+                    handledResult = true;
                 }
                 else {
-                    result = false;
+                    handledResult = false;
                 }
                 break;
             default:
-                result = false;
+                handledResult = false;
                 break;
         }
 
-        return result;
+        return handledResult;
     }
 
+    /**
+     *
+     */
     @Override
     public void commit() {
 
-        super.commit();
-
         if (bg.getGridIndex().equals(new Point(1, 0))) {
-            msg.setPosition(new PointF(getScreenRegion().center().offset(3, 3)));
-            bg.setPosition(new PointF(getScreenRegion().center().offset(3, 3)));
+            msg.setPositionOffset(new PointF(3, 3));
+            bg.setPositionOffset(new PointF(3, 3));
+        } else {
+            msg.setPositionOffset(new PointF(0, 0));
+            bg.setPositionOffset(new PointF(0, 0));
         }
-        else {
-            msg.setPosition(new PointF(getScreenRegion().center()));
-            bg.setPosition(new PointF(getScreenRegion().center()));
-        }
-        shadow.setPosition(new PointF(getScreenRegion().center().offset(3, 3)));
-        msg.commit();
-        bg.commit();
-        shadow.commit();
-    }
 
-    @Override
-    public void setVisible(boolean visible) {
-
-        super.setVisible(visible);
-
-        msg.setVisible(visible);
-        bg.setVisible(visible);
-        shadow.setVisible(visible);
+        super.commit();
     }
 
     private static int uid = 0;
 
     private Event eventHandler;
     private Sprite msg;
-    private Sprite bg, shadow;
+    private Sprite bg;
     private boolean pressed = false;
 }

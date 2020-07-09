@@ -43,6 +43,7 @@ public class Battle {
      *
      */
     private void resolveCollision() {
+
         ArrayList<Unit> units = new ArrayList<>();
         units.addAll(attacker.getUnits());
         units.addAll(defender.getUnits());
@@ -110,57 +111,44 @@ public class Battle {
      */
     public void handlePostFight() {
 
-        Squad winner = null;
+        Squad winner = null, loser = null;
         if (attacker.isEliminated() || defender.isEliminated()) {
-            // If one or them is elimated, finish battle
-            attacker.endFight();
-            defender.endFight();
+            // If one or them is eliminated, finish battle
             if (attacker.isEliminated()) {
                 winner = defender;
-            }
-            else if (defender.isEliminated()) {
+            } else if (defender.isEliminated()) {
                 winner = attacker;
             }
             finished = true;
-        }
-        else if (attacker.isWillingToRetreat()) {
-            // Try retreating attacker
-            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(attacker);
-            if (retreatableCoords != null && retreatableCoords.size() > 0) {
-                // Retreat attacker
-                attacker.moveTo(retreatableCoords.get(0));
-
-                // Finish battle
-                attacker.endFight();
-                defender.endFight();
-                finished = true;
-
+        } else {
+            if (attacker.isWillingToRetreat()) {
                 winner = defender;
+                loser = attacker;
+                finished = true;
+            } else if (defender.isWillingToRetreat()) {
+                winner = attacker;
+                loser = defender;
+                finished = true;
             }
         }
-        else if (defender.isWillingToRetreat()) {
-            // Try retreating defender
-            ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(defender);
-            if (retreatableCoords != null) {
-                for (OffsetCoord retreatableCoord: retreatableCoords) {
-                    if (!retreatableCoord.equals(attacker.getPrevMapCoord())) {
-                        // Retreat defender
-                        defender.moveTo(retreatableCoord);
 
-                        // Finish battle
-                        attacker.endFight();
-                        defender.endFight();
-                        finished = true;
-
-                        winner = attacker;
-                        break;
-                    }
+        // If there's loser
+        if (finished) {
+            if (loser != null) {
+                // Try retreating loser
+                ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(loser);
+                if (retreatableCoords != null && retreatableCoords.size() > 0) {
+                    // Retreat loser
+                    loser.moveTo(retreatableCoords.get(0));
                 }
             }
-        }
 
-        if (winner != null) {
-            winner.addExp(WINNER_EXP);
+            attacker.endFight();
+            defender.endFight();
+
+            if (winner != null) {
+                winner.addExp(WINNER_EXP);
+            }
         }
     }
 

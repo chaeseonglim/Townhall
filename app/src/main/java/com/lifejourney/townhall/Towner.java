@@ -37,15 +37,17 @@ public class Towner extends Tribe {
         ArrayList<Town> towns = getMap().getTowns();
 
         maxPopulation = 0;
+        happiness = 0;
         for (Town town: towns) {
             if (town.getSide() == getSide()) {
                 gold += town.collectTax();
                 maxPopulation += town.collectPopulation();
+                happiness += town.collectHappiness();
             }
         }
 
         Log.i(LOG_TAG, "Towner " + getSide().toString() + " gold: " + gold +
-                " max population: " + maxPopulation);
+                " max population: " + maxPopulation + " happiness: " + happiness);
 
         collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
     }
@@ -74,6 +76,14 @@ public class Towner extends Tribe {
         return gold;
     }
 
+    /**
+     *
+     * @return
+     */
+    public int getHappiness() {
+        return happiness;
+    }
+
 
     private final static int COLLECT_UPDATE_TIME = 60;
 
@@ -81,4 +91,5 @@ public class Towner extends Tribe {
     private int maxPopulation;
     private int population;
     private int gold;
+    private int happiness;
 }

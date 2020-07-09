@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-class TownMap extends HexTileMap implements View {
+class TownMap extends HexTileMap implements View, Town.Event {
 
     private static final String LOG_TAG = "TownMap";
 
@@ -51,6 +51,11 @@ class TownMap extends HexTileMap implements View {
         setMapData(bitmap.getInfoArray());
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
 
+        // Init town list
+        for (int i = 0; i < Town.Side.values().length; ++i) {
+            townsBySide.add(new ArrayList<Town>());
+        }
+
         // Add town information
         Town.SetTileSize(getTileSize());
         Size mapSize = getMapSize();
@@ -66,17 +71,19 @@ class TownMap extends HexTileMap implements View {
                 ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
                 Town.Side side = Town.Side.values()[ordinal];
 
-                Town town = new Town(this, mapCoord, type, side);
+                Town town = new Town(this, this, mapCoord, type, side);
                 towns.put(mapCoord, town);
+                townsBySide.get(side.ordinal()).add(town);
             }
         }
 
         // Calculate viewport clipping area
         OffsetCoord bottomRightMapCoord = new OffsetCoord(mapSize.width-1, mapSize.height-1);
         PointF bottomRightGameCoord = bottomRightMapCoord.toGameCoord();
-        clippedViewport = new RectF(-getTileSize().width, -getTileSize().height,
-                bottomRightGameCoord.x + getTileSize().width*2,
-                bottomRightGameCoord.y + getTileSize().height*2);
+        clippedViewport = new RectF(-getTileSize().width - leftMargin,
+                -getTileSize().height - topMargin,
+                bottomRightGameCoord.x + getTileSize().width * 2 + leftMargin + rightMargin,
+                bottomRightGameCoord.y + getTileSize().height * 2 + topMargin + bottomMargin);
 
         listener.onMapCreated();
     }
@@ -90,6 +97,19 @@ class TownMap extends HexTileMap implements View {
         super.close();
 
         listener.onMapDestroyed();
+    }
+
+    /**
+     *
+     * @param town
+     * @param prevSide
+     * @param newSide
+     */
+    @Override
+    public void onTownOccupied(Town town, Town.Side prevSide, Town.Side newSide) {
+
+        townsBySide.get(prevSide.ordinal()).remove(town);
+        townsBySide.get(newSide.ordinal()).add(town);
     }
 
     /**
@@ -163,10 +183,8 @@ class TownMap extends HexTileMap implements View {
      */
     public void redrawTileSprite(Town.Side side) {
 
-        for (Town town: towns.values()) {
-            if (town.getSide() == side) {
-                redrawTileSprite(town.getMapCoord());
-            }
+        for (Town town: townsBySide.get(side.ordinal())) {
+            redrawTileSprite(town.getMapCoord());
         }
     }
 
@@ -326,13 +344,27 @@ class TownMap extends HexTileMap implements View {
         this.dragging = dragging;
     }
 
-    private final static int SPRITE_LAYER = 0;
+    /**
+     *
+     * @param side
+     * @return
+     */
+    public ArrayList<Town> getTownsBySide(Town.Side side) {
+
+        return townsBySide.get(side.ordinal());
+    }
+
     private final static int HEX_SIZE = 64;
 
     private Event listener;
     private float scale;
+    private int leftMargin = 0;
+    private int rightMargin = 0;
+    private int topMargin = 32;
+    private int bottomMargin = 0;
     private boolean dragging = false;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
+    private ArrayList<ArrayList<Town>> townsBySide = new ArrayList<>(Town.Side.values().length);
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;
     private PointF lastDraggingScreenCoord;

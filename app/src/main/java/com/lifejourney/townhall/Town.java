@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.net.sip.SipSession;
 import android.util.Log;
 
 import com.lifejourney.engine2d.OffsetCoord;
@@ -13,6 +14,11 @@ import java.util.Arrays;
 public class Town {
 
     private final static String LOG_TAG = "Town";
+
+    public interface Event {
+
+        void onTownOccupied(Town town, Side prevSide, Side newSide);
+    }
 
     enum Type {
         GRASS,
@@ -168,8 +174,9 @@ public class Town {
         TileSize = tileSize;
     }
 
-    public Town(TownMap map, OffsetCoord mapCoord, Type type, Side side) {
+    public Town(Event listener, TownMap map, OffsetCoord mapCoord, Type type, Side side) {
 
+        this.listener = listener;
         this.map = map;
         this.mapCoord = mapCoord;
         this.type = type;
@@ -232,27 +239,31 @@ public class Town {
     private void updateOccupation(Side occupationingSide) {
 
         if (this.occupyingSide != occupationingSide) {
-            // New conqueror coming
+            // Someone try to occupy this
             this.occupyingSide = occupationingSide;
-            this.currentOccupationStep = 0;
-            this.currentOccupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+            this.occupationStep = 0;
+            this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
             map.redrawTileSprite(mapCoord);
-        } else if (--this.currentOccupationUpdateLeft == 0) {
+        } else if (--this.occupationUpdateLeft == 0) {
             map.redrawTileSprite(mapCoord);
-            if (++this.currentOccupationStep > OCCUPATION_TOTAL_STEP) {
-                // Occupied
+            if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
+                // It's finally occupied
                 Side prevSide = this.side;
                 this.side = occupationingSide;
-                this.currentOccupationStep = 0;
-                this.currentOccupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+                this.occupationStep = 0;
+                this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
 
                 // Update tiles
                 map.redrawTileSprite(this.side);
                 if (prevSide != Side.NEUTRAL) {
                     map.redrawTileSprite(prevSide);
                 }
+
+                if (listener != null) {
+                    listener.onTownOccupied(this, prevSide, side);
+                }
             } else {
-                this.currentOccupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+                this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
             }
         }
     }
@@ -262,12 +273,12 @@ public class Town {
      */
     private void resetOccupation() {
 
-        if (this.currentOccupationStep > 0) {
+        if (this.occupationStep > 0) {
             map.redrawTileSprite(mapCoord);
         }
         this.occupyingSide = Side.NEUTRAL;
-        this.currentOccupationStep = 0;
-        this.currentOccupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+        this.occupationStep = 0;
+        this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
     }
 
     /**
@@ -281,8 +292,8 @@ public class Town {
 
         ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord, false);
 
-        // If it's towner
         if (side == Side.TOWNER) {
+            // Economy only prosper when it's Towner's town
             // Get base exp delta by economy prosper
             int[] expDeltas = new int[EconomyArea.values().length];
             for (int i = 0; i < EconomyArea.values().length; ++i) {
@@ -378,7 +389,7 @@ public class Town {
                 }
             }
 
-            // If economy is changed, redraw tile
+            // If economy is changed, redraw the tile
             if (!Arrays.equals(prevLevels, levels)) {
                 map.redrawTileSprite(mapCoord);
             }
@@ -395,9 +406,10 @@ public class Town {
             }
 
             // Update happiness
-            happiness = Math.min(Math.max(happiness + happinessDelta, 0), 100);
+            happiness = Math.min(Math.max(BASE_HAPPINESS + happinessDelta, 0), 100);
 
         } else if (side != Side.NEUTRAL) {
+
             // It only deteriorated if it's on enemy's hand
             for (int i = 0; i < EconomyArea.values().length; ++i) {
                 // Update exp
@@ -594,9 +606,9 @@ public class Town {
         }
 
         // If occupation is ongoing, show progress
-        if (currentOccupationStep > 0) {
+        if (occupationStep > 0) {
             occupationSprite.setVisible(true);
-            occupationSprite.setGridIndex(currentOccupationStep - 1, occupyingSide.ordinal());
+            occupationSprite.setGridIndex(occupationStep - 1, occupyingSide.ordinal());
             sprites.add(occupationSprite);
         } else {
             occupationSprite.setVisible(false);
@@ -816,6 +828,14 @@ public class Town {
      *
      * @return
      */
+    public int collectHappiness() {
+        return happiness;
+    }
+
+    /**
+     *
+     * @return
+     */
     public boolean isOccupying() {
 
         return occupyingSide != Side.NEUTRAL && getBattle() == null;
@@ -831,6 +851,7 @@ public class Town {
     private final static int BASE_ECONOMY_EXP_DELTA_DETERIORATE = -5;
     private final static int BASE_ECONOMY_EXP_DELTA_FROM_NEIGHBOR_DOWNTOWN = 5;
     private final static int BASE_ECONOMY_EXP_DELTA_FROM_NEIGHBOR_ENEMY = 5;
+    private final static int BASE_HAPPINESS = 50;
     private final static int BASE_HAPPINESS_DELTA_FROM_TOWN_LEVEL = 2;
     private final static int BASE_HAPPINESS_DELTA_FROM_NEIGHBOR_TOWN = 1;
     private final static int BASE_HAPPINESS_DELTA_FROM_ENEMY_TOWN = -5;
@@ -842,6 +863,7 @@ public class Town {
     private final static int OCCUPATION_TOTAL_STEP = 5;
     private final static int OCCUPATION_STEP_UPDATE_TIME = 30;
 
+    private Event listener = null;
     private TownMap map;
     private OffsetCoord mapCoord;
     private Type type;
@@ -850,8 +872,8 @@ public class Town {
 
     // Occupation
     private Side occupyingSide = Side.NEUTRAL;
-    private int currentOccupationStep = 0;
-    private int currentOccupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+    private int occupationStep = 0;
+    private int occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
 
     // Economy
     private int[] levels;

@@ -139,9 +139,19 @@ public abstract class Tribe implements Squad.Event {
         return map;
     }
 
+    /**
+     *
+     * @return
+     */
+    public ArrayList<Town> getTowns() {
+
+        return towns;
+    }
+
     private Town.Side side;
     private Squad.Event squadListener;
     private TownMap map;
     private OffsetCoord headquarterCoord;
     private ArrayList<Squad> squads = new ArrayList<>();
+    private ArrayList<Town> towns = new ArrayList<>();
 }

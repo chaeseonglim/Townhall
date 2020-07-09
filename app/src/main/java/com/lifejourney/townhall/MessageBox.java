@@ -79,15 +79,18 @@ public class MessageBox extends Widget {
 
         eventHandler = builder.eventHandler;
 
-        bg = new Sprite.Builder(builder.bgAsset)
+        Sprite bg = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(builder.layer).depth(0.2f)
                 .gridSize(2, 1).visible(false).build();
-        shadow = new Sprite.Builder(builder.bgAsset)
+        addSprite(bg);
+        Sprite shadow = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(builder.layer).depth(0.1f).opaque(0.2f)
                 .gridSize(2, 1).visible(false).build();
         shadow.setGridIndex(1, 0);
+        shadow.setPositionOffset(new PointF(5, 5));
+        addSprite(shadow);
 
         pages = new ArrayList<>();
         for (int i = 0; i < builder.messages.size(); ++i) {
@@ -97,7 +100,9 @@ public class MessageBox extends Widget {
                             .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
                             .smooth(true).depth(0.3f)
                             .layer(builder.layer).visible(false).build();
+            sprite.setPositionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN));
             pages.add(sprite);
+            addSprite(sprite);
         }
     }
 
@@ -107,12 +112,8 @@ public class MessageBox extends Widget {
     @Override
     public void close() {
 
-        for (Sprite sprite: pages) {
-            sprite.close();
-        }
-        pages.clear();
-        bg.close();
-        shadow.close();
+        super.close();
+        pages = null;
     }
 
     /**
@@ -122,20 +123,6 @@ public class MessageBox extends Widget {
     public void commit() {
 
         super.commit();
-
-        RectF screenRegion = getScreenRegion();
-        PointF screenPt = screenRegion.center();
-
-        if (currentPage < pages.size()) {
-            pages.get(currentPage).setPosition(screenPt.clone().offset(TEXT_MARGIN, TEXT_MARGIN));
-            pages.get(currentPage).commit();
-        }
-
-        bg.setPosition(screenPt);
-        bg.commit();
-
-        shadow.setPosition(screenPt.offset(5, 5));
-        shadow.commit();
     }
 
     /**
@@ -157,6 +144,11 @@ public class MessageBox extends Widget {
                     touched = true;
                     currentPage++;
                     currentPage %= pages.size();
+                    for (Sprite sprite: pages) {
+                        sprite.hide();
+                    }
+                    pages.get(currentPage).show();
+
                     if (eventHandler != null) {
                         eventHandler.onMessageBoxTouched(this);
                     }
@@ -166,12 +158,7 @@ public class MessageBox extends Widget {
                     return false;
                 }
             case MotionEvent.ACTION_MOVE:
-                if (touched) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return touched;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 if (touched) {
@@ -198,8 +185,6 @@ public class MessageBox extends Widget {
         if (currentPage < pages.size()) {
             pages.get(currentPage).setVisible(visible);
         }
-        bg.setVisible(visible);
-        shadow.setVisible(visible);
     }
 
     /**
@@ -221,7 +206,6 @@ public class MessageBox extends Widget {
     private final int TEXT_MARGIN = 12;
 
     private Event eventHandler;
-    private Sprite bg, shadow;
     private ArrayList<Sprite> pages;
     private int currentPage = 0;
     private boolean touched = false;

@@ -1,9 +1,6 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import com.lifejourney.engine2d.OffsetCoord;
-import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
@@ -15,7 +12,9 @@ public class GameWorld extends World
     static final String LOG_TAG = "GameWorld";
 
     GameWorld() {
+
         super();
+
         setDesiredFPS(15.0f);
 
         map = new TownMap(this, "map.png", scale);
@@ -25,11 +24,6 @@ public class GameWorld extends World
         tribes = new ArrayList<>();
         tribes.add(new Towner(this, map));
         tribes.add(new Bandit(this, map));
-
-        /*
-        initCollisionPool(map.getMapSize().clone()
-                .multiply(map.getTileSize().width, map.getTileSize().height), false);
-        */
 
         /*
         messageBox = new MessageBox.Builder(this,
@@ -45,7 +39,11 @@ public class GameWorld extends World
                 .build();
         okButton.show();
         addWidget(okButton);
-         */
+*/
+
+        EconomyBar economyBar = new EconomyBar();
+        economyBar.show();
+        addWidget(economyBar);
     }
 
     /**
@@ -53,12 +51,13 @@ public class GameWorld extends World
      */
     @Override
     public void close() {
+
         map.close();
         map = null;
     }
 
     @Override
-    protected void postupdate() {
+    protected void postUpdate() {
 
         // Check if new battle is arisen
         for (Squad squad: squads) {
@@ -86,10 +85,8 @@ public class GameWorld extends World
             }
         }
 
-        // Remove eliminated squads
-        ListIterator<Squad> iterSquad = squads.listIterator();
-        while (iterSquad.hasNext()) {
-            Squad squad = iterSquad.next();
+        // Close eliminated squads (removing will be placed on callback)
+        for (Squad squad : squads) {
             if (squad.isEliminated()) {
                 squad.close();
             }
