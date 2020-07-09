@@ -21,9 +21,15 @@ public class GameWorld extends World
         map.show();
         addView(map);
 
+        Towner towner = new Towner(this, map);
+
         tribes = new ArrayList<>();
-        tribes.add(new Towner(this, map));
+        tribes.add(towner);
         tribes.add(new Bandit(this, map));
+
+        EconomyBar economyBar = new EconomyBar(towner);
+        economyBar.show();
+        addWidget(economyBar);
 
         /*
         messageBox = new MessageBox.Builder(this,
@@ -39,11 +45,7 @@ public class GameWorld extends World
                 .build();
         okButton.show();
         addWidget(okButton);
-*/
-
-        EconomyBar economyBar = new EconomyBar();
-        economyBar.show();
-        addWidget(economyBar);
+        */
     }
 
     /**

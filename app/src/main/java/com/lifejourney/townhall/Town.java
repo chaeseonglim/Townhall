@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.net.sip.SipSession;
 import android.util.Log;
 
 import com.lifejourney.engine2d.OffsetCoord;
@@ -17,12 +16,14 @@ public class Town {
 
     public interface Event {
 
+        void onTownUpdated(Town town);
+
         void onTownOccupied(Town town, Side prevSide, Side newSide);
     }
 
     enum Type {
         GRASS,
-        BADLAND,
+        BADLANDS,
         FOREST,
         HILL,
         MOUNTAIN,
@@ -33,11 +34,9 @@ public class Town {
         int availableEconomySlot() {
             switch (this) {
                 case GRASS:
-                    return 3;
-                case BADLAND:
+                case BADLANDS:
                     return 3;
                 case FOREST:
-                    return 2;
                 case HILL:
                     return 2;
                 case MOUNTAIN:
@@ -53,7 +52,7 @@ public class Town {
         boolean isMovable(Squad squad) {
             switch (this) {
                 case GRASS:
-                case BADLAND:
+                case BADLANDS:
                 case FOREST:
                 case HILL:
                     return true;
@@ -74,7 +73,7 @@ public class Town {
             switch (this) {
                 case GRASS:
                     return true;
-                case BADLAND:
+                case BADLANDS:
                     return true;
                 case FOREST:
                     return true;
@@ -101,7 +100,7 @@ public class Town {
                     } else {
                         return 1.0f;
                     }
-                case BADLAND:
+                case BADLANDS:
                     if (area == EconomyArea.FORTRESS) {
                         return 0.6f;
                     } else {
@@ -174,10 +173,9 @@ public class Town {
         TileSize = tileSize;
     }
 
-    public Town(Event listener, TownMap map, OffsetCoord mapCoord, Type type, Side side) {
+    public Town(Event listener, OffsetCoord mapCoord, Type type, Side side) {
 
         this.listener = listener;
-        this.map = map;
         this.mapCoord = mapCoord;
         this.type = type;
         this.side = side;
@@ -243,9 +241,9 @@ public class Town {
             this.occupyingSide = occupationingSide;
             this.occupationStep = 0;
             this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
-            map.redrawTileSprite(mapCoord);
+
+            listener.onTownUpdated(this);
         } else if (--this.occupationUpdateLeft == 0) {
-            map.redrawTileSprite(mapCoord);
             if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
                 // It's finally occupied
                 Side prevSide = this.side;
@@ -253,18 +251,12 @@ public class Town {
                 this.occupationStep = 0;
                 this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
 
-                // Update tiles
-                map.redrawTileSprite(this.side);
-                if (prevSide != Side.NEUTRAL) {
-                    map.redrawTileSprite(prevSide);
-                }
-
-                if (listener != null) {
-                    listener.onTownOccupied(this, prevSide, side);
-                }
+                listener.onTownOccupied(this, prevSide, side);
             } else {
                 this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
             }
+
+            listener.onTownUpdated(this);
         }
     }
 
@@ -274,7 +266,7 @@ public class Town {
     private void resetOccupation() {
 
         if (this.occupationStep > 0) {
-            map.redrawTileSprite(mapCoord);
+            listener.onTownUpdated(this);
         }
         this.occupyingSide = Side.NEUTRAL;
         this.occupationStep = 0;
@@ -289,8 +281,6 @@ public class Town {
         if (economyUpdateLeft-- > 0) {
             return;
         }
-
-        ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord, false);
 
         if (side == Side.TOWNER) {
             // Economy only prosper when it's Towner's town
@@ -311,10 +301,12 @@ public class Town {
             int totalNeighborTownLevel = 0;
             int totalEnemyTownCount = 0;
             for (Town neighborTown : neighborTowns) {
-                if (neighborTown.getSide() == getSide()) {
-                    totalNeighborTownLevel += neighborTown.getLevel(EconomyArea.DOWNTOWN);
-                } else if (neighborTown.getSide() != Side.NEUTRAL) {
-                    totalEnemyTownCount++;
+                if (neighborTown != null) {
+                    if (neighborTown.getSide() == getSide()) {
+                        totalNeighborTownLevel += neighborTown.getLevel(EconomyArea.DOWNTOWN);
+                    } else if (neighborTown.getSide() != Side.NEUTRAL) {
+                        totalEnemyTownCount++;
+                    }
                 }
             }
 
@@ -391,7 +383,7 @@ public class Town {
 
             // If economy is changed, redraw the tile
             if (!Arrays.equals(prevLevels, levels)) {
-                map.redrawTileSprite(mapCoord);
+                listener.onTownUpdated(this);
             }
 
             // Get happiness delta
@@ -515,7 +507,7 @@ public class Town {
             if (type == Type.FOREST) {
                 baseSprite.setGridIndex(0, Type.GRASS.ordinal());
             } else if (type == Type.HILL) {
-                baseSprite.setGridIndex(0, Type.BADLAND.ordinal());
+                baseSprite.setGridIndex(0, Type.BADLANDS.ordinal());
             } else {
                 baseSprite.setGridIndex(0, type.ordinal());
             }
@@ -582,9 +574,8 @@ public class Town {
             sprites.add(sideSprite);
 
             // Set border sprite
-            ArrayList<Town> neighbors = map.getNeighborTowns(mapCoord, true);
             int index = 0;
-            for (Town neighbor : neighbors) {
+            for (Town neighbor : neighborTowns) {
                 Sprite borderSprite = borderSprites.get(index);
                 if (neighbor == null || neighbor.getSide() != side) {
                     borderSprite.setGridIndex(index, side.ordinal());
@@ -793,10 +784,9 @@ public class Town {
         }
 
         // Count neighbor town's stat
-        ArrayList<Town> neighborTowns = map.getNeighborTowns(mapCoord, false);
         int totalNeighborTownLevel = 0;
         for (Town neighborTown : neighborTowns) {
-            if (neighborTown.getSide() == getSide()) {
+            if (neighborTown != null && neighborTown.getSide() == getSide()) {
                 totalNeighborTownLevel += neighborTown.getLevel(EconomyArea.DOWNTOWN);
             }
         }
@@ -841,6 +831,14 @@ public class Town {
         return occupyingSide != Side.NEUTRAL && getBattle() == null;
     }
 
+    /**
+     *
+     * @param towns
+     */
+    public void setNeighborTowns(ArrayList<Town> towns) {
+        neighborTowns = towns;
+    }
+
     private final static int SPRITE_LAYER = 0;
     private final static int ECONOMY_UPDATE_COUNT = 30;
     private final static int MAX_ECONOMY_LEVEL = 5;
@@ -863,12 +861,12 @@ public class Town {
     private final static int OCCUPATION_TOTAL_STEP = 5;
     private final static int OCCUPATION_STEP_UPDATE_TIME = 30;
 
-    private Event listener = null;
-    private TownMap map;
+    private Event listener;
     private OffsetCoord mapCoord;
     private Type type;
     private Side side;
     private boolean focused = false;
+    private ArrayList<Town> neighborTowns = null;
 
     // Occupation
     private Side occupyingSide = Side.NEUTRAL;

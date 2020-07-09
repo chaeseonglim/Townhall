@@ -71,10 +71,13 @@ class TownMap extends HexTileMap implements View, Town.Event {
                 ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
                 Town.Side side = Town.Side.values()[ordinal];
 
-                Town town = new Town(this, this, mapCoord, type, side);
+                Town town = new Town(this, mapCoord, type, side);
                 towns.put(mapCoord, town);
                 townsBySide.get(side.ordinal()).add(town);
             }
+        }
+        for (Town town: towns.values()) {
+            town.setNeighborTowns(getNeighborTowns(town.getMapCoord(), true));
         }
 
         // Calculate viewport clipping area
@@ -102,6 +105,16 @@ class TownMap extends HexTileMap implements View, Town.Event {
     /**
      *
      * @param town
+     */
+    @Override
+    public void onTownUpdated(Town town) {
+
+        redrawTileSprite(town.getMapCoord());
+    }
+
+    /**
+     *
+     * @param town
      * @param prevSide
      * @param newSide
      */
@@ -110,6 +123,11 @@ class TownMap extends HexTileMap implements View, Town.Event {
 
         townsBySide.get(prevSide.ordinal()).remove(town);
         townsBySide.get(newSide.ordinal()).add(town);
+
+        if (prevSide != Town.Side.NEUTRAL) {
+            redrawTileSprite(prevSide);
+        }
+        redrawTileSprite(newSide);
     }
 
     /**
@@ -145,7 +163,9 @@ class TownMap extends HexTileMap implements View, Town.Event {
                         Engine2D.GetInstance().translateScreenToWidgetCoord(touchedScreenCoord);
                 if (lastTouchedWidgetCoord.distance(touchedWidgetCoord) < 60.0f) {
                     OffsetCoord touchedMapCoord = new OffsetCoord(touchedGameCoord);
-                    listener.onMapFocused(getTown(touchedMapCoord));
+                    if (listener != null) {
+                        listener.onMapFocused(getTown(touchedMapCoord));
+                    }
                 }
             } else if (eventAction == MotionEvent.ACTION_CANCEL) {
                 setDragging(false);

@@ -34,17 +34,14 @@ public class Towner extends Tribe {
             return;
         }
 
-        ArrayList<Town> towns = getMap().getTowns();
-
         maxPopulation = 0;
         happiness = 0;
-        for (Town town: towns) {
-            if (town.getSide() == getSide()) {
-                gold += town.collectTax();
-                maxPopulation += town.collectPopulation();
-                happiness += town.collectHappiness();
-            }
+        for (Town town: getTowns()) {
+            gold += town.collectTax();
+            maxPopulation += town.collectPopulation();
+            happiness += town.collectHappiness();
         }
+        happiness /= getTowns().size();
 
         Log.i(LOG_TAG, "Towner " + getSide().toString() + " gold: " + gold +
                 " max population: " + maxPopulation + " happiness: " + happiness);

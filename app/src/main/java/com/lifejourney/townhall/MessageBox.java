@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.CollidableObject;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -12,6 +13,7 @@ import com.lifejourney.engine2d.RectF;
 import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
+import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
 import java.util.ArrayList;
@@ -86,21 +88,23 @@ public class MessageBox extends Widget {
         addSprite(bg);
         Sprite shadow = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
+                .positionOffset(new PointF(5, 5))
                 .smooth(false).layer(builder.layer).depth(0.1f).opaque(0.2f)
                 .gridSize(2, 1).visible(false).build();
         shadow.setGridIndex(1, 0);
-        shadow.setPositionOffset(new PointF(5, 5));
         addSprite(shadow);
 
         pages = new ArrayList<>();
         for (int i = 0; i < builder.messages.size(); ++i) {
             Sprite sprite =
-                    new Sprite.Builder("messagebox"+i, builder.messages.get(i), builder.fontSize,
-                            builder.textColor, Color.argb(0, 0, 0, 0), Paint.Align.LEFT)
-                            .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
-                            .smooth(true).depth(0.3f)
-                            .layer(builder.layer).visible(false).build();
-            sprite.setPositionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN));
+                new TextSprite.Builder("messagebox"+i, builder.messages.get(i), builder.fontSize)
+                    .fontColor(builder.textColor)
+                    .bgColor(Color.argb(0, 0, 0, 0))
+                    .textAlign(Paint.Align.LEFT)
+                    .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
+                    .positionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN))
+                    .smooth(true).depth(0.3f)
+                    .layer(builder.layer).visible(false).build();
             pages.add(sprite);
             addSprite(sprite);
         }

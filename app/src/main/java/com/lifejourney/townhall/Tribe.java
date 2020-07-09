@@ -13,8 +13,9 @@ public abstract class Tribe implements Squad.Event {
         this.side = side;
         this.map = map;
         this.squadListener = squadListener;
-        for (Town town: map.getTowns()) {
-            if (town.getType() == Town.Type.HEADQUARTER && town.getSide() == side) {
+        this.towns = map.getTownsBySide(side);
+        for (Town town: towns) {
+            if (town.getType() == Town.Type.HEADQUARTER) {
                 this.headquarterCoord = town.getMapCoord();
             }
         }

@@ -54,24 +54,24 @@ public class Squad extends Object implements Controllable {
         public Squad build() {
             Sprite currentStick =
                 new Sprite.Builder("SquadStick", "squad.png").layer(SPRITE_LAYER)
-                    .size(ICON_SPRITE_SIZE).smooth(false).visible(true)
+                    .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
+                    .smooth(false).visible(true)
                     .gridSize(5, 3).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
             currentStick.setGridIndex(side.ordinal(), 0);
-            currentStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
             Sprite targetStick =
                 new Sprite.Builder("SquadTarget", "squad.png").layer(SPRITE_LAYER)
-                    .size(ICON_SPRITE_SIZE).smooth(false).visible(false).depth(-0.5f)
+                    .size(ICON_SPRITE_SIZE).positionOffset(TARGET_SPRITE_HOTSPOT_OFFSET)
+                    .smooth(false).visible(false).depth(-0.5f)
                     .gridSize(5, 3).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
                     .build();
             targetStick.setGridIndex(side.ordinal(), 0);
-            targetStick.setPositionOffset(TARGET_SPRITE_HOTSPOT_OFFSET);
             Sprite squadIcon =
-                    new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
-                            .size(ICON_SPRITE_SIZE).smooth(false).visible(false).depth(0.1f)
-                            .gridSize(8, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
-                            .build();
-            squadIcon.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
+                new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
+                    .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
+                    .smooth(false).visible(false).depth(0.1f)
+                    .gridSize(8, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
+                    .build();
             Sprite movingArrow =
                 new Sprite.Builder("SquadMovingArrow", "squad_moving_arrow.png")
                     .layer(SPRITE_LAYER - 1)
