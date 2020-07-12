@@ -13,13 +13,14 @@ import com.lifejourney.engine2d.Widget;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class EconomyBar extends Widget {
+public class UnitBuilder extends Widget {
 
     private final String LOG_TAG = "EconomyBar";
 
-    public EconomyBar(Villager villager, Rect region, int layer, float depth) {
+    public UnitBuilder(Villager villager) {
 
-        super(region, layer, depth);
+        super(new Rect(20, 0, 500, 64), 20, 0.0f);
+
         this.villager = villager;
 
         Sprite bg = new Sprite.Builder("economy_bar.png")
@@ -30,7 +31,7 @@ public class EconomyBar extends Widget {
         addSprite(bg);
 
         happinessSprite = new Sprite.Builder("economy_bar_happiness.png")
-                .size(new SizeF(42, 42))
+                .size(new SizeF(36, 36))
                 .positionOffset(new PointF(40, 0))
                 .smooth(false).depth(0.1f)
                 .gridSize(5, 1)

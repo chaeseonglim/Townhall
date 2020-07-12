@@ -22,9 +22,9 @@ public class SpeedControl extends Widget implements Button.Event {
         void onSpeedControlUpdate(SpeedControl speedControl);
     };
 
-    public SpeedControl(Event listener) {
+    public SpeedControl(Event listener, Rect region, int layer, float depth) {
 
-        super(new Rect(1080, 0, 174, 64), 20, 0.0f);
+        super(region, layer, depth);
         this.listener = listener;
 
         Sprite bg = new Sprite.Builder("speed_control.png")
@@ -34,15 +34,16 @@ public class SpeedControl extends Widget implements Button.Event {
                 .layer(20).visible(false).build();
         addSprite(bg);
 
-        pauseButton = new Button.Builder(this,
-                new Rect(1080, 0, 87, 64))
+        Rect pauseButtonRegion = new Rect(region.x, region.y, region.width/2, region.height);
+        pauseButton = new Button.Builder(this, pauseButtonRegion)
                 .imageSpriteAsset("speed_control_btn1.png").numImageSpriteSet(2).layer(21).build();
         pauseButton.setImageSpriteSet(1);
         pauseButton.show();
         addWidget(pauseButton);
 
-        playButton = new Button.Builder(this,
-                new Rect(1167, 0, 87, 64))
+        Rect playButtonRegion = new Rect(region.x + region.width/2, region.y,
+                region.width/2, region.height);
+        playButton = new Button.Builder(this, playButtonRegion)
                 .imageSpriteAsset("speed_control_btn2.png").numImageSpriteSet(4).layer(21).build();
         playButton.setImageSpriteSet(playSpeed);
         playButton.show();

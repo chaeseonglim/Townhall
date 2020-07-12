@@ -838,7 +838,7 @@ public class Squad extends Object implements Controllable {
     private final static float ICON_SPRITE_OPAQUE_BATTLE = 0.5f;
     private final static float ICON_SPRITE_OPAQUE_DRAGGING = 0.2f;
     private final static float TARGET_SPRITE_OPAQUE_NORMAL = 0.0f;
-    private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.5f;
+    private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.8f;
     private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
 

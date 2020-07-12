@@ -37,12 +37,11 @@ class GameMap extends HexTileMap implements View, Town.Event {
      *
      * @param mapBitmap
      */
-    GameMap(Event listener, String mapBitmap, float scale) {
+    GameMap(Event listener, String mapBitmap) {
 
-        super((int) (HEX_SIZE * scale));
+        super(HEX_SIZE);
 
         this.listener = listener;
-        this.scale = scale;
         setCacheMargin(4);
 
         // Load map data from bitmap file
@@ -379,11 +378,10 @@ class GameMap extends HexTileMap implements View, Town.Event {
     private final static int HEX_SIZE = 64;
 
     private Event listener;
-    private float scale;
     private int leftMargin = 0;
     private int rightMargin = 0;
     private int topMargin = 32;
-    private int bottomMargin = 0;
+    private int bottomMargin = 32;
     private boolean dragging = false;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
     private ArrayList<ArrayList<Town>> townsBySide = new ArrayList<>(Town.Side.values().length);

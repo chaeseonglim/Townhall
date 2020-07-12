@@ -1,6 +1,7 @@
 package com.lifejourney.townhall;
 
 import com.lifejourney.engine2d.OffsetCoord;
+import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class GameWorld extends World
 
         setDesiredFPS(10.0f);
 
-        map = new GameMap(this, "map.png", scale);
+        map = new GameMap(this, "map.png");
         map.show();
         addView(map);
 
@@ -28,13 +29,50 @@ public class GameWorld extends World
         tribes.add(villager);
         tribes.add(new Bandit(this, map));
 
-        EconomyBar economyBar = new EconomyBar(villager);
+        EconomyBar economyBar = new EconomyBar(villager,
+            new Rect(20, 0, 500, 64), 20, 0.0f);
         economyBar.show();
         addWidget(economyBar);
 
-        SpeedControl speedControl = new SpeedControl(this);
+        SpeedControl speedControl = new SpeedControl(this,
+            new Rect(1080, 0, 174, 64), 20, 0.0f);
         speedControl.show();
         addWidget(speedControl);
+
+        settingButton = new Button.Builder(this,
+                new Rect(1160,  600, 100, 64))
+                .imageSpriteAsset("setting_btn.png").numImageSpriteSet(1).layer(20).build();
+        settingButton.setImageSpriteSet(0);
+        settingButton.show();
+        addWidget(settingButton);
+
+        homeButton = new Button.Builder(this,
+                new Rect(20,  600, 100, 64))
+                .imageSpriteAsset("home_btn.png").numImageSpriteSet(1).layer(20).build();
+        homeButton.setImageSpriteSet(0);
+        homeButton.show();
+        addWidget(homeButton);
+
+        unitBuilderButton = new Button.Builder(this,
+                new Rect(140, 600, 100, 64))
+                .imageSpriteAsset("unit_builder_btn.png").numImageSpriteSet(1).layer(20).build();
+        unitBuilderButton.setImageSpriteSet(0);
+        unitBuilderButton.show();
+        addWidget(unitBuilderButton);
+
+        researchButton = new Button.Builder(this,
+                new Rect(260, 600, 100, 64))
+                .imageSpriteAsset("research_btn.png").numImageSpriteSet(1).layer(20).build();
+        researchButton.setImageSpriteSet(0);
+        researchButton.show();
+        addWidget(researchButton);
+
+        infoButton = new Button.Builder(this,
+                new Rect(380, 600, 100, 64))
+                .imageSpriteAsset("info_btn.png").numImageSpriteSet(1).layer(20).build();
+        infoButton.setImageSpriteSet(0);
+        infoButton.hide();
+        addWidget(infoButton);
 
         /*
         messageBox = new MessageBox.Builder(this,
@@ -155,10 +193,7 @@ public class GameWorld extends World
         if (focusedTown == town) {
             town.setFocus(false);
             focusedTown = null;
-            return;
-        }
-
-        if (focusedSquad != null) {
+        } else if (focusedSquad != null) {
             focusedSquad.setFocus(false);
             focusedSquad = null;
             town.setFocus(false);
@@ -168,6 +203,13 @@ public class GameWorld extends World
                 focusedTown = null;
             }
             focusedTown = town;
+        }
+
+        // Care for info button
+        if (focusedTown == null && focusedSquad == null) {
+            infoButton.hide();
+        } else {
+            infoButton.show();
         }
     }
 
@@ -191,6 +233,16 @@ public class GameWorld extends World
 
         map.getTown(squad.getMapCoord()).removeSquad(squad);
         removeSquad(squad);
+
+        // Check if destroyed squad is focused
+        if (focusedSquad == squad) {
+            focusedSquad = null;
+        }
+        if (focusedTown == null && focusedSquad == null) {
+            infoButton.hide();
+        } else {
+            infoButton.show();
+        }
     }
 
     /**
@@ -212,6 +264,9 @@ public class GameWorld extends World
             focusedTown = null;
         }
         focusedSquad = squad;
+
+        // Care for info button
+        infoButton.show();
     }
 
     /**
@@ -266,7 +321,6 @@ public class GameWorld extends World
     @Override
     public void onButtonPressed(Button button) {
 
-        messageBox.show();
     }
 
     @Override
@@ -287,42 +341,6 @@ public class GameWorld extends World
             // 3x
             setDesiredFPS(35.0f);
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public float getScale() {
-
-        return scale;
-    }
-
-    /**
-     *
-     * @param scale
-     */
-    public void setScale(float scale) {
-
-        this.scale = scale;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public GameMap getMap() {
-
-        return map;
-    }
-
-    /**
-     *
-     * @param map
-     */
-    public void setMap(GameMap map) {
-
-        this.map = map;
     }
 
     /**
@@ -365,10 +383,14 @@ public class GameWorld extends World
         removeObject(unit);
     }
 
-    private float scale = 1.0f;
     private boolean paused = false;
     private GameMap map;
     private MessageBox messageBox;
+    private Button unitBuilderButton;
+    private Button infoButton;
+    private Button homeButton;
+    private Button settingButton;
+    private Button researchButton;
     private ArrayList<Battle> battles = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Unit> units = new ArrayList<>();

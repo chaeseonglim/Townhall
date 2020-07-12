@@ -389,11 +389,13 @@ public class Town {
             // Get happiness delta
             int happinessDelta = getLevel(EconomyArea.DOWNTOWN) * BASE_HAPPINESS_DELTA_FROM_TOWN_LEVEL;
             for (Town neighborTown : neighborTowns) {
-                if (neighborTown.getSide() == getSide()) {
-                    happinessDelta += neighborTown.getLevel(EconomyArea.DOWNTOWN) *
-                            BASE_HAPPINESS_DELTA_FROM_NEIGHBOR_TOWN;
-                } else if (neighborTown.getSide() != Side.NEUTRAL) {
-                    happinessDelta += BASE_HAPPINESS_DELTA_FROM_ENEMY_TOWN;
+                if (neighborTown != null) {
+                    if (neighborTown.getSide() == getSide()) {
+                        happinessDelta += neighborTown.getLevel(EconomyArea.DOWNTOWN) *
+                                BASE_HAPPINESS_DELTA_FROM_NEIGHBOR_TOWN;
+                    } else if (neighborTown.getSide() != Side.NEUTRAL) {
+                        happinessDelta += BASE_HAPPINESS_DELTA_FROM_ENEMY_TOWN;
+                    }
                 }
             }
 

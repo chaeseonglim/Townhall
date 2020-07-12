@@ -86,7 +86,7 @@ public class Button extends Widget {
         imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).depth(0.2f)
-                .gridSize(2, builder.numImageSpriteSet)
+                .gridSize(3, builder.numImageSpriteSet)
                 .layer(builder.layer).visible(false).build();
         imageSprite.setGridIndex(0, imageSpriteSet);
         addSprite(imageSprite);
@@ -96,7 +96,7 @@ public class Button extends Widget {
                     .size(new SizeF(getRegion().size()))
                     .positionOffset(new PointF(3, 3))
                     .smooth(false).depth(0.1f).opaque(0.2f)
-                    .gridSize(2, 1)
+                    .gridSize(3, 1)
                     .layer(builder.layer).visible(false).build();
             addSprite(shadowSprite);
         }
@@ -132,6 +132,10 @@ public class Button extends Widget {
 
         if (!isVisible()) {
             return false;
+        }
+
+        if (disabled && checkIfInputEventInRegion(event)) {
+            return true;
         }
 
         int eventAction = event.getAction();
@@ -211,6 +215,22 @@ public class Button extends Widget {
         imageSprite.setGridIndex(imageSprite.getGridIndex().x, imageSpriteSet);
     }
 
+    /**
+     *
+     */
+    public void enable() {
+        disabled = false;
+        imageSprite.setGridIndex(0, imageSpriteSet);
+    }
+
+    /**
+     *
+     */
+    public void disable() {
+        disabled = true;
+        imageSprite.setGridIndex(2, imageSpriteSet);
+    }
+
     private static int UID = 0;
 
     private Event listener;
@@ -219,4 +239,5 @@ public class Button extends Widget {
     private int imageSpriteSet = 0;
     private boolean shadow;
     private boolean pressed = false;
+    private boolean disabled = false;
 }
