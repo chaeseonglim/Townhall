@@ -17,11 +17,11 @@ public class EconomyBar extends Widget {
 
     private final String LOG_TAG = "EconomyBar";
 
-    public EconomyBar(Towner towner) {
+    public EconomyBar(Villager villager) {
 
         super(new Rect(20, 0, 500, 64), 20, 0.0f);
 
-        this.towner = towner;
+        this.villager = villager;
 
         Sprite bg = new Sprite.Builder("economy_bar.png")
                 .size(new SizeF(getRegion().size()))
@@ -44,7 +44,7 @@ public class EconomyBar extends Widget {
                 .textAlign(Paint.Align.RIGHT)
                 .fontName("NanumBarunGothic.ttf")
                 .size(new SizeF(130, 36))
-                .positionOffset(new PointF(-105, 0))
+                .positionOffset(new PointF(-105, -3))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(goldTextSprite);
@@ -55,7 +55,7 @@ public class EconomyBar extends Widget {
                 .textAlign(Paint.Align.RIGHT)
                 .fontName("NanumBarunGothic.ttf")
                 .size(new SizeF(130, 36))
-                .positionOffset(new PointF(150, 0))
+                .positionOffset(new PointF(150, -3))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(popTextSprite);
@@ -72,19 +72,20 @@ public class EconomyBar extends Widget {
 
     @Override
     public void update() {
+
         super.update();
 
         if (--updateTimeLeft == 0) {
-            goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(towner.getGold()));
-            int popDiff = towner.getMaxPopulation() - towner.getPopulation();
+            goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(villager.getGold()));
+            int popDiff = villager.getMaxPopulation() - villager.getPopulation();
             popTextSprite.setText(((popDiff >= 0)?"+":"-")+ popDiff);
-            if (towner.getHappiness() > 80) {
+            if (villager.getHappiness() > 80) {
                 happinessSprite.setGridIndex(0, 0);
-            } else if (towner.getHappiness() > 60) {
+            } else if (villager.getHappiness() > 60) {
                 happinessSprite.setGridIndex(1, 0);
-            } else if (towner.getHappiness() > 40) {
+            } else if (villager.getHappiness() > 40) {
                 happinessSprite.setGridIndex(2, 0);
-            } else if (towner.getHappiness() > 20) {
+            } else if (villager.getHappiness() > 20) {
                 happinessSprite.setGridIndex(3, 0);
             } else  {
                 happinessSprite.setGridIndex(4, 0);
@@ -105,7 +106,7 @@ public class EconomyBar extends Widget {
 
     private static final int UPDATE_PERIOD = 30;
 
-    private Towner towner;
+    private Villager villager;
     private Sprite happinessSprite;
     private TextSprite goldTextSprite;
     private TextSprite popTextSprite;

@@ -8,7 +8,7 @@ public abstract class Tribe implements Squad.Event {
 
     private static final String LOG_TAG = "Tribe";
 
-    public Tribe(Town.Side side, Squad.Event squadListener, TownMap map) {
+    public Tribe(Town.Side side, Squad.Event squadListener, GameMap map) {
 
         this.side = side;
         this.map = map;
@@ -135,7 +135,7 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public TownMap getMap() {
+    public GameMap getMap() {
 
         return map;
     }
@@ -151,7 +151,7 @@ public abstract class Tribe implements Squad.Event {
 
     private Town.Side side;
     private Squad.Event squadListener;
-    private TownMap map;
+    private GameMap map;
     private OffsetCoord headquarterCoord;
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Town> towns = new ArrayList<>();

@@ -25,21 +25,30 @@ public class Button extends Widget {
 
         private Button.Event eventHandler;
         private Rect region;
-        private String message;
 
-        private String bgAsset = "button_bg.png";
+        private String message;
+        private String imageSpriteAsset = "button_bg.png";
+        private int numImageSpriteSet = 1;
         private float fontSize = 35.0f;
         private int textColor = Color.argb(255, 255, 255, 255);
         private int layer = 0;
         private float depth = 0.0f;
+        private boolean shadow = false;
 
-        Builder(Button.Event eventHandler, Rect region, String message) {
+        Builder(Button.Event eventHandler, Rect region) {
             this.eventHandler = eventHandler;
             this.region = region;
-            this.message = message;
         }
-        Builder bgAsset(String bgAsset) {
-            this.bgAsset = bgAsset;
+        Builder message(String message) {
+            this.message = message;
+            return this;
+        }
+        Builder imageSpriteAsset(String imageSpriteAsset) {
+            this.imageSpriteAsset = imageSpriteAsset;
+            return this;
+        }
+        Builder numImageSpriteSet(int numImageSpriteSet) {
+            this.numImageSpriteSet = numImageSpriteSet;
             return this;
         }
         Builder fontSize(float fontSize) {
@@ -58,6 +67,10 @@ public class Button extends Widget {
             this.depth = depth;
             return this;
         }
+        Builder shadow(boolean shadow) {
+            this.shadow = shadow;
+            return this;
+        }
         Button build() {
             return new Button(this);
         }
@@ -68,30 +81,36 @@ public class Button extends Widget {
         super(builder.region, builder.layer, builder.depth);
 
         listener = builder.eventHandler;
+        shadow = builder.shadow;
 
-        bgSprite = new Sprite.Builder(builder.bgAsset)
+        imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).depth(0.2f)
-                .gridSize(2, 1)
+                .gridSize(2, builder.numImageSpriteSet)
                 .layer(builder.layer).visible(false).build();
-        addSprite(bgSprite);
+        imageSprite.setGridIndex(0, imageSpriteSet);
+        addSprite(imageSprite);
 
-        Sprite shadow = new Sprite.Builder(builder.bgAsset)
-                .size(new SizeF(getRegion().size()))
-                .positionOffset(new PointF(3, 3))
-                .smooth(false).depth(0.1f).opaque(0.2f)
-                .gridSize(2, 1)
-                .layer(builder.layer).visible(false).build();
-        addSprite(shadow);
+        if (shadow) {
+            Sprite shadowSprite = new Sprite.Builder("shadow", builder.imageSpriteAsset)
+                    .size(new SizeF(getRegion().size()))
+                    .positionOffset(new PointF(3, 3))
+                    .smooth(false).depth(0.1f).opaque(0.2f)
+                    .gridSize(2, 1)
+                    .layer(builder.layer).visible(false).build();
+            addSprite(shadowSprite);
+        }
 
-        messageSprite = new TextSprite.Builder("button"+ UID++, builder.message, builder.fontSize)
-                .fontColor(builder.textColor)
-                .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.CENTER)
-                .size(new SizeF(builder.region.size()))
-                .smooth(true).depth(0.3f)
-                .layer(builder.layer).visible(false).build();
-        addSprite(messageSprite);
+        if (builder.message != null) {
+            messageSprite = new TextSprite.Builder("button" + UID++, builder.message, builder.fontSize)
+                    .fontColor(builder.textColor)
+                    .bgColor(Color.argb(0, 0, 0, 0))
+                    .textAlign(Paint.Align.CENTER)
+                    .size(new SizeF(builder.region.size()))
+                    .smooth(true).depth(0.3f)
+                    .layer(builder.layer).visible(false).build();
+            addSprite(messageSprite);
+        }
     }
 
     /**
@@ -122,11 +141,10 @@ public class Button extends Widget {
         {
             case MotionEvent.ACTION_DOWN:
                 if (checkIfInputEventInRegion(event)) {
-                    bgSprite.setGridIndex(1, 0);
+                    imageSprite.setGridIndex(1, imageSpriteSet);
                     pressed = true;
                     handledResult = true;
-                }
-                else {
+                } else {
                     handledResult = false;
                 }
                 break;
@@ -136,23 +154,21 @@ public class Button extends Widget {
             case MotionEvent.ACTION_CANCEL:
                 if (pressed) {
                     pressed = false;
-                    bgSprite.setGridIndex(0, 0);
+                    imageSprite.setGridIndex(0, imageSpriteSet);
                     handledResult = true;
-                }
-                else {
+                } else {
                     handledResult = false;
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if (pressed) {
                     pressed = false;
-                    bgSprite.setGridIndex(0, 0);
+                    imageSprite.setGridIndex(0, imageSpriteSet);
                     if (checkIfInputEventInRegion(event) && listener != null) {
                         listener.onButtonPressed(this);
                     }
                     handledResult = true;
-                }
-                else {
+                } else {
                     handledResult = false;
                 }
                 break;
@@ -170,21 +186,37 @@ public class Button extends Widget {
     @Override
     public void commit() {
 
-        if (bgSprite.getGridIndex().equals(new Point(1, 0))) {
-            messageSprite.setPositionOffset(new PointF(3, 3));
-            bgSprite.setPositionOffset(new PointF(3, 3));
+        if (imageSprite.getGridIndex().x == 1) {
+            if (messageSprite != null) {
+                messageSprite.setPositionOffset(new PointF(3, 3));
+            }
+            imageSprite.setPositionOffset(new PointF(3, 3));
         } else {
-            messageSprite.setPositionOffset(new PointF(0, 0));
-            bgSprite.setPositionOffset(new PointF(0, 0));
+            if (messageSprite != null) {
+                messageSprite.setPositionOffset(new PointF(0, 0));
+            }
+            imageSprite.setPositionOffset(new PointF(0, 0));
         }
 
         super.commit();
     }
 
+    /**
+     *
+     * @param imageSpriteSet
+     */
+    public void setImageSpriteSet(int imageSpriteSet) {
+
+        this.imageSpriteSet = imageSpriteSet;
+        imageSprite.setGridIndex(imageSprite.getGridIndex().x, imageSpriteSet);
+    }
+
     private static int UID = 0;
 
     private Event listener;
-    private Sprite messageSprite;
-    private Sprite bgSprite;
+    private Sprite messageSprite = null;
+    private Sprite imageSprite;
+    private int imageSpriteSet = 0;
+    private boolean shadow;
     private boolean pressed = false;
 }

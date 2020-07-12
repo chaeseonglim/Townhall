@@ -20,7 +20,8 @@ import com.lifejourney.engine2d.Rect;
 
 import java.util.Locale;
 
-public class Townhall extends FragmentActivity implements Choreographer.FrameCallback, SurfaceHolder.Callback {
+public class Townhall extends FragmentActivity
+        implements Choreographer.FrameCallback, SurfaceHolder.Callback {
 
     private static final long ONE_MS_IN_NS = 1000000;
     private static final long ONE_S_IN_NS = 1000 * ONE_MS_IN_NS;
@@ -93,7 +94,6 @@ public class Townhall extends FragmentActivity implements Choreographer.FrameCal
         world.close();
 
         finalizeEngine();
-
     }
 
     /**

@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-class TownMap extends HexTileMap implements View, Town.Event {
+class GameMap extends HexTileMap implements View, Town.Event {
 
-    private static final String LOG_TAG = "TownMap";
+    private static final String LOG_TAG = "GameMap";
 
     public interface Event {
 
@@ -37,7 +37,7 @@ class TownMap extends HexTileMap implements View, Town.Event {
      *
      * @param mapBitmap
      */
-    TownMap(Event listener, String mapBitmap, float scale) {
+    GameMap(Event listener, String mapBitmap, float scale) {
 
         super((int) (HEX_SIZE * scale));
 
@@ -164,7 +164,9 @@ class TownMap extends HexTileMap implements View, Town.Event {
                 if (lastTouchedWidgetCoord.distance(touchedWidgetCoord) < 60.0f) {
                     OffsetCoord touchedMapCoord = new OffsetCoord(touchedGameCoord);
                     if (listener != null) {
-                        listener.onMapFocused(getTown(touchedMapCoord));
+                        Town townToFocus = getTown(touchedMapCoord);
+                        townToFocus.setFocus(true);
+                        listener.onMapFocused(townToFocus);
                     }
                 }
             } else if (eventAction == MotionEvent.ACTION_CANCEL) {

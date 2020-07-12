@@ -134,7 +134,7 @@ public class Town {
 
     enum Side {
         NEUTRAL,
-        TOWNER,
+        VILLAGER,
         BANDIT,
         PIRATE,
         REBEL
@@ -282,8 +282,8 @@ public class Town {
             return;
         }
 
-        if (side == Side.TOWNER) {
-            // Economy only prosper when it's Towner's town
+        if (side == Side.VILLAGER) {
+            // Economy only prosper when it's Villager's town
             // Get base exp delta by economy prosper
             int[] expDeltas = new int[EconomyArea.values().length];
             for (int i = 0; i < EconomyArea.values().length; ++i) {
@@ -336,8 +336,8 @@ public class Town {
             // Back-up previous levels
             int[] prevLevels = Arrays.copyOf(levels, levels.length);
 
-            Log.i(LOG_TAG, "levels " + levels[0] + " " + levels[1] + " " + levels[2] + " " + levels[3]);
-            Log.i(LOG_TAG, "exps " + exps[0] + " " + exps[1] + " " + exps[2] + " " + exps[3]);
+            //Log.i(LOG_TAG, "levels " + levels[0] + " " + levels[1] + " " + levels[2] + " " + levels[3]);
+            //Log.i(LOG_TAG, "exps " + exps[0] + " " + exps[1] + " " + exps[2] + " " + exps[3]);
 
             // Level down if exp is negative
             for (int i = 0; i < EconomyArea.values().length; ++i) {
@@ -434,7 +434,7 @@ public class Town {
             baseSprite =
                     new Sprite.Builder("Base", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(4, 8).smooth(false)
+                            .size(TileSize).gridSize(4, 9).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
         }
 
@@ -483,9 +483,18 @@ public class Town {
             glowingSprite =
                     new Sprite.Builder("GlowingLine", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(4, 8).smooth(false)
+                            .size(TileSize).gridSize(4, 9).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.5f).visible(true).build();
             glowingSprite.setGridIndex(0, 7);
+        }
+
+        if (selectionSprite == null) {
+            selectionSprite =
+                    new Sprite.Builder("Selection", "tiles.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(TileSize).gridSize(4, 9).smooth(false)
+                            .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
+            selectionSprite.setGridIndex(0, 8);
         }
     }
 
@@ -615,6 +624,15 @@ public class Town {
             glowingSprite.commit();
         }
 
+        // Show selection sprites
+        if (focused) {
+            selectionSprite.setVisible(true);
+            sprites.add(selectionSprite);
+        } else {
+            selectionSprite.setVisible(false);
+            selectionSprite.commit();
+        }
+
         return sprites;
     }
 
@@ -734,6 +752,7 @@ public class Town {
     public void setFocus(boolean focused) {
 
         this.focused = focused;
+        listener.onTownUpdated(this);
     }
 
     /**
@@ -819,6 +838,7 @@ public class Town {
      * @return
      */
     public int collectHappiness() {
+
         return happiness;
     }
 
@@ -836,6 +856,7 @@ public class Town {
      * @param towns
      */
     public void setNeighborTowns(ArrayList<Town> towns) {
+
         neighborTowns = towns;
     }
 
@@ -893,6 +914,7 @@ public class Town {
     private ArrayList<Sprite> borderSprites = null;
     private Sprite occupationSprite = null;
     private Sprite glowingSprite = null;
+    private Sprite selectionSprite = null;
     private int baseSpriteSelection = (int)(Math.random()*4);
     private int economySpriteSelection = (int)(Math.random()*3);
 }

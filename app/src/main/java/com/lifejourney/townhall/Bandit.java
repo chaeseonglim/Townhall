@@ -2,7 +2,7 @@ package com.lifejourney.townhall;
 
 public class Bandit extends Tribe {
 
-    public Bandit(Squad.Event squadListener, TownMap map) {
+    public Bandit(Squad.Event squadListener, GameMap map) {
 
         super(Town.Side.BANDIT, squadListener, map);
 

@@ -42,10 +42,10 @@ public class Squad extends Object implements Controllable {
 
         private Event listener;
         private PointF position;
-        private TownMap map;
+        private GameMap map;
         private Town.Side side;
 
-        public Builder(Event listener, PointF position, TownMap map, Town.Side side) {
+        public Builder(Event listener, PointF position, GameMap map, Town.Side side) {
             this.listener = listener;
             this.position = position;
             this.map = map;
@@ -91,10 +91,10 @@ public class Squad extends Object implements Controllable {
     private static class PrivateBuilder<T extends Squad.PrivateBuilder<T>> extends Object.Builder<T> {
 
         private Event listener;
-        private TownMap map;
+        private GameMap map;
         private Town.Side side;
 
-        public PrivateBuilder(Event listener, PointF position, TownMap map, Town.Side side) {
+        public PrivateBuilder(Event listener, PointF position, GameMap map, Town.Side side) {
             super(position);
             this.listener = listener;
             this.map = map;
@@ -631,7 +631,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public TownMap getMap() {
+    public GameMap getMap() {
 
         return map;
     }
@@ -843,7 +843,7 @@ public class Squad extends Object implements Controllable {
     private final static float RETREAT_THRESHOLD = 0.3f;
 
     private Event listener;
-    private TownMap map;
+    private GameMap map;
     private Town.Side side;
     private SizeF spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();

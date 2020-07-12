@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class GameWorld extends World
-        implements Squad.Event, TownMap.Event, Button.Event, MessageBox.Event {
+        implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event,
+                SpeedControl.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -15,21 +16,25 @@ public class GameWorld extends World
 
         super();
 
-        setDesiredFPS(15.0f);
+        setDesiredFPS(10.0f);
 
-        map = new TownMap(this, "map.png", scale);
+        map = new GameMap(this, "map.png", scale);
         map.show();
         addView(map);
 
-        Towner towner = new Towner(this, map);
+        Villager villager = new Villager(this, map);
 
         tribes = new ArrayList<>();
-        tribes.add(towner);
+        tribes.add(villager);
         tribes.add(new Bandit(this, map));
 
-        EconomyBar economyBar = new EconomyBar(towner);
+        EconomyBar economyBar = new EconomyBar(villager);
         economyBar.show();
         addWidget(economyBar);
+
+        SpeedControl speedControl = new SpeedControl(this);
+        speedControl.show();
+        addWidget(speedControl);
 
         /*
         messageBox = new MessageBox.Builder(this,
@@ -58,8 +63,28 @@ public class GameWorld extends World
         map = null;
     }
 
+    /**
+     *
+     */
+    @Override
+    protected void updateObjects() {
+
+        if (paused) {
+            return;
+        }
+
+        super.updateObjects();
+    }
+
+    /**
+     *
+     */
     @Override
     protected void postUpdate() {
+
+        if (paused) {
+            return;
+        }
 
         // Check if new battle is arisen
         for (Squad squad: squads) {
@@ -111,7 +136,6 @@ public class GameWorld extends World
      */
     @Override
     public void onMapCreated() {
-
     }
 
     /**
@@ -119,7 +143,6 @@ public class GameWorld extends World
      */
     @Override
     public void onMapDestroyed() {
-
     }
 
     /**
@@ -128,16 +151,24 @@ public class GameWorld extends World
      */
     @Override
     public void onMapFocused(Town town) {
+
         if (focusedTown == town) {
+            town.setFocus(false);
+            focusedTown = null;
             return;
         }
-        if (focusedTown != null) {
-            focusedTown.setFocus(false);
-        }
+
         if (focusedSquad != null) {
             focusedSquad.setFocus(false);
+            focusedSquad = null;
+            town.setFocus(false);
+        } else {
+            if (focusedTown != null) {
+                focusedTown.setFocus(false);
+                focusedTown = null;
+            }
+            focusedTown = town;
         }
-        focusedTown = town;
     }
 
     /**
@@ -174,9 +205,11 @@ public class GameWorld extends World
         }
         if (focusedSquad != null) {
             focusedSquad.setFocus(false);
+            focusedSquad = null;
         }
         if (focusedTown != null) {
             focusedTown.setFocus(false);
+            focusedTown = null;
         }
         focusedSquad = squad;
     }
@@ -236,6 +269,26 @@ public class GameWorld extends World
         messageBox.show();
     }
 
+    @Override
+    public void onSpeedControlUpdate(SpeedControl speedControl) {
+
+        if (speedControl.getPlaySpeed() == 0) {
+            // Pause
+            setDesiredFPS(15.0f);
+            paused = true;
+        } else if (speedControl.getPlaySpeed() == 1) {
+            // 1x
+            setDesiredFPS(15.0f);
+            paused = false;
+        } else if (speedControl.getPlaySpeed() == 2) {
+            // 2x
+            setDesiredFPS(25.0f);
+        } else if (speedControl.getPlaySpeed() == 3) {
+            // 3x
+            setDesiredFPS(35.0f);
+        }
+    }
+
     /**
      *
      * @return
@@ -258,7 +311,7 @@ public class GameWorld extends World
      *
      * @return
      */
-    public TownMap getMap() {
+    public GameMap getMap() {
 
         return map;
     }
@@ -267,7 +320,7 @@ public class GameWorld extends World
      *
      * @param map
      */
-    public void setMap(TownMap map) {
+    public void setMap(GameMap map) {
 
         this.map = map;
     }
@@ -313,7 +366,8 @@ public class GameWorld extends World
     }
 
     private float scale = 1.0f;
-    private TownMap map;
+    private boolean paused = false;
+    private GameMap map;
     private MessageBox messageBox;
     private ArrayList<Battle> battles = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();

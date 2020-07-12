@@ -11,7 +11,7 @@ public class Battle {
 
     private static final String LOG_TAG = "Battle";
 
-    public Battle(TownMap map, Squad attacker, Squad defender) {
+    public Battle(GameMap map, Squad attacker, Squad defender) {
 
         this.map = map;
         this.attacker = attacker;
@@ -180,7 +180,7 @@ public class Battle {
     private int SUPPORTER_EXP  = 25;
 
     private OffsetCoord mapCoord;
-    private TownMap map;
+    private GameMap map;
     private Squad attacker;
     private Squad defender;
     private ArrayList<Squad> supporters = new ArrayList<>();

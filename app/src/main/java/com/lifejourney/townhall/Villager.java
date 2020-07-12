@@ -4,15 +4,13 @@ import android.util.Log;
 
 import com.lifejourney.engine2d.OffsetCoord;
 
-import java.util.ArrayList;
+public class Villager extends Tribe {
 
-public class Towner extends Tribe {
+    private static final String LOG_TAG = "Villager";
 
-    private static final String LOG_TAG = "Towner";
+    public Villager(Squad.Event squadListener, GameMap map) {
 
-    public Towner(Squad.Event squadListener, TownMap map) {
-
-        super(Town.Side.TOWNER, squadListener, map);
+        super(Town.Side.VILLAGER, squadListener, map);
 
         this.maxPopulation = 0;
         this.population = 0;
@@ -43,7 +41,7 @@ public class Towner extends Tribe {
         }
         happiness /= getTowns().size();
 
-        Log.i(LOG_TAG, "Towner " + getSide().toString() + " gold: " + gold +
+        Log.i(LOG_TAG, "Villager " + getSide().toString() + " gold: " + gold +
                 " max population: " + maxPopulation + " happiness: " + happiness);
 
         collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
