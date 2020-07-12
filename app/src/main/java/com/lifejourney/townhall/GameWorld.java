@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
@@ -19,56 +20,64 @@ public class GameWorld extends World
 
         setDesiredFPS(10.0f);
 
+        // Build map
         map = new GameMap(this, "map.png");
         map.show();
         addView(map);
 
+        // Build tribes
         Villager villager = new Villager(this, map);
-
-        tribes = new ArrayList<>();
         tribes.add(villager);
         tribes.add(new Bandit(this, map));
 
+        // Build UIs
         EconomyBar economyBar = new EconomyBar(villager,
-            new Rect(20, 0, 500, 64), 20, 0.0f);
+            new Rect(20, 10, 440, 64), 20, 0.0f);
         economyBar.show();
         addWidget(economyBar);
 
+        dateBar = new DateBar(
+                new Rect(480, 10, 230, 64), 20, 0.0f);
+        dateBar.show();
+        addWidget(dateBar);
+
         SpeedControl speedControl = new SpeedControl(this,
-            new Rect(1080, 0, 174, 64), 20, 0.0f);
+            new Rect(1080, 10, 174, 64), 20, 0.0f);
         speedControl.show();
         addWidget(speedControl);
 
+        Rect viewport = Engine2D.GetInstance().getViewport();
+
         settingButton = new Button.Builder(this,
-                new Rect(1160,  600, 100, 64))
+                new Rect(1160,  viewport.height - 74, 100, 64))
                 .imageSpriteAsset("setting_btn.png").numImageSpriteSet(1).layer(20).build();
         settingButton.setImageSpriteSet(0);
         settingButton.show();
         addWidget(settingButton);
 
         homeButton = new Button.Builder(this,
-                new Rect(20,  600, 100, 64))
+                new Rect(20,  viewport.height - 74, 100, 64))
                 .imageSpriteAsset("home_btn.png").numImageSpriteSet(1).layer(20).build();
         homeButton.setImageSpriteSet(0);
         homeButton.show();
         addWidget(homeButton);
 
         unitBuilderButton = new Button.Builder(this,
-                new Rect(140, 600, 100, 64))
+                new Rect(140, viewport.height - 74, 100, 64))
                 .imageSpriteAsset("unit_builder_btn.png").numImageSpriteSet(1).layer(20).build();
         unitBuilderButton.setImageSpriteSet(0);
         unitBuilderButton.show();
         addWidget(unitBuilderButton);
 
         researchButton = new Button.Builder(this,
-                new Rect(260, 600, 100, 64))
+                new Rect(260,  viewport.height - 74, 100, 64))
                 .imageSpriteAsset("research_btn.png").numImageSpriteSet(1).layer(20).build();
         researchButton.setImageSpriteSet(0);
         researchButton.show();
         addWidget(researchButton);
 
         infoButton = new Button.Builder(this,
-                new Rect(380, 600, 100, 64))
+                new Rect(380, viewport.height - 74, 100, 64))
                 .imageSpriteAsset("info_btn.png").numImageSpriteSet(1).layer(20).build();
         infoButton.setImageSpriteSet(0);
         infoButton.hide();
@@ -167,6 +176,14 @@ public class GameWorld extends World
         for (Tribe tribe: tribes) {
             tribe.update();
         }
+
+        // Update date
+        if (--dayUpdateTimeLeft == 0) {
+            day++;
+            dateBar.setDay(day);
+            dayUpdateTimeLeft = DAY_UPDATE_PERIOD;
+        }
+
     }
 
     /**
@@ -383,7 +400,20 @@ public class GameWorld extends World
         removeObject(unit);
     }
 
+    /**
+     *
+     * @return
+     */
+    public int getDay() {
+        return day;
+    }
+
+    private static final int DAY_UPDATE_PERIOD = 90;
+
     private boolean paused = false;
+    private int day = 0;
+    private int dayUpdateTimeLeft = DAY_UPDATE_PERIOD;
+
     private GameMap map;
     private MessageBox messageBox;
     private Button unitBuilderButton;
@@ -391,10 +421,13 @@ public class GameWorld extends World
     private Button homeButton;
     private Button settingButton;
     private Button researchButton;
+    private DateBar dateBar;
+
+    private Squad focusedSquad = null;
+    private Town focusedTown = null;
+
     private ArrayList<Battle> battles = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Unit> units = new ArrayList<>();
-    private Squad focusedSquad = null;
-    private Town focusedTown = null;
-    private ArrayList<Tribe> tribes;
+    private ArrayList<Tribe> tribes = new ArrayList<>();
 }

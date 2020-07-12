@@ -31,7 +31,7 @@ public class EconomyBar extends Widget {
 
         happinessSprite = new Sprite.Builder("economy_bar_happiness.png")
                 .size(new SizeF(42, 42))
-                .positionOffset(new PointF(40, 0))
+                .positionOffset(new PointF(60, 0))
                 .smooth(false).depth(0.1f)
                 .gridSize(5, 1)
                 .layer(20).visible(false).build();
@@ -43,7 +43,7 @@ public class EconomyBar extends Widget {
                 .textAlign(Paint.Align.RIGHT)
                 .fontName("NanumBarunGothic.ttf")
                 .size(new SizeF(130, 36))
-                .positionOffset(new PointF(-105, -3))
+                .positionOffset(new PointF(-80, -3))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(goldTextSprite);
@@ -54,7 +54,7 @@ public class EconomyBar extends Widget {
                 .textAlign(Paint.Align.RIGHT)
                 .fontName("NanumBarunGothic.ttf")
                 .size(new SizeF(130, 36))
-                .positionOffset(new PointF(150, -3))
+                .positionOffset(new PointF(130, -3))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(popTextSprite);
@@ -69,6 +69,9 @@ public class EconomyBar extends Widget {
         super.close();
     }
 
+    /**
+     *
+     */
     @Override
     public void update() {
 
