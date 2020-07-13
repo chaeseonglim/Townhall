@@ -135,15 +135,6 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public GameMap getMap() {
-
-        return map;
-    }
-
-    /**
-     *
-     * @return
-     */
     public ArrayList<Town> getTowns() {
 
         return towns;
