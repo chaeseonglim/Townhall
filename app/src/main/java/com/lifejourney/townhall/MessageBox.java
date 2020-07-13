@@ -2,15 +2,10 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 
-import com.lifejourney.engine2d.CollidableObject;
-import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
-import com.lifejourney.engine2d.RectF;
-import com.lifejourney.engine2d.Size;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
@@ -29,29 +24,29 @@ public class MessageBox extends Widget {
 
     public static class Builder {
 
-        private Event eventHandler;
+        private Event listener;
         private Rect region;
         private ArrayList<String> messages;
 
-        private String bgAsset = "messagebox_bg.png";
+        private String imageSpriteAsset = "messagebox_bg.png";
         private float fontSize = 35.0f;
         private int textColor = Color.argb(255, 255, 255, 255);
         private int layer = 0;
         private float depth = 0.0f;
 
-        Builder(Event eventHandler, Rect region, String message) {
-            this.eventHandler = eventHandler;
+        Builder(Event listener, Rect region, String message) {
+            this.listener = listener;
             this.region = region;
             this.messages = new ArrayList<>();
             messages.add(message);
         }
-        Builder(Event eventHandler, Rect region, ArrayList<String> messages) {
-            this.eventHandler = eventHandler;
+        Builder(Event listener, Rect region, ArrayList<String> messages) {
+            this.listener = listener;
             this.region = region;
             this.messages = messages;
         }
-        Builder bgAsset(String bgAsset) {
-            this.bgAsset = bgAsset;
+        Builder imageSpriteAsset(String imageSpriteAsset) {
+            this.imageSpriteAsset = imageSpriteAsset;
             return this;
         }
         Builder fontSize(float fontSize) {
@@ -78,25 +73,24 @@ public class MessageBox extends Widget {
     private MessageBox(Builder builder) {
 
         super(builder.region, builder.layer, builder.depth);
+        listener = builder.listener;
 
-        eventHandler = builder.eventHandler;
-
-        Sprite bg = new Sprite.Builder(builder.bgAsset)
+        Sprite imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(builder.layer).depth(0.2f)
                 .gridSize(2, 1).visible(false).build();
-        addSprite(bg);
-        Sprite shadow = new Sprite.Builder(builder.bgAsset)
+        addSprite(imageSprite);
+        Sprite shadowSprite = new Sprite.Builder(builder.imageSpriteAsset)
                 .size(new SizeF(getRegion().size()))
                 .positionOffset(new PointF(5, 5))
                 .smooth(false).layer(builder.layer).depth(0.1f).opaque(0.2f)
                 .gridSize(2, 1).visible(false).build();
-        shadow.setGridIndex(1, 0);
-        addSprite(shadow);
+        shadowSprite.setGridIndex(1, 0);
+        addSprite(shadowSprite);
 
         pages = new ArrayList<>();
         for (int i = 0; i < builder.messages.size(); ++i) {
-            Sprite sprite =
+            Sprite textSprite =
                 new TextSprite.Builder("messagebox"+i, builder.messages.get(i), builder.fontSize)
                     .fontColor(builder.textColor)
                     .bgColor(Color.argb(0, 0, 0, 0))
@@ -105,8 +99,8 @@ public class MessageBox extends Widget {
                     .positionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN))
                     .smooth(true).depth(0.3f)
                     .layer(builder.layer).visible(false).build();
-            pages.add(sprite);
-            addSprite(sprite);
+            pages.add(textSprite);
+            addSprite(textSprite);
         }
     }
 
@@ -136,8 +130,13 @@ public class MessageBox extends Widget {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (!isVisible()) {
             return false;
+        }
+
+        if (super.onTouchEvent(event)) {
+            return true;
         }
 
         int eventAction = event.getAction();
@@ -153,8 +152,8 @@ public class MessageBox extends Widget {
                     }
                     pages.get(currentPage).show();
 
-                    if (eventHandler != null) {
-                        eventHandler.onMessageBoxTouched(this);
+                    if (listener != null) {
+                        listener.onMessageBoxTouched(this);
                     }
                     return true;
                 }
@@ -196,6 +195,7 @@ public class MessageBox extends Widget {
      * @return
      */
     public int getTotalPage() {
+
         return pages.size();
     }
 
@@ -204,12 +204,13 @@ public class MessageBox extends Widget {
      * @return
      */
     public int getCurrentPage() {
+
         return currentPage;
     }
 
     private final int TEXT_MARGIN = 12;
 
-    private Event eventHandler;
+    private Event listener;
     private ArrayList<Sprite> pages;
     private int currentPage = 0;
     private boolean touched = false;

@@ -4,9 +4,9 @@ public class Bandit extends Tribe {
 
     public Bandit(Squad.Event squadListener, GameMap map) {
 
-        super(Town.Side.BANDIT, squadListener, map);
+        super(Town.Faction.BANDIT, squadListener, map);
 
-        spawnSquad(getHeadquarterCoord().toGameCoord(), getSide(),
+        spawnSquad(getHeadquarterCoord().toGameCoord(), getFaction(),
                 Unit.UnitClass.SWORD, Unit.UnitClass.LONGBOW, Unit.UnitClass.LONGBOW);
     }
 

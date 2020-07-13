@@ -8,14 +8,14 @@ public abstract class Tribe implements Squad.Event {
 
     private static final String LOG_TAG = "Tribe";
 
-    public Tribe(Town.Side side, Squad.Event squadListener, GameMap map) {
+    public Tribe(Town.Faction faction, Squad.Event squadListener, GameMap map) {
 
-        this.side = side;
+        this.faction = faction;
         this.map = map;
         this.squadListener = squadListener;
-        this.towns = map.getTownsBySide(side);
+        this.towns = map.getTownsBySide(faction);
         for (Town town: towns) {
-            if (town.getType() == Town.Type.HEADQUARTER) {
+            if (town.getTerrain() == Town.Terrain.HEADQUARTER_GRASS) {
                 this.headquarterCoord = town.getMapCoord();
             }
         }
@@ -94,12 +94,12 @@ public abstract class Tribe implements Squad.Event {
     /**
      *
      * @param position
-     * @param side
+     * @param faction
      * @param unitClass
      */
-    public void spawnSquad(PointF position, Town.Side side, Unit.UnitClass... unitClass) {
+    public void spawnSquad(PointF position, Town.Faction faction, Unit.UnitClass... unitClass) {
 
-        Squad squad = new Squad.Builder(this, position, map, side).build();
+        Squad squad = new Squad.Builder(this, position, map, faction).build();
         if (unitClass.length >= 1) {
             squad.spawnUnit(unitClass[0]);
         }
@@ -126,9 +126,9 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public Town.Side getSide() {
+    public Town.Faction getFaction() {
 
-        return side;
+        return faction;
     }
 
     /**
@@ -149,7 +149,7 @@ public abstract class Tribe implements Squad.Event {
         return towns;
     }
 
-    private Town.Side side;
+    private Town.Faction faction;
     private Squad.Event squadListener;
     private GameMap map;
     private OffsetCoord headquarterCoord;

@@ -193,13 +193,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
     public static class Builder {
 
         private UnitClass unitClass;
-        private Town.Side side;
+        private Town.Faction faction;
 
         private PointF position = new PointF();
 
-        public Builder(UnitClass unitClass, Town.Side side) {
+        public Builder(UnitClass unitClass, Town.Faction faction) {
             this.unitClass = unitClass;
-            this.side = side;
+            this.faction = faction;
         }
         public Builder position(PointF position) {
             this.position = position;
@@ -211,7 +211,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             unitClassSprite.setGridIndex(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y);
             Sprite unitFrameSprite = new Sprite.Builder("frame", "unit_frame.png").gridSize(5,1)
                     .size(new SizeF(16, 16)).smooth(true).build();
-            unitFrameSprite.setGridIndex(side.ordinal(), 0);
+            unitFrameSprite.setGridIndex(faction.ordinal(), 0);
             Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(9,1)
                     .size(new SizeF(16, 16)).smooth(true).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
@@ -221,7 +221,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     .maxForce(unitClass.maxForce()).maxVelocity(unitClass.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
                     .mass(unitClass.mass()).friction(unitClass.friction())
-                    .side(side)
+                    .side(faction)
                     .shape(unitClass.shape()).layer(SPRITE_LAYER).build();
         }
     }
@@ -230,14 +230,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private static class PrivateBuilder<T extends Unit.PrivateBuilder<T>> extends CollidableObject.Builder<T> {
 
         private UnitClass unitClass;
-        private Town.Side side;
+        private Town.Faction faction;
 
         public PrivateBuilder(PointF position, UnitClass unitClass) {
             super(position);
             this.unitClass = unitClass;
         }
-        public PrivateBuilder side(Town.Side side) {
-            this.side = side;
+        public PrivateBuilder side(Town.Faction faction) {
+            this.faction = faction;
             return this;
         }
         public Unit build() {
@@ -251,7 +251,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         targetMapPosition = new OffsetCoord(getPosition());
         unitClass = builder.unitClass;
-        side = builder.side;
+        faction = builder.faction;
         health = getUnitClass().maxHealth();
         level = 1;
     }
@@ -720,7 +720,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private ArrayList<Unit> closedOpponents;
-    private Town.Side side;
+    private Town.Faction faction;
 
     private OffsetCoord targetMapPosition;
     private int meleeAttackLeft = 0;

@@ -10,18 +10,18 @@ public class Villager extends Tribe {
 
     public Villager(Squad.Event squadListener, GameMap map) {
 
-        super(Town.Side.VILLAGER, squadListener, map);
+        super(Town.Faction.VILLAGER, squadListener, map);
 
         this.maxPopulation = 0;
         this.population = 0;
         this.gold = 0;
 
-        spawnSquad(getHeadquarterCoord().toGameCoord(), getSide(),
+        spawnSquad(getHeadquarterCoord().toGameCoord(), getFaction(),
                 Unit.UnitClass.SWORD, Unit.UnitClass.LONGBOW, Unit.UnitClass.LONGBOW);
 
         OffsetCoord coord = getHeadquarterCoord().clone();
         coord.offset(1, 0);
-        spawnSquad(coord.toGameCoord(), getSide(),
+        spawnSquad(coord.toGameCoord(), getFaction(),
                 Unit.UnitClass.SWORD, Unit.UnitClass.LONGBOW, Unit.UnitClass.LONGBOW);
     }
 
@@ -41,7 +41,7 @@ public class Villager extends Tribe {
         }
         happiness /= getTowns().size();
 
-        Log.i(LOG_TAG, "Villager " + getSide().toString() + " gold: " + gold +
+        Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold +
                 " max population: " + maxPopulation + " happiness: " + happiness);
 
         collectUpdateTimeLeft = COLLECT_UPDATE_TIME;

@@ -43,13 +43,13 @@ public class Squad extends Object implements Controllable {
         private Event listener;
         private PointF position;
         private GameMap map;
-        private Town.Side side;
+        private Town.Faction faction;
 
-        public Builder(Event listener, PointF position, GameMap map, Town.Side side) {
+        public Builder(Event listener, PointF position, GameMap map, Town.Faction faction) {
             this.listener = listener;
             this.position = position;
             this.map = map;
-            this.side = side;
+            this.faction = faction;
         }
         public Squad build() {
             Sprite currentStick =
@@ -58,14 +58,14 @@ public class Squad extends Object implements Controllable {
                     .smooth(false).visible(true)
                     .gridSize(5, 3).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
-            currentStick.setGridIndex(side.ordinal(), 0);
+            currentStick.setGridIndex(faction.ordinal(), 0);
             Sprite targetStick =
                 new Sprite.Builder("SquadTarget", "squad.png").layer(SPRITE_LAYER)
                     .size(ICON_SPRITE_SIZE).positionOffset(TARGET_SPRITE_HOTSPOT_OFFSET)
                     .smooth(false).visible(false).depth(-0.5f)
                     .gridSize(5, 3).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
                     .build();
-            targetStick.setGridIndex(side.ordinal(), 0);
+            targetStick.setGridIndex(faction.ordinal(), 0);
             Sprite squadIcon =
                 new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
                     .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
@@ -78,7 +78,7 @@ public class Squad extends Object implements Controllable {
                     .size(MOVING_ARROW_SIZE).smooth(true).visible(false)
                     .gridSize(4, 6).opaque(MOVING_ARROW_SPRITE_OPAQUE_NORMAL)
                     .build();
-            return (Squad)new PrivateBuilder<>(listener, position, map, side).priority(-1).layer(SPRITE_LAYER)
+            return (Squad)new PrivateBuilder<>(listener, position, map, faction).priority(-1).layer(SPRITE_LAYER)
                     .sprite(currentStick, true)
                     .sprite(targetStick, false)
                     .sprite(squadIcon, true)
@@ -92,13 +92,13 @@ public class Squad extends Object implements Controllable {
 
         private Event listener;
         private GameMap map;
-        private Town.Side side;
+        private Town.Faction faction;
 
-        public PrivateBuilder(Event listener, PointF position, GameMap map, Town.Side side) {
+        public PrivateBuilder(Event listener, PointF position, GameMap map, Town.Faction faction) {
             super(position);
             this.listener = listener;
             this.map = map;
-            this.side = side;
+            this.faction = faction;
         }
         public Squad build() {
             return new Squad(this);
@@ -110,7 +110,7 @@ public class Squad extends Object implements Controllable {
         super(builder);
         spriteSize = ICON_SPRITE_SIZE;
         listener = builder.listener;
-        side = builder.side;
+        faction = builder.faction;
         map = builder.map;
 
         listener.onSquadCreated(this);
@@ -414,7 +414,7 @@ public class Squad extends Object implements Controllable {
      */
     public void spawnUnit(Unit.UnitClass unitClass) {
 
-        Unit unit = new Unit.Builder(unitClass, side).position(getPosition().clone()).build();
+        Unit unit = new Unit.Builder(unitClass, faction).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setCompanions(units);
         addUnit(unit);
@@ -460,7 +460,7 @@ public class Squad extends Object implements Controllable {
 
         // Adjust squad icon to be battle position
         setPosition(getPosition().clone().offset(
-                ((opponent.getSide().ordinal() > getSide().ordinal())? -1.0f : 1.0f) *
+                ((opponent.getFaction().ordinal() > getFaction().ordinal())? -1.0f : 1.0f) *
                         map.getTileSize().width / 4.0f, 0));
     }
 
@@ -613,18 +613,18 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public Town.Side getSide() {
+    public Town.Faction getFaction() {
 
-        return side;
+        return faction;
     }
 
     /**
      *
-     * @param side
+     * @param faction
      */
-    public void setSide(Town.Side side) {
+    public void setFaction(Town.Faction faction) {
 
-        this.side = side;
+        this.faction = faction;
     }
 
     /**
@@ -693,14 +693,14 @@ public class Squad extends Object implements Controllable {
 
         this.focused = focused;
         if (this.focused) {
-            currentStick.setGridIndex(side.ordinal(), 2);
+            currentStick.setGridIndex(faction.ordinal(), 2);
             if (isMoving()) {
                 targetStick.setVisible(true);
             }
             listener.onSquadFocused(this);
         }
         else {
-            currentStick.setGridIndex(side.ordinal(), 0);
+            currentStick.setGridIndex(faction.ordinal(), 0);
             targetStick.setVisible(false);
             map.setGlowingTiles(null);
         }
@@ -774,18 +774,18 @@ public class Squad extends Object implements Controllable {
             ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
 
             if (optimalPath == null) {
-                targetStick.setGridIndex(side.ordinal(), 1);
+                targetStick.setGridIndex(faction.ordinal(), 1);
             } else {
                 ArrayList<OffsetCoord> glowingLine = new ArrayList<>();
                 for (Waypoint waypoint : optimalPath) {
                     glowingLine.add(new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y));
                 }
                 map.setGlowingTiles(glowingLine);
-                targetStick.setGridIndex(side.ordinal(), 0);
+                targetStick.setGridIndex(faction.ordinal(), 0);
             }
         } else {
             map.setGlowingTiles(null);
-            targetStick.setGridIndex(side.ordinal(), 1);
+            targetStick.setGridIndex(faction.ordinal(), 1);
         }
     }
 
@@ -844,7 +844,7 @@ public class Squad extends Object implements Controllable {
 
     private Event listener;
     private GameMap map;
-    private Town.Side side;
+    private Town.Faction faction;
     private SizeF spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean focused = false;

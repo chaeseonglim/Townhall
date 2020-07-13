@@ -13,11 +13,11 @@ import com.lifejourney.engine2d.Widget;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class UnitBuilder extends Widget {
+public class SquadBuilderBox extends Widget {
 
     private final String LOG_TAG = "EconomyBar";
 
-    public UnitBuilder(Villager villager) {
+    public SquadBuilderBox(Villager villager) {
 
         super(new Rect(20, 0, 500, 64), 20, 0.0f);
 

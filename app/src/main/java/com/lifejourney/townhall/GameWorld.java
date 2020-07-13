@@ -10,7 +10,7 @@ import java.util.ListIterator;
 
 public class GameWorld extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event,
-                SpeedControl.Event {
+                SpeedControl.Event, InfoBox.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -41,7 +41,7 @@ public class GameWorld extends World
         dateBar.show();
         addWidget(dateBar);
 
-        SpeedControl speedControl = new SpeedControl(this,
+        speedControl = new SpeedControl(this,
             new Rect(1080, 10, 174, 64), 20, 0.0f);
         speedControl.show();
         addWidget(speedControl);
@@ -62,22 +62,15 @@ public class GameWorld extends World
         homeButton.show();
         addWidget(homeButton);
 
-        unitBuilderButton = new Button.Builder(this,
+        squadBuilderButton = new Button.Builder(this,
                 new Rect(140, viewport.height - 74, 100, 64))
-                .imageSpriteAsset("unit_builder_btn.png").numImageSpriteSet(1).layer(20).build();
-        unitBuilderButton.setImageSpriteSet(0);
-        unitBuilderButton.show();
-        addWidget(unitBuilderButton);
-
-        researchButton = new Button.Builder(this,
-                new Rect(260,  viewport.height - 74, 100, 64))
-                .imageSpriteAsset("research_btn.png").numImageSpriteSet(1).layer(20).build();
-        researchButton.setImageSpriteSet(0);
-        researchButton.show();
-        addWidget(researchButton);
+                .imageSpriteAsset("squad_builder_btn.png").numImageSpriteSet(1).layer(20).build();
+        squadBuilderButton.setImageSpriteSet(0);
+        squadBuilderButton.show();
+        addWidget(squadBuilderButton);
 
         infoButton = new Button.Builder(this,
-                new Rect(380, viewport.height - 74, 100, 64))
+                new Rect(260, viewport.height - 74, 100, 64))
                 .imageSpriteAsset("info_btn.png").numImageSpriteSet(1).layer(20).build();
         infoButton.setImageSpriteSet(0);
         infoButton.hide();
@@ -338,6 +331,17 @@ public class GameWorld extends World
     @Override
     public void onButtonPressed(Button button) {
 
+        // Info button is pressed
+        if (button == infoButton) {
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+
+            if (focusedSquad != null) {
+                popupNewInfoBox(focusedSquad);
+            } else if (focusedTown != null) {
+                popupNewInfoBox(focusedTown);
+            }
+        }
     }
 
     @Override
@@ -354,10 +358,68 @@ public class GameWorld extends World
         } else if (speedControl.getPlaySpeed() == 2) {
             // 2x
             setDesiredFPS(25.0f);
+            paused = false;
         } else if (speedControl.getPlaySpeed() == 3) {
             // 3x
             setDesiredFPS(35.0f);
+            paused = false;
         }
+    }
+
+    /**
+     *
+     * @param infoBox
+     */
+    @Override
+    public void onInfoBoxSwitchToTown(InfoBox infoBox) {
+
+        popupNewInfoBox(map.getTown(focusedSquad.getMapCoord()));
+
+        infoBox.close();
+        removeWidget(infoBox);
+    }
+
+    /**
+     *
+     * @param infoBox
+     */
+    @Override
+    public void onInfoBoxClosed(InfoBox infoBox) {
+
+        infoBox.close();
+        removeWidget(infoBox);
+
+        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+    }
+
+    /**
+     *
+     * @param town
+     */
+    private void popupNewInfoBox(Town town) {
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+                700, 400);
+
+        InfoBox infoBox = new InfoBox(this, infoBoxRegion, 30, 0.0f, town);
+        infoBox.show();
+        addWidget(infoBox);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    private void popupNewInfoBox(Squad squad) {
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+                700, 400);
+
+        InfoBox infoBox = new InfoBox(this, infoBoxRegion, 30, 0.0f, squad);
+        infoBox.show();
+        addWidget(infoBox);
     }
 
     /**
@@ -413,15 +475,16 @@ public class GameWorld extends World
     private boolean paused = false;
     private int day = 0;
     private int dayUpdateTimeLeft = DAY_UPDATE_PERIOD;
+    private int playSpeedReturnedFromWidget = 0;
 
     private GameMap map;
     private MessageBox messageBox;
-    private Button unitBuilderButton;
+    private Button squadBuilderButton;
     private Button infoButton;
     private Button homeButton;
     private Button settingButton;
-    private Button researchButton;
     private DateBar dateBar;
+    private SpeedControl speedControl;
 
     private Squad focusedSquad = null;
     private Town focusedTown = null;

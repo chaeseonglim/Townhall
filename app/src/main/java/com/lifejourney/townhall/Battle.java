@@ -79,7 +79,7 @@ public class Battle {
         attacker.fight();
         defender.fight();
         for (Squad supporter: supporters) {
-            if (supporter.getSide().equals(attacker.getSide())) {
+            if (supporter.getFaction().equals(attacker.getFaction())) {
                 supporter.support(attacker, defender);
             } else {
                 supporter.support(defender, attacker);
@@ -93,9 +93,9 @@ public class Battle {
         int defenderEarnedExp = attacker.handleFightResult(),
                 attackerEarnedExp = defender.handleFightResult();
         for (Squad squad: squads) {
-            if (squad.getSide() == attacker.getSide()) {
+            if (squad.getFaction() == attacker.getFaction()) {
                 squad.addExp(attackerEarnedExp);
-            } else if (squad.getSide() == defender.getSide()) {
+            } else if (squad.getFaction() == defender.getFaction()) {
                 squad.addExp(defenderEarnedExp);
             }
         }

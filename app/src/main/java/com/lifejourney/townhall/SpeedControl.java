@@ -82,19 +82,31 @@ public class SpeedControl extends Widget implements Button.Event {
     public void onButtonPressed(Button button) {
 
         if (button == pauseButton) {
-            playSpeed = 0;
+            setPlaySpeed(0);
+        } else {
+            if (getPlaySpeed() + 1 > 3) {
+                setPlaySpeed(1);
+            } else {
+                setPlaySpeed(getPlaySpeed() + 1);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param playSpeed
+     */
+    public void setPlaySpeed(int playSpeed) {
+
+        this.playSpeed = playSpeed;
+
+        if (playSpeed == 0) {
             pauseButton.setImageSpriteSet(0);
             playButton.setImageSpriteSet(0);
         } else {
-            if (playSpeed++ == 0) {
-                pauseButton.setImageSpriteSet(1);
-            }
-            if (playSpeed > 3) {
-                playSpeed = 1;
-            }
+            pauseButton.setImageSpriteSet(1);
             playButton.setImageSpriteSet(playSpeed);
         }
-
         listener.onSpeedControlUpdate(this);
     }
 

@@ -2,8 +2,10 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -83,13 +85,15 @@ public class Button extends Widget {
         listener = builder.eventHandler;
         shadow = builder.shadow;
 
-        imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
-                .size(new SizeF(getRegion().size()))
-                .smooth(false).depth(0.2f)
-                .gridSize(3, builder.numImageSpriteSet)
-                .layer(builder.layer).visible(false).build();
-        imageSprite.setGridIndex(0, imageSpriteSet);
-        addSprite(imageSprite);
+        if (!builder.imageSpriteAsset.equals("")) {
+            imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
+                    .size(new SizeF(getRegion().size()))
+                    .smooth(false).depth(0.2f)
+                    .gridSize(3, builder.numImageSpriteSet)
+                    .layer(builder.layer).visible(false).build();
+            imageSprite.setGridIndex(0, imageSpriteSet);
+            addSprite(imageSprite);
+        }
 
         if (shadow) {
             Sprite shadowSprite = new Sprite.Builder("shadow", builder.imageSpriteAsset)
@@ -115,15 +119,6 @@ public class Button extends Widget {
 
     /**
      *
-     */
-    @Override
-    public void close() {
-
-        super.close();
-    }
-
-    /**
-     *
      * @param event
      * @return
      */
@@ -134,18 +129,28 @@ public class Button extends Widget {
             return false;
         }
 
+        if (super.onTouchEvent(event)) {
+            return true;
+        }
+
         if (disabled && checkIfInputEventInRegion(event)) {
             return true;
         }
 
-        int eventAction = event.getAction();
         boolean handledResult;
+        int eventAction = event.getAction();
 
         switch (eventAction)
         {
             case MotionEvent.ACTION_DOWN:
                 if (checkIfInputEventInRegion(event)) {
-                    imageSprite.setGridIndex(1, imageSpriteSet);
+                    if (imageSprite != null) {
+                        imageSprite.setGridIndex(1, imageSpriteSet);
+                        imageSprite.setPositionOffset(new PointF(3, 3));
+                    }
+                    if (messageSprite != null) {
+                        messageSprite.setPositionOffset(new PointF(3, 3));
+                    }
                     pressed = true;
                     handledResult = true;
                 } else {
@@ -158,7 +163,13 @@ public class Button extends Widget {
             case MotionEvent.ACTION_CANCEL:
                 if (pressed) {
                     pressed = false;
-                    imageSprite.setGridIndex(0, imageSpriteSet);
+                    if (imageSprite != null) {
+                        imageSprite.setGridIndex(0, imageSpriteSet);
+                        imageSprite.setPositionOffset(new PointF(0, 0));
+                    }
+                    if (messageSprite != null) {
+                        messageSprite.setPositionOffset(new PointF(0, 0));
+                    }
                     handledResult = true;
                 } else {
                     handledResult = false;
@@ -167,7 +178,13 @@ public class Button extends Widget {
             case MotionEvent.ACTION_UP:
                 if (pressed) {
                     pressed = false;
-                    imageSprite.setGridIndex(0, imageSpriteSet);
+                    if (imageSprite != null) {
+                        imageSprite.setGridIndex(0, imageSpriteSet);
+                        imageSprite.setPositionOffset(new PointF(0, 0));
+                    }
+                    if (messageSprite != null) {
+                        messageSprite.setPositionOffset(new PointF(0, 0));
+                    }
                     if (checkIfInputEventInRegion(event) && listener != null) {
                         listener.onButtonPressed(this);
                     }
@@ -186,33 +203,14 @@ public class Button extends Widget {
 
     /**
      *
-     */
-    @Override
-    public void commit() {
-
-        if (imageSprite.getGridIndex().x == 1) {
-            if (messageSprite != null) {
-                messageSprite.setPositionOffset(new PointF(3, 3));
-            }
-            imageSprite.setPositionOffset(new PointF(3, 3));
-        } else {
-            if (messageSprite != null) {
-                messageSprite.setPositionOffset(new PointF(0, 0));
-            }
-            imageSprite.setPositionOffset(new PointF(0, 0));
-        }
-
-        super.commit();
-    }
-
-    /**
-     *
      * @param imageSpriteSet
      */
     public void setImageSpriteSet(int imageSpriteSet) {
 
-        this.imageSpriteSet = imageSpriteSet;
-        imageSprite.setGridIndex(imageSprite.getGridIndex().x, imageSpriteSet);
+        if (imageSprite != null) {
+            this.imageSpriteSet = imageSpriteSet;
+            imageSprite.setGridIndex(imageSprite.getGridIndex().x, imageSpriteSet);
+        }
     }
 
     /**
@@ -220,7 +218,9 @@ public class Button extends Widget {
      */
     public void enable() {
         disabled = false;
-        imageSprite.setGridIndex(0, imageSpriteSet);
+        if (imageSprite != null) {
+            imageSprite.setGridIndex(0, imageSpriteSet);
+        }
     }
 
     /**
@@ -228,14 +228,16 @@ public class Button extends Widget {
      */
     public void disable() {
         disabled = true;
-        imageSprite.setGridIndex(2, imageSpriteSet);
+        if (imageSprite != null) {
+            imageSprite.setGridIndex(2, imageSpriteSet);
+        }
     }
 
     private static int UID = 0;
 
     private Event listener;
     private Sprite messageSprite = null;
-    private Sprite imageSprite;
+    private Sprite imageSprite = null;
     private int imageSpriteSet = 0;
     private boolean shadow;
     private boolean pressed = false;

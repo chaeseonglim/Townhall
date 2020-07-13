@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -51,7 +50,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
 
         // Init town list
-        for (int i = 0; i < Town.Side.values().length; ++i) {
+        for (int i = 0; i < Town.Faction.values().length; ++i) {
             townsBySide.add(new ArrayList<Town>());
         }
 
@@ -62,17 +61,17 @@ class GameMap extends HexTileMap implements View, Town.Event {
             for (int x = 0; x < mapSize.width; ++x) {
                 OffsetCoord mapCoord = new OffsetCoord(x, y);
 
-                // base type
+                // base terrain
                 int ordinal = (getMapData(mapCoord) & 0x00F00000) >> 20;
-                Town.Type type = Town.Type.values()[ordinal];
+                Town.Terrain terrain = Town.Terrain.values()[ordinal];
 
-                // side
+                // faction
                 ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
-                Town.Side side = Town.Side.values()[ordinal];
+                Town.Faction faction = Town.Faction.values()[ordinal];
 
-                Town town = new Town(this, mapCoord, type, side);
+                Town town = new Town(this, mapCoord, terrain, faction);
                 towns.put(mapCoord, town);
-                townsBySide.get(side.ordinal()).add(town);
+                townsBySide.get(faction.ordinal()).add(town);
             }
         }
         for (Town town: towns.values()) {
@@ -114,19 +113,19 @@ class GameMap extends HexTileMap implements View, Town.Event {
     /**
      *
      * @param town
-     * @param prevSide
-     * @param newSide
+     * @param prevFaction
+     * @param newFaction
      */
     @Override
-    public void onTownOccupied(Town town, Town.Side prevSide, Town.Side newSide) {
+    public void onTownOccupied(Town town, Town.Faction prevFaction, Town.Faction newFaction) {
 
-        townsBySide.get(prevSide.ordinal()).remove(town);
-        townsBySide.get(newSide.ordinal()).add(town);
+        townsBySide.get(prevFaction.ordinal()).remove(town);
+        townsBySide.get(newFaction.ordinal()).add(town);
 
-        if (prevSide != Town.Side.NEUTRAL) {
-            redrawTileSprite(prevSide);
+        if (prevFaction != Town.Faction.NEUTRAL) {
+            redrawTileSprite(prevFaction);
         }
-        redrawTileSprite(newSide);
+        redrawTileSprite(newFaction);
     }
 
     /**
@@ -162,8 +161,8 @@ class GameMap extends HexTileMap implements View, Town.Event {
                         Engine2D.GetInstance().translateScreenToWidgetCoord(touchedScreenCoord);
                 if (lastTouchedWidgetCoord.distance(touchedWidgetCoord) < 60.0f) {
                     OffsetCoord touchedMapCoord = new OffsetCoord(touchedGameCoord);
-                    if (listener != null) {
-                        Town townToFocus = getTown(touchedMapCoord);
+                    Town townToFocus = getTown(touchedMapCoord);
+                    if (townToFocus != null) {
                         townToFocus.setFocus(true);
                         listener.onMapFocused(townToFocus);
                     }
@@ -200,11 +199,11 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
     /**
      *
-     * @param side
+     * @param faction
      */
-    public void redrawTileSprite(Town.Side side) {
+    public void redrawTileSprite(Town.Faction faction) {
 
-        for (Town town: townsBySide.get(side.ordinal())) {
+        for (Town town: townsBySide.get(faction.ordinal())) {
             redrawTileSprite(town.getMapCoord());
         }
     }
@@ -221,13 +220,13 @@ class GameMap extends HexTileMap implements View, Town.Event {
             return false;
         }
 
-        if (!town.getType().isMovable(squad)) {
+        if (!town.getTerrain().isMovable(squad)) {
             return false;
         }
 
         ArrayList<Squad> squads = Objects.requireNonNull(towns.get(mapCoord)).getSquads();
         for (Squad localSquad : squads) {
-            if (squad != localSquad && squad.getSide() == localSquad.getSide()) {
+            if (squad != localSquad && squad.getFaction() == localSquad.getFaction()) {
                 return false;
             }
         }
@@ -367,12 +366,12 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
     /**
      *
-     * @param side
+     * @param faction
      * @return
      */
-    public ArrayList<Town> getTownsBySide(Town.Side side) {
+    public ArrayList<Town> getTownsBySide(Town.Faction faction) {
 
-        return townsBySide.get(side.ordinal());
+        return townsBySide.get(faction.ordinal());
     }
 
     private final static int HEX_SIZE = 64;
@@ -384,7 +383,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
     private int bottomMargin = 32;
     private boolean dragging = false;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
-    private ArrayList<ArrayList<Town>> townsBySide = new ArrayList<>(Town.Side.values().length);
+    private ArrayList<ArrayList<Town>> townsBySide = new ArrayList<>(Town.Faction.values().length);
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;
     private PointF lastDraggingScreenCoord;
