@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -118,77 +119,6 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
-     * @param event
-     * @return
-     */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        boolean result = false;
-
-        if (!isVisible()) {
-            return false;
-        }
-
-        // Get current touched coord
-        int eventAction = event.getAction();
-        PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
-        PointF touchedGameCoord =
-                Engine2D.GetInstance().translateScreenToGameCoord(touchedScreenCoord);
-
-        // If it goes out of region without dragging, ignore touch
-        RectF region = new RectF(getPosition(), spriteSize);
-        region.offset(-spriteSize.width /2, -spriteSize.height /2);
-        if (!region.includes(touchedGameCoord) && !isDragging()) {
-            return false;
-        }
-
-        if (eventAction == MotionEvent.ACTION_DOWN) {
-            setTouching(true);
-            result = true;
-        }
-        else if (isTouching()) {
-            if (eventAction == MotionEvent.ACTION_MOVE) {
-                if (isFighting()) {
-                    if (isDragging()) {
-                        // If the battle begins during dragging, cancel dragging
-                        setDragging(false, touchedGameCoord);
-                    }
-                } else if (isFocused()) {
-                    // Keep dragging
-                    setDragging(true, touchedGameCoord);
-                }
-                result = true;
-            } else if (eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL) {
-                if (!isFocused()) {
-                    // If it's not set to focused, set focus first
-                    setFocus(true);
-                } else if (isDragging()) {
-                    OffsetCoord targetMapCoord = new OffsetCoord(touchedGameCoord);
-                    if (eventAction == MotionEvent.ACTION_CANCEL ||
-                            targetMapCoord.equals(getMapCoord()) ||
-                            !map.isMovable(targetMapCoord, this)) {
-                        // It it's dragged to the same tile, the cation is canceled or it's not movable tile,
-                        // stop dragging and cancel moving
-                        setDragging(false, touchedGameCoord);
-                        stopMoving();
-                    } else {
-                        // Stop dragging and seek to target
-                        setDragging(false, touchedGameCoord);
-                        seekTo(targetMapCoord);
-                    }
-                }
-                setTouching(false);
-                result = true;
-            }
-        }
-
-        lastTouchedScreenCoord = touchedScreenCoord;
-        return result;
-    }
-
-    /**
-     *
      */
     @Override
     public void close() {
@@ -283,11 +213,18 @@ public class Squad extends Object implements Controllable {
             }
             map.scroll(scrollOffset);
 
-            // Show glowing line while dragging
-            PointF lastTouchedGameCoord =
-                    Engine2D.GetInstance().translateScreenToGameCoord(lastTouchedScreenCoord);
-            OffsetCoord lastDraggingMapCoord = new OffsetCoord(lastTouchedGameCoord);
-            showGlowingTilesToTarget(lastDraggingMapCoord, false);
+            if (firstDraggingGameCoord != null) {
+                if (isFocused()) {
+                    // Show glowing line while focused
+                    showGlowingTilesToTarget(targetMapCoordToMove, true);
+                }
+            } else {
+                // Show glowing line while dragging
+                PointF lastTouchedGameCoord =
+                        Engine2D.GetInstance().translateScreenToGameCoord(lastTouchedScreenCoord);
+                OffsetCoord lastDraggingMapCoord = new OffsetCoord(lastTouchedGameCoord);
+                showGlowingTilesToTarget(lastDraggingMapCoord, false);
+            }
         } else if (isFocused()) {
             // Show glowing line while focused
             showGlowingTilesToTarget(targetMapCoordToMove, true);
@@ -302,6 +239,87 @@ public class Squad extends Object implements Controllable {
 
         super.commit();
     }
+
+    /**
+     *
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        boolean result = false;
+
+        if (!isVisible()) {
+            return false;
+        }
+
+        // Get current touched coord
+        int eventAction = event.getAction();
+        PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
+        PointF touchedGameCoord =
+                Engine2D.GetInstance().translateScreenToGameCoord(touchedScreenCoord);
+
+        // If it goes out of region without dragging, ignore touch
+        RectF region = new RectF(getPosition(), spriteSize);
+        region.offset(-spriteSize.width /2, -spriteSize.height /2);
+        if (!region.includes(touchedGameCoord) && !isDragging()) {
+            return false;
+        }
+
+        if (eventAction == MotionEvent.ACTION_DOWN) {
+            setTouching(true);
+            result = true;
+        }
+        else if (isTouching()) {
+            if (eventAction == MotionEvent.ACTION_MOVE) {
+                if (isFighting()) {
+                    if (isDragging()) {
+                        // If the battle begins during dragging, cancel dragging
+                        setDragging(false, touchedGameCoord);
+                    }
+                } else if (isFocused()) {
+                    // Keep dragging
+                    setDragging(true, touchedGameCoord);
+                }
+                result = true;
+            } else if (eventAction == MotionEvent.ACTION_UP || eventAction == MotionEvent.ACTION_CANCEL) {
+                if (!isFocused()) {
+                    // If it's not set to focused, set focus first
+                    setFocus(true);
+                } else if (isDragging()) {
+                    OffsetCoord targetMapCoord = new OffsetCoord(touchedGameCoord);
+                    // If it's dragged to the same tile or it's not movable tile
+                    if (eventAction == MotionEvent.ACTION_CANCEL ||
+                            targetMapCoord.equals(getMapCoord()) ||
+                            !map.isMovable(targetMapCoord, this)) {
+                        if (targetMapCoord.equals(getMapCoord()) && firstDraggingGameCoord == null) {
+                            // cancel dragging and moving
+                            setDragging(false, touchedGameCoord);
+                            stopMoving();
+                        } else {
+                            // cancel dragging
+                            setDragging(false, touchedGameCoord);
+                            if (isMoving()) {
+                                Sprite targetStick = getSprite("SquadTarget");
+                                targetStick.setVisible(true);
+                            }
+                        }
+                    } else {
+                        // Stop dragging and seek to target
+                        setDragging(false, touchedGameCoord);
+                        seekTo(targetMapCoord);
+                    }
+                }
+                setTouching(false);
+                result = true;
+            }
+        }
+
+        lastTouchedScreenCoord = touchedScreenCoord;
+        return result;
+    }
+
 
     /**
      *
@@ -487,7 +505,7 @@ public class Squad extends Object implements Controllable {
      */
     void fight() {
 
-        // Let all unit fight
+        // Let all units fight
         for (Unit unit: units) {
             unit.fight();
         }
@@ -689,21 +707,27 @@ public class Squad extends Object implements Controllable {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
-        Sprite squadIcon = getSprite("SquadIcon");
-        Sprite movingArrow = getSprite("SquadMovingArrow");
+
+        if (!this.dragging && dragging) {
+            firstDraggingGameCoord = touchedGameCoord.clone();
+        }
 
         this.dragging = dragging;
 
         if (this.dragging) {
-            currentStick.setOpaque(ICON_SPRITE_OPAQUE_DRAGGING);
-            targetStick.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
-            targetStick.setVisible(true);
-            targetStick.setPosition(touchedGameCoord);
+            if (firstDraggingGameCoord == null ||
+                    firstDraggingGameCoord.distance(touchedGameCoord) > MIN_DISTANCE_START_DRAGGING) {
+                currentStick.setOpaque(ICON_SPRITE_OPAQUE_DRAGGING);
+                targetStick.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
+                targetStick.setVisible(true);
+                targetStick.setPosition(touchedGameCoord);
+                firstDraggingGameCoord = null;
+            }
         }
         else {
             currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
             targetStick.setVisible(false);
-            movingArrow.setVisible(false);
+            firstDraggingGameCoord = null;
         }
     }
 
@@ -712,6 +736,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isTouching() {
+
         return touching;
     }
 
@@ -720,6 +745,7 @@ public class Squad extends Object implements Controllable {
      * @param touching
      */
     public void setTouching(boolean touching) {
+
         this.touching = touching;
     }
 
@@ -728,6 +754,7 @@ public class Squad extends Object implements Controllable {
      * @param targetMapCoord
      */
     private void showGlowingTilesToTarget(OffsetCoord targetMapCoord, boolean useNextCoord) {
+
         Sprite targetStick = getSprite("SquadTarget");
 
         if (targetMapCoord == null) {
@@ -760,6 +787,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public OffsetCoord getPrevMapCoord() {
+
         return prevMapCoord;
     }
 
@@ -768,6 +796,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public OffsetCoord getNextMapCoordToMove() {
+
         return nextMapCoordToMove;
     }
 
@@ -800,6 +829,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isFocused() {
+
         return focused;
     }
 
@@ -808,6 +838,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isDragging() {
+
         return dragging;
     }
 
@@ -847,6 +878,7 @@ public class Squad extends Object implements Controllable {
         if (isFighting() || isOccupying()) {
             return false;
         }
+
         ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
         for (Town neighborTown: neighborTowns) {
             if (neighborTown.getBattle() != null) {
@@ -857,6 +889,7 @@ public class Squad extends Object implements Controllable {
     }
 
     private final static int SPRITE_LAYER = 5;
+    private final static float MIN_DISTANCE_START_DRAGGING = 30;
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
     private final static SizeF MOVING_ARROW_SIZE = new SizeF(32, 32);
     private final static PointF ICON_SPRITE_HOTSPOT_OFFSET = new PointF(0, -25);
@@ -878,10 +911,10 @@ public class Squad extends Object implements Controllable {
     private boolean touching = false;
     private boolean dragging = false;
     private boolean fighting = false;
-    private boolean occupying = false;
     private OffsetCoord targetMapCoordToMove;
     private OffsetCoord nextMapCoordToMove;
     private OffsetCoord prevMapCoord;
     private int totalHealthAtBeginningOfFight;
     private PointF lastTouchedScreenCoord = null;
+    private PointF firstDraggingGameCoord = null;
 }
