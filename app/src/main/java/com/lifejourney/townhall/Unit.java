@@ -18,6 +18,16 @@ public class Unit extends CollidableObject implements Projectile.Event {
         SWORD,
         LONGBOW;
 
+        String toGameString() {
+            switch (this) {
+                case SWORD:
+                    return "검병";
+                case LONGBOW:
+                    return "궁수";
+                default:
+                    return "";
+            }
+        }
         Point spriteGridIndex() {
             switch (this) {
                 case SWORD:

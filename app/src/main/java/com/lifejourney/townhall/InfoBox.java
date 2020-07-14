@@ -232,13 +232,99 @@ public class InfoBox extends Widget implements Button.Event{
                 .build();
         addWidget(toTownButton);
 
+        // Faction
         PointF textPosition = new PointF(-250, -155);
+        addText("소속", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        textPosition.offset(0, 30);
+        addText(squad.getFaction().toGameString(), new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 255));
+
+        // Status
+        textPosition.offset(0, 30);
+        addText("상태", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        String status;
+        if (squad.isMoving()) {
+            status = "이동중";
+        } else if (squad.isFighting()) {
+            status = "전투중";
+        } else if (squad.isSupporting()) {
+            status = "지원중";
+        } else if (squad.isOccupying()) {
+            status = "점령중";
+        } else {
+            status = "대기중";
+        }
+        textPosition.offset(0, 30);
+        addText(status, new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 255));
+
+        // Unit information
+        textPosition.offset(0, 30);
         addText("유닛", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.setTo(100, -155);
+        for (Unit unit: squad.getUnits()) {
+            textPosition.offset(0, 30);
+            addText(unit.getUnitClass().toGameString()+" Lv"+unit.getLevel(),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+        }
+
+        // Recruiting
+        textPosition.offset(0, 30);
         addText("충원", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
+
+        if (!squad.isMoving() && !squad.isSupporting() && !squad.isOccupying() && !squad.isFighting()) {
+            Rect recruitingButtonRegion =
+                    new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
+                            64, 64);
+            recruitingButton1 =
+                    new Button.Builder(this, recruitingButtonRegion.clone())
+                            .imageSpriteAsset("unit_recruiting_btn.png").numImageSpriteSet(3)
+                            .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                            .build();
+            recruitingButton1.setImageSpriteSet((squad.getUnits().size() < 1) ?
+                    0 : squad.getUnits().get(0).getUnitClass().ordinal() + 1);
+            addWidget(recruitingButton1);
+
+            recruitingButtonRegion.offset(73, 0);
+            recruitingButton2 =
+                    new Button.Builder(this, recruitingButtonRegion.clone())
+                            .imageSpriteAsset("unit_recruiting_btn.png").numImageSpriteSet(3)
+                            .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                            .build();
+            recruitingButton2.setImageSpriteSet((squad.getUnits().size() < 2) ?
+                    0 : squad.getUnits().get(1).getUnitClass().ordinal() + 1);
+            addWidget(recruitingButton2);
+
+            recruitingButtonRegion.offset(73, 0);
+            recruitingButton3 =
+                    new Button.Builder(this, recruitingButtonRegion.clone())
+                            .imageSpriteAsset("unit_recruiting_btn.png").numImageSpriteSet(3)
+                            .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                            .build();
+            recruitingButton3.setImageSpriteSet((squad.getUnits().size() < 3) ?
+                    0 : squad.getUnits().get(2).getUnitClass().ordinal() + 1);
+            addWidget(recruitingButton3);
+        } else {
+            textPosition.offset(0, 30);
+            addText("충원 불가", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+        }
+
+        // Stats
+        textPosition.setTo(175, -155);
+        addText("보너스", new SizeF(300, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        textPosition.offset(-75, 30);
+        addText("-", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 255));
     }
 
     /**
@@ -350,6 +436,9 @@ public class InfoBox extends Widget implements Button.Event{
     private Button downtownDevelopmentButton;
     private Button marketDevelopmentButton;
     private Button fortressDevelopmentButton;
+    private Button recruitingButton1;
+    private Button recruitingButton2;
+    private Button recruitingButton3;
     private Town town;
     private Squad squad;
 }

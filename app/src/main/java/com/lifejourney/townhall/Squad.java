@@ -647,24 +647,6 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
-     * @return
-     */
-    public boolean isFighting() {
-
-        return fighting;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isEliminated() {
-
-        return units.size() == 0;
-    }
-
-    /**
-     *
      * @param expEarned
      */
     public void addExp(int expEarned) {
@@ -672,14 +654,6 @@ public class Squad extends Object implements Controllable {
         for (Unit unit: units) {
             unit.addExp(expEarned);
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isFocused() {
-        return focused;
     }
 
     /**
@@ -704,14 +678,6 @@ public class Squad extends Object implements Controllable {
             targetStick.setVisible(false);
             map.setGlowingTiles(null);
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isDragging() {
-        return dragging;
     }
 
     /**
@@ -827,6 +793,67 @@ public class Squad extends Object implements Controllable {
         for (Unit unit: units) {
             unit.hide();
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isFocused() {
+        return focused;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDragging() {
+        return dragging;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isFighting() {
+
+        return fighting;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEliminated() {
+
+        return units.size() == 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isOccupying() {
+
+        return !isFighting() && map.getTown(getMapCoord()).isOccupying();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isSupporting() {
+
+        if (isFighting() || isOccupying()) {
+            return false;
+        }
+        ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
+        for (Town neighborTown: neighborTowns) {
+            if (neighborTown.getBattle() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private final static int SPRITE_LAYER = 5;
