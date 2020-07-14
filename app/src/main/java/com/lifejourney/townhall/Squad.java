@@ -302,6 +302,7 @@ public class Squad extends Object implements Controllable {
                             setDragging(false, touchedGameCoord);
                             if (isMoving()) {
                                 Sprite targetStick = getSprite("SquadTarget");
+                                targetStick.setPosition(targetMapCoordToMove.toGameCoord());
                                 targetStick.setVisible(true);
                             }
                         }
@@ -359,10 +360,10 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
-     * @param targetOffset
+     * @param targetMapCoord
      * @return
      */
-    private void seekTo(OffsetCoord targetOffset) {
+    private void seekTo(OffsetCoord targetMapCoord) {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
@@ -370,7 +371,7 @@ public class Squad extends Object implements Controllable {
         Sprite movingArrow = getSprite("SquadMovingArrow");
 
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetStick.setPosition(targetOffset.toGameCoord());
+        targetStick.setPosition(targetMapCoord.toGameCoord());
         if (isFocused()) {
             targetStick.setVisible(true);
         }
@@ -379,17 +380,17 @@ public class Squad extends Object implements Controllable {
         squadIcon.addAnimationFrame(1, 0, 40);
         squadIcon.addAnimationFrame(2, 0, 40);
         dragging = false;
-        targetMapCoordToMove = targetOffset;
+        targetMapCoordToMove = targetMapCoord;
 
         OffsetCoord currentMapCoord = getMapCoord();
-        if (currentMapCoord.equals(targetOffset)) {
+        if (currentMapCoord.equals(targetMapCoord)) {
             // If it reached to target offset, done moving
             stopMoving();
             return;
         }
 
         // Path finding
-        SquadPathFinder pathFinder = new SquadPathFinder(this, targetOffset, false);
+        SquadPathFinder pathFinder = new SquadPathFinder(this, targetMapCoord, false);
         ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
 
         if (optimalPath == null) {

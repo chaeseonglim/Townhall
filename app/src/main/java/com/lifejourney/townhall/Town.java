@@ -468,7 +468,7 @@ public class Town {
             baseSprite =
                     new Sprite.Builder("Base", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(4, 9).smooth(false)
+                            .size(TileSize).gridSize(4, 7).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
         }
 
@@ -515,20 +515,20 @@ public class Town {
 
         if (glowingSprite == null) {
             glowingSprite =
-                    new Sprite.Builder("Glowing", "tiles.png")
+                    new Sprite.Builder("Glowing", "tiles_glowing.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(4, 9).smooth(false)
+                            .size(TileSize).gridSize(1, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.5f).visible(true).build();
-            glowingSprite.setGridIndex(0, 7);
+            glowingSprite.setGridIndex(0, 0);
         }
 
         if (selectionSprite == null) {
             selectionSprite =
-                    new Sprite.Builder("Selection", "tiles.png")
+                    new Sprite.Builder("Selection", "tiles_selection.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(4, 9).smooth(false)
+                            .size(TileSize).gridSize(1, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
-            selectionSprite.setGridIndex(0, 8);
+            selectionSprite.setGridIndex(0, 0);
         }
     }
 
