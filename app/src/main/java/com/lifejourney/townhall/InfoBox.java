@@ -11,7 +11,7 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class InfoBox extends Widget implements Button.Event{
+public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Event {
 
     private final String LOG_TAG = "InfoBox";
 
@@ -276,7 +276,7 @@ public class InfoBox extends Widget implements Button.Event{
 
         // Recruiting
         textPosition.offset(0, 30);
-        addText("충원", new SizeF(150, 40), textPosition.clone(),
+        addText("모집", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         if (!squad.isMoving() && !squad.isSupporting() && !squad.isOccupying() && !squad.isFighting()) {
@@ -313,7 +313,7 @@ public class InfoBox extends Widget implements Button.Event{
             addWidget(recruitingButton3);
         } else {
             textPosition.offset(0, 30);
-            addText("충원 불가", new SizeF(150, 40), textPosition.clone(),
+            addText("모집 불가", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         }
 
@@ -329,27 +329,10 @@ public class InfoBox extends Widget implements Button.Event{
 
     /**
      *
-     */
-    @Override
-    public void close() {
-
-        super.close();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void commit() {
-
-        super.commit();
-    }
-
-    /**
-     *
      * @param text
      * @param size
      * @param position
+     * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
@@ -369,10 +352,6 @@ public class InfoBox extends Widget implements Button.Event{
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-        if (!isVisible()) {
-            return false;
-        }
 
         // It consumes all input when activated
         super.onTouchEvent(event);
@@ -426,7 +405,33 @@ public class InfoBox extends Widget implements Button.Event{
                             (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
             town.setFacilityDevelopment(Town.Facility.FORTRESS, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 9);
+        } else if (button == recruitingButton1) {
+            UnitBuilderBox unitBuilderBox =
+                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
+            hide();
+            unitBuilderBox.show();
+            addWidget(unitBuilderBox);
+        } else if (button == recruitingButton2) {
+            UnitBuilderBox unitBuilderBox =
+                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
+            hide();
+            unitBuilderBox.show();
+            addWidget(unitBuilderBox);
+        } else if (button == recruitingButton3) {
+            UnitBuilderBox unitBuilderBox =
+                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
+            hide();
+            unitBuilderBox.show();
+            addWidget(unitBuilderBox);
         }
+    }
+
+    @Override
+    public void onUnitBuilderBoxSelected(UnitBuilderBox infoBox, Unit.UnitClass unitClass) {
+        infoBox.close();
+        removeWidget(infoBox);
+
+        show();
     }
 
     private Event listener;

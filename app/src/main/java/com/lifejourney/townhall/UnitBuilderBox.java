@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -13,102 +14,132 @@ import com.lifejourney.engine2d.Widget;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class UnitBuilderBox extends Widget {
+public class UnitBuilderBox extends Widget implements Button.Event{
 
-    private final String LOG_TAG = "EconomyBar";
+    private final String LOG_TAG = "UnitBuilderBox";
 
-    public UnitBuilderBox(Villager villager) {
+    public interface Event {
 
-        super(new Rect(20, 0, 500, 64), 20, 0.0f);
+        void onUnitBuilderBoxSelected(UnitBuilderBox infoBox, Unit.UnitClass unitClass);
+    }
 
-        this.villager = villager;
+    public UnitBuilderBox(Event listener, Rect region, int layer, float depth) {
 
-        Sprite bg = new Sprite.Builder("economy_bar.png")
+        super(region, layer, depth);
+
+        this.listener = listener;
+
+        // Background sprite
+        Sprite backgroundSprite = new Sprite.Builder("unit_builder_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).depth(0.0f)
-                .gridSize(1, 1)
-                .layer(20).visible(false).build();
-        addSprite(bg);
+                .smooth(false).layer(layer).depth(depth)
+                .gridSize(1, 1).visible(false).opaque(0.8f).build();
+        addSprite(backgroundSprite);
 
-        happinessSprite = new Sprite.Builder("economy_bar_happiness.png")
-                .size(new SizeF(36, 36))
-                .positionOffset(new PointF(40, 0))
-                .smooth(false).depth(0.1f)
-                .gridSize(5, 1)
-                .layer(20).visible(false).build();
-        addSprite(happinessSprite);
+        // Cancel button
+        Rect cancelButtonRegion = new Rect(region.right() - 155, region.bottom() - 67,
+                150, 60);
+        cancelButton = new Button.Builder(this, cancelButtonRegion)
+                .message("취소").imageSpriteAsset("")
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
+                .build();
+        addWidget(cancelButton);
 
-        goldTextSprite = new TextSprite.Builder("goldText", "0", 26)
-                .fontColor(Color.argb(255, 255, 255, 0))
-                .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.RIGHT)
-                .fontName("NanumBarunGothic.ttf")
-                .size(new SizeF(130, 36))
-                .positionOffset(new PointF(-105, -3))
-                .smooth(true).depth(0.1f)
-                .layer(20).visible(false).build();
-        addSprite(goldTextSprite);
+        // Select button
+        Rect selectButtonRegion = new Rect(region.right() - 155, region.bottom() - 67,
+                150, 60);
+        selectButton = new Button.Builder(this, selectButtonRegion)
+                .message("선택").imageSpriteAsset("")
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
+                .build();
+        addWidget(selectButton);
 
-        popTextSprite = new TextSprite.Builder("popText", "+0", 26)
-                .fontColor(Color.argb(255, 255, 255, 0))
-                .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.RIGHT)
-                .fontName("NanumBarunGothic.ttf")
-                .size(new SizeF(130, 36))
-                .positionOffset(new PointF(150, -3))
-                .smooth(true).depth(0.1f)
-                .layer(20).visible(false).build();
-        addSprite(popTextSprite);
+        // Tile type
+        PointF textPosition = new PointF(-250, -155);
+        addText("지형", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        textPosition.offset(0, 30);
+        addText("-", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 255));
+
+        // Population
+        textPosition.setTo(100, -155);
+        addText("인구 / 행복도",
+                new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+        textPosition.offset(0, 30);
+        addText("없음 / 없음",
+                new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 255));
     }
 
     /**
      *
      */
-    @Override
-    public void close() {
-
-        super.close();
-    }
-
     @Override
     public void update() {
 
         super.update();
 
-        if (--updateTimeLeft == 0) {
-            goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(villager.getGold()));
-            int popDiff = villager.getMaxPopulation() - villager.getPopulation();
-            popTextSprite.setText(((popDiff >= 0)?"+":"-")+ popDiff);
-            if (villager.getHappiness() > 80) {
-                happinessSprite.setGridIndex(0, 0);
-            } else if (villager.getHappiness() > 60) {
-                happinessSprite.setGridIndex(1, 0);
-            } else if (villager.getHappiness() > 40) {
-                happinessSprite.setGridIndex(2, 0);
-            } else if (villager.getHappiness() > 20) {
-                happinessSprite.setGridIndex(3, 0);
-            } else  {
-                happinessSprite.setGridIndex(4, 0);
-            }
-            updateTimeLeft = UPDATE_PERIOD;
-        }
-
+        selectButton.hide();
     }
 
     /**
      *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
      */
-    @Override
-    public void commit() {
+    private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        super.commit();
+        addSprite(new TextSprite.Builder("text", text, 25)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(Paint.Align.LEFT)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
     }
 
-    private static final int UPDATE_PERIOD = 30;
+    /**
+     *
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
 
-    private Villager villager;
-    private Sprite happinessSprite;
-    private TextSprite goldTextSprite;
-    private TextSprite popTextSprite;
-    private int updateTimeLeft = UPDATE_PERIOD;
+        if (!isVisible()) {
+            return false;
+        }
+
+        // It consumes all input when activated
+        super.onTouchEvent(event);
+
+        return true;
+    }
+
+    /**
+     *
+     * @param button
+     */
+    @Override
+    public void onButtonPressed(Button button) {
+
+        if (button == cancelButton) {
+            // Cancel button
+            setVisible(false);
+            listener.onUnitBuilderBoxSelected(this, null);
+        } else if (button == selectButton) {
+            // Select button
+            setVisible(false);
+            listener.onUnitBuilderBoxSelected(this, null);
+        }
+    }
+
+    private Event listener;
+    private Button cancelButton;
+    private Button selectButton;
 }

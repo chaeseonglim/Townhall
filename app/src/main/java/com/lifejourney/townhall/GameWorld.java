@@ -18,7 +18,7 @@ public class GameWorld extends World
 
         super();
 
-        setDesiredFPS(10.0f);
+        setDesiredFPS(15.0f);
 
         // Build map
         map = new GameMap(this, "map.png");
