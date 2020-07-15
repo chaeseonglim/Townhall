@@ -233,15 +233,6 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
-     */
-    @Override
-    public void commit() {
-
-        super.commit();
-    }
-
-    /**
-     *
      * @param event
      * @return
      */
@@ -439,6 +430,26 @@ public class Squad extends Object implements Controllable {
         addUnit(unit);
 
         listener.onSquadUnitSpawned(this, unit);
+    }
+
+    /**
+     *
+     * @param unit
+     */
+    public void removeUnit(Unit unit) {
+
+        unit.close();
+        units.remove(unit);
+    }
+
+    /**
+     *
+     * @param index
+     */
+    public void removeUnit(int index) {
+
+        units.get(index).close();
+        units.remove(index);
     }
 
     /**

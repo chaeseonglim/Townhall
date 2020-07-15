@@ -18,6 +18,7 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
     public interface Event {
 
         void onInfoBoxSwitchToTown(InfoBox infoBox);
+
         void onInfoBoxClosed(InfoBox infoBox);
     }
 
@@ -37,13 +38,176 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 67,
+        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
                 .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
                 .build();
         addWidget(closeButton);
+
+        updateTownInfo();
+
+    }
+
+    public InfoBox(Event listener, Rect region, int layer, float depth, Squad squad) {
+
+        super(region, layer, depth);
+        this.listener = listener;
+        this.squad = squad;
+
+        // Background sprite
+        Sprite backgroundSprite = new Sprite.Builder("info_box.png")
+                .size(new SizeF(getRegion().size()))
+                .smooth(false).layer(layer).depth(depth)
+                .gridSize(2, 1).visible(false).opaque(0.8f).build();
+        backgroundSprite.setGridIndex(1, 0);
+        addSprite(backgroundSprite);
+
+        // Close button
+        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
+                150, 60);
+        closeButton = new Button.Builder(this, closeButtonRegion)
+                .message("닫기").imageSpriteAsset("")
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 255))
+                .build();
+        addWidget(closeButton);
+
+        // Town button
+        Rect toTownButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
+                150, 60);
+        toTownButton = new Button.Builder(this, toTownButtonRegion)
+                .message("마을로").imageSpriteAsset("")
+                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 255))
+                .build();
+        addWidget(toTownButton);
+
+
+        updateSquadInfo();
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addText(String text, SizeF size, PointF position, int fontColor) {
+
+        addSprite(new TextSprite.Builder("text", text, 25)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(Paint.Align.LEFT)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        // It consumes all input
+        super.onTouchEvent(event);
+        return true;
+    }
+
+    /**
+     *
+     * @param button
+     */
+    @Override
+    public void onButtonPressed(Button button) {
+
+        if (button == closeButton) {
+            // Close button
+            setVisible(false);
+            listener.onInfoBoxClosed(this);
+        } else if (button == toTownButton) {
+            // To town button
+            setVisible(false);
+            listener.onInfoBoxSwitchToTown(this);
+        } else if (button == farmDevelopmentButton) {
+            // Farm development button
+            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FARM);
+            Town.FacilityDevelopment newDevelopment =
+                    Town.FacilityDevelopment.values()[
+                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
+            town.setFacilityDevelopment(Town.Facility.FARM, newDevelopment);
+            button.setImageSpriteSet(newDevelopment.ordinal());
+        } else if (button == marketDevelopmentButton) {
+            // Market development button
+            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.MARKET);
+            Town.FacilityDevelopment newDevelopment =
+                    Town.FacilityDevelopment.values()[
+                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
+            town.setFacilityDevelopment(Town.Facility.MARKET, newDevelopment);
+            button.setImageSpriteSet(newDevelopment.ordinal() + 3);
+        } else if (button == downtownDevelopmentButton) {
+            // Downtown development button
+            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.DOWNTOWN);
+            Town.FacilityDevelopment newDevelopment =
+                    Town.FacilityDevelopment.values()[
+                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
+            town.setFacilityDevelopment(Town.Facility.DOWNTOWN, newDevelopment);
+            button.setImageSpriteSet(newDevelopment.ordinal() + 6);
+        } else if (button == fortressDevelopmentButton) {
+            // Fortress development button
+            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FORTRESS);
+            Town.FacilityDevelopment newDevelopment =
+                    Town.FacilityDevelopment.values()[
+                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
+            town.setFacilityDevelopment(Town.Facility.FORTRESS, newDevelopment);
+            button.setImageSpriteSet(newDevelopment.ordinal() + 9);
+        } else if (button == recruitingButtons[0] ||
+                button == recruitingButtons[1] ||
+                button == recruitingButtons[2]) {
+            for (int i = 0;; ++i) {
+                if (button == recruitingButtons[i]) {
+                    recruitingSlot = i;
+                    break;
+                }
+            }
+            hide();
+            UnitBuilderBox unitBuilderBox =
+                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
+            addWidget(unitBuilderBox);
+            unitBuilderBox.show();
+        }
+    }
+
+    /**
+     *
+     * @param infoBox
+     * @param unitClass
+     */
+    @Override
+    public void onUnitBuilderBoxSelected(UnitBuilderBox infoBox, Unit.UnitClass unitClass) {
+
+        removeWidget(infoBox);
+        show();
+
+        if (unitClass != null) {
+            squad.removeUnit(recruitingSlot);
+            squad.spawnUnit(unitClass);
+            updateSquadInfo();
+        }
+    }
+
+    /**
+     *
+     */
+    private void updateTownInfo() {
+
+        Rect region = getRegion();
+        int layer = getLayer();
+
+        removeSprites("text");
 
         // Tile type
         PointF textPosition = new PointF(-250, -155);
@@ -124,44 +288,56 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
 
+                if (farmDevelopmentButton != null) {
+                    removeWidget(farmDevelopmentButton);
+                }
                 Rect developmentButtonRegion =
                         new Rect(region.left() + 22, region.top() + (int)textPosition.y + 219,
                                 64, 64);
                 farmDevelopmentButton =
                         new Button.Builder(this,  developmentButtonRegion.clone())
-                        .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                        .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                        .build();
+                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .build();
                 farmDevelopmentButton.setImageSpriteSet(
                         town.getFacilityDevelopment(Town.Facility.FARM).ordinal());
                 addWidget(farmDevelopmentButton);
 
+                if (marketDevelopmentButton != null) {
+                    removeWidget(marketDevelopmentButton);
+                }
                 developmentButtonRegion.offset(73, 0);
                 marketDevelopmentButton =
                         new Button.Builder(this, developmentButtonRegion.clone())
-                        .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                        .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                        .build();
+                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .build();
                 marketDevelopmentButton.setImageSpriteSet(
                         town.getFacilityDevelopment(Town.Facility.MARKET).ordinal() + 3);
                 addWidget(marketDevelopmentButton);
 
+                if (downtownDevelopmentButton != null) {
+                    removeWidget(downtownDevelopmentButton);
+                }
                 developmentButtonRegion.offset(73, 0);
                 downtownDevelopmentButton =
                         new Button.Builder(this, developmentButtonRegion.clone())
-                        .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                        .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                        .build();
+                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .build();
                 downtownDevelopmentButton.setImageSpriteSet(
                         town.getFacilityDevelopment(Town.Facility.DOWNTOWN).ordinal() + 6);
                 addWidget(downtownDevelopmentButton);
 
+                if (fortressDevelopmentButton != null) {
+                    removeWidget(fortressDevelopmentButton);
+                }
                 developmentButtonRegion.offset(73, 0);
                 fortressDevelopmentButton =
                         new Button.Builder(this, developmentButtonRegion.clone())
-                        .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                        .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                        .build();
+                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .build();
                 fortressDevelopmentButton.setImageSpriteSet(
                         town.getFacilityDevelopment(Town.Facility.FORTRESS).ordinal() + 9);
                 addWidget(fortressDevelopmentButton);
@@ -200,37 +376,12 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
         }
     }
 
-    public InfoBox(Event listener, Rect region, int layer, float depth, Squad squad) {
+    private void updateSquadInfo() {
 
-        super(region, layer, depth);
-        this.listener = listener;
-        this.squad = squad;
+        Rect region = getRegion();
+        int layer = getLayer();
 
-        // Background sprite
-        Sprite backgroundSprite = new Sprite.Builder("info_box.png")
-                .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(layer).depth(depth)
-                .gridSize(2, 1).visible(false).opaque(0.8f).build();
-        backgroundSprite.setGridIndex(1, 0);
-        addSprite(backgroundSprite);
-
-        // Close button
-        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
-                150, 60);
-        closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
-                .build();
-        addWidget(closeButton);
-
-        // Town button
-        Rect toTownButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
-                150, 60);
-        toTownButton = new Button.Builder(this, toTownButtonRegion)
-                .message("마을로").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
-                .build();
-        addWidget(toTownButton);
+        removeSprites("text");
 
         // Faction
         PointF textPosition = new PointF(-250, -155);
@@ -267,54 +418,50 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
         addText("유닛", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        for (Unit unit: squad.getUnits()) {
+        for (Unit unit : squad.getUnits()) {
             textPosition.offset(0, 30);
-            addText(unit.getUnitClass().toGameString()+" Lv"+unit.getLevel(),
+            addText(unit.getUnitClass().toGameString() + " Lv" + unit.getLevel(),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         }
 
-        // Recruiting
-        textPosition.offset(0, 30);
-        addText("모집", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
-
-        if (!squad.isMoving() && !squad.isSupporting() && !squad.isOccupying() && !squad.isFighting()) {
-            Rect recruitingButtonRegion =
-                    new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
-                            64, 64);
-            recruitingButton1 =
-                    new Button.Builder(this, recruitingButtonRegion.clone())
-                            .imageSpriteAsset("unit_recruiting_btn.png").numImageSpriteSet(3)
-                            .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                            .build();
-            recruitingButton1.setImageSpriteSet((squad.getUnits().size() < 1) ?
-                    0 : squad.getUnits().get(0).getUnitClass().ordinal() + 1);
-            addWidget(recruitingButton1);
-
-            recruitingButtonRegion.offset(73, 0);
-            recruitingButton2 =
-                    new Button.Builder(this, recruitingButtonRegion.clone())
-                            .imageSpriteAsset("unit_recruiting_btn.png").numImageSpriteSet(3)
-                            .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                            .build();
-            recruitingButton2.setImageSpriteSet((squad.getUnits().size() < 2) ?
-                    0 : squad.getUnits().get(1).getUnitClass().ordinal() + 1);
-            addWidget(recruitingButton2);
-
-            recruitingButtonRegion.offset(73, 0);
-            recruitingButton3 =
-                    new Button.Builder(this, recruitingButtonRegion.clone())
-                            .imageSpriteAsset("unit_recruiting_btn.png").numImageSpriteSet(3)
-                            .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
-                            .build();
-            recruitingButton3.setImageSpriteSet((squad.getUnits().size() < 3) ?
-                    0 : squad.getUnits().get(2).getUnitClass().ordinal() + 1);
-            addWidget(recruitingButton3);
-        } else {
+        if (squad.getFaction() == Town.Faction.VILLAGER) {
+            // Recruiting
             textPosition.offset(0, 30);
-            addText("모집 불가", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+            addText("모집", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+
+            if (!squad.isMoving() &&
+                    !squad.isSupporting() &&
+                    !squad.isOccupying() &&
+                    !squad.isFighting()) {
+                Rect recruitingButtonRegion =
+                        new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
+                                64, 64);
+                for (int i = 0; i < 3; ++i) {
+                    if (squad.getUnits().size() >= i) {
+                        if (recruitingButtons[i] != null) {
+                            removeWidget(recruitingButtons[i]);
+                        }
+                        recruitingButtons[i] =
+                                new Button.Builder(this, recruitingButtonRegion.clone())
+                                        .imageSpriteAsset("unit_recruiting_btn.png")
+                                        .numImageSpriteSet(Unit.UnitClass.values().length + 1)
+                                        .layer(layer + 1).build();
+                        recruitingButtons[i].setImageSpriteSet((squad.getUnits().size() < (i + 1)) ?
+                                0 : squad.getUnits().get(i).getUnitClass().ordinal() + 1);
+                        addWidget(recruitingButtons[i]);
+                    } else {
+                        recruitingButtons[i] = null;
+                    }
+
+                    recruitingButtonRegion.offset(73, 0);
+                }
+            } else {
+                textPosition.offset(0, 30);
+                addText("모집 불가", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            }
         }
 
         // Stats
@@ -327,113 +474,6 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
                 Color.rgb(255, 255, 255));
     }
 
-    /**
-     *
-     * @param text
-     * @param size
-     * @param position
-     * @param fontColor
-     */
-    private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text", text, 25)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
-                .textAlign(Paint.Align.LEFT)
-                .size(size).positionOffset(position)
-                .smooth(true).depth(0.1f)
-                .layer(getLayer()+1).visible(false).build());
-    }
-
-    /**
-     *
-     * @param event
-     * @return
-     */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        // It consumes all input when activated
-        super.onTouchEvent(event);
-        return true;
-    }
-
-    /**
-     *
-     * @param button
-     */
-    @Override
-    public void onButtonPressed(Button button) {
-
-        if (button == closeButton) {
-            // Close button
-            setVisible(false);
-            listener.onInfoBoxClosed(this);
-        } else if (button == toTownButton) {
-            // To town button
-            setVisible(false);
-            listener.onInfoBoxSwitchToTown(this);
-        } else if (button == farmDevelopmentButton) {
-            // Farm development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FARM);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.FARM, newDevelopment);
-            button.setImageSpriteSet(newDevelopment.ordinal());
-        } else if (button == marketDevelopmentButton) {
-            // Market development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.MARKET);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.MARKET, newDevelopment);
-            button.setImageSpriteSet(newDevelopment.ordinal() + 3);
-        } else if (button == downtownDevelopmentButton) {
-            // Downtown development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.DOWNTOWN);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.DOWNTOWN, newDevelopment);
-            button.setImageSpriteSet(newDevelopment.ordinal() + 6);
-        } else if (button == fortressDevelopmentButton) {
-            // Fortress development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FORTRESS);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.FORTRESS, newDevelopment);
-            button.setImageSpriteSet(newDevelopment.ordinal() + 9);
-        } else if (button == recruitingButton1) {
-            UnitBuilderBox unitBuilderBox =
-                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
-            hide();
-            unitBuilderBox.show();
-            addWidget(unitBuilderBox);
-        } else if (button == recruitingButton2) {
-            UnitBuilderBox unitBuilderBox =
-                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
-            hide();
-            unitBuilderBox.show();
-            addWidget(unitBuilderBox);
-        } else if (button == recruitingButton3) {
-            UnitBuilderBox unitBuilderBox =
-                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
-            hide();
-            unitBuilderBox.show();
-            addWidget(unitBuilderBox);
-        }
-    }
-
-    @Override
-    public void onUnitBuilderBoxSelected(UnitBuilderBox infoBox, Unit.UnitClass unitClass) {
-        infoBox.close();
-        removeWidget(infoBox);
-
-        show();
-    }
-
     private Event listener;
     private Button closeButton;
     private Button toTownButton;
@@ -441,9 +481,8 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
     private Button downtownDevelopmentButton;
     private Button marketDevelopmentButton;
     private Button fortressDevelopmentButton;
-    private Button recruitingButton1;
-    private Button recruitingButton2;
-    private Button recruitingButton3;
+    private Button[] recruitingButtons = new Button[3];
+    private int recruitingSlot = 0;
     private Town town;
     private Squad squad;
 }

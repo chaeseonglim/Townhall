@@ -37,41 +37,40 @@ public class UnitBuilderBox extends Widget implements Button.Event{
         addSprite(backgroundSprite);
 
         // Cancel button
-        Rect cancelButtonRegion = new Rect(region.right() - 155, region.bottom() - 67,
-                150, 60);
+        Rect cancelButtonRegion = new Rect(region.right() - 140, region.bottom() - 65,
+                136, 60);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("취소").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 255))
                 .build();
         addWidget(cancelButton);
 
         // Select button
-        Rect selectButtonRegion = new Rect(region.right() - 155, region.bottom() - 67,
-                150, 60);
+        Rect selectButtonRegion = new Rect(region.right() - 140, region.bottom() - 65,
+                136, 60);
         selectButton = new Button.Builder(this, selectButtonRegion)
                 .message("선택").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 255))
                 .build();
         addWidget(selectButton);
 
-        // Tile type
-        PointF textPosition = new PointF(-250, -155);
-        addText("지형", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
+        // Unit button
+        Rect unitButtonRegion =
+                new Rect(region.left() + 22, region.bottom() - 67,
+                        64, 64);
+        for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
+            unitButtons[i] =
+                    new Button.Builder(this, unitButtonRegion.clone())
+                            .imageSpriteAsset("unit_selection_btn.png")
+                            .numImageSpriteSet(Unit.UnitClass.values().length*2)
+                            .layer(layer + 1).build();
+            unitButtons[i].setImageSpriteSet(i*2);
+            addWidget(unitButtons[i]);
 
-        textPosition.offset(0, 30);
-        addText("-", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+            unitButtonRegion.offset(73, 0);
+        }
 
-        // Population
-        textPosition.setTo(100, -155);
-        addText("인구 / 행복도",
-                new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
-        textPosition.offset(0, 30);
-        addText("없음 / 없음",
-                new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+        updateUnitInfo();
     }
 
     /**
@@ -80,9 +79,15 @@ public class UnitBuilderBox extends Widget implements Button.Event{
     @Override
     public void update() {
 
-        super.update();
+        if (selectedUnitClass == null) {
+            selectButton.hide();
+            cancelButton.show();
+        } else {
+            selectButton.show();
+            cancelButton.hide();
+        }
 
-        selectButton.hide();
+        super.update();
     }
 
     /**
@@ -94,13 +99,51 @@ public class UnitBuilderBox extends Widget implements Button.Event{
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text", text, 25)
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());
+    }
+
+    private void updateUnitInfo() {
+
+        // Remove all previous texts
+        removeSprites("text"+textIndex++);
+
+        if (selectedUnitClass != null) {
+            // Unit Class
+            PointF textPosition = new PointF(-250, -155);
+            addText("클래스", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(selectedUnitClass.toGameString(), new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Strong/Weakness
+            textPosition.setTo(100, -155);
+            addText("강점",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText("없음",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+            textPosition.offset(0, 30);
+            addText("약점",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText("없음",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+        } else {
+            PointF textPosition = new PointF(-250+75, -155);
+            addText("클래스를 선택하세요.", new SizeF(300, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+        }
     }
 
     /**
@@ -135,11 +178,34 @@ public class UnitBuilderBox extends Widget implements Button.Event{
         } else if (button == selectButton) {
             // Select button
             setVisible(false);
-            listener.onUnitBuilderBoxSelected(this, null);
+            listener.onUnitBuilderBoxSelected(this, selectedUnitClass);
+        } else {
+            // Unit selection buttons
+            for (int i = 0; i < unitButtons.length; ++i) {
+                if (button == unitButtons[i]) {
+                    int myButtonSetAlpha;
+                    if (selectedUnitClass != null && selectedUnitClass.ordinal() == i) {
+                        myButtonSetAlpha = 0;
+                        selectedUnitClass = null;
+                    } else {
+                        myButtonSetAlpha = 1;
+                        selectedUnitClass = Unit.UnitClass.values()[i];
+                    }
+                    for (int j = 0; j < unitButtons.length; ++j) {
+                        unitButtons[j].setImageSpriteSet(j * 2);
+                    }
+                    button.setImageSpriteSet(i * 2 + myButtonSetAlpha);
+                    updateUnitInfo();
+                    break;
+                }
+            }
         }
     }
 
     private Event listener;
     private Button cancelButton;
     private Button selectButton;
+    private Button[] unitButtons = new Button[Unit.UnitClass.values().length];
+    private Unit.UnitClass selectedUnitClass = null;
+    private int textIndex = 0;
 }
