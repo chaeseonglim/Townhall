@@ -56,16 +56,16 @@ public class Squad extends Object implements Controllable {
                 new Sprite.Builder("SquadStick", "squad.png").layer(SPRITE_LAYER)
                     .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
                     .smooth(false).visible(true)
-                    .gridSize(5, 3).opaque(ICON_SPRITE_OPAQUE_NORMAL)
+                    .gridSize(3, 5).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
-            currentStick.setGridIndex(faction.ordinal(), 0);
+            currentStick.setGridIndex(0, faction.ordinal());
             Sprite targetStick =
                 new Sprite.Builder("SquadTarget", "squad.png").layer(SPRITE_LAYER)
-                    .size(ICON_SPRITE_SIZE).positionOffset(TARGET_SPRITE_HOTSPOT_OFFSET)
+                    .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
                     .smooth(false).visible(false).depth(-0.5f)
-                    .gridSize(5, 3).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
+                    .gridSize(3, 5).opaque(TARGET_SPRITE_OPAQUE_NORMAL)
                     .build();
-            targetStick.setGridIndex(faction.ordinal(), 0);
+            targetStick.setGridIndex(0, faction.ordinal());
             Sprite squadIcon =
                 new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
                     .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
@@ -297,6 +297,7 @@ public class Squad extends Object implements Controllable {
                             if (isMoving()) {
                                 Sprite targetStick = getSprite("SquadTarget");
                                 targetStick.setPosition(targetMapCoordToMove.toGameCoord());
+                                targetStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
                                 targetStick.setVisible(true);
                             }
                         }
@@ -366,6 +367,7 @@ public class Squad extends Object implements Controllable {
 
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         targetStick.setPosition(targetMapCoord.toGameCoord());
+        targetStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
         if (isFocused()) {
             targetStick.setVisible(true);
         }
@@ -707,14 +709,14 @@ public class Squad extends Object implements Controllable {
 
         this.focused = focused;
         if (this.focused) {
-            currentStick.setGridIndex(faction.ordinal(), 2);
+            currentStick.setGridIndex(2, faction.ordinal());
             if (isMoving()) {
                 targetStick.setVisible(true);
             }
             listener.onSquadFocused(this);
         }
         else {
-            currentStick.setGridIndex(faction.ordinal(), 0);
+            currentStick.setGridIndex(0, faction.ordinal());
             targetStick.setVisible(false);
             map.setGlowingTiles(null);
         }
@@ -743,6 +745,7 @@ public class Squad extends Object implements Controllable {
                 targetStick.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
                 targetStick.setVisible(true);
                 targetStick.setPosition(touchedGameCoord);
+                targetStick.setPositionOffset(TARGET_SPRITE_HOTSPOT_OFFSET);
                 firstDraggingGameCoord = null;
             }
         }
@@ -796,11 +799,11 @@ public class Squad extends Object implements Controllable {
                     glowingLine.add(new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y));
                 }
                 map.setGlowingTiles(glowingLine);
-                targetStick.setGridIndex(faction.ordinal(), 0);
+                targetStick.setGridIndex(0, faction.ordinal());
             }
         } else {
             map.setGlowingTiles(null);
-            targetStick.setGridIndex(faction.ordinal(), 1);
+            targetStick.setGridIndex(1, faction.ordinal());
         }
     }
 
@@ -923,7 +926,7 @@ public class Squad extends Object implements Controllable {
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
     private final static SizeF MOVING_ARROW_SIZE = new SizeF(32, 32);
     private final static PointF ICON_SPRITE_HOTSPOT_OFFSET = new PointF(0, -25);
-    private final static PointF TARGET_SPRITE_HOTSPOT_OFFSET = new PointF(0, -25);
+    private final static PointF TARGET_SPRITE_HOTSPOT_OFFSET = new PointF(0, -80);
     private final static float ICON_SPRITE_OPAQUE_NORMAL = 1.0f;
     private final static float ICON_SPRITE_OPAQUE_BATTLE = 0.5f;
     private final static float ICON_SPRITE_OPAQUE_DRAGGING = 0.2f;
