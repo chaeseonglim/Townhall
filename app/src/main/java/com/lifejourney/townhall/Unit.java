@@ -217,13 +217,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public Unit build() {
             Sprite unitClassSprite = new Sprite.Builder("class", "unit_class.png").gridSize(5,1)
-                    .size(new SizeF(16, 16)).smooth(true).build();
+                    .size(new SizeF(16, 16)).smooth(true).opaque(0.0f).build();
             unitClassSprite.setGridIndex(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y);
             Sprite unitFrameSprite = new Sprite.Builder("frame", "unit_frame.png").gridSize(5,1)
-                    .size(new SizeF(16, 16)).smooth(true).build();
+                    .size(new SizeF(16, 16)).smooth(true).opaque(0.0f).build();
             unitFrameSprite.setGridIndex(faction.ordinal(), 0);
             Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(9,1)
-                    .size(new SizeF(16, 16)).smooth(true).build();
+                    .size(new SizeF(16, 16)).smooth(true).opaque(0.0f).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitClassSprite)
                     .sprite(unitFrameSprite)
@@ -272,12 +272,16 @@ public class Unit extends CollidableObject implements Projectile.Event {
     @Override
     public void update() {
 
-        if (opponents != null) {
+        if (!isRecruiting() && isFighting()) {
             // If it's on battle,  seek or flee enemies
             float highestFavor = -Float.MAX_VALUE, lowestFavor = Float.MAX_VALUE;
             Unit highestFavorUnit = null, lowestFavorUnit = null;
             float highestFavorDistance = Float.MAX_VALUE, lowestFavorDistance = Float.MAX_VALUE;
             for (Unit opponent : opponents) {
+                if (opponent.isRecruiting()) {
+                    continue;
+                }
+
                 float distance = opponent.getPosition().distance(getPosition());
                 if (distance <= getUnitClass().awareness()) {
                     float favor = getUnitClass().favor(opponent.getUnitClass());
@@ -308,9 +312,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
 
             wander(80.0f, 1.0f, 0.1f);
-        }
-
-        else {
+        } else {
             // If it's at peace, seek to target position
             PointF targetPosition = new PointF(targetMapPosition.toGameCoord());
             OffsetCoord currentMapOffset = new OffsetCoord(getPosition());
@@ -334,8 +336,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Update moving
         super.update();
 
+        // Update projectile
         if (projectile != null) {
             projectile.update();
+        }
+
+        // Handle recruiting
+        if (!isRecruiting()) {
+            for (Sprite sprite : getSprites()) {
+                sprite.setOpaque(1.0f);
+            }
+        } else if (opponents == null) {
+            recruitingTimeLeft--;
         }
     }
 
@@ -344,6 +356,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     @Override
     public void commit() {
+
         super.commit();
 
         if (projectile != null) {
@@ -357,16 +370,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     @Override
     public void onCollisionOccurred(CollidableObject targetObject) {
-
-        Unit collidedUnit = (Unit) targetObject;
-
-        // if collided unit is enemy, stop and fight
-        if (opponents.contains(collidedUnit)) {
-            if (closedOpponents == null) {
-                closedOpponents = new ArrayList<>();
-            }
-            closedOpponents.add(collidedUnit);
-        }
     }
 
     /**
@@ -384,14 +387,17 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public void fight() {
 
-        // Do melee attack
+        if (isRecruiting())
+            return;
+
+        // Do the melee attack
         Unit meleeTarget = searchFavoredMeleeTarget();
         if (meleeTarget != null) {
             attackMelee(meleeTarget);
         }
 
+        // Do the ranged attack
         if (meleeTarget == null) {
-            // Do ranged attack
             Unit rangedTarget = searchFavoredRangedTarget();
             if (rangedTarget != null) {
                 attackRanged(rangedTarget);
@@ -403,6 +409,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      */
     public void support() {
+
+        if (isRecruiting()) {
+            return;
+        }
 
         // Do ranged attack
         Unit rangedTarget = searchFavoredRangedTarget();
@@ -422,6 +432,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
         float highestFavor = -Float.MAX_VALUE;
         int highestHealth = Integer.MAX_VALUE;
         for (Unit opponent : opponents) {
+            if (opponent.isRecruiting()) {
+                continue;
+            }
             if (opponent.getPosition().distance(getPosition()) <=
                     getUnitClass().meleeAttackRange()) {
                 float favor = getUnitClass().favor(opponent.getUnitClass());
@@ -453,6 +466,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         // Select highest favored enemy for ranged attack
         for (Unit opponent : opponents) {
+            if (opponent.isRecruiting()) {
+                continue;
+            }
             if (opponent.getPosition().distance(getPosition()) <=
                     getUnitClass().rangedAttackRange()) {
                 float favor = getUnitClass().favor(opponent.getUnitClass());
@@ -713,6 +729,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      */
     public void addExp(int expEarned) {
+        if (isRecruiting()) {
+            return;
+        }
+
         exp += expEarned;
         if (level < MAX_LEVEL && exp > getUnitClass().requiredExp(level)) {
             exp = 0;
@@ -720,8 +740,25 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isRecruiting() {
+        return recruitingTimeLeft > 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isFighting() {
+        return opponents != null;
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
+    private final static int RECRUITING_TIME = 300;
 
     private UnitClass unitClass;
     private int level;
@@ -729,9 +766,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private int health;
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
-    private ArrayList<Unit> closedOpponents;
     private Town.Faction faction;
 
+    private int recruitingTimeLeft = RECRUITING_TIME;
     private OffsetCoord targetMapPosition;
     private int meleeAttackLeft = 0;
     private int rangedAttackLeft = 0;

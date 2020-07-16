@@ -25,11 +25,9 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
     public interface Event {
 
-        void onMapCreated();
+        void onMapTownFocused(Town town);
 
-        void onMapDestroyed();
-
-        void onMapFocused(Town town);
+        void onMapTownOccupied(Town town);
     }
 
     /**
@@ -85,8 +83,6 @@ class GameMap extends HexTileMap implements View, Town.Event {
                 -getTileSize().height - topMargin,
                 bottomRightGameCoord.x + getTileSize().width * 2 + leftMargin + rightMargin,
                 bottomRightGameCoord.y + getTileSize().height * 2 + topMargin + bottomMargin);
-
-        listener.onMapCreated();
     }
 
     /**
@@ -96,8 +92,6 @@ class GameMap extends HexTileMap implements View, Town.Event {
     public void close() {
 
         super.close();
-
-        listener.onMapDestroyed();
     }
 
     /**
@@ -126,6 +120,8 @@ class GameMap extends HexTileMap implements View, Town.Event {
             redrawTileSprite(prevFaction);
         }
         redrawTileSprite(newFaction);
+
+        listener.onMapTownOccupied(town);
     }
 
     /**
@@ -164,7 +160,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
                     Town townToFocus = getTown(touchedMapCoord);
                     if (townToFocus != null) {
                         townToFocus.setFocus(true);
-                        listener.onMapFocused(townToFocus);
+                        listener.onMapTownFocused(townToFocus);
                     }
                 }
             } else if (eventAction == MotionEvent.ACTION_CANCEL) {

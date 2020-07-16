@@ -26,7 +26,7 @@ public class Battle {
      */
     public void update() {
 
-        // Collistion detection between units first
+        // Collision detection between units first
         resolveCollision();
 
         // Fight
@@ -45,8 +45,16 @@ public class Battle {
     private void resolveCollision() {
 
         ArrayList<Unit> units = new ArrayList<>();
-        units.addAll(attacker.getUnits());
-        units.addAll(defender.getUnits());
+        for (Unit unit: attacker.getUnits()) {
+            if (!unit.isRecruiting()) {
+                units.add(unit);
+            }
+        }
+        for (Unit unit: defender.getUnits()) {
+            if (!unit.isRecruiting()) {
+                units.add(unit);
+            }
+        }
 
         // Collision detection
         CollisionDetector collisionDetector = Engine2D.GetInstance().getCollisionDetector();
@@ -112,43 +120,55 @@ public class Battle {
     public void handlePostFight() {
 
         Squad winner = null, loser = null;
+        boolean eliminated = false;
         if (attacker.isEliminated() || defender.isEliminated()) {
             // If one or them is eliminated, finish battle
             if (attacker.isEliminated()) {
                 winner = defender;
+                loser = attacker;
             } else if (defender.isEliminated()) {
                 winner = attacker;
+                loser = defender;
             }
-            finished = true;
+            eliminated = true;
         } else {
             if (attacker.isWillingToRetreat()) {
                 winner = defender;
                 loser = attacker;
-                finished = true;
             } else if (defender.isWillingToRetreat()) {
                 winner = attacker;
                 loser = defender;
-                finished = true;
             }
         }
 
         // If there's loser
-        if (finished) {
-            if (loser != null) {
+        if (winner != null && loser != null) {
+            if (eliminated) {
+                attacker.endFight();
+                defender.endFight();
+                winner.addExp(WINNER_EXP);
+                if (attacker.isEliminated()) {
+                    attacker.close();
+                }
+                if (defender.isEliminated()) {
+                    defender.close();
+                }
+            } else {
                 // Try retreating loser
                 ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(loser);
-                if (retreatableCoords != null && retreatableCoords.size() > 0) {
-                    // Retreat loser
-                    loser.moveTo(retreatableCoords.get(0));
+                if (retreatableCoords == null || retreatableCoords.size() == 0) {
+                    // Failed to retreat
+                    return;
                 }
-            }
 
-            attacker.endFight();
-            defender.endFight();
-
-            if (winner != null) {
+                // Move loser
+                attacker.endFight();
+                defender.endFight();
                 winner.addExp(WINNER_EXP);
+                loser.moveTo(retreatableCoords.get(0));
             }
+
+            finished = true;
         }
     }
 

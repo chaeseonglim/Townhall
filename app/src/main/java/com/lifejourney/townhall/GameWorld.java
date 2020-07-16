@@ -62,19 +62,19 @@ public class GameWorld extends World
         homeButton.show();
         addWidget(homeButton);
 
-        squadBuilderButton = new Button.Builder(this,
-                new Rect(140, viewport.height - 74, 100, 64))
-                .imageSpriteAsset("squad_builder_btn.png").numImageSpriteSet(1).layer(20).build();
-        squadBuilderButton.setImageSpriteSet(0);
-        squadBuilderButton.show();
-        addWidget(squadBuilderButton);
-
         infoButton = new Button.Builder(this,
-                new Rect(260, viewport.height - 74, 100, 64))
+                new Rect(140, viewport.height - 74, 100, 64))
                 .imageSpriteAsset("info_btn.png").numImageSpriteSet(1).layer(20).build();
         infoButton.setImageSpriteSet(0);
         infoButton.hide();
         addWidget(infoButton);
+
+        squadBuilderButton = new Button.Builder(this,
+                new Rect(260, viewport.height - 74, 100, 64))
+                .imageSpriteAsset("squad_builder_btn.png").numImageSpriteSet(1).layer(20).build();
+        squadBuilderButton.setImageSpriteSet(0);
+        squadBuilderButton.hide();
+        addWidget(squadBuilderButton);
 
         /*
         messageBox = new MessageBox.Builder(this,
@@ -152,13 +152,6 @@ public class GameWorld extends World
             }
         }
 
-        // Close eliminated squads (removing will be placed on callback)
-        for (Squad squad : squads) {
-            if (squad.isEliminated()) {
-                squad.close();
-            }
-        }
-
         // Update towns
         ArrayList<Town> towns = map.getTowns();
         for (Town town: towns) {
@@ -181,33 +174,19 @@ public class GameWorld extends World
 
     /**
      *
-     */
-    @Override
-    public void onMapCreated() {
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void onMapDestroyed() {
-    }
-
-    /**
-     *
      * @param town
      */
     @Override
-    public void onMapFocused(Town town) {
+    public void onMapTownFocused(Town town) {
 
         if (focusedTown == town) {
             town.setFocus(false);
             focusedTown = null;
-        } else if (focusedSquad != null) {
-            focusedSquad.setFocus(false);
-            focusedSquad = null;
-            town.setFocus(false);
         } else {
+            if (focusedSquad != null) {
+                focusedSquad.setFocus(false);
+                focusedSquad = null;
+            }
             if (focusedTown != null) {
                 focusedTown.setFocus(false);
                 focusedTown = null;
@@ -218,8 +197,30 @@ public class GameWorld extends World
         // Care for info button
         if (focusedTown == null && focusedSquad == null) {
             infoButton.hide();
+            squadBuilderButton.hide();
         } else {
             infoButton.show();
+            if (focusedTown != null && focusedTown.getFaction() == Town.Faction.VILLAGER &&
+                    focusedTown.getSquads().isEmpty()) {
+                squadBuilderButton.show();
+            } else {
+                squadBuilderButton.hide();
+            }
+        }
+    }
+
+    /**
+     *
+     * @param town
+     */
+    @Override
+    public void onMapTownOccupied(Town town) {
+
+        if (focusedTown == town && focusedTown.getFaction() == Town.Faction.VILLAGER &&
+                focusedTown.getSquads().isEmpty()) {
+            squadBuilderButton.show();
+        } else {
+            squadBuilderButton.hide();
         }
     }
 
@@ -277,6 +278,7 @@ public class GameWorld extends World
 
         // Care for info button
         infoButton.show();
+        squadBuilderButton.hide();
     }
 
     /**
@@ -298,7 +300,7 @@ public class GameWorld extends World
      * @param unit
      */
     @Override
-    public void onSquadUnitSpawned(Squad squad, Unit unit) {
+    public void onSquadUnitAdded(Squad squad, Unit unit) {
 
         addUnit(unit);
     }
@@ -309,7 +311,7 @@ public class GameWorld extends World
      * @param unit
      */
     @Override
-    public void onSquadUnitKilled(Squad squad, Unit unit) {
+    public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
         removeUnit(unit);
     }
@@ -331,8 +333,9 @@ public class GameWorld extends World
     @Override
     public void onButtonPressed(Button button) {
 
-        // Info button is pressed
         if (button == infoButton) {
+            // Info button is pressed
+
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
 
@@ -341,6 +344,19 @@ public class GameWorld extends World
             } else if (focusedTown != null) {
                 popupNewInfoBox(focusedTown);
             }
+        } else if (button == squadBuilderButton) {
+            // Squad builder button is pressed
+
+            Squad squad = tribes.get(0).spawnSquad(focusedTown.getMapCoord().toGameCoord(),
+                    Town.Faction.VILLAGER);
+            focusedTown.setFocus(false);
+            focusedTown = null;
+            squad.setFocus(true);
+            focusedSquad = squad;
+
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+            popupNewInfoBox(squad);
         }
     }
 
@@ -390,6 +406,15 @@ public class GameWorld extends World
         removeWidget(infoBox);
 
         speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+
+        // In case of building new squad
+        if (focusedSquad != null && focusedSquad.getUnits().isEmpty()) {
+            Town town = map.getTown(focusedSquad.getMapCoord());
+            Squad squad = focusedSquad;
+            squad.close();
+            town.setFocus(true);
+            onMapTownFocused(town);
+        }
     }
 
     /**

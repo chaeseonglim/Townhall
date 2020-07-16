@@ -15,14 +15,6 @@ public class Villager extends Tribe {
         this.maxPopulation = 0;
         this.population = 0;
         this.gold = 0;
-
-        spawnSquad(getHeadquarterCoord().toGameCoord(), getFaction(),
-                Unit.UnitClass.SWORD, Unit.UnitClass.LONGBOW, Unit.UnitClass.LONGBOW);
-
-        OffsetCoord coord = getHeadquarterCoord().clone();
-        coord.offset(1, 0);
-        spawnSquad(coord.toGameCoord(), getFaction(),
-                Unit.UnitClass.SWORD, Unit.UnitClass.LONGBOW, Unit.UnitClass.LONGBOW);
     }
 
     @Override

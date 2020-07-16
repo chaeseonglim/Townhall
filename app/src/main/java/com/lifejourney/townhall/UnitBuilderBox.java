@@ -11,9 +11,6 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 public class UnitBuilderBox extends Widget implements Button.Event{
 
     private final String LOG_TAG = "UnitBuilderBox";
@@ -57,7 +54,7 @@ public class UnitBuilderBox extends Widget implements Button.Event{
         // Unit button
         Rect unitButtonRegion =
                 new Rect(region.left() + 22, region.bottom() - 67,
-                        64, 64);
+                        60, 64);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
                     new Button.Builder(this, unitButtonRegion.clone())
@@ -67,7 +64,7 @@ public class UnitBuilderBox extends Widget implements Button.Event{
             unitButtons[i].setImageSpriteSet(i*2);
             addWidget(unitButtons[i]);
 
-            unitButtonRegion.offset(73, 0);
+            unitButtonRegion.offset(67, 0);
         }
 
         updateUnitInfo();

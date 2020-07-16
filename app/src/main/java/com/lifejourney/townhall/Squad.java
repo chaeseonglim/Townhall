@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -34,9 +33,9 @@ public class Squad extends Object implements Controllable {
 
         void onSquadMoved(Squad squad, OffsetCoord prevMapCoord, OffsetCoord newMapCoord);
 
-        void onSquadUnitSpawned(Squad squad, Unit unit);
+        void onSquadUnitAdded(Squad squad, Unit unit);
 
-        void onSquadUnitKilled(Squad squad, Unit unit);
+        void onSquadUnitRemoved(Squad squad, Unit unit);
     }
 
     public static class Builder {
@@ -123,6 +122,10 @@ public class Squad extends Object implements Controllable {
     @Override
     public void close() {
 
+        for (Unit unit: units) {
+            listener.onSquadUnitRemoved(this, unit);
+            unit.close();
+        }
         listener.onSquadDestroyed(this);
 
         super.close();
@@ -416,6 +419,8 @@ public class Squad extends Object implements Controllable {
     private void addUnit(Unit unit) {
 
         units.add(unit);
+
+        listener.onSquadUnitAdded(this, unit);
     }
 
     /**
@@ -428,8 +433,6 @@ public class Squad extends Object implements Controllable {
         unit.setVisible(isVisible());
         unit.setCompanions(units);
         addUnit(unit);
-
-        listener.onSquadUnitSpawned(this, unit);
     }
 
     /**
@@ -438,8 +441,9 @@ public class Squad extends Object implements Controllable {
      */
     public void removeUnit(Unit unit) {
 
-        unit.close();
         units.remove(unit);
+        listener.onSquadUnitRemoved(this, unit);
+        unit.close();
     }
 
     /**
@@ -448,8 +452,14 @@ public class Squad extends Object implements Controllable {
      */
     public void removeUnit(int index) {
 
-        units.get(index).close();
+        if (units.size() <= index) {
+            return;
+        }
+
+        Unit unit = units.get(index);
         units.remove(index);
+        listener.onSquadUnitRemoved(this, unit);
+        unit.close();
     }
 
     /**
@@ -604,7 +614,7 @@ public class Squad extends Object implements Controllable {
             if (unit.isKilled()) {
                 expEarned += unit.getUnitClass().earnedExp(unit.getLevel());
                 iter.remove();
-                listener.onSquadUnitKilled(this, unit);
+                listener.onSquadUnitRemoved(this, unit);
                 unit.close();
             }
         }
@@ -869,7 +879,15 @@ public class Squad extends Object implements Controllable {
      */
     public boolean isEliminated() {
 
-        return units.size() == 0;
+        int activeUnitCount = 0;
+        for (Unit unit: units) {
+            if (unit.isRecruiting()) {
+                continue;
+            }
+            activeUnitCount++;
+        }
+
+        return activeUnitCount == 0;
     }
 
     /**

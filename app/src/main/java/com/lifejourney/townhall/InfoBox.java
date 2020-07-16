@@ -383,52 +383,52 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
 
         removeSprites("text");
 
-        // Faction
-        PointF textPosition = new PointF(-250, -155);
-        addText("소속", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
-
-        textPosition.offset(0, 30);
-        addText(squad.getFaction().toGameString(), new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
-
         // Status
-        textPosition.offset(0, 30);
+        PointF textPosition = new PointF(-250, -155);
         addText("상태", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        String status;
+        String status = squad.getFaction().toGameString() + " 부대";
         if (squad.isMoving()) {
-            status = "이동중";
+            status += " (이동중)";
         } else if (squad.isFighting()) {
-            status = "전투중";
+            status += " (전투중)";
         } else if (squad.isSupporting()) {
-            status = "지원중";
+            status += " (지원중)";
         } else if (squad.isOccupying()) {
-            status = "점령중";
+            status += " (점령중)";
         } else {
-            status = "대기중";
+            status += " (대기중)";
         }
-        textPosition.offset(0, 30);
-        addText(status, new SizeF(150, 40), textPosition.clone(),
+        textPosition.offset(75, 30);
+        addText(status, new SizeF(300, 40), textPosition.clone(),
                 Color.rgb(255, 255, 255));
 
         // Unit information
         textPosition.offset(0, 30);
-        addText("유닛", new SizeF(150, 40), textPosition.clone(),
+        addText("유닛", new SizeF(300, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
+        if (squad.getUnits().isEmpty()) {
+            textPosition.offset(0, 50);
+            addText("유닛이 없습니다.\n충원 버튼을 누르세요.", new SizeF(300, 80), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+            textPosition.offset(0, 8);
+        }
         for (Unit unit : squad.getUnits()) {
             textPosition.offset(0, 30);
-            addText(unit.getUnitClass().toGameString() + " Lv" + unit.getLevel(),
-                    new SizeF(150, 40), textPosition.clone(),
+            String unitStr = unit.getUnitClass().toGameString() + " Lv" + unit.getLevel();
+            if (unit.isRecruiting()) {
+                unitStr += " (충원중)";
+            }
+            addText(unitStr, new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         }
 
         if (squad.getFaction() == Town.Faction.VILLAGER) {
             // Recruiting
-            textPosition.offset(0, 30);
-            addText("모집", new SizeF(150, 40), textPosition.clone(),
+            textPosition.offset(-75, 30);
+            addText("충원", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
             if (!squad.isMoving() &&
@@ -437,12 +437,12 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
                     !squad.isFighting()) {
                 Rect recruitingButtonRegion =
                         new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
-                                64, 64);
+                                60, 64);
                 for (int i = 0; i < 3; ++i) {
+                    if (recruitingButtons[i] != null) {
+                        removeWidget(recruitingButtons[i]);
+                    }
                     if (squad.getUnits().size() >= i) {
-                        if (recruitingButtons[i] != null) {
-                            removeWidget(recruitingButtons[i]);
-                        }
                         recruitingButtons[i] =
                                 new Button.Builder(this, recruitingButtonRegion.clone())
                                         .imageSpriteAsset("unit_recruiting_btn.png")
@@ -452,10 +452,18 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
                                 0 : squad.getUnits().get(i).getUnitClass().ordinal() + 1);
                         addWidget(recruitingButtons[i]);
                     } else {
-                        recruitingButtons[i] = null;
+                        recruitingButtons[i] =
+                                new Button.Builder(this, recruitingButtonRegion.clone())
+                                        .imageSpriteAsset("unit_recruiting_btn.png")
+                                        .numImageSpriteSet(Unit.UnitClass.values().length + 1)
+                                        .layer(layer + 1).build();
+                        recruitingButtons[i].setImageSpriteSet((squad.getUnits().size() < (i + 1)) ?
+                                0 : squad.getUnits().get(i).getUnitClass().ordinal() + 1);
+                        recruitingButtons[i].disable();
+                        addWidget(recruitingButtons[i]);
                     }
 
-                    recruitingButtonRegion.offset(73, 0);
+                    recruitingButtonRegion.offset(69, 0);
                 }
             } else {
                 textPosition.offset(0, 30);

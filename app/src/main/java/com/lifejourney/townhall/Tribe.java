@@ -74,9 +74,9 @@ public abstract class Tribe implements Squad.Event {
      * @param unit
      */
     @Override
-    public void onSquadUnitSpawned(Squad squad, Unit unit) {
+    public void onSquadUnitAdded(Squad squad, Unit unit) {
 
-        squadListener.onSquadUnitSpawned(squad, unit);
+        squadListener.onSquadUnitAdded(squad, unit);
 
     }
 
@@ -86,9 +86,9 @@ public abstract class Tribe implements Squad.Event {
      * @param unit
      */
     @Override
-    public void onSquadUnitKilled(Squad squad, Unit unit) {
+    public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
-        squadListener.onSquadUnitKilled(squad, unit);
+        squadListener.onSquadUnitRemoved(squad, unit);
     }
 
     /**
@@ -97,7 +97,7 @@ public abstract class Tribe implements Squad.Event {
      * @param faction
      * @param unitClass
      */
-    public void spawnSquad(PointF position, Town.Faction faction, Unit.UnitClass... unitClass) {
+    public Squad spawnSquad(PointF position, Town.Faction faction, Unit.UnitClass... unitClass) {
 
         Squad squad = new Squad.Builder(this, position, map, faction).build();
         if (unitClass.length >= 1) {
@@ -111,6 +111,8 @@ public abstract class Tribe implements Squad.Event {
         }
         squad.show();
         squads.add(squad);
+
+        return squad;
     }
 
     /**

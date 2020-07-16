@@ -251,7 +251,7 @@ public class Town {
             }
         }
 
-        if (enemyExist) {
+        if (enemyExist && !squads.get(0).isEliminated()) {
             // If enemy squad is exist, occupy town
             updateOccupation(enemyFaction);
         } else {
@@ -902,7 +902,8 @@ public class Town {
      */
     public boolean isOccupying() {
 
-        return occupyingFaction != Faction.NEUTRAL && getBattle() == null;
+        return (occupyingFaction != Faction.NEUTRAL && getBattle() == null &&
+                !squads.get(0).isEliminated());
     }
 
     /**
