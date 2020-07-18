@@ -11,7 +11,7 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Event {
+public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Event {
 
     private final String LOG_TAG = "InfoBox";
 
@@ -174,10 +174,10 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
                 }
             }
             hide();
-            UnitBuilderBox unitBuilderBox =
-                    new UnitBuilderBox(this, getRegion(), getLayer()+10, 0.0f);
-            addWidget(unitBuilderBox);
-            unitBuilderBox.show();
+            UnitSelectionBox unitSelectionBox =
+                    new UnitSelectionBox(this, getRegion(), getLayer()+10, 0.0f);
+            addWidget(unitSelectionBox);
+            unitSelectionBox.show();
         }
     }
 
@@ -187,7 +187,7 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
      * @param unitClass
      */
     @Override
-    public void onUnitBuilderBoxSelected(UnitBuilderBox infoBox, Unit.UnitClass unitClass) {
+    public void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass) {
 
         removeWidget(infoBox);
         show();
@@ -240,7 +240,7 @@ public class InfoBox extends Widget implements Button.Event, UnitBuilderBox.Even
         addText("시설", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        if (town.getTerrain().availableEconomySlot() == 0) {
+        if (town.getTerrain().facilitySlots() == 0) {
             textPosition.offset(0, 30);
             addText("개발 불가", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));

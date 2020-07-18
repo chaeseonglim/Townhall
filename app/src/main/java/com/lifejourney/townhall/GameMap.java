@@ -80,7 +80,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
             }
         }
         for (Town town: towns.values()) {
-            town.setNeighborTowns(getNeighborTowns(town.getMapCoord(), true));
+            town.setNeighbors(getNeighborTowns(town.getMapCoord(), true));
         }
 
         // Calculate viewport clipping area
@@ -93,7 +93,9 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
         // Scroll to headquarter
         if (villagerHq != null) {
-            scroll(new Point(villagerHq.getMapCoord().toGameCoord().subtract(clippedViewport.center())));
+            Point offset = new Point(villagerHq.getMapCoord().toGameCoord())
+                    .subtract(Engine2D.GetInstance().getViewport().center());
+            scroll(offset);
         }
     }
 
@@ -120,18 +122,17 @@ class GameMap extends HexTileMap implements View, Town.Event {
      *
      * @param town
      * @param prevFaction
-     * @param newFaction
      */
     @Override
-    public void onTownOccupied(Town town, Town.Faction prevFaction, Town.Faction newFaction) {
+    public void onTownOccupied(Town town, Town.Faction prevFaction) {
 
         townsBySide.get(prevFaction.ordinal()).remove(town);
-        townsBySide.get(newFaction.ordinal()).add(town);
+        townsBySide.get(town.getFaction().ordinal()).add(town);
 
         if (prevFaction != Town.Faction.NEUTRAL) {
             redrawTileSprite(prevFaction);
         }
-        redrawTileSprite(newFaction);
+        redrawTileSprite(town.getFaction());
 
         listener.onMapTownOccupied(town);
     }

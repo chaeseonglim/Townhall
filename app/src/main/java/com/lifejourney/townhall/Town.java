@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.SizeF;
@@ -16,7 +18,7 @@ public class Town {
 
         void onTownUpdated(Town town);
 
-        void onTownOccupied(Town town, Faction prevFaction, Faction newFaction);
+        void onTownOccupied(Town town, Faction oldFaction);
     }
 
     enum Terrain {
@@ -46,14 +48,14 @@ public class Town {
                     return "강";
                 case HEADQUARTER_GRASS:
                 case HEADQUARTER_BADLANDS:
-                    return "마을회관";
+                    return "본부";
                 case UNKNOWN:
                 default:
                     return "모름";
             }
         }
 
-        int availableEconomySlot() {
+        int facilitySlots() {
             switch (this) {
                 case GRASS:
                 case BADLANDS:
@@ -90,7 +92,7 @@ public class Town {
             }
         }
 
-        public boolean isProsperable() {
+        public boolean canDevelop() {
             switch (this) {
                 case GRASS:
                 case BADLANDS:
@@ -107,42 +109,65 @@ public class Town {
             }
         }
 
-        public float prosperRate(Facility facility) {
+        public int bonusDevelopmentDelta(Facility facility) {
             switch (this) {
                 case GRASS:
-                    if (facility == Facility.FORTRESS) {
-                        return 0.5f;
+                    if (facility == Facility.DOWNTOWN || facility == Facility.FARM) {
+                        return 1;
                     } else {
-                        return 1.0f;
+                        return 0;
                     }
                 case BADLANDS:
-                    if (facility == Facility.FORTRESS) {
-                        return 0.6f;
+                    if (facility == Facility.DOWNTOWN || facility == Facility.MARKET) {
+                        return 1;
                     } else {
-                        return 0.8f;
+                        return 0;
                     }
                 case FOREST:
-                    if (facility == Facility.FORTRESS) {
-                        return 0.9f;
-                    } else if (facility == Facility.FARM) {
-                        return 0.8f;
-                    } else if (facility == Facility.MARKET) {
-                        return 0.4f;
+                    if (facility == Facility.FARM || facility == Facility.FORTRESS) {
+                        return 1;
+                    } else if (facility == Facility.DOWNTOWN) {
+                        return -1;
                     } else {
-                        return 0.5f;
+                        return 0;
                     }
                 case HILL:
                     if (facility == Facility.FORTRESS) {
-                        return 1.0f;
-                    } else if (facility == Facility.FARM) {
-                        return 0.3f;
-                    } else if (facility == Facility.DOWNTOWN) {
-                        return 0.8f;
+                        return 2;
+                    } else if (facility == Facility.DOWNTOWN || facility == Facility.FARM) {
+                        return -1;
                     } else {
-                        return 0.5f;
+                        return 0;
                     }
                 default:
-                    return 0.0f;
+                    return 0;
+            }
+        }
+
+        public int bonusHappinessDelta() {
+            switch (this) {
+                case GRASS:
+                    return 1;
+                case BADLANDS:
+                    return -1;
+                case FOREST:
+                case HILL:
+                default:
+                    return 0;
+            }
+        }
+
+        public int bonusDefenseDelta() {
+            switch (this) {
+                case GRASS:
+                case BADLANDS:
+                    return 0;
+                case FOREST:
+                    return 1;
+                case HILL:
+                    return 2;
+                default:
+                    return 0;
             }
         }
     }
@@ -172,15 +197,6 @@ public class Town {
         }
     }
 
-    enum Specialities {
-        IRON,
-        WOOD,
-        GEM,
-        HORSE,
-        POWDER,
-        NONE;
-    }
-
     enum Facility {
         DOWNTOWN,
         FARM,
@@ -191,8 +207,32 @@ public class Town {
     enum FacilityDevelopment {
         PROSPER,
         STALL,
-        DETERIORATE
+        DETERIORATE;
+
+        public int baseDevelopmentDelta() {
+            switch (this) {
+                case PROSPER:
+                case STALL:
+                    return 1;
+                case DETERIORATE:
+                    return -5;
+                default:
+                    return 0;
+            }
+        }
     }
+
+    enum DeltaAttribute {
+        FARM_DEVELOPMENT,
+        MARKET_DEVELOPMENT,
+        DOWNTOWN_DEVELOPMENT,
+        FORTRESS_DEVELOPMENT,
+        GOLD,
+        POPULATION,
+        DEFENSE,
+        HAPPINESS
+    }
+
 
     private static SizeF TileSize;
 
@@ -216,18 +256,11 @@ public class Town {
         this.facilityExps = new int[Facility.values().length];
         Arrays.fill(this.facilityExps, 0);
         this.facilityDevelopment = new FacilityDevelopment[Facility.values().length];
-        Arrays.fill(this.facilityDevelopment, FacilityDevelopment.PROSPER);
-        for (int i = 0; i < 4; ++i) {
-            if (!this.terrain.isProsperable()) {
-                this.facilityDevelopment[i] = FacilityDevelopment.DETERIORATE;
-            }
+        if (this.terrain.canDevelop()) {
+            Arrays.fill(this.facilityDevelopment, FacilityDevelopment.PROSPER);
+        } else {
+            Arrays.fill(this.facilityDevelopment, FacilityDevelopment.DETERIORATE);
         }
-        /*
-        this.facilityDevelopment[0] = FacilityDevelopment.DETERIORATE;
-        this.facilityDevelopment[2] = FacilityDevelopment.DETERIORATE;
-        this.facilityDevelopment[3] = FacilityDevelopment.DETERIORATE;
-         */
-        this.specialties = Specialities.NONE;
         this.happiness = 50;
     }
 
@@ -241,24 +274,23 @@ public class Town {
             return;
         }
 
-        // Check if there's enemy squads
-        boolean enemyExist = false;
-        Faction enemyFaction = Faction.NEUTRAL;
-        for (Squad squad : squads) {
-            if (squad.getFaction() != getFaction() && !squad.isMoving()) {
-                enemyExist = true;
-                enemyFaction = squad.getFaction();
-            }
-        }
+        assert squads.size() <= 1;
 
-        if (enemyExist && !squads.get(0).isEliminated()) {
-            // If enemy squad is exist, occupy town
-            updateOccupation(enemyFaction);
+        Squad squad = (squads.isEmpty())? null : squads.get(0);
+        if (squad != null &&
+                squad.getFaction() != getFaction() &&
+                !squad.isMoving() &&
+                !squad.isEliminated()) {
+            // If an enemy squad is exist, occupy town
+            updateOccupation(squad.getFaction());
         } else {
-            // Else, update facility
-            resetOccupation();
-            if (terrain != Terrain.HEADQUARTER_GRASS) {
+            cancelOccupation();
+
+            // Or update town
+            if (townUpdateLeft-- == 0) {
                 updateFacility();
+                updateDelta();
+                townUpdateLeft = TOWN_UPDATE_COUNT;
             }
         }
     }
@@ -266,203 +298,178 @@ public class Town {
     /**
      *
      */
-    private void updateOccupation(Faction occupationingFaction) {
+    private void updateOccupation(Faction occupyingFaction) {
 
-        if (this.occupyingFaction != occupationingFaction) {
-            // Someone try to occupy this
-            this.occupyingFaction = occupationingFaction;
+        if (this.occupyingFaction != occupyingFaction) {
+            // If someone new try to occupy this, update information
+            this.occupyingFaction = occupyingFaction;
             this.occupationStep = 0;
-            this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
-
+            this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
             listener.onTownUpdated(this);
-        } else if (--this.occupationUpdateLeft == 0) {
+        } else if (--this.occupationUpdateForThisStepLeft == 0) {
             if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
-                // It's finally occupied
+                // If occupation is done, change the owner faction of town
                 Faction prevFaction = this.faction;
-                this.faction = occupationingFaction;
+                this.faction = occupyingFaction;
                 this.occupationStep = 0;
-                this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
-
-                listener.onTownOccupied(this, prevFaction, faction);
+                this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
+                listener.onTownOccupied(this, prevFaction);
             } else {
-                this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+                // Or just update the occupation status
+                this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
             }
-
             listener.onTownUpdated(this);
         }
     }
 
-    /**
+    /*
      *
      */
-    private void resetOccupation() {
+    private void cancelOccupation() {
 
+        // Cancel occupation process
         if (this.occupationStep > 0) {
             listener.onTownUpdated(this);
         }
         this.occupyingFaction = Faction.NEUTRAL;
         this.occupationStep = 0;
-        this.occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+        this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
     }
+
+    /**
+     *
+     */
+    private void updateDelta() {
+
+        if (faction == Faction.VILLAGER) {
+            // Calculate delta from this town
+            for (int i = 0; i < Facility.values().length; ++i) {
+                deltas[i] = facilityDevelopment[i].baseDevelopmentDelta() +
+                        terrain.bonusDevelopmentDelta(Facility.values()[i]);
+            }
+            deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.bonusHappinessDelta();
+            deltas[DeltaAttribute.DEFENSE.ordinal()] = terrain.bonusDefenseDelta();
+            deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET);
+            deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM);
+
+            // Calculate delta from neighbors
+            for (Town neighbor : neighbors) {
+                if (neighbor != null) {
+                    if (neighbor.getFaction() == getFaction()) {
+                        int downtownLvl = neighbor.getFacilityLevel(Facility.DOWNTOWN);
+                        int fortressLvl = neighbor.getFacilityLevel(Facility.FORTRESS);
+                        for (int i = 0; i < Facility.values().length; ++i) {
+                            if (facilityDevelopment[i] != FacilityDevelopment.DETERIORATE) {
+                                deltas[i] += downtownLvl;
+                            }
+                            deltas[i] -= fortressLvl;
+                        }
+                        deltas[DeltaAttribute.HAPPINESS.ordinal()] -= fortressLvl;
+                        deltas[DeltaAttribute.GOLD.ordinal()] +=
+                                neighbor.getFacilityLevel(Facility.DOWNTOWN);
+                        deltas[DeltaAttribute.POPULATION.ordinal()] +=
+                                neighbor.getFacilityLevel(Facility.DOWNTOWN);
+                        deltas[DeltaAttribute.DEFENSE.ordinal()] +=
+                                neighbor.getFacilityLevel(Facility.FORTRESS);
+                    } else if (neighbor.getFaction() != Faction.NEUTRAL) {
+                        for (int i = 0; i < Facility.values().length; ++i) {
+                            deltas[i] -= 1;
+                        }
+                        deltas[DeltaAttribute.HAPPINESS.ordinal()] -= 5;
+                    }
+                }
+            }
+        } else if (faction != Faction.NEUTRAL) {
+            // Facility is deteriorated if it's on enemy's hand
+            for (int i = 0; i < Facility.values().length; ++i) {
+                deltas[i] = FacilityDevelopment.DETERIORATE.baseDevelopmentDelta();
+            }
+            deltas[DeltaAttribute.HAPPINESS.ordinal()] = 0;
+            deltas[DeltaAttribute.DEFENSE.ordinal()] = 0;
+    }
+}
 
     /**
      *
      */
     private void updateFacility() {
 
-        if (facilityUpdateLeft-- > 0) {
-            return;
+        // Get base exp delta for facilities
+        int[] facilityExpDelta = new int[Facility.values().length];
+        for (int i = 0; i < Facility.values().length; ++i) {
+            facilityExpDelta[i] = FACILITY_EXP_STEP * deltas[i];
         }
 
-        if (faction == Faction.VILLAGER) {
-            // Economy only prosper when it's Villager's town
-            // Get base exp delta by facility development
-            int[] expDeltas = new int[Facility.values().length];
-            for (int i = 0; i < Facility.values().length; ++i) {
-                if (facilityDevelopment[i] == FacilityDevelopment.PROSPER) {
-                    Facility facility = Facility.values()[i];
-                    expDeltas[i] = (int) (BASE_FACILITY_EXP_DELTA_PROSPER * terrain.prosperRate(facility));
-                } else if (facilityDevelopment[i] == FacilityDevelopment.STALL) {
-                    expDeltas[i] = BASE_FACILITY_EXP_DELTA_STALL;
+        // Update exp
+        for (int i = 0; i < Facility.values().length; ++i) {
+            facilityExps[i] += facilityExpDelta[i];
+        }
+
+        //Log.i(LOG_TAG, "levels " + levels[0] + " " + levels[1] + " " + levels[2] + " " + levels[3]);
+        //Log.i(LOG_TAG, "exps " + exps[0] + " " + exps[1] + " " + exps[2] + " " + exps[3]);
+
+        // Back-up previous levels
+        int[] prevLevels = Arrays.copyOf(facilityLevels, facilityLevels.length);
+
+        // Level down if exp is negative
+        for (int i = 0; i < Facility.values().length; ++i) {
+            if (facilityExps[i] < 0) {
+                if (facilityLevels[i] > 0) {
+                    facilityLevels[i]--;
+                    facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]-1;
+                    if (facilityLevels[i] == 4 || facilityLevels[i] == 3 || facilityLevels[i] == 0) {
+                        // Remove facility from placement if facility level is certain level
+                        facilitySlots.remove(Facility.values()[i]);
+                        Log.e(LOG_TAG, "facilitySlots: " + facilitySlots.size());
+                    }
                 } else {
-                    expDeltas[i] = BASE_FACILITY_EXP_DELTA_DETERIORATE;
+                    facilityExps[i] = 0;
                 }
             }
+        }
 
-            // Count neighbor town's stat
-            int totalNeighborTownLevel = 0;
-            int totalEnemyTownCount = 0;
-            for (Town neighborTown : neighborTowns) {
-                if (neighborTown != null) {
-                    if (neighborTown.getFaction() == getFaction()) {
-                        totalNeighborTownLevel += neighborTown.getFacilityLevel(Facility.DOWNTOWN);
-                    } else if (neighborTown.getFaction() != Faction.NEUTRAL) {
-                        totalEnemyTownCount++;
-                    }
-                }
-            }
-
-            // Update exp delta by aggregating neighbor town's status
-            for (int i = 0; i < Facility.values().length; ++i) {
-                // Exp delta from friendly neighbor downtown level
-                if (facilityDevelopment[i] != FacilityDevelopment.DETERIORATE) {
-                    Facility facility = Facility.values()[i];
-                    if (Facility.values()[i] != Facility.FORTRESS) {
-                        expDeltas[i] += totalNeighborTownLevel *
-                                BASE_FACILITY_EXP_DELTA_FROM_NEIGHBOR_DOWNTOWN * terrain.prosperRate(facility);
-                    }
-                }
-                // Exp delta from enemy neighbor towns
-                if (Facility.values()[i] != Facility.FORTRESS) {
-                    expDeltas[i] += BASE_FACILITY_EXP_DELTA_FROM_NEIGHBOR_ENEMY * totalEnemyTownCount;
-                } else {
-                    expDeltas[i] -= BASE_FACILITY_EXP_DELTA_FROM_NEIGHBOR_ENEMY * totalEnemyTownCount;
-                }
-            }
-
-            // Update exp
-            for (int i = 0; i < Facility.values().length; ++i) {
-                facilityExps[i] += expDeltas[i];
-            }
-
-            // Back-up previous levels
-            int[] prevLevels = Arrays.copyOf(facilityLevels, facilityLevels.length);
-
-            //Log.i(LOG_TAG, "levels " + levels[0] + " " + levels[1] + " " + levels[2] + " " + levels[3]);
-            //Log.i(LOG_TAG, "exps " + exps[0] + " " + exps[1] + " " + exps[2] + " " + exps[3]);
-
-            // Level down if exp is negative
-            for (int i = 0; i < Facility.values().length; ++i) {
-                if (facilityExps[i] < 0) {
-                    if (facilityLevels[i] > 0) {
-                        facilityLevels[i]--;
-                        facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
-
-                        // Remove from placement
-                        if (facilityLevels[i] == 4 || facilityLevels[i] == 3 || facilityLevels[i] == 0) {
-                            facilitySlots.remove(Facility.values()[i]);
-                        }
-                    } else {
-                        facilityExps[i] = 0;
-                    }
-                }
-            }
-
-            // And level up if exp is above the required exp for this level
-            for (int i = 0; i < Facility.values().length; ++i) {
-                Facility facility = Facility.values()[i];
-                if (facilityLevels[i] < MAX_FACILITY_LEVEL &&
-                        facilityExps[i] >= REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]) {
-                    if (Arrays.stream(facilityLevels).sum() < MAX_FACILITY_LEVEL) {
-                        // In case of level 1, need to check if slot is full
-                        if (facilityLevels[i] == 0 || facilityLevels[i] == 3 || facilityLevels[i] == 4) {
-                            if (facilitySlots.size() < terrain.availableEconomySlot()) {
-                                facilitySlots.add(facility);
-                                facilityLevels[i]++;
-                                facilityExps[i] = 0;
-                            } else {
-                                facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
-                            }
-                        } else {
+        // Level up if exp is above the required exp for this level
+        for (int i = 0; i < Facility.values().length; ++i) {
+            if (facilityDevelopment[i] == FacilityDevelopment.PROSPER &&
+                    facilityLevels[i] < MAX_FACILITY_LEVEL &&
+                    facilityExps[i] >= REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]) {
+                // Check if town have max facility already
+                if (Arrays.stream(facilityLevels).sum() < MAX_FACILITY_LEVEL) {
+                    // Check if facility need additional slots
+                    if (facilityLevels[i] == 0 || facilityLevels[i] == 3 || facilityLevels[i] == 4) {
+                        if (facilitySlots.size() < terrain.facilitySlots()) {
+                            facilitySlots.add(Facility.values()[i]);
                             facilityLevels[i]++;
                             facilityExps[i] = 0;
+                        } else {
+                            facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
                         }
                     } else {
-                        facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
-                    }
-                }
-            }
-
-            // If a facility level is changed, redraw the tile
-            if (!Arrays.equals(prevLevels, facilityLevels)) {
-                listener.onTownUpdated(this);
-            }
-
-            // Get happiness delta
-            int happinessDelta = getFacilityLevel(Facility.DOWNTOWN) * BASE_HAPPINESS_DELTA_FROM_TOWN_LEVEL;
-            for (Town neighborTown : neighborTowns) {
-                if (neighborTown != null) {
-                    if (neighborTown.getFaction() == getFaction()) {
-                        happinessDelta += neighborTown.getFacilityLevel(Facility.DOWNTOWN) *
-                                BASE_HAPPINESS_DELTA_FROM_NEIGHBOR_TOWN;
-                    } else if (neighborTown.getFaction() != Faction.NEUTRAL) {
-                        happinessDelta += BASE_HAPPINESS_DELTA_FROM_ENEMY_TOWN;
-                    }
-                }
-            }
-
-            // Update happiness
-            happiness = Math.min(Math.max(BASE_HAPPINESS + happinessDelta, 0), 100);
-
-        } else if (faction != Faction.NEUTRAL) {
-
-            // It only deteriorated if it's on enemy's hand
-            for (int i = 0; i < Facility.values().length; ++i) {
-                // Update exp
-                facilityExps[i] = BASE_FACILITY_EXP_DELTA_DETERIORATE;
-
-                // Level down
-                if (facilityExps[i] < 0) {
-                    if (facilityLevels[i] > 0) {
-                        facilityLevels[i]--;
-                        facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
-                    } else {
+                        facilityLevels[i]++;
                         facilityExps[i] = 0;
                     }
+                } else {
+                    facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
                 }
             }
-
-            // Update happiness
-            happiness = 0;
         }
 
-        facilityUpdateLeft = FACILITY_UPDATE_COUNT;
+        // Update happiness
+        int happinessDelta = HAPPINESS_STEP * deltas[DeltaAttribute.HAPPINESS.ordinal()];
+        happiness = Math.min(Math.max(BASE_HAPPINESS + happinessDelta, 0), 100);
+
+        // If any facility level is changed, redraw the tile
+        if (!Arrays.equals(prevLevels, facilityLevels)) {
+            listener.onTownUpdated(this);
+        }
     }
 
     /**
      *
      */
-    public void createTileSprites() {
+    private ArrayList<Sprite> getTileSprites() {
+
+        ArrayList<Sprite> sprites = new ArrayList<>();
 
         if (baseSprite == null) {
             baseSprite =
@@ -471,6 +478,7 @@ public class Town {
                             .size(TileSize).gridSize(4, 7).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
         }
+        sprites.add(baseSprite);
 
         if (facilitySprites == null) {
             facilitySprites = new ArrayList<>();
@@ -483,6 +491,7 @@ public class Town {
                 facilitySprites.add(facilitySprite);
             }
         }
+        sprites.addAll(facilitySprites);
 
         if (factionSprite == null) {
             factionSprite =
@@ -491,6 +500,7 @@ public class Town {
                             .size(TileSize).gridSize(7, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
         }
+        sprites.add(factionSprite);
 
         if (borderSprites == null) {
             borderSprites = new ArrayList<>();
@@ -504,6 +514,7 @@ public class Town {
                 borderSprites.add(border);
             }
         }
+        sprites.addAll(borderSprites);
 
         if (occupationSprite == null) {
             occupationSprite =
@@ -512,6 +523,7 @@ public class Town {
                             .size(TileSize).gridSize(6, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.4f).visible(true).build();
         }
+        sprites.add(occupationSprite);
 
         if (glowingSprite == null) {
             glowingSprite =
@@ -521,6 +533,7 @@ public class Town {
                             .layer(SPRITE_LAYER).depth(0.5f).visible(true).build();
             glowingSprite.setGridIndex(0, 0);
         }
+        sprites.add(glowingSprite);
 
         if (selectionSprite == null) {
             selectionSprite =
@@ -530,6 +543,9 @@ public class Town {
                             .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
             selectionSprite.setGridIndex(0, 0);
         }
+        sprites.add(selectionSprite);
+
+        return sprites;
     }
 
     /**
@@ -540,10 +556,8 @@ public class Town {
      */
     public ArrayList<Sprite> getTileSprites(boolean glowing, boolean showTerritories) {
 
-        // Create tile sprites first
-        createTileSprites();
-
-        ArrayList<Sprite> sprites = new ArrayList<>();
+        // Get sprites list
+        ArrayList<Sprite> sprites = getTileSprites();
 
         // Set base sprite
         if (Arrays.stream(facilityLevels).sum() > 0) {
@@ -557,7 +571,8 @@ public class Town {
         } else {
             baseSprite.setGridIndex(baseSpriteSelection, terrain.ordinal());
         }
-        sprites.add(baseSprite);
+
+        Log.e(LOG_TAG, "facilitySlot " + facilitySlots.size());
 
         // Set facility sprite
         if (facilitySlots.size() == 0) {
@@ -565,12 +580,12 @@ public class Town {
                 sprite.setVisible(false);
             }
         } else {
-            int i;
-            for (i = 0; i < facilitySlots.size(); ++i) {
+            int i = 0;
+            for (; i < facilitySlots.size(); ++i) {
                 Sprite sprite = facilitySprites.get(i);
 
                 Facility facility = facilitySlots.get(i);
-                int level = facilityLevels[facility.ordinal()];
+                int level = getFacilityLevel(facility);
                 sprite.setGridIndex(level - 1, facility.ordinal());
 
                 int placement = (i + facilitySpriteSelection) % 3;
@@ -583,7 +598,6 @@ public class Town {
                 }
 
                 sprite.setVisible(true);
-                sprites.add(sprite);
             }
             for (; i < 3; ++i) {
                 Sprite sprite = facilitySprites.get(i);
@@ -599,13 +613,11 @@ public class Town {
                 if (terrain == Terrain.FOREST) {
                     sprite.setGridIndex(0, Facility.values().length);
                     sprite.setVisible(true);
-                    sprites.add(sprite);
                 } else if (terrain == Terrain.HILL) {
                     sprite.setGridIndex(1, Facility.values().length);
                     sprite.setVisible(true);
-                    sprites.add(sprite);
                 } else {
-                    facilitySprites.get(i).setVisible(false);
+                    sprite.setVisible(false);
                 }
             }
         }
@@ -614,28 +626,23 @@ public class Town {
             // Set faction sprite
             factionSprite.setGridIndex(6, faction.ordinal());
             factionSprite.setVisible(true);
-            sprites.add(factionSprite);
 
             // Set border sprite
             int index = 0;
-            for (Town neighbor : neighborTowns) {
+            for (Town neighbor : neighbors) {
                 Sprite borderSprite = borderSprites.get(index);
                 if (neighbor == null || neighbor.getFaction() != faction) {
                     borderSprite.setGridIndex(index, faction.ordinal());
                     borderSprite.setVisible(true);
-                    sprites.add(borderSprite);
                 } else {
                     borderSprite.setVisible(false);
-                    borderSprite.commit();
                 }
                 index++;
             }
         } else {
             factionSprite.setVisible(false);
-            factionSprite.commit();
             for (Sprite border : borderSprites) {
                 border.setVisible(false);
-                border.commit();
             }
         }
 
@@ -643,28 +650,22 @@ public class Town {
         if (occupationStep > 0) {
             occupationSprite.setVisible(true);
             occupationSprite.setGridIndex(occupationStep - 1, occupyingFaction.ordinal());
-            sprites.add(occupationSprite);
         } else {
             occupationSprite.setVisible(false);
-            occupationSprite.commit();
         }
 
         // Show glowing sprites
         if (glowing) {
             glowingSprite.setVisible(true);
-            sprites.add(glowingSprite);
         } else {
             glowingSprite.setVisible(false);
-            glowingSprite.commit();
         }
 
         // Show selection sprites
         if (focused) {
             selectionSprite.setVisible(true);
-            sprites.add(selectionSprite);
         } else {
             selectionSprite.setVisible(false);
-            selectionSprite.commit();
         }
 
         return sprites;
@@ -854,19 +855,9 @@ public class Town {
 
         if (getBattle() != null) {
             return 0;
+        } else {
+            return (int) (GOLD_STEP * deltas[DeltaAttribute.GOLD.ordinal()] * (100.0f / happiness));
         }
-
-        // Count neighbor town's stat
-        int totalNeighborTownLevel = 0;
-        for (Town neighborTown : neighborTowns) {
-            if (neighborTown != null && neighborTown.getFaction() == getFaction()) {
-                totalNeighborTownLevel += neighborTown.getFacilityLevel(Facility.DOWNTOWN);
-            }
-        }
-
-        return (int) (facilityLevels[Facility.MARKET.ordinal()] * BASE_TAX_DELTA_FROM_MARKET_LEVEL *
-                (1.0f + totalNeighborTownLevel * TAX_PROPOSITION_FROM_NEIGHBOR_DOWNTOWN_LEVEL) *
-                (100.0f / happiness));
     }
 
     /**
@@ -877,21 +868,16 @@ public class Town {
 
         if (getBattle() != null) {
             return 0;
+        } else {
+            return (POPULATION_STEP * deltas[DeltaAttribute.POPULATION.ordinal()]);
         }
-
-        if (terrain == Terrain.HEADQUARTER_GRASS) {
-            return HEADQUARTER_POPULATION;
-        }
-
-        return facilityLevels[Facility.FARM.ordinal()] * BASE_POPULATION_DELTA_FROM_FARM_LEVEL +
-               facilityLevels[Facility.DOWNTOWN.ordinal()] * BASE_POPULATION_DELTA_FROM_NEIGHBOR_DOWNTOWN_LEVEL;
     }
 
     /**
      *
      * @return
      */
-    public int collectHappiness() {
+    public int getHappiness() {
 
         return happiness;
     }
@@ -908,55 +894,48 @@ public class Town {
 
     /**
      *
-     * @param towns
+     * @param neighbors
      */
-    public void setNeighborTowns(ArrayList<Town> towns) {
+    public void setNeighbors(ArrayList<Town> neighbors) {
 
-        neighborTowns = towns;
+        this.neighbors = neighbors;
     }
 
     private final static int SPRITE_LAYER = 0;
-    private final static int FACILITY_UPDATE_COUNT = 30;
+    private final static int TOWN_UPDATE_COUNT = 30;
     private final static int MAX_FACILITY_LEVEL = 5;
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
             new int[] { 100, 200, 300, 400, 500};
-    private final static int BASE_FACILITY_EXP_DELTA_PROSPER = 10;
-    private final static int BASE_FACILITY_EXP_DELTA_STALL = 0;
-    private final static int BASE_FACILITY_EXP_DELTA_DETERIORATE = -5;
-    private final static int BASE_FACILITY_EXP_DELTA_FROM_NEIGHBOR_DOWNTOWN = 5;
-    private final static int BASE_FACILITY_EXP_DELTA_FROM_NEIGHBOR_ENEMY = 5;
+    private final static int FACILITY_EXP_STEP = 10;
+    private final static int GOLD_STEP = 10;
+    private final static int POPULATION_STEP = 1;
+    private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;
-    private final static int BASE_HAPPINESS_DELTA_FROM_TOWN_LEVEL = 2;
-    private final static int BASE_HAPPINESS_DELTA_FROM_NEIGHBOR_TOWN = 1;
-    private final static int BASE_HAPPINESS_DELTA_FROM_ENEMY_TOWN = -5;
-    private final static int BASE_TAX_DELTA_FROM_MARKET_LEVEL = 10;
-    private final static float TAX_PROPOSITION_FROM_NEIGHBOR_DOWNTOWN_LEVEL = 0.1f;
-    private final static int BASE_POPULATION_DELTA_FROM_FARM_LEVEL = 20;
-    private final static int BASE_POPULATION_DELTA_FROM_NEIGHBOR_DOWNTOWN_LEVEL = 10;
-    private final static int HEADQUARTER_POPULATION = 50;
     private final static int OCCUPATION_TOTAL_STEP = 5;
-    private final static int OCCUPATION_STEP_UPDATE_TIME = 30;
+    private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 30;
 
     private Event listener;
     private OffsetCoord mapCoord;
     private Terrain terrain;
     private Faction faction;
     private boolean focused = false;
-    private ArrayList<Town> neighborTowns = null;
+    private ArrayList<Town> neighbors = null;
 
     // Occupation
     private Faction occupyingFaction = Faction.NEUTRAL;
     private int occupationStep = 0;
-    private int occupationUpdateLeft = OCCUPATION_STEP_UPDATE_TIME;
+    private int occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
+
+    // Deltas
+    private int[] deltas = new int[DeltaAttribute.values().length];
 
     // Facility
     private int[] facilityLevels;
     private int[] facilityExps;
     private FacilityDevelopment[] facilityDevelopment;
     private ArrayList<Facility> facilitySlots = new ArrayList<>();
+    private int townUpdateLeft = (int)(Math.random()* TOWN_UPDATE_COUNT);
     private int happiness;
-    private Specialities specialties;
-    private int facilityUpdateLeft = FACILITY_UPDATE_COUNT;
 
     // Squad
     private ArrayList<Squad> squads = new ArrayList<>();

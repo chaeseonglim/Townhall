@@ -2,8 +2,6 @@ package com.lifejourney.townhall;
 
 import android.util.Log;
 
-import com.lifejourney.engine2d.OffsetCoord;
-
 public class Villager extends Tribe {
 
     private static final String LOG_TAG = "Villager";
@@ -29,7 +27,7 @@ public class Villager extends Tribe {
         for (Town town: getTowns()) {
             gold += town.collectTax();
             maxPopulation += town.collectPopulation();
-            happiness += town.collectHappiness();
+            happiness += town.getHappiness();
         }
         happiness /= getTowns().size();
 
