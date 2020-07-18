@@ -53,6 +53,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
         }
 
         // Add town information
+        Town villagerHq = null;
         Town.SetTileSize(getTileSize());
         Size mapSize = getMapSize();
         for (int y = 0; y < mapSize.height; ++y) {
@@ -70,6 +71,12 @@ class GameMap extends HexTileMap implements View, Town.Event {
                 Town town = new Town(this, mapCoord, terrain, faction);
                 towns.put(mapCoord, town);
                 townsBySide.get(faction.ordinal()).add(town);
+
+                if ((terrain == Town.Terrain.HEADQUARTER_BADLANDS ||
+                        terrain == Town.Terrain.HEADQUARTER_GRASS) &&
+                        faction == Town.Faction.VILLAGER) {
+                    villagerHq = town;
+                }
             }
         }
         for (Town town: towns.values()) {
@@ -83,6 +90,11 @@ class GameMap extends HexTileMap implements View, Town.Event {
                 -getTileSize().height - topMargin,
                 bottomRightGameCoord.x + getTileSize().width * 2 + leftMargin + rightMargin,
                 bottomRightGameCoord.y + getTileSize().height * 2 + topMargin + bottomMargin);
+
+        // Scroll to headquarter
+        if (villagerHq != null) {
+            scroll(new Point(villagerHq.getMapCoord().toGameCoord().subtract(clippedViewport.center())));
+        }
     }
 
     /**
