@@ -9,10 +9,6 @@ public class Villager extends Tribe {
     public Villager(Squad.Event squadListener, GameMap map) {
 
         super(Town.Faction.VILLAGER, squadListener, map);
-
-        this.maxPopulation = 0;
-        this.population = 0;
-        this.gold = 0;
     }
 
     @Override
@@ -31,8 +27,8 @@ public class Villager extends Tribe {
         }
         happiness /= getTowns().size();
 
-        Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold +
-                " max population: " + maxPopulation + " happiness: " + happiness);
+        //Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold +
+        //        " max population: " + maxPopulation + " happiness: " + happiness);
 
         collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
     }
@@ -73,8 +69,8 @@ public class Villager extends Tribe {
     private final static int COLLECT_UPDATE_TIME = 60;
 
     private int collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
-    private int maxPopulation;
-    private int population;
-    private int gold;
-    private int happiness;
+    private int maxPopulation = 0;
+    private int population = 0;
+    private int gold = 0;
+    private int happiness = 50;
 }

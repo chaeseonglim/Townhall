@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.SizeF;
@@ -287,10 +285,11 @@ public class Town {
             cancelOccupation();
 
             // Or update town
-            if (townUpdateLeft-- == 0) {
+            if (firstUpdate || townUpdateLeft-- == 0) {
                 updateFacility();
                 updateDelta();
                 townUpdateLeft = TOWN_UPDATE_COUNT;
+                firstUpdate = false;
             }
         }
     }
@@ -420,7 +419,6 @@ public class Town {
                     if (facilityLevels[i] == 4 || facilityLevels[i] == 3 || facilityLevels[i] == 0) {
                         // Remove facility from placement if facility level is certain level
                         facilitySlots.remove(Facility.values()[i]);
-                        Log.e(LOG_TAG, "facilitySlots: " + facilitySlots.size());
                     }
                 } else {
                     facilityExps[i] = 0;
@@ -467,9 +465,7 @@ public class Town {
     /**
      *
      */
-    private ArrayList<Sprite> getTileSprites() {
-
-        ArrayList<Sprite> sprites = new ArrayList<>();
+    private void createTileSprites() {
 
         if (baseSprite == null) {
             baseSprite =
@@ -478,7 +474,6 @@ public class Town {
                             .size(TileSize).gridSize(4, 7).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
         }
-        sprites.add(baseSprite);
 
         if (facilitySprites == null) {
             facilitySprites = new ArrayList<>();
@@ -491,7 +486,6 @@ public class Town {
                 facilitySprites.add(facilitySprite);
             }
         }
-        sprites.addAll(facilitySprites);
 
         if (factionSprite == null) {
             factionSprite =
@@ -500,7 +494,6 @@ public class Town {
                             .size(TileSize).gridSize(7, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
         }
-        sprites.add(factionSprite);
 
         if (borderSprites == null) {
             borderSprites = new ArrayList<>();
@@ -514,7 +507,6 @@ public class Town {
                 borderSprites.add(border);
             }
         }
-        sprites.addAll(borderSprites);
 
         if (occupationSprite == null) {
             occupationSprite =
@@ -523,7 +515,6 @@ public class Town {
                             .size(TileSize).gridSize(6, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.4f).visible(true).build();
         }
-        sprites.add(occupationSprite);
 
         if (glowingSprite == null) {
             glowingSprite =
@@ -533,7 +524,6 @@ public class Town {
                             .layer(SPRITE_LAYER).depth(0.5f).visible(true).build();
             glowingSprite.setGridIndex(0, 0);
         }
-        sprites.add(glowingSprite);
 
         if (selectionSprite == null) {
             selectionSprite =
@@ -543,9 +533,6 @@ public class Town {
                             .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
             selectionSprite.setGridIndex(0, 0);
         }
-        sprites.add(selectionSprite);
-
-        return sprites;
     }
 
     /**
@@ -556,8 +543,10 @@ public class Town {
      */
     public ArrayList<Sprite> getTileSprites(boolean glowing, boolean showTerritories) {
 
-        // Get sprites list
-        ArrayList<Sprite> sprites = getTileSprites();
+        ArrayList<Sprite> sprites = new ArrayList<>();
+
+        // create sprites list
+        createTileSprites();
 
         // Set base sprite
         if (Arrays.stream(facilityLevels).sum() > 0) {
@@ -571,13 +560,13 @@ public class Town {
         } else {
             baseSprite.setGridIndex(baseSpriteSelection, terrain.ordinal());
         }
-
-        Log.e(LOG_TAG, "facilitySlot " + facilitySlots.size());
+        sprites.add(baseSprite);
 
         // Set facility sprite
         if (facilitySlots.size() == 0) {
             for (Sprite sprite : facilitySprites) {
                 sprite.setVisible(false);
+                sprite.commit();
             }
         } else {
             int i = 0;
@@ -598,6 +587,7 @@ public class Town {
                 }
 
                 sprite.setVisible(true);
+                sprites.add(sprite);
             }
             for (; i < 3; ++i) {
                 Sprite sprite = facilitySprites.get(i);
@@ -613,11 +603,14 @@ public class Town {
                 if (terrain == Terrain.FOREST) {
                     sprite.setGridIndex(0, Facility.values().length);
                     sprite.setVisible(true);
+                    sprites.add(sprite);
                 } else if (terrain == Terrain.HILL) {
                     sprite.setGridIndex(1, Facility.values().length);
                     sprite.setVisible(true);
+                    sprites.add(sprite);
                 } else {
                     sprite.setVisible(false);
+                    sprite.commit();
                 }
             }
         }
@@ -626,23 +619,28 @@ public class Town {
             // Set faction sprite
             factionSprite.setGridIndex(6, faction.ordinal());
             factionSprite.setVisible(true);
+            sprites.add(factionSprite);
 
             // Set border sprite
             int index = 0;
             for (Town neighbor : neighbors) {
-                Sprite borderSprite = borderSprites.get(index);
+                Sprite border = borderSprites.get(index);
                 if (neighbor == null || neighbor.getFaction() != faction) {
-                    borderSprite.setGridIndex(index, faction.ordinal());
-                    borderSprite.setVisible(true);
+                    border.setGridIndex(index, faction.ordinal());
+                    border.setVisible(true);
+                    sprites.add(border);
                 } else {
-                    borderSprite.setVisible(false);
+                    border.setVisible(false);
+                    border.commit();
                 }
                 index++;
             }
         } else {
             factionSprite.setVisible(false);
+            factionSprite.commit();
             for (Sprite border : borderSprites) {
                 border.setVisible(false);
+                border.commit();
             }
         }
 
@@ -650,22 +648,28 @@ public class Town {
         if (occupationStep > 0) {
             occupationSprite.setVisible(true);
             occupationSprite.setGridIndex(occupationStep - 1, occupyingFaction.ordinal());
+            sprites.add(occupationSprite);
         } else {
             occupationSprite.setVisible(false);
+            occupationSprite.commit();
         }
 
         // Show glowing sprites
         if (glowing) {
             glowingSprite.setVisible(true);
+            sprites.add(glowingSprite);
         } else {
             glowingSprite.setVisible(false);
+            glowingSprite.commit();
         }
 
         // Show selection sprites
         if (focused) {
             selectionSprite.setVisible(true);
+            sprites.add(selectionSprite);
         } else {
             selectionSprite.setVisible(false);
+            selectionSprite.commit();
         }
 
         return sprites;
@@ -907,7 +911,7 @@ public class Town {
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
             new int[] { 100, 200, 300, 400, 500};
     private final static int FACILITY_EXP_STEP = 10;
-    private final static int GOLD_STEP = 10;
+    private final static int GOLD_STEP = 5;
     private final static int POPULATION_STEP = 1;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;
@@ -920,6 +924,7 @@ public class Town {
     private Faction faction;
     private boolean focused = false;
     private ArrayList<Town> neighbors = null;
+    private boolean firstUpdate = true;
 
     // Occupation
     private Faction occupyingFaction = Faction.NEUTRAL;

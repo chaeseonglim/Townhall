@@ -35,6 +35,7 @@ public class EconomyBar extends Widget {
                 .smooth(false).depth(0.1f)
                 .gridSize(5, 1)
                 .layer(20).visible(false).build();
+        happinessSprite.setGridIndex(2, 0);
         addSprite(happinessSprite);
 
         goldTextSprite = new TextSprite.Builder("goldText", "0", 26)
