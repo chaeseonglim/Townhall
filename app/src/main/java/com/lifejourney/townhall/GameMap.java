@@ -130,9 +130,9 @@ class GameMap extends HexTileMap implements View, Town.Event {
         townsBySide.get(town.getFaction().ordinal()).add(town);
 
         if (prevFaction != Town.Faction.NEUTRAL) {
-            redrawTileSprite(prevFaction);
+            redrawTileSprites(prevFaction);
         }
-        redrawTileSprite(town.getFaction());
+        redrawTileSprites(town.getFaction());
 
         listener.onMapTownOccupied(town);
     }
@@ -191,7 +191,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
      * @return
      */
     @Override
-    protected ArrayList<Sprite> getTileSprite(OffsetCoord mapCoord) {
+    protected ArrayList<Sprite> getTileSprites(OffsetCoord mapCoord) {
 
         boolean glowing = (glowingTiles != null && glowingTiles.contains(mapCoord));
         return getTown(mapCoord).getTileSprites(glowing, showTerritories);
@@ -202,7 +202,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
      * @param mapCoord
      */
     @Override
-    public void removeTileSprite(OffsetCoord mapCoord) {
+    public void removeTileSprites(OffsetCoord mapCoord) {
         getTown(mapCoord).removeTileSprites();
     }
 
@@ -210,7 +210,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
      *
      * @param faction
      */
-    public void redrawTileSprite(Town.Faction faction) {
+    public void redrawTileSprites(Town.Faction faction) {
 
         for (Town town: townsBySide.get(faction.ordinal())) {
             redrawTileSprite(town.getMapCoord());

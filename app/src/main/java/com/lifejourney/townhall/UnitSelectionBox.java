@@ -53,8 +53,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
         // Unit button
         Rect unitButtonRegion =
-                new Rect(region.left() + 22, region.bottom() - 67,
-                        58, 64);
+                new Rect(region.left() + 22, region.bottom() - 65,
+                        58, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
                     new Button.Builder(this, unitButtonRegion.clone())
@@ -137,7 +137,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         } else {
-            PointF textPosition = new PointF(-250+75, -155);
+            PointF textPosition = new PointF(-250 + 75, -155);
             addText("클래스를 선택하세요.", new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         }

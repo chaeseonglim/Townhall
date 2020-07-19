@@ -77,7 +77,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
             return 0.0f;
         }
-        public int closeApproachRange() {
+        public int seekingFavorRange() {
             return 20;
         }
         public float meleeAttackRange() {
@@ -302,7 +302,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 }
             }
             if (highestFavor > 0.0f && highestFavorUnit != null) {
-                if (highestFavorDistance > getUnitClass().closeApproachRange()) {
+                if (highestFavorDistance > getUnitClass().seekingFavorRange()) {
                     seek(highestFavorUnit.getPosition(), 1.0f);
                 }
             } else if (lowestFavor < 0.0f && lowestFavorUnit != null) {
