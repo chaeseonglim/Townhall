@@ -161,11 +161,25 @@ public class Battle {
                     return;
                 }
 
-                // Move loser
+                // End fight
                 attacker.endFight();
                 defender.endFight();
                 winner.addExp(WINNER_EXP);
-                loser.moveTo(retreatableCoords.get(0));
+
+                // Move loser to other tile
+                ArrayList<OffsetCoord> retreatableSameFactionCoords = new ArrayList<>();
+                for (OffsetCoord retreatableCoord: retreatableCoords) {
+                    if (map.getTown(retreatableCoord).getFaction() == loser.getFaction()) {
+                        retreatableSameFactionCoords.add(retreatableCoord);
+                    }
+                }
+                if (retreatableSameFactionCoords.size() > 0) {
+                    loser.moveTo(retreatableSameFactionCoords.get(
+                            (int)(Math.random()*retreatableSameFactionCoords.size())));
+                } else {
+                    loser.moveTo(retreatableCoords.get(
+                            (int)(Math.random()*retreatableCoords.size())));
+                }
             }
 
             finished = true;

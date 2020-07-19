@@ -233,13 +233,29 @@ public class Squad extends Object implements Controllable {
             showGlowingTilesToTarget(targetMapCoordToMove, true);
         }
 
-        // Set unit to defensive bonus
-        if (faction == Town.Faction.VILLAGER) {
-            Town town = map.getTown(getMapCoord());
-            for (Unit unit: units) {
-                unit.setDefensiveBonus(town.getDeltas(Town.DeltaAttribute.DEFENSE));
-            }
+        // Set unit to bonus
+        for (Unit unit: units) {
+            unit.setOffensiveBonus(getOffensiveBonus());
+            unit.setDefensiveBonus(getDefensiveBonus());
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getOffensiveBonus() {
+
+        return map.getTown(getMapCoord()).getDeltas(Town.DeltaAttribute.OFFENSIVE);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getDefensiveBonus() {
+
+        return map.getTown(getMapCoord()).getDeltas(Town.DeltaAttribute.DEFENSIVE);
     }
 
     /**
@@ -948,7 +964,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int payGold() {
+    public int getUpkeepGold() {
         int goldUpkeep = 0;
         for (Unit unit: units) {
             goldUpkeep += unit.getGoldUpkeep();
@@ -960,7 +976,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int payPopulation() {
+    public int getPopulation() {
         int populationUpkeep = 0;
         for (Unit unit: units) {
             populationUpkeep += unit.getPopulationUpkeep();

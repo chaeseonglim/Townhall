@@ -20,7 +20,7 @@ public class Villager extends Tribe {
         population = 0;
         happiness = 0;
         for (Town town: getTowns()) {
-            gold += town.collectTax();
+            gold += town.getTax();
             population += town.getPopulation();
             happiness += town.getHappiness();
         }
@@ -28,8 +28,8 @@ public class Villager extends Tribe {
 
         // Pay upkeep
         for (Squad squad: getSquads()) {
-            gold -= squad.payGold();
-            population -= squad.payPopulation();
+            gold -= squad.getUpkeepGold();
+            population -= squad.getPopulation();
         }
 
         getEventHandler().onTribeCollected(this);

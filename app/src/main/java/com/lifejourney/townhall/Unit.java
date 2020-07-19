@@ -647,7 +647,17 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float adjustByDefensiveBonus(float value) {
 
-        return value * (1.0f + 0.1f * defensiveBonus);
+        return value * (1.0f + 0.05f * defensiveBonus);
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    private float adjustByOffensiveBonus(float value) {
+
+        return value * (1.0f + 0.05f * offensiveBonus);
     }
 
     /**
@@ -674,7 +684,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getMeleeDamage() {
 
-        return adjustByLevel(getUnitClass().meleeDamage());
+        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().meleeDamage()));
     }
 
     /**
@@ -683,7 +693,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getRangedDamage() {
 
-        return adjustByLevel(getUnitClass().rangedDamage());
+        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().rangedDamage()));
     }
 
     /**
@@ -847,6 +857,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
         this.defensiveBonus = defenseBonus;
     }
 
+    /**
+     *
+     * @param offensiveBonus
+     */
+    public void setOffensiveBonus(int offensiveBonus) {
+        this.offensiveBonus = offensiveBonus;
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
@@ -858,6 +876,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private Town.Faction faction;
+    private int offensiveBonus;
     private int defensiveBonus;
 
     private int recruitingTimeLeft = RECRUITING_TIME;

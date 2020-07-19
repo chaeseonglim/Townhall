@@ -136,35 +136,35 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             eventHandler.onInfoBoxSwitchToTown(this);
         } else if (button == farmDevelopmentButton) {
             // Farm development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FARM);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.FARM, newDevelopment);
+            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.FARM);
+            Town.DevelopmentPolicy newDevelopment =
+                    Town.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
+            town.setDevelopmentPolicy(Town.Facility.FARM, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal());
         } else if (button == marketDevelopmentButton) {
             // Market development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.MARKET);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.MARKET, newDevelopment);
+            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.MARKET);
+            Town.DevelopmentPolicy newDevelopment =
+                    Town.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
+            town.setDevelopmentPolicy(Town.Facility.MARKET, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 3);
         } else if (button == downtownDevelopmentButton) {
             // Downtown development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.DOWNTOWN);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.DOWNTOWN, newDevelopment);
+            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.DOWNTOWN);
+            Town.DevelopmentPolicy newDevelopment =
+                    Town.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
+            town.setDevelopmentPolicy(Town.Facility.DOWNTOWN, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 6);
         } else if (button == fortressDevelopmentButton) {
             // Fortress development button
-            Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FORTRESS);
-            Town.FacilityDevelopment newDevelopment =
-                    Town.FacilityDevelopment.values()[
-                            (development.ordinal()+1)%Town.FacilityDevelopment.values().length];
-            town.setFacilityDevelopment(Town.Facility.FORTRESS, newDevelopment);
+            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.FORTRESS);
+            Town.DevelopmentPolicy newDevelopment =
+                    Town.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
+            town.setDevelopmentPolicy(Town.Facility.FORTRESS, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 9);
         } else if (button == recruitingButtons[0] ||
                 button == recruitingButtons[1] ||
@@ -199,7 +199,6 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
         show();
 
         if (unitClass != null) {
-
             // Remove unit if there's a unit in target slot
             Unit unitToRemove = squad.getUnit(recruitingSlot);
             if (unitToRemove != null) {
@@ -316,7 +315,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                                 .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
                                 .build();
                 farmDevelopmentButton.setImageSpriteSet(
-                        town.getFacilityDevelopment(Town.Facility.FARM).ordinal());
+                        town.getDevelopmentPolicy(Town.Facility.FARM).ordinal());
                 addWidget(farmDevelopmentButton);
 
                 if (marketDevelopmentButton != null) {
@@ -329,7 +328,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                                 .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
                                 .build();
                 marketDevelopmentButton.setImageSpriteSet(
-                        town.getFacilityDevelopment(Town.Facility.MARKET).ordinal() + 3);
+                        town.getDevelopmentPolicy(Town.Facility.MARKET).ordinal() + 3);
                 addWidget(marketDevelopmentButton);
 
                 if (downtownDevelopmentButton != null) {
@@ -342,7 +341,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                                 .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
                                 .build();
                 downtownDevelopmentButton.setImageSpriteSet(
-                        town.getFacilityDevelopment(Town.Facility.DOWNTOWN).ordinal() + 6);
+                        town.getDevelopmentPolicy(Town.Facility.DOWNTOWN).ordinal() + 6);
                 addWidget(downtownDevelopmentButton);
 
                 if (fortressDevelopmentButton != null) {
@@ -355,7 +354,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                                 .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
                                 .build();
                 fortressDevelopmentButton.setImageSpriteSet(
-                        town.getFacilityDevelopment(Town.Facility.FORTRESS).ordinal() + 9);
+                        town.getDevelopmentPolicy(Town.Facility.FORTRESS).ordinal() + 9);
                 addWidget(fortressDevelopmentButton);
             }
         }
@@ -363,33 +362,55 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
         if (town.getFaction() == Town.Faction.VILLAGER) {
             // Population
             textPosition.setTo(100, -155);
-            addText("인구 / 행복도",
+            addText("인구",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText(town.getPopulation() + " / " + town.getHappiness(),
+            addText(town.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
             // Income
-            textPosition.offset(0, 30);
+            textPosition.offset(150, -30);
             addText("수입",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText(town.collectTax() + "",
+            addText(town.getTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
             // Bonus
+            textPosition.offset(-150, 30);
+            addText("행복도",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
+            addText(town.getHappiness() + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Happiness
+            textPosition.offset(150, -30);
             addText("방어도",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText(town.getDeltas(Town.DeltaAttribute.DEFENSE) + "",
+            addText(town.getDeltas(Town.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
+
+        } else {
+            // Bonus
+            textPosition.setTo(100, -155);
+            addText("방어도",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(town.getDeltas(Town.DeltaAttribute.DEFENSIVE) + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
         }
     }
 
@@ -490,13 +511,46 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
         }
 
         // Stats
-        textPosition.setTo(175, -155);
-        addText("보너스", new SizeF(300, 40), textPosition.clone(),
+        textPosition.setTo(100, -155);
+        addText("인구 소모", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-75, 30);
-        addText("-", new SizeF(150, 40), textPosition.clone(),
+        textPosition.offset(0, 30);
+        addText(squad.getPopulation() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 255));
+
+        textPosition.offset(150, -30);
+        addText("유지비", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        textPosition.offset(0, 30);
+        addText(squad.getUpkeepGold() + "", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 255));
+
+        if (squad.getUnits().size() > 0) {
+            int offensiveBonus = squad.getOffensiveBonus();
+            int defensiveBonus = squad.getDefensiveBonus();
+
+            textPosition.offset(-150, 30);
+            addText("보너스", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+
+            if (offensiveBonus != 0 || defensiveBonus != 0) {
+                textPosition.offset(0, 30);
+                addText("공격 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+
+                textPosition.offset(150, 0);
+                addText("방어 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            } else {
+                textPosition.offset(0, 30);
+                addText("없음", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            }
+        }
     }
 
     private Event eventHandler;

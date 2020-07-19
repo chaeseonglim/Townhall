@@ -202,12 +202,12 @@ public class Town {
         FORTRESS;
     }
 
-    enum FacilityDevelopment {
+    enum DevelopmentPolicy {
         PROSPER,
         STALL,
         DETERIORATE;
 
-        public int baseDevelopmentDelta() {
+        public int developmentDelta() {
             switch (this) {
                 case PROSPER:
                 case STALL:
@@ -221,14 +221,15 @@ public class Town {
     }
 
     enum DeltaAttribute {
-        FARM_DEVELOPMENT,
-        MARKET_DEVELOPMENT,
-        DOWNTOWN_DEVELOPMENT,
-        FORTRESS_DEVELOPMENT,
+        DEVELOPMENT_DOWNTOWN,
+        DEVELOPMENT_FARM,
+        DEVELOPMENT_MARKET,
+        DEVELOPMENT_FORTRESS,
         GOLD,
         POPULATION,
-        DEFENSE,
-        HAPPINESS
+        HAPPINESS,
+        DEFENSIVE,
+        OFFENSIVE
     }
 
 
@@ -253,11 +254,11 @@ public class Town {
         Arrays.fill(this.facilityLevels, 0);
         this.facilityExps = new int[Facility.values().length];
         Arrays.fill(this.facilityExps, 0);
-        this.facilityDevelopment = new FacilityDevelopment[Facility.values().length];
+        this.developmentPolicy = new DevelopmentPolicy[Facility.values().length];
         if (this.terrain.canDevelop()) {
-            Arrays.fill(this.facilityDevelopment, FacilityDevelopment.PROSPER);
+            Arrays.fill(this.developmentPolicy, DevelopmentPolicy.PROSPER);
         } else {
-            Arrays.fill(this.facilityDevelopment, FacilityDevelopment.DETERIORATE);
+            Arrays.fill(this.developmentPolicy, DevelopmentPolicy.DETERIORATE);
         }
         this.happiness = 50;
     }
@@ -343,17 +344,20 @@ public class Town {
         if (faction == Faction.VILLAGER) {
             // Calculate delta from this town
             for (int i = 0; i < Facility.values().length; ++i) {
-                deltas[i] = facilityDevelopment[i].baseDevelopmentDelta() +
+                deltas[i] = developmentPolicy[i].developmentDelta() +
                         terrain.developmentDelta(Facility.values()[i]);
             }
-            deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.happinessDelta();
-            deltas[DeltaAttribute.DEFENSE.ordinal()] = terrain.defenseDelta();
             deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET);
             deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM);
+            deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.happinessDelta();
+            deltas[DeltaAttribute.OFFENSIVE.ordinal()] = 0;
+            deltas[DeltaAttribute.DEFENSIVE.ordinal()] = getFacilityLevel(Facility.FORTRESS) * 2 +
+                    terrain.defenseDelta();
             if (terrain == Terrain.HEADQUARTER_GRASS || terrain == Terrain.HEADQUARTER_BADLANDS) {
                 deltas[DeltaAttribute.GOLD.ordinal()] = 5;
                 deltas[DeltaAttribute.POPULATION.ordinal()] = 5;
-                deltas[DeltaAttribute.DEFENSE.ordinal()] = 5;
+                deltas[DeltaAttribute.OFFENSIVE.ordinal()] = 5;
+                deltas[DeltaAttribute.DEFENSIVE.ordinal()] = 5;
                 deltas[DeltaAttribute.HAPPINESS.ordinal()] = 5;
             }
 
@@ -376,7 +380,7 @@ public class Town {
                 }
             }
             for (int i = 0; i < Facility.values().length; ++i) {
-                if (facilityDevelopment[i] != FacilityDevelopment.DETERIORATE) {
+                if (developmentPolicy[i] != DevelopmentPolicy.DETERIORATE) {
                     deltas[i] += maxDowntownLvl;
                 }
                 deltas[i] -= maxFortressLvl;
@@ -384,14 +388,15 @@ public class Town {
             deltas[DeltaAttribute.HAPPINESS.ordinal()] -= maxFortressLvl;
             deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
-            deltas[DeltaAttribute.DEFENSE.ordinal()] += maxFortressLvl;
+            deltas[DeltaAttribute.DEFENSIVE.ordinal()] += maxFortressLvl;
         } else if (faction != Faction.NEUTRAL) {
             // Facility is deteriorated if it's on enemy's hand
             for (int i = 0; i < Facility.values().length; ++i) {
-                deltas[i] = FacilityDevelopment.DETERIORATE.baseDevelopmentDelta();
+                deltas[i] = DevelopmentPolicy.DETERIORATE.developmentDelta();
             }
             deltas[DeltaAttribute.HAPPINESS.ordinal()] = 0;
-            deltas[DeltaAttribute.DEFENSE.ordinal()] = 0;
+            deltas[DeltaAttribute.OFFENSIVE.ordinal()] = 0;
+            deltas[DeltaAttribute.DEFENSIVE.ordinal()] = terrain.defenseDelta();
     }
 }
 
@@ -435,7 +440,7 @@ public class Town {
 
         // Level up if exp is above the required exp for this level
         for (int i = 0; i < Facility.values().length; ++i) {
-            if (facilityDevelopment[i] == FacilityDevelopment.PROSPER &&
+            if (developmentPolicy[i] == DevelopmentPolicy.PROSPER &&
                     facilityLevels[i] < MAX_FACILITY_LEVEL &&
                     facilityExps[i] >= REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]) {
                 // Check if town have max facility already
@@ -852,26 +857,26 @@ public class Town {
      * @param facility
      * @return
      */
-    public FacilityDevelopment getFacilityDevelopment(Facility facility) {
+    public DevelopmentPolicy getDevelopmentPolicy(Facility facility) {
 
-        return facilityDevelopment[facility.ordinal()];
+        return developmentPolicy[facility.ordinal()];
     }
 
     /**
      *
      * @param facility
-     * @param development
+     * @param policy
      */
-    public void setFacilityDevelopment(Facility facility, FacilityDevelopment development) {
+    public void setDevelopmentPolicy(Facility facility, DevelopmentPolicy policy) {
 
-        facilityDevelopment[facility.ordinal()] = development;
+        developmentPolicy[facility.ordinal()] = policy;
     }
 
     /**
      *
      * @return
      */
-    public int collectTax() {
+    public int getTax() {
 
         if (getBattle() != null) {
             return 0;
@@ -963,7 +968,7 @@ public class Town {
     // Facility
     private int[] facilityLevels;
     private int[] facilityExps;
-    private FacilityDevelopment[] facilityDevelopment;
+    private DevelopmentPolicy[] developmentPolicy;
     private ArrayList<Facility> facilitySlots = new ArrayList<>();
     private int townUpdateLeft = (int)(Math.random()* TOWN_UPDATE_COUNT);
     private int happiness;
