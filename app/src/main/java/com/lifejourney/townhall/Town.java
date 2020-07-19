@@ -107,7 +107,7 @@ public class Town {
             }
         }
 
-        public int bonusDevelopmentDelta(Facility facility) {
+        public int developmentDelta(Facility facility) {
             switch (this) {
                 case GRASS:
                     if (facility == Facility.DOWNTOWN || facility == Facility.FARM) {
@@ -142,7 +142,7 @@ public class Town {
             }
         }
 
-        public int bonusHappinessDelta() {
+        public int happinessDelta() {
             switch (this) {
                 case GRASS:
                     return 1;
@@ -155,7 +155,7 @@ public class Town {
             }
         }
 
-        public int bonusDefenseDelta() {
+        public int defenseDelta() {
             switch (this) {
                 case GRASS:
                 case BADLANDS:
@@ -344,36 +344,29 @@ public class Town {
             // Calculate delta from this town
             for (int i = 0; i < Facility.values().length; ++i) {
                 deltas[i] = facilityDevelopment[i].baseDevelopmentDelta() +
-                        terrain.bonusDevelopmentDelta(Facility.values()[i]);
+                        terrain.developmentDelta(Facility.values()[i]);
             }
-            deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.bonusHappinessDelta();
-            deltas[DeltaAttribute.DEFENSE.ordinal()] = terrain.bonusDefenseDelta();
+            deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.happinessDelta();
+            deltas[DeltaAttribute.DEFENSE.ordinal()] = terrain.defenseDelta();
             deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET);
             deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM);
             if (terrain == Terrain.HEADQUARTER_GRASS || terrain == Terrain.HEADQUARTER_BADLANDS) {
                 deltas[DeltaAttribute.GOLD.ordinal()] = 5;
                 deltas[DeltaAttribute.POPULATION.ordinal()] = 5;
+                deltas[DeltaAttribute.DEFENSE.ordinal()] = 5;
+                deltas[DeltaAttribute.HAPPINESS.ordinal()] = 5;
             }
 
             // Calculate delta from neighbors
+            int maxDowntownLvl = 0;
+            int maxFortressLvl = 0;
             for (Town neighbor : neighbors) {
                 if (neighbor != null) {
                     if (neighbor.getFaction() == getFaction()) {
                         int downtownLvl = neighbor.getFacilityLevel(Facility.DOWNTOWN);
                         int fortressLvl = neighbor.getFacilityLevel(Facility.FORTRESS);
-                        for (int i = 0; i < Facility.values().length; ++i) {
-                            if (facilityDevelopment[i] != FacilityDevelopment.DETERIORATE) {
-                                deltas[i] += downtownLvl;
-                            }
-                            deltas[i] -= fortressLvl;
-                        }
-                        deltas[DeltaAttribute.HAPPINESS.ordinal()] -= fortressLvl;
-                        deltas[DeltaAttribute.GOLD.ordinal()] +=
-                                neighbor.getFacilityLevel(Facility.DOWNTOWN);
-                        deltas[DeltaAttribute.POPULATION.ordinal()] +=
-                                neighbor.getFacilityLevel(Facility.DOWNTOWN);
-                        deltas[DeltaAttribute.DEFENSE.ordinal()] +=
-                                neighbor.getFacilityLevel(Facility.FORTRESS);
+                        maxDowntownLvl = Math.max(maxDowntownLvl, downtownLvl);
+                        maxFortressLvl = Math.max(maxFortressLvl, fortressLvl);
                     } else if (neighbor.getFaction() != Faction.NEUTRAL) {
                         for (int i = 0; i < Facility.values().length; ++i) {
                             deltas[i] -= 1;
@@ -382,6 +375,16 @@ public class Town {
                     }
                 }
             }
+            for (int i = 0; i < Facility.values().length; ++i) {
+                if (facilityDevelopment[i] != FacilityDevelopment.DETERIORATE) {
+                    deltas[i] += maxDowntownLvl;
+                }
+                deltas[i] -= maxFortressLvl;
+            }
+            deltas[DeltaAttribute.HAPPINESS.ordinal()] -= maxFortressLvl;
+            deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
+            deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
+            deltas[DeltaAttribute.DEFENSE.ordinal()] += maxFortressLvl;
         } else if (faction != Faction.NEUTRAL) {
             // Facility is deteriorated if it's on enemy's hand
             for (int i = 0; i < Facility.values().length; ++i) {
@@ -916,6 +919,16 @@ public class Town {
     public void setNeighbors(ArrayList<Town> neighbors) {
 
         this.neighbors = neighbors;
+    }
+
+    /**
+     *
+     * @param attribute
+     * @return
+     */
+    public int getDeltas(DeltaAttribute attribute) {
+
+        return deltas[attribute.ordinal()];
     }
 
     private final static int SPRITE_LAYER = 0;

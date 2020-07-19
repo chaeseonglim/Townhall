@@ -642,6 +642,16 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     /**
      *
+     * @param value
+     * @return
+     */
+    private float adjustByDefensiveBonus(float value) {
+
+        return value * (1.0f + 0.1f * defensiveBonus);
+    }
+
+    /**
+     *
      * @return
      */
     public int getMaxHealth() {
@@ -700,7 +710,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getArmor() {
 
-        return adjustByLevel(getUnitClass().armor());
+        return adjustByDefensiveBonus(adjustByLevel(getUnitClass().armor()));
     }
 
     /**
@@ -829,6 +839,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
         return faction;
     }
 
+    /**
+     *
+     * @param defenseBonus
+     */
+    public void setDefensiveBonus(int defenseBonus) {
+        this.defensiveBonus = defenseBonus;
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
@@ -840,6 +858,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private Town.Faction faction;
+    private int defensiveBonus;
 
     private int recruitingTimeLeft = RECRUITING_TIME;
     private OffsetCoord targetMapPosition;

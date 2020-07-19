@@ -380,6 +380,16 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             addText(town.collectTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
+
+            // Bonus
+            textPosition.offset(0, 30);
+            addText("방어도",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(town.getDeltas(Town.DeltaAttribute.DEFENSE) + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
         }
     }
 

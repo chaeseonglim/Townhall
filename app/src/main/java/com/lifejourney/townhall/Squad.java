@@ -232,6 +232,14 @@ public class Squad extends Object implements Controllable {
             // Show glowing line while focused
             showGlowingTilesToTarget(targetMapCoordToMove, true);
         }
+
+        // Set unit to defensive bonus
+        if (faction == Town.Faction.VILLAGER) {
+            Town town = map.getTown(getMapCoord());
+            for (Unit unit: units) {
+                unit.setDefensiveBonus(town.getDeltas(Town.DeltaAttribute.DEFENSE));
+            }
+        }
     }
 
     /**
