@@ -217,7 +217,7 @@ public class Townhall extends FragmentActivity
      */
     protected void initResources() {
 
-        world = new GameWorld();
+        world = new GameWorld("map.png");
     }
 
     private GameWorld world;

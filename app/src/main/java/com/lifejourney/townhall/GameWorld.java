@@ -14,7 +14,7 @@ public class GameWorld extends World
 
     static final String LOG_TAG = "GameWorld";
 
-    GameWorld() {
+    GameWorld(String mapFileName) {
 
         super();
 
@@ -22,7 +22,7 @@ public class GameWorld extends World
         setDesiredFPS(15.0f);
 
         // Build map
-        map = new GameMap(this, "map.png");
+        map = new GameMap(this, mapFileName);
         map.show();
         addView(map);
 
