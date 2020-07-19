@@ -176,8 +176,12 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                 }
             }
             hide();
+            Unit.UnitClass replacementUnitClass = null;
+            if (squad.getUnit(recruitingSlot) != null) {
+                replacementUnitClass = squad.getUnit(recruitingSlot).getUnitClass();
+            }
             UnitSelectBox unitSelectBox = new UnitSelectBox(this, villager,
-                    getRegion(), getLayer() + 10, 0.0f);
+                    replacementUnitClass, getRegion(), getLayer() + 10, 0.0f);
             addWidget(unitSelectBox);
             unitSelectBox.show();
         }
@@ -200,11 +204,11 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             Unit unitToRemove = squad.getUnit(recruitingSlot);
             if (unitToRemove != null) {
                 squad.removeUnit(recruitingSlot);
-                villager.pay(0, -unitClass.populationUpkeep());
+                villager.pay(0, -unitClass.population());
             }
 
             // Add unit
-            villager.pay(unitClass.goldForPurchase(), unitClass.populationUpkeep());
+            villager.pay(unitClass.costToPurchase(), unitClass.population());
             squad.spawnUnit(unitClass);
             updateSquadInfo();
         }

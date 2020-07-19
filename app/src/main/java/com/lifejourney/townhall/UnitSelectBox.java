@@ -20,12 +20,14 @@ public class UnitSelectBox extends Widget implements Button.Event{
         void onUnitBuilderBoxSelected(UnitSelectBox infoBox, Unit.UnitClass unitClass);
     }
 
-    public UnitSelectBox(Event eventHandler, Villager villager, Rect region, int layer, float depth) {
+    public UnitSelectBox(Event eventHandler, Villager villager, Unit.UnitClass replacementClass,
+                         Rect region, int layer, float depth) {
 
         super(region, layer, depth);
 
         this.eventHandler = eventHandler;
         this.villager = villager;
+        this.replacementUnitClass = replacementClass;
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("unit_builder_box.png")
@@ -63,7 +65,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
                             .numImageSpriteSet(Unit.UnitClass.values().length * 4)
                             .layer(layer + 1).build();
             Unit.UnitClass unitClass = Unit.UnitClass.values()[i];
-            if (villager.isAffordable(unitClass)) {
+            if (villager.isAffordable(unitClass, replacementUnitClass)) {
                 unitButtons[i].setImageSpriteSet(i * 4);
             } else {
                 unitButtons[i].setImageSpriteSet(i * 4 + 2);
@@ -83,7 +85,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
     public void update() {
 
         // Do this here for preventing auto show/hide affect to the button status
-        if (selectedUnitClass == null || !villager.isAffordable(selectedUnitClass)) {
+        if (selectedUnitClass == null || !villager.isAffordable(selectedUnitClass, replacementUnitClass)) {
             selectButton.hide();
             cancelButton.show();
         } else {
@@ -194,7 +196,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
             // Reset prev button
             if (selectedUnitClass != null) {
                 int unitClassIndex = selectedUnitClass.ordinal();
-                if (villager.isAffordable(selectedUnitClass)) {
+                if (villager.isAffordable(selectedUnitClass, replacementUnitClass)) {
                     unitButtons[unitClassIndex].setImageSpriteSet(unitClassIndex * 4);
                 } else {
                     unitButtons[unitClassIndex].setImageSpriteSet(unitClassIndex * 4 + 2);
@@ -204,7 +206,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
             // Set selectedUnitClass
             int unitClassIndex = pressedUnitClass.ordinal();
             if (selectedUnitClass != null && selectedUnitClass == pressedUnitClass) {
-                if (villager.isAffordable(selectedUnitClass)) {
+                if (villager.isAffordable(selectedUnitClass, replacementUnitClass)) {
                     button.setImageSpriteSet(unitClassIndex * 4);
                 } else {
                     button.setImageSpriteSet(unitClassIndex * 4 + 2);
@@ -214,7 +216,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
             } else {
                 selectedUnitClass = pressedUnitClass;
 
-                if (villager.isAffordable(selectedUnitClass)) {
+                if (villager.isAffordable(selectedUnitClass, replacementUnitClass)) {
                     button.setImageSpriteSet(unitClassIndex * 4 + 1);
                 } else {
                     button.setImageSpriteSet(unitClassIndex * 4 + 3);
@@ -231,5 +233,6 @@ public class UnitSelectBox extends Widget implements Button.Event{
     private Button selectButton;
     private Button[] unitButtons = new Button[Unit.UnitClass.values().length];
     private Unit.UnitClass selectedUnitClass = null;
+    private Unit.UnitClass replacementUnitClass;
     private int textIndex = 0;
 }

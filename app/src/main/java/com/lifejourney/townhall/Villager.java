@@ -92,10 +92,14 @@ public class Villager extends Tribe {
      * @param unitClass
      * @return
      */
-    public boolean isAffordable(Unit.UnitClass unitClass) {
+    public boolean isAffordable(Unit.UnitClass unitClass, Unit.UnitClass replacementClass) {
 
-        return (getGold() >= unitClass.goldForPurchase() &&
-                getPopulation() >= unitClass.populationUpkeep());
+        int replacementPopulation = 0;
+        if (replacementClass != null) {
+            replacementPopulation = replacementClass.population();
+        }
+        return (getGold() >= unitClass.costToPurchase() &&
+                getPopulation() + replacementPopulation >= unitClass.population());
     }
 
     private final static int COLLECT_UPDATE_TIME = 60;

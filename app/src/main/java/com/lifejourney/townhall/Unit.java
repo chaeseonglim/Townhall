@@ -23,7 +23,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 case SWORDMAN:
                     return "검병";
                 case LONGBOWMAN:
-                    return "궁수";
+                    return "장궁병";
                 default:
                     return "";
             }
@@ -47,7 +47,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     return null;
             }
         }
-        public int goldForPurchase() {
+        public int costToPurchase() {
             switch (this) {
                 case SWORDMAN:
                     return 200;
@@ -57,7 +57,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     return 0;
             }
         }
-        public int goldUpkeep() {
+        public int costUpkeep() {
             switch (this) {
                 case SWORDMAN:
                     return 50;
@@ -67,7 +67,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     return 0;
             }
         }
-        public int populationUpkeep() {
+        public int population() {
             switch (this) {
                 case SWORDMAN:
                     return 5;
@@ -132,7 +132,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 case SWORDMAN:
                     return 30;
                 case LONGBOWMAN:
-                    return 40;
+                    return 50;
             }
             return 0;
         }
@@ -150,7 +150,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 case SWORDMAN:
                     return 10.0f;
                 case LONGBOWMAN:
-                    return 3.0f;
+                    return 5.0f;
             }
             return 0.0f;
         }
@@ -175,6 +175,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public float rangedEvasion() {
             switch (this) {
                 case SWORDMAN:
+                    return 0.5f;
                 case LONGBOWMAN:
                     return 0.1f;
             }
@@ -204,12 +205,12 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public int requiredExp(int level) {
             return 100*level;
         }
-        public int maxHealth() {
+        public int health() {
             switch (this) {
                 case SWORDMAN:
                     return 100;
                 case LONGBOWMAN:
-                    return 60;
+                    return 50;
             }
             return 0;
         }
@@ -220,13 +221,31 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return 0.1f;
         }
         public float maxForce() {
-            return 3.0f;
+            switch (this) {
+                case SWORDMAN:
+                    return 3.0f;
+                case LONGBOWMAN:
+                    return 1.5f;
+            }
+            return 0;
         }
         public float maxVelocity() {
-            return 2.0f;
+            switch (this) {
+                case SWORDMAN:
+                    return 2.0f;
+                case LONGBOWMAN:
+                    return 2.0f;
+            }
+            return 0;
         }
         public float mass() {
-            return 5.0f;
+            switch (this) {
+                case SWORDMAN:
+                    return 5.0f;
+                case LONGBOWMAN:
+                    return 3.0f;
+            }
+            return 0;
         }
     }
 
@@ -292,7 +311,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         targetMapPosition = new OffsetCoord(getPosition());
         unitClass = builder.unitClass;
         faction = builder.faction;
-        health = getUnitClass().maxHealth();
+        health = getUnitClass().health();
         level = 1;
     }
 
@@ -627,7 +646,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public int getMaxHealth() {
 
-        return adjustByLevel(getUnitClass().maxHealth());
+        return adjustByLevel(getUnitClass().health());
     }
 
     /**
@@ -791,7 +810,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getGoldUpkeep() {
-        return unitClass.goldUpkeep();
+        return unitClass.costUpkeep();
     }
 
     /**
@@ -799,7 +818,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getPopulationUpkeep() {
-        return unitClass.populationUpkeep();
+        return unitClass.population();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Town.Faction getFaction() {
+        return faction;
     }
 
     private final static int MAX_LEVEL = 10;
