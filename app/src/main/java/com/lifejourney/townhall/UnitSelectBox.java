@@ -11,20 +11,21 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class UnitSelectionBox extends Widget implements Button.Event{
+public class UnitSelectBox extends Widget implements Button.Event{
 
-    private final String LOG_TAG = "UnitSelectionBox";
+    private final String LOG_TAG = "UnitSelectBox";
 
     public interface Event {
 
-        void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass);
+        void onUnitBuilderBoxSelected(UnitSelectBox infoBox, Unit.UnitClass unitClass);
     }
 
-    public UnitSelectionBox(Event listener, Rect region, int layer, float depth) {
+    public UnitSelectBox(Event eventHandler, Villager villager, Rect region, int layer, float depth) {
 
         super(region, layer, depth);
 
-        this.listener = listener;
+        this.eventHandler = eventHandler;
+        this.villager = villager;
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("unit_builder_box.png")
@@ -54,17 +55,22 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         // Unit button
         Rect unitButtonRegion =
                 new Rect(region.left() + 22, region.bottom() - 65,
-                        58, 60);
+                        56, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
                     new Button.Builder(this, unitButtonRegion.clone())
                             .imageSpriteAsset("unit_selection_btn.png")
-                            .numImageSpriteSet(Unit.UnitClass.values().length*2)
+                            .numImageSpriteSet(Unit.UnitClass.values().length * 4)
                             .layer(layer + 1).build();
-            unitButtons[i].setImageSpriteSet(i*2);
+            Unit.UnitClass unitClass = Unit.UnitClass.values()[i];
+            if (villager.isAffordable(unitClass)) {
+                unitButtons[i].setImageSpriteSet(i * 4);
+            } else {
+                unitButtons[i].setImageSpriteSet(i * 4 + 2);
+            }
             addWidget(unitButtons[i]);
 
-            unitButtonRegion.offset(63, 0);
+            unitButtonRegion.offset(62, 0);
         }
 
         updateUnitInfo();
@@ -76,7 +82,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
     @Override
     public void update() {
 
-        if (selectedUnitClass == null) {
+        // Do this here for preventing auto show/hide affect to the button status
+        if (selectedUnitClass == null || !villager.isAffordable(selectedUnitClass)) {
             selectButton.hide();
             cancelButton.show();
         } else {
@@ -170,36 +177,56 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
         if (button == cancelButton) {
             // Cancel button
-            setVisible(false);
-            listener.onUnitBuilderBoxSelected(this, null);
+            eventHandler.onUnitBuilderBoxSelected(this, null);
         } else if (button == selectButton) {
             // Select button
-            setVisible(false);
-            listener.onUnitBuilderBoxSelected(this, selectedUnitClass);
+            eventHandler.onUnitBuilderBoxSelected(this, selectedUnitClass);
         } else {
             // Unit selection buttons
+            Unit.UnitClass pressedUnitClass = null;
             for (int i = 0; i < unitButtons.length; ++i) {
                 if (button == unitButtons[i]) {
-                    int myButtonSetAlpha;
-                    if (selectedUnitClass != null && selectedUnitClass.ordinal() == i) {
-                        myButtonSetAlpha = 0;
-                        selectedUnitClass = null;
-                    } else {
-                        myButtonSetAlpha = 1;
-                        selectedUnitClass = Unit.UnitClass.values()[i];
-                    }
-                    for (int j = 0; j < unitButtons.length; ++j) {
-                        unitButtons[j].setImageSpriteSet(j * 2);
-                    }
-                    button.setImageSpriteSet(i * 2 + myButtonSetAlpha);
-                    updateUnitInfo();
+                    pressedUnitClass = Unit.UnitClass.values()[i];
                     break;
                 }
             }
+
+            // Reset prev button
+            if (selectedUnitClass != null) {
+                int unitClassIndex = selectedUnitClass.ordinal();
+                if (villager.isAffordable(selectedUnitClass)) {
+                    unitButtons[unitClassIndex].setImageSpriteSet(unitClassIndex * 4);
+                } else {
+                    unitButtons[unitClassIndex].setImageSpriteSet(unitClassIndex * 4 + 2);
+                }
+            }
+
+            // Set selectedUnitClass
+            int unitClassIndex = pressedUnitClass.ordinal();
+            if (selectedUnitClass != null && selectedUnitClass == pressedUnitClass) {
+                if (villager.isAffordable(selectedUnitClass)) {
+                    button.setImageSpriteSet(unitClassIndex * 4);
+                } else {
+                    button.setImageSpriteSet(unitClassIndex * 4 + 2);
+                }
+
+                selectedUnitClass = null;
+            } else {
+                selectedUnitClass = pressedUnitClass;
+
+                if (villager.isAffordable(selectedUnitClass)) {
+                    button.setImageSpriteSet(unitClassIndex * 4 + 1);
+                } else {
+                    button.setImageSpriteSet(unitClassIndex * 4 + 3);
+                }
+            }
+
+            updateUnitInfo();
         }
     }
 
-    private Event listener;
+    private Event eventHandler;
+    private Villager villager;
     private Button cancelButton;
     private Button selectButton;
     private Button[] unitButtons = new Button[Unit.UnitClass.values().length];

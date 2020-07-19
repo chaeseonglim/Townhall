@@ -10,7 +10,7 @@ import java.util.ListIterator;
 
 public class GameWorld extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event,
-                SpeedControl.Event, InfoBox.Event {
+                SpeedControl.Event, InfoBox.Event, Tribe.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -18,6 +18,7 @@ public class GameWorld extends World
 
         super();
 
+        // Set FPS
         setDesiredFPS(15.0f);
 
         // Build map
@@ -31,18 +32,17 @@ public class GameWorld extends World
         tribes.add(new Bandit(this, map));
 
         // Build UIs
-        EconomyBar economyBar = new EconomyBar(villager,
-            new Rect(20, 10, 440, 64), 20, 0.0f);
+        economyBar = new EconomyBar(villager, new Rect(20, 10, 440, 64),
+                20, 0.0f);
         economyBar.show();
         addWidget(economyBar);
 
-        dateBar = new DateBar(
-                new Rect(480, 10, 230, 64), 20, 0.0f);
+        dateBar = new DateBar(new Rect(480, 10, 230, 64), 20, 0.0f);
         dateBar.show();
         addWidget(dateBar);
 
-        speedControl = new SpeedControl(this,
-            new Rect(1080, 10, 174, 64), 20, 0.0f);
+        speedControl = new SpeedControl(this, new Rect(1080, 10, 174, 64),
+                20, 0.0f);
         speedControl.show();
         addWidget(speedControl);
 
@@ -155,13 +155,6 @@ public class GameWorld extends World
         for (Tribe tribe: tribes) {
             tribe.update();
         }
-
-        // Update date
-        if (--dayUpdateTimeLeft == 0) {
-            day++;
-            dateBar.setDay(day);
-            dayUpdateTimeLeft = DAY_UPDATE_PERIOD;
-        }
     }
 
     /**
@@ -214,6 +207,16 @@ public class GameWorld extends World
         } else {
             squadBuilderButton.hide();
         }
+    }
+
+    /**
+     *
+     * @param tribe
+     */
+    @Override
+    public void onTribeCollected(Tribe tribe) {
+
+        economyBar.refresh();
     }
 
     /**
@@ -295,6 +298,9 @@ public class GameWorld extends World
     public void onSquadUnitAdded(Squad squad, Unit unit) {
 
         addUnit(unit);
+        if (squad.getFaction() == Town.Faction.VILLAGER) {
+            economyBar.refresh();
+        }
     }
 
     /**
@@ -306,6 +312,9 @@ public class GameWorld extends World
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
         removeUnit(unit);
+        if (squad.getFaction() == Town.Faction.VILLAGER) {
+            economyBar.refresh();
+        }
     }
 
     /**
@@ -327,7 +336,6 @@ public class GameWorld extends World
 
         if (button == infoButton) {
             // Info button is pressed
-
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
 
@@ -338,7 +346,6 @@ public class GameWorld extends World
             }
         } else if (button == squadBuilderButton) {
             // Squad builder button is pressed
-
             Squad squad = tribes.get(0).spawnSquad(focusedTown.getMapCoord().toGameCoord(),
                     Town.Faction.VILLAGER);
             focusedTown.setFocus(false);
@@ -434,7 +441,8 @@ public class GameWorld extends World
         Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
                 700, 400);
 
-        InfoBox infoBox = new InfoBox(this, infoBoxRegion, 30, 0.0f, squad);
+        InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), infoBoxRegion,
+                30, 0.0f, squad);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -479,19 +487,7 @@ public class GameWorld extends World
         removeObject(unit);
     }
 
-    /**
-     *
-     * @return
-     */
-    public int getDay() {
-        return day;
-    }
-
-    private static final int DAY_UPDATE_PERIOD = 90;
-
     private boolean paused = false;
-    private int day = 0;
-    private int dayUpdateTimeLeft = DAY_UPDATE_PERIOD;
     private int playSpeedReturnedFromWidget = 0;
 
     private GameMap map;
@@ -500,6 +496,7 @@ public class GameWorld extends World
     private Button infoButton;
     private Button homeButton;
     private Button settingButton;
+    private EconomyBar economyBar;
     private DateBar dateBar;
     private SpeedControl speedControl;
 

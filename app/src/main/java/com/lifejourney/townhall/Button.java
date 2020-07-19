@@ -2,11 +2,8 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 
-import com.lifejourney.engine2d.Engine2D;
-import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -82,7 +79,7 @@ public class Button extends Widget {
 
         super(builder.region, builder.layer, builder.depth);
 
-        listener = builder.eventHandler;
+        eventHandler = builder.eventHandler;
         shadow = builder.shadow;
 
         if (!builder.imageSpriteAsset.equals("")) {
@@ -185,8 +182,8 @@ public class Button extends Widget {
                     if (messageSprite != null) {
                         messageSprite.setPositionOffset(new PointF(0, 0));
                     }
-                    if (checkIfInputEventInRegion(event) && listener != null) {
-                        listener.onButtonPressed(this);
+                    if (checkIfInputEventInRegion(event) && eventHandler != null) {
+                        eventHandler.onButtonPressed(this);
                     }
                     handledResult = true;
                 } else {
@@ -235,7 +232,7 @@ public class Button extends Widget {
 
     private static int UID = 0;
 
-    private Event listener;
+    private Event eventHandler;
     private Sprite messageSprite = null;
     private Sprite imageSprite = null;
     private int imageSpriteSet = 0;

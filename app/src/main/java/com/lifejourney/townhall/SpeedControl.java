@@ -1,17 +1,9 @@
 package com.lifejourney.townhall;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-
-import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
-import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class SpeedControl extends Widget implements Button.Event {
 
@@ -22,10 +14,10 @@ public class SpeedControl extends Widget implements Button.Event {
         void onSpeedControlUpdate(SpeedControl speedControl);
     };
 
-    public SpeedControl(Event listener, Rect region, int layer, float depth) {
+    public SpeedControl(Event eventHandler, Rect region, int layer, float depth) {
 
         super(region, layer, depth);
-        this.listener = listener;
+        this.eventHandler = eventHandler;
 
         Sprite bg = new Sprite.Builder("speed_control.png")
                 .size(new SizeF(getRegion().size()))
@@ -48,30 +40,6 @@ public class SpeedControl extends Widget implements Button.Event {
         playButton.setImageSpriteSet(playSpeed);
         playButton.show();
         addWidget(playButton);
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void close() {
-
-        super.close();
-    }
-
-    @Override
-    public void update() {
-
-        super.update();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void commit() {
-
-        super.commit();
     }
 
     /**
@@ -107,7 +75,7 @@ public class SpeedControl extends Widget implements Button.Event {
             pauseButton.setImageSpriteSet(1);
             playButton.setImageSpriteSet(playSpeed);
         }
-        listener.onSpeedControlUpdate(this);
+        eventHandler.onSpeedControlUpdate(this);
     }
 
     /**
@@ -115,11 +83,12 @@ public class SpeedControl extends Widget implements Button.Event {
      * @return
      */
     int getPlaySpeed() {
+
         return playSpeed;
     }
 
+    private Event eventHandler;
     private Button pauseButton;
     private Button playButton;
-    private Event listener;
     private int playSpeed = 1;  /* 0: paused, 1: play 1x, 2: play 2x, 3: play 3x */
 }

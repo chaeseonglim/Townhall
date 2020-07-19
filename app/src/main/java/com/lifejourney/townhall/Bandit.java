@@ -2,12 +2,12 @@ package com.lifejourney.townhall;
 
 public class Bandit extends Tribe {
 
-    public Bandit(Squad.Event squadListener, GameMap map) {
+    public Bandit(Event eventHandler, GameMap map) {
 
-        super(Town.Faction.BANDIT, squadListener, map);
+        super(eventHandler, Town.Faction.BANDIT, map);
 
-        spawnSquad(getHeadquarterCoord().toGameCoord(), getFaction(),
-                Unit.UnitClass.SWORD, Unit.UnitClass.LONGBOW, Unit.UnitClass.LONGBOW);
+        spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
+                Unit.UnitClass.SWORDMAN, Unit.UnitClass.LONGBOWMAN, Unit.UnitClass.LONGBOWMAN);
     }
 
     /**

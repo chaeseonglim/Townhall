@@ -15,14 +15,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private static final String LOG_TAG = "Unit";
 
     enum UnitClass {
-        SWORD,
-        LONGBOW;
+        SWORDMAN,
+        LONGBOWMAN;
 
         String toGameString() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return "검병";
-                case LONGBOW:
+                case LONGBOWMAN:
                     return "궁수";
                 default:
                     return "";
@@ -30,9 +30,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         Point spriteGridIndex() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return new Point(1, 0);
-                case LONGBOW:
+                case LONGBOWMAN:
                     return new Point(2, 0);
                 default:
                     return null;
@@ -40,28 +40,58 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public Shape shape() {
             switch (this) {
-                case SWORD:
-                case LONGBOW:
+                case SWORDMAN:
+                case LONGBOWMAN:
                     return new Shape(8.0f);
                 default:
                     return null;
             }
         }
+        public int goldForPurchase() {
+            switch (this) {
+                case SWORDMAN:
+                    return 200;
+                case LONGBOWMAN:
+                    return 200;
+                default:
+                    return 0;
+            }
+        }
+        public int goldUpkeep() {
+            switch (this) {
+                case SWORDMAN:
+                    return 50;
+                case LONGBOWMAN:
+                    return 50;
+                default:
+                    return 0;
+            }
+        }
+        public int populationUpkeep() {
+            switch (this) {
+                case SWORDMAN:
+                    return 5;
+                case LONGBOWMAN:
+                    return 5;
+                default:
+                    return 0;
+            }
+        }
         public float favor(UnitClass unitClassType) {
             switch (this) {
-                case SWORD:
-                    if (unitClassType == SWORD) {
+                case SWORDMAN:
+                    if (unitClassType == SWORDMAN) {
                         return 0.1f;
                     }
-                    else if (unitClassType == LONGBOW) {
+                    else if (unitClassType == LONGBOWMAN) {
                         return 0.5f;
                     }
                     break;
-                case LONGBOW:
-                    if (unitClassType == SWORD) {
+                case LONGBOWMAN:
+                    if (unitClassType == SWORDMAN) {
                         return -0.5f;
                     }
-                    else if (unitClassType == LONGBOW) {
+                    else if (unitClassType == LONGBOWMAN) {
                         return -0.1f;
                     }
                     break;
@@ -70,9 +100,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public float awareness() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 150.0f;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 64.0f;
             }
             return 0.0f;
@@ -82,79 +112,79 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public float meleeAttackRange() {
             switch (this) {
-                case SWORD:
-                case LONGBOW:
+                case SWORDMAN:
+                case LONGBOWMAN:
                     return 26.0f;
             }
             return 0.0f;
         }
         public float rangedAttackRange() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 0.0f;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 150.0f;
             }
             return 0.0f;
         }
         public int meleeAttackSpeed() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 30;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 40;
             }
             return 0;
         }
         public int rangedAttackSpeed() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 0;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 40;
             }
             return 0;
         }
         public float meleeDamage() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 10.0f;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 3.0f;
             }
             return 0.0f;
         }
         public float rangedDamage() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 0.0f;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 5.0f;
             }
             return 0.0f;
         }
         public float meleeEvasion() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 0.2f;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 0.05f;
             }
             return 0.0f;
         }
         public float rangedEvasion() {
             switch (this) {
-                case SWORD:
-                case LONGBOW:
+                case SWORDMAN:
+                case LONGBOWMAN:
                     return 0.1f;
             }
             return 0.0f;
         }
         public float armor() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 0.2f;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 0.05f;
             }
             return 0.0f;
@@ -162,10 +192,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public int earnedExp(int level) {
             int expEarned = 0;
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     expEarned = 10;
                     break;
-                case LONGBOW:
+                case LONGBOWMAN:
                     expEarned = 10;
                     break;
             }
@@ -176,9 +206,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public int maxHealth() {
             switch (this) {
-                case SWORD:
+                case SWORDMAN:
                     return 100;
-                case LONGBOW:
+                case LONGBOWMAN:
                     return 60;
             }
             return 0;
@@ -754,6 +784,22 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public boolean isFighting() {
         return opponents != null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getGoldUpkeep() {
+        return unitClass.goldUpkeep();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getPopulationUpkeep() {
+        return unitClass.populationUpkeep();
     }
 
     private final static int MAX_LEVEL = 10;

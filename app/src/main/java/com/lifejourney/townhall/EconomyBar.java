@@ -3,6 +3,7 @@ package com.lifejourney.townhall;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -38,7 +39,7 @@ public class EconomyBar extends Widget {
         happinessSprite.setGridIndex(2, 0);
         addSprite(happinessSprite);
 
-        goldTextSprite = new TextSprite.Builder("goldText", "0", 26)
+        goldTextSprite = new TextSprite.Builder("goldText", " ", 26)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(Paint.Align.RIGHT)
@@ -49,7 +50,7 @@ public class EconomyBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(goldTextSprite);
 
-        popTextSprite = new TextSprite.Builder("popText", "+0", 26)
+        popTextSprite = new TextSprite.Builder("popText", " ", 26)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(Paint.Align.RIGHT)
@@ -64,54 +65,41 @@ public class EconomyBar extends Widget {
     /**
      *
      */
-    @Override
-    public void close() {
+    public void refresh() {
 
-        super.close();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void update() {
-
-        super.update();
-
-        if (--updateTimeLeft == 0) {
-            goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(villager.getGold()));
-            int popDiff = villager.getMaxPopulation() - villager.getPopulation();
-            popTextSprite.setText(((popDiff >= 0)?"+":"-")+ popDiff);
-            if (villager.getHappiness() > 80) {
-                happinessSprite.setGridIndex(0, 0);
-            } else if (villager.getHappiness() > 60) {
-                happinessSprite.setGridIndex(1, 0);
-            } else if (villager.getHappiness() > 40) {
-                happinessSprite.setGridIndex(2, 0);
-            } else if (villager.getHappiness() > 20) {
-                happinessSprite.setGridIndex(3, 0);
-            } else  {
-                happinessSprite.setGridIndex(4, 0);
-            }
-            updateTimeLeft = UPDATE_PERIOD;
+        // Set gold text
+        if (villager.getGold() >= 0) {
+            goldTextSprite.setFontColor(Color.rgb(255, 255, 0));
+        } else {
+            goldTextSprite.setFontColor(Color.rgb(255, 0, 0));
         }
+        goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(villager.getGold()));
 
+        // Set population text
+        int population = villager.getPopulation();
+        if (population >= 0) {
+            popTextSprite.setFontColor(Color.rgb(255, 255, 0));
+        } else {
+            popTextSprite.setFontColor(Color.rgb(255, 0, 0));
+        }
+        popTextSprite.setText(((population >= 0)?"+":"")+ population);
+
+        // Set happiness text
+        if (villager.getHappiness() > 80) {
+            happinessSprite.setGridIndex(0, 0);
+        } else if (villager.getHappiness() > 60) {
+            happinessSprite.setGridIndex(1, 0);
+        } else if (villager.getHappiness() > 40) {
+            happinessSprite.setGridIndex(2, 0);
+        } else if (villager.getHappiness() > 20) {
+            happinessSprite.setGridIndex(3, 0);
+        } else  {
+            happinessSprite.setGridIndex(4, 0);
+        }
     }
-
-    /**
-     *
-     */
-    @Override
-    public void commit() {
-
-        super.commit();
-    }
-
-    private static final int UPDATE_PERIOD = 30;
 
     private Villager villager;
     private Sprite happinessSprite;
     private TextSprite goldTextSprite;
     private TextSprite popTextSprite;
-    private int updateTimeLeft = UPDATE_PERIOD;
 }

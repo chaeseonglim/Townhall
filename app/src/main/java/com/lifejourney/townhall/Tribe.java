@@ -8,15 +8,21 @@ public abstract class Tribe implements Squad.Event {
 
     private static final String LOG_TAG = "Tribe";
 
-    public Tribe(Town.Faction faction, Squad.Event squadListener, GameMap map) {
+    public interface Event extends Squad.Event {
 
+        void onTribeCollected(Tribe tribe);
+    }
+
+
+    public Tribe(Event eventHandler, Town.Faction faction, GameMap map) {
+
+        this.eventHandler = eventHandler;
         this.faction = faction;
         this.map = map;
-        this.squadListener = squadListener;
         this.towns = map.getTownsBySide(faction);
         for (Town town: towns) {
             if (town.getTerrain() == Town.Terrain.HEADQUARTER_GRASS) {
-                this.headquarterCoord = town.getMapCoord();
+                this.headquarterPosition = town.getMapCoord();
             }
         }
     }
@@ -33,7 +39,7 @@ public abstract class Tribe implements Squad.Event {
     @Override
     public void onSquadCreated(Squad squad) {
 
-        squadListener.onSquadCreated(squad);
+        eventHandler.onSquadCreated(squad);
     }
 
     /**
@@ -43,7 +49,7 @@ public abstract class Tribe implements Squad.Event {
     @Override
     public void onSquadDestroyed(Squad squad) {
 
-        squadListener.onSquadDestroyed(squad);
+        eventHandler.onSquadDestroyed(squad);
     }
 
     /**
@@ -53,7 +59,7 @@ public abstract class Tribe implements Squad.Event {
     @Override
     public void onSquadFocused(Squad squad) {
 
-        squadListener.onSquadFocused(squad);
+        eventHandler.onSquadFocused(squad);
     }
 
     /**
@@ -65,7 +71,7 @@ public abstract class Tribe implements Squad.Event {
     @Override
     public void onSquadMoved(Squad squad, OffsetCoord oldMapCoord, OffsetCoord newMapCoord) {
 
-        squadListener.onSquadMoved(squad, oldMapCoord, newMapCoord);
+        eventHandler.onSquadMoved(squad, oldMapCoord, newMapCoord);
     }
 
     /**
@@ -76,7 +82,7 @@ public abstract class Tribe implements Squad.Event {
     @Override
     public void onSquadUnitAdded(Squad squad, Unit unit) {
 
-        squadListener.onSquadUnitAdded(squad, unit);
+        eventHandler.onSquadUnitAdded(squad, unit);
 
     }
 
@@ -88,7 +94,7 @@ public abstract class Tribe implements Squad.Event {
     @Override
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
-        squadListener.onSquadUnitRemoved(squad, unit);
+        eventHandler.onSquadUnitRemoved(squad, unit);
     }
 
     /**
@@ -119,9 +125,9 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public OffsetCoord getHeadquarterCoord() {
+    public OffsetCoord getHeadquarterPosition() {
 
-        return headquarterCoord;
+        return headquarterPosition;
     }
 
     /**
@@ -142,10 +148,28 @@ public abstract class Tribe implements Squad.Event {
         return towns;
     }
 
+    /**
+     *
+     * @return
+     */
+    public ArrayList<Squad> getSquads() {
+
+        return squads;
+    }
+
+    /**
+     *
+     * @return
+     */
+    protected Event getEventHandler() {
+
+        return eventHandler;
+    }
+
+    private Event eventHandler;
     private Town.Faction faction;
-    private Squad.Event squadListener;
     private GameMap map;
-    private OffsetCoord headquarterCoord;
+    private OffsetCoord headquarterPosition;
     private ArrayList<Squad> squads = new ArrayList<>();
-    private ArrayList<Town> towns = new ArrayList<>();
+    private ArrayList<Town> towns;
 }

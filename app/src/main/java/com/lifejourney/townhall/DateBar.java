@@ -10,9 +10,6 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 public class DateBar extends Widget {
 
     private final String LOG_TAG = "DateBar";
@@ -44,28 +41,28 @@ public class DateBar extends Widget {
      *
      */
     @Override
-    public void close() {
+    public void update() {
+        super.update();
 
-        super.close();
+        // Update date
+        if (--updateTimeLeft == 0) {
+            day++;
+            dateTextSprite.setText(day + " days");
+            updateTimeLeft = DAY_UPDATE_PERIOD;
+        }
     }
 
     /**
      *
+     * @return
      */
-    @Override
-    public void commit() {
-
-        super.commit();
+    public int getDay() {
+        return day;
     }
 
-    /**
-     *
-     * @param day
-     */
-    public void setDay(int day) {
+    private static final int DAY_UPDATE_PERIOD = 90;
 
-        dateTextSprite.setText(day + " days");
-    }
-
+    private int day = 0;
+    private int updateTimeLeft = DAY_UPDATE_PERIOD;
     private TextSprite dateTextSprite;
 }

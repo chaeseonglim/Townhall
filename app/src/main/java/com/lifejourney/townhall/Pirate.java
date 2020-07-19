@@ -2,9 +2,9 @@ package com.lifejourney.townhall;
 
 public class Pirate extends Tribe {
 
-    public Pirate(Squad.Event squadListener, GameMap map) {
+    public Pirate(Event eventHandler, GameMap map) {
 
-        super(Town.Faction.PIRATE, squadListener, map);
+        super(eventHandler, Town.Faction.PIRATE, map);
     }
 
     /**

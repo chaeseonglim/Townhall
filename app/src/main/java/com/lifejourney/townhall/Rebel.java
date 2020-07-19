@@ -2,9 +2,9 @@ package com.lifejourney.townhall;
 
 public class Rebel extends Tribe {
 
-    public Rebel(Squad.Event squadListener, GameMap map) {
+    public Rebel(Event eventHandler, GameMap map) {
 
-        super(Town.Faction.VILLAGER, squadListener, map);
+        super(eventHandler, Town.Faction.VILLAGER, map);
     }
 
     /**

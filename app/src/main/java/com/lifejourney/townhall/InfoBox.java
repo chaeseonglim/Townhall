@@ -11,7 +11,7 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Event {
+public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event {
 
     private final String LOG_TAG = "InfoBox";
 
@@ -22,11 +22,11 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         void onInfoBoxClosed(InfoBox infoBox);
     }
 
-    public InfoBox(Event listener, Rect region, int layer, float depth, Town town) {
+    public InfoBox(Event eventHandler, Rect region, int layer, float depth, Town town) {
 
         super(region, layer, depth);
 
-        this.listener = listener;
+        this.eventHandler = eventHandler;
         this.town = town;
 
         // Background sprite
@@ -50,10 +50,12 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
 
     }
 
-    public InfoBox(Event listener, Rect region, int layer, float depth, Squad squad) {
+    public InfoBox(Event eventHandler, Villager villager, Rect region, int layer, float depth, Squad squad) {
 
         super(region, layer, depth);
-        this.listener = listener;
+
+        this.eventHandler = eventHandler;
+        this.villager = villager;
         this.squad = squad;
 
         // Background sprite
@@ -127,11 +129,11 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         if (button == closeButton) {
             // Close button
             setVisible(false);
-            listener.onInfoBoxClosed(this);
+            eventHandler.onInfoBoxClosed(this);
         } else if (button == toTownButton) {
             // To town button
             setVisible(false);
-            listener.onInfoBoxSwitchToTown(this);
+            eventHandler.onInfoBoxSwitchToTown(this);
         } else if (button == farmDevelopmentButton) {
             // Farm development button
             Town.FacilityDevelopment development = town.getFacilityDevelopment(Town.Facility.FARM);
@@ -174,10 +176,10 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                 }
             }
             hide();
-            UnitSelectionBox unitSelectionBox =
-                    new UnitSelectionBox(this, getRegion(), getLayer()+10, 0.0f);
-            addWidget(unitSelectionBox);
-            unitSelectionBox.show();
+            UnitSelectBox unitSelectBox = new UnitSelectBox(this, villager,
+                    getRegion(), getLayer() + 10, 0.0f);
+            addWidget(unitSelectBox);
+            unitSelectBox.show();
         }
     }
 
@@ -187,13 +189,22 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
      * @param unitClass
      */
     @Override
-    public void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass) {
+    public void onUnitBuilderBoxSelected(UnitSelectBox infoBox, Unit.UnitClass unitClass) {
 
         removeWidget(infoBox);
         show();
 
         if (unitClass != null) {
-            squad.removeUnit(recruitingSlot);
+
+            // Remove unit if there's a unit in target slot
+            Unit unitToRemove = squad.getUnit(recruitingSlot);
+            if (unitToRemove != null) {
+                squad.removeUnit(recruitingSlot);
+                villager.pay(0, -unitClass.populationUpkeep());
+            }
+
+            // Add unit
+            villager.pay(unitClass.goldForPurchase(), unitClass.populationUpkeep());
             squad.spawnUnit(unitClass);
             updateSquadInfo();
         }
@@ -228,7 +239,8 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             townStatus += " (전투중)";
         } else if (town.isOccupying()) {
             townStatus += " (점령중)";
-        } else if (town.getFaction() == Town.Faction.VILLAGER){
+        } else if (town.getFaction() == Town.Faction.VILLAGER &&
+            town.getTotalFacilityLevel() < 5){
             townStatus += " (개발중)";
         }
         textPosition.offset(75, 30);
@@ -351,7 +363,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText("없음 / 없음",
+            addText(town.getPopulation() + " / " + town.getHappiness(),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
@@ -361,16 +373,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText("없음",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
-            // Influence
-            textPosition.offset(0, 30);
-            addText("영향도",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText("없음",
+            addText(town.collectTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         }
@@ -411,7 +414,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
 
         if (squad.getUnits().isEmpty()) {
             textPosition.offset(0, 50);
-            addText("유닛이 없습니다.\n충원 버튼을 누르세요.", new SizeF(300, 80), textPosition.clone(),
+            addText("유닛이 없습니다.\n하단 모집 버튼을 누르세요.", new SizeF(300, 80), textPosition.clone(),
                     Color.rgb(255, 255, 255));
             textPosition.offset(0, 8);
         }
@@ -419,7 +422,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             textPosition.offset(0, 30);
             String unitStr = unit.getUnitClass().toGameString() + " Lv" + unit.getLevel();
             if (unit.isRecruiting()) {
-                unitStr += " (충원중)";
+                unitStr += " (모집중)";
             }
             addText(unitStr, new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
@@ -428,7 +431,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         if (squad.getFaction() == Town.Faction.VILLAGER) {
             // Recruiting
             textPosition.offset(-75, 30);
-            addText("충원", new SizeF(150, 40), textPosition.clone(),
+            addText("모집", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
             if (!squad.isMoving() &&
@@ -482,7 +485,10 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                 Color.rgb(255, 255, 255));
     }
 
-    private Event listener;
+    private Event eventHandler;
+    private Villager villager;
+    private Town town;
+    private Squad squad;
     private Button closeButton;
     private Button toTownButton;
     private Button farmDevelopmentButton;
@@ -491,6 +497,4 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
     private Button fortressDevelopmentButton;
     private Button[] recruitingButtons = new Button[3];
     private int recruitingSlot = 0;
-    private Town town;
-    private Squad squad;
 }

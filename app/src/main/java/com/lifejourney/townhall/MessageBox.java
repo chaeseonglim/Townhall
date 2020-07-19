@@ -73,7 +73,7 @@ public class MessageBox extends Widget {
     private MessageBox(Builder builder) {
 
         super(builder.region, builder.layer, builder.depth);
-        listener = builder.listener;
+        eventHandler = builder.listener;
 
         Sprite imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
                 .size(new SizeF(getRegion().size()))
@@ -152,8 +152,8 @@ public class MessageBox extends Widget {
                     }
                     pages.get(currentPage).show();
 
-                    if (listener != null) {
-                        listener.onMessageBoxTouched(this);
+                    if (eventHandler != null) {
+                        eventHandler.onMessageBoxTouched(this);
                     }
                     return true;
                 }
@@ -210,7 +210,7 @@ public class MessageBox extends Widget {
 
     private final int TEXT_MARGIN = 12;
 
-    private Event listener;
+    private Event eventHandler;
     private ArrayList<Sprite> pages;
     private int currentPage = 0;
     private boolean touched = false;

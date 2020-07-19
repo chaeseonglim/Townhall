@@ -243,9 +243,9 @@ public class Town {
         TileSize = tileSize;
     }
 
-    public Town(Event listener, OffsetCoord mapCoord, Terrain terrain, Faction faction) {
+    public Town(Event eventHandler, OffsetCoord mapCoord, Terrain terrain, Faction faction) {
 
-        this.listener = listener;
+        this.eventHandler = eventHandler;
         this.mapCoord = mapCoord;
         this.terrain = terrain;
         this.faction = faction;
@@ -286,8 +286,8 @@ public class Town {
 
             // Or update town
             if (firstUpdate || townUpdateLeft-- == 0) {
-                updateFacility();
                 updateDelta();
+                updateFacility();
                 townUpdateLeft = TOWN_UPDATE_COUNT;
                 firstUpdate = false;
             }
@@ -304,7 +304,7 @@ public class Town {
             this.occupyingFaction = occupyingFaction;
             this.occupationStep = 0;
             this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
-            listener.onTownUpdated(this);
+            eventHandler.onTownUpdated(this);
         } else if (--this.occupationUpdateForThisStepLeft == 0) {
             if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
                 // If occupation is done, change the owner faction of town
@@ -312,12 +312,12 @@ public class Town {
                 this.faction = occupyingFaction;
                 this.occupationStep = 0;
                 this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
-                listener.onTownOccupied(this, prevFaction);
+                eventHandler.onTownOccupied(this, prevFaction);
             } else {
                 // Or just update the occupation status
                 this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
             }
-            listener.onTownUpdated(this);
+            eventHandler.onTownUpdated(this);
         }
     }
 
@@ -328,7 +328,7 @@ public class Town {
 
         // Cancel occupation process
         if (this.occupationStep > 0) {
-            listener.onTownUpdated(this);
+            eventHandler.onTownUpdated(this);
         }
         this.occupyingFaction = Faction.NEUTRAL;
         this.occupationStep = 0;
@@ -350,6 +350,10 @@ public class Town {
             deltas[DeltaAttribute.DEFENSE.ordinal()] = terrain.bonusDefenseDelta();
             deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET);
             deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM);
+            if (terrain == Terrain.HEADQUARTER_GRASS || terrain == Terrain.HEADQUARTER_BADLANDS) {
+                deltas[DeltaAttribute.GOLD.ordinal()] = 5;
+                deltas[DeltaAttribute.POPULATION.ordinal()] = 5;
+            }
 
             // Calculate delta from neighbors
             for (Town neighbor : neighbors) {
@@ -432,7 +436,7 @@ public class Town {
                     facilityLevels[i] < MAX_FACILITY_LEVEL &&
                     facilityExps[i] >= REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]) {
                 // Check if town have max facility already
-                if (Arrays.stream(facilityLevels).sum() < MAX_FACILITY_LEVEL) {
+                if (getTotalFacilityLevel() < MAX_FACILITY_LEVEL) {
                     // Check if facility need additional slots
                     if (facilityLevels[i] == 0 || facilityLevels[i] == 3 || facilityLevels[i] == 4) {
                         if (facilitySlots.size() < terrain.facilitySlots()) {
@@ -458,7 +462,7 @@ public class Town {
 
         // If any facility level is changed, redraw the tile
         if (!Arrays.equals(prevLevels, facilityLevels)) {
-            listener.onTownUpdated(this);
+            eventHandler.onTownUpdated(this);
         }
     }
 
@@ -549,7 +553,7 @@ public class Town {
         createTileSprites();
 
         // Set base sprite
-        if (Arrays.stream(facilityLevels).sum() > 0) {
+        if (getTotalFacilityLevel() > 0) {
             if (terrain == Terrain.FOREST) {
                 baseSprite.setGridIndex(0, Terrain.GRASS.ordinal());
             } else if (terrain == Terrain.HILL) {
@@ -791,7 +795,7 @@ public class Town {
     public void setFocus(boolean focused) {
 
         this.focused = focused;
-        listener.onTownUpdated(this);
+        eventHandler.onTownUpdated(this);
     }
 
     /**
@@ -820,6 +824,15 @@ public class Town {
     public int getFacilityLevel(Facility facility) {
 
         return facilityLevels[facility.ordinal()];
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getTotalFacilityLevel() {
+
+        return Arrays.stream(facilityLevels).sum();
     }
 
     /**
@@ -868,7 +881,7 @@ public class Town {
      *
      * @return
      */
-    public int collectPopulation() {
+    public int getPopulation() {
 
         if (getBattle() != null) {
             return 0;
@@ -918,7 +931,7 @@ public class Town {
     private final static int OCCUPATION_TOTAL_STEP = 5;
     private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 30;
 
-    private Event listener;
+    private Event eventHandler;
     private OffsetCoord mapCoord;
     private Terrain terrain;
     private Faction faction;

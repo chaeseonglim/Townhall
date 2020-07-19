@@ -1,44 +1,43 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 public class Villager extends Tribe {
 
     private static final String LOG_TAG = "Villager";
 
-    public Villager(Squad.Event squadListener, GameMap map) {
+    public Villager(Tribe.Event eventHandler, GameMap map) {
 
-        super(Town.Faction.VILLAGER, squadListener, map);
+        super(eventHandler, Town.Faction.VILLAGER, map);
     }
 
     @Override
     public void update() {
 
-        if (collectUpdateTimeLeft-- > 0) {
+        if (collectTimeLeft-- > 0) {
             return;
         }
 
-        maxPopulation = 0;
+        // Collect taxes
+        population = 0;
         happiness = 0;
         for (Town town: getTowns()) {
             gold += town.collectTax();
-            maxPopulation += town.collectPopulation();
+            population += town.getPopulation();
             happiness += town.getHappiness();
         }
         happiness /= getTowns().size();
 
+        // Pay upkeep
+        for (Squad squad: getSquads()) {
+            gold -= squad.payGold();
+            population -= squad.payPopulation();
+        }
+
+        getEventHandler().onTribeCollected(this);
+
         //Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold +
         //        " max population: " + maxPopulation + " happiness: " + happiness);
 
-        collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getMaxPopulation() {
-        return maxPopulation;
+        collectTimeLeft = COLLECT_UPDATE_TIME;
     }
 
     /**
@@ -46,6 +45,7 @@ public class Villager extends Tribe {
      * @return
      */
     public int getPopulation() {
+
         return population;
     }
 
@@ -54,6 +54,7 @@ public class Villager extends Tribe {
      * @return
      */
     public int getGold() {
+
         return gold;
     }
 
@@ -62,15 +63,46 @@ public class Villager extends Tribe {
      * @return
      */
     public int getHappiness() {
+
         return happiness;
     }
 
+    /**
+     *
+     * @param gold
+     */
+    public void pay(int gold) {
+
+        this.gold -= gold;
+    }
+
+    /**
+     *
+     * @param gold
+     * @param population
+     */
+    public void pay(int gold, int population) {
+
+        this.gold -= gold;
+        this.population -= population;
+    }
+
+    /**
+     *
+     * @param unitClass
+     * @return
+     */
+    public boolean isAffordable(Unit.UnitClass unitClass) {
+
+        return (getGold() >= unitClass.goldForPurchase() &&
+                getPopulation() >= unitClass.populationUpkeep());
+    }
 
     private final static int COLLECT_UPDATE_TIME = 60;
+    private final static int STARTING_GOLD = 250;
 
-    private int collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
-    private int maxPopulation = 0;
+    private int collectTimeLeft = 1;
     private int population = 0;
-    private int gold = 0;
+    private int gold = STARTING_GOLD;
     private int happiness = 50;
 }

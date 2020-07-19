@@ -109,11 +109,11 @@ public class Squad extends Object implements Controllable {
 
         super(builder);
         spriteSize = ICON_SPRITE_SIZE;
-        listener = builder.listener;
+        eventHandler = builder.listener;
         faction = builder.faction;
         map = builder.map;
 
-        listener.onSquadCreated(this);
+        eventHandler.onSquadCreated(this);
     }
 
     /**
@@ -123,10 +123,10 @@ public class Squad extends Object implements Controllable {
     public void close() {
 
         for (Unit unit: units) {
-            listener.onSquadUnitRemoved(this, unit);
+            eventHandler.onSquadUnitRemoved(this, unit);
             unit.close();
         }
-        listener.onSquadDestroyed(this);
+        eventHandler.onSquadDestroyed(this);
 
         super.close();
     }
@@ -325,7 +325,7 @@ public class Squad extends Object implements Controllable {
 
         prevMapCoord = getMapCoord().clone();
         setPosition(targetMapCoord.toGameCoord());
-        listener.onSquadMoved(this, prevMapCoord, targetMapCoord);
+        eventHandler.onSquadMoved(this, prevMapCoord, targetMapCoord);
     }
 
     /**
@@ -422,7 +422,7 @@ public class Squad extends Object implements Controllable {
 
         units.add(unit);
 
-        listener.onSquadUnitAdded(this, unit);
+        eventHandler.onSquadUnitAdded(this, unit);
     }
 
     /**
@@ -444,7 +444,7 @@ public class Squad extends Object implements Controllable {
     public void removeUnit(Unit unit) {
 
         units.remove(unit);
-        listener.onSquadUnitRemoved(this, unit);
+        eventHandler.onSquadUnitRemoved(this, unit);
         unit.close();
     }
 
@@ -460,7 +460,7 @@ public class Squad extends Object implements Controllable {
 
         Unit unit = units.get(index);
         units.remove(index);
-        listener.onSquadUnitRemoved(this, unit);
+        eventHandler.onSquadUnitRemoved(this, unit);
         unit.close();
     }
 
@@ -469,7 +469,22 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     ArrayList<Unit> getUnits() {
+
         return units;
+    }
+
+    /**
+     *
+     * @param index
+     * @return
+     */
+    Unit getUnit(int index) {
+
+        if (units.size() <= index) {
+            return null;
+        }
+
+        return units.get(index);
     }
 
     /**
@@ -616,7 +631,7 @@ public class Squad extends Object implements Controllable {
             if (unit.isKilled()) {
                 expEarned += unit.getUnitClass().earnedExp(unit.getLevel());
                 iter.remove();
-                listener.onSquadUnitRemoved(this, unit);
+                eventHandler.onSquadUnitRemoved(this, unit);
                 unit.close();
             }
         }
@@ -713,7 +728,7 @@ public class Squad extends Object implements Controllable {
             if (isMoving()) {
                 targetStick.setVisible(true);
             }
-            listener.onSquadFocused(this);
+            eventHandler.onSquadFocused(this);
         }
         else {
             currentStick.setGridIndex(0, faction.ordinal());
@@ -921,6 +936,30 @@ public class Squad extends Object implements Controllable {
         return false;
     }
 
+    /**
+     *
+     * @return
+     */
+    public int payGold() {
+        int goldUpkeep = 0;
+        for (Unit unit: units) {
+            goldUpkeep += unit.getGoldUpkeep();
+        }
+        return goldUpkeep;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int payPopulation() {
+        int populationUpkeep = 0;
+        for (Unit unit: units) {
+            populationUpkeep += unit.getPopulationUpkeep();
+        }
+        return populationUpkeep;
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static float MIN_DISTANCE_START_DRAGGING = 30;
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
@@ -935,7 +974,7 @@ public class Squad extends Object implements Controllable {
     private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
 
-    private Event listener;
+    private Event eventHandler;
     private GameMap map;
     private Town.Faction faction;
     private SizeF spriteSize;
