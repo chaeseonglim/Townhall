@@ -252,11 +252,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
     public static class Builder {
 
         private UnitClass unitClass;
-        private Town.Faction faction;
+        private Tribe.Faction faction;
 
         private PointF position = new PointF();
 
-        public Builder(UnitClass unitClass, Town.Faction faction) {
+        public Builder(UnitClass unitClass, Tribe.Faction faction) {
             this.unitClass = unitClass;
             this.faction = faction;
         }
@@ -289,13 +289,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private static class PrivateBuilder<T extends Unit.PrivateBuilder<T>> extends CollidableObject.Builder<T> {
 
         private UnitClass unitClass;
-        private Town.Faction faction;
+        private Tribe.Faction faction;
 
         public PrivateBuilder(PointF position, UnitClass unitClass) {
             super(position);
             this.unitClass = unitClass;
         }
-        public PrivateBuilder side(Town.Faction faction) {
+        public PrivateBuilder side(Tribe.Faction faction) {
             this.faction = faction;
             return this;
         }
@@ -845,7 +845,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      * @return
      */
-    public Town.Faction getFaction() {
+    public Tribe.Faction getFaction() {
         return faction;
     }
 
@@ -875,7 +875,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private int health;
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
-    private Town.Faction faction;
+    private Tribe.Faction faction;
     private int offensiveBonus;
     private int defensiveBonus;
 

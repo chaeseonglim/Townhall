@@ -6,7 +6,7 @@ public class Villager extends Tribe {
 
     public Villager(Tribe.Event eventHandler, GameMap map) {
 
-        super(eventHandler, Town.Faction.VILLAGER, map);
+        super(eventHandler, Tribe.Faction.VILLAGER, map);
     }
 
     @Override

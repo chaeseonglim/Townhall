@@ -48,7 +48,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
         setMapSize(new Size(bitmap.getWidth(), bitmap.getHeight()));
 
         // Init town list
-        for (int i = 0; i < Town.Faction.values().length; ++i) {
+        for (int i = 0; i < Tribe.Faction.values().length; ++i) {
             townsBySide.add(new ArrayList<Town>());
         }
 
@@ -66,7 +66,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
                 // faction
                 ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
-                Town.Faction faction = Town.Faction.values()[ordinal];
+                Tribe.Faction faction = Tribe.Faction.values()[ordinal];
 
                 Town town = new Town(this, mapCoord, terrain, faction);
                 towns.put(mapCoord, town);
@@ -74,7 +74,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
                 if ((terrain == Town.Terrain.HEADQUARTER_BADLANDS ||
                         terrain == Town.Terrain.HEADQUARTER_GRASS) &&
-                        faction == Town.Faction.VILLAGER) {
+                        faction == Tribe.Faction.VILLAGER) {
                     villagerHq = town;
                 }
             }
@@ -124,12 +124,12 @@ class GameMap extends HexTileMap implements View, Town.Event {
      * @param prevFaction
      */
     @Override
-    public void onTownOccupied(Town town, Town.Faction prevFaction) {
+    public void onTownOccupied(Town town, Tribe.Faction prevFaction) {
 
         townsBySide.get(prevFaction.ordinal()).remove(town);
         townsBySide.get(town.getFaction().ordinal()).add(town);
 
-        if (prevFaction != Town.Faction.NEUTRAL) {
+        if (prevFaction != Tribe.Faction.NEUTRAL) {
             redrawTileSprites(prevFaction);
         }
         redrawTileSprites(town.getFaction());
@@ -210,7 +210,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
      *
      * @param faction
      */
-    public void redrawTileSprites(Town.Faction faction) {
+    public void redrawTileSprites(Tribe.Faction faction) {
 
         for (Town town: townsBySide.get(faction.ordinal())) {
             redrawTileSprite(town.getMapCoord());
@@ -378,7 +378,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
      * @param faction
      * @return
      */
-    public ArrayList<Town> getTownsBySide(Town.Faction faction) {
+    public ArrayList<Town> getTownsBySide(Tribe.Faction faction) {
 
         return townsBySide.get(faction.ordinal());
     }
@@ -392,7 +392,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
     private int bottomMargin = 32;
     private boolean dragging = false;
     private HashMap<OffsetCoord, Town> towns = new HashMap<>();
-    private ArrayList<ArrayList<Town>> townsBySide = new ArrayList<>(Town.Faction.values().length);
+    private ArrayList<ArrayList<Town>> townsBySide = new ArrayList<>(Tribe.Faction.values().length);
     private ArrayList<OffsetCoord> glowingTiles = null;
     private PointF lastTouchedScreenCoord;
     private PointF lastDraggingScreenCoord;

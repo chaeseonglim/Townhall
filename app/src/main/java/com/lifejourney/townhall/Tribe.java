@@ -8,13 +8,38 @@ public abstract class Tribe implements Squad.Event {
 
     private static final String LOG_TAG = "Tribe";
 
+    enum Faction {
+        NEUTRAL,
+        VILLAGER,
+        BANDIT,
+        PIRATE,
+        REBEL;
+
+        String toGameString() {
+            switch(this) {
+                case NEUTRAL:
+                    return "중립";
+                case VILLAGER:
+                    return "주민";
+                case BANDIT:
+                    return "산적";
+                case PIRATE:
+                    return "해적";
+                case REBEL:
+                    return "반란군";
+                default:
+                    return "";
+            }
+        }
+    }
+
     public interface Event extends Squad.Event {
 
         void onTribeCollected(Tribe tribe);
     }
 
 
-    public Tribe(Event eventHandler, Town.Faction faction, GameMap map) {
+    public Tribe(Event eventHandler, Faction faction, GameMap map) {
 
         this.eventHandler = eventHandler;
         this.faction = faction;
@@ -103,7 +128,7 @@ public abstract class Tribe implements Squad.Event {
      * @param faction
      * @param unitClass
      */
-    public Squad spawnSquad(PointF position, Town.Faction faction, Unit.UnitClass... unitClass) {
+    public Squad spawnSquad(PointF position, Faction faction, Unit.UnitClass... unitClass) {
 
         Squad squad = new Squad.Builder(this, position, map, faction).build();
         if (unitClass.length >= 1) {
@@ -134,7 +159,7 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public Town.Faction getFaction() {
+    public Faction getFaction() {
 
         return faction;
     }
@@ -167,7 +192,7 @@ public abstract class Tribe implements Squad.Event {
     }
 
     private Event eventHandler;
-    private Town.Faction faction;
+    private Faction faction;
     private GameMap map;
     private OffsetCoord headquarterPosition;
     private ArrayList<Squad> squads = new ArrayList<>();

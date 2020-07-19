@@ -16,7 +16,7 @@ public class Town {
 
         void onTownUpdated(Town town);
 
-        void onTownOccupied(Town town, Faction oldFaction);
+        void onTownOccupied(Town town, Tribe.Faction oldFaction);
     }
 
     enum Terrain {
@@ -81,9 +81,9 @@ public class Town {
                 case HEADQUARTER_BADLANDS:
                     return true;
                 case MOUNTAIN:
-                    return squad.getFaction() == Faction.BANDIT;
+                    return squad.getFaction() == Tribe.Faction.BANDIT;
                 case RIVER:
-                    return squad.getFaction() == Faction.PIRATE;
+                    return squad.getFaction() == Tribe.Faction.PIRATE;
                 case UNKNOWN:
                 default:
                     return false;
@@ -170,31 +170,6 @@ public class Town {
         }
     }
 
-    enum Faction {
-        NEUTRAL,
-        VILLAGER,
-        BANDIT,
-        PIRATE,
-        REBEL;
-
-        String toGameString() {
-            switch(this) {
-                case NEUTRAL:
-                    return "중립";
-                case VILLAGER:
-                    return "주민";
-                case BANDIT:
-                    return "도적";
-                case PIRATE:
-                    return "해적";
-                case REBEL:
-                    return "반란군";
-                default:
-                    return "";
-            }
-        }
-    }
-
     enum Facility {
         DOWNTOWN,
         FARM,
@@ -244,7 +219,7 @@ public class Town {
         TileSize = tileSize;
     }
 
-    public Town(Event eventHandler, OffsetCoord mapCoord, Terrain terrain, Faction faction) {
+    public Town(Event eventHandler, OffsetCoord mapCoord, Terrain terrain, Tribe.Faction faction) {
 
         this.eventHandler = eventHandler;
         this.mapCoord = mapCoord;
@@ -298,7 +273,7 @@ public class Town {
     /**
      *
      */
-    private void updateOccupation(Faction occupyingFaction) {
+    private void updateOccupation(Tribe.Faction occupyingFaction) {
 
         if (this.occupyingFaction != occupyingFaction) {
             // If someone new try to occupy this, update information
@@ -309,7 +284,7 @@ public class Town {
         } else if (--this.occupationUpdateForThisStepLeft == 0) {
             if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
                 // If occupation is done, change the owner faction of town
-                Faction prevFaction = this.faction;
+                Tribe.Faction prevFaction = this.faction;
                 this.faction = occupyingFaction;
                 this.occupationStep = 0;
                 this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
@@ -331,7 +306,7 @@ public class Town {
         if (this.occupationStep > 0) {
             eventHandler.onTownUpdated(this);
         }
-        this.occupyingFaction = Faction.NEUTRAL;
+        this.occupyingFaction = Tribe.Faction.NEUTRAL;
         this.occupationStep = 0;
         this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
     }
@@ -341,7 +316,7 @@ public class Town {
      */
     private void updateDelta() {
 
-        if (faction == Faction.VILLAGER) {
+        if (faction == Tribe.Faction.VILLAGER) {
             // Calculate delta from this town
             for (int i = 0; i < Facility.values().length; ++i) {
                 deltas[i] = developmentPolicy[i].developmentDelta() +
@@ -371,7 +346,7 @@ public class Town {
                         int fortressLvl = neighbor.getFacilityLevel(Facility.FORTRESS);
                         maxDowntownLvl = Math.max(maxDowntownLvl, downtownLvl);
                         maxFortressLvl = Math.max(maxFortressLvl, fortressLvl);
-                    } else if (neighbor.getFaction() != Faction.NEUTRAL) {
+                    } else if (neighbor.getFaction() != Tribe.Faction.NEUTRAL) {
                         for (int i = 0; i < Facility.values().length; ++i) {
                             deltas[i] -= 1;
                         }
@@ -389,7 +364,7 @@ public class Town {
             deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] += maxFortressLvl;
-        } else if (faction != Faction.NEUTRAL) {
+        } else if (faction != Tribe.Faction.NEUTRAL) {
             // Facility is deteriorated if it's on enemy's hand
             for (int i = 0; i < Facility.values().length; ++i) {
                 deltas[i] = DevelopmentPolicy.DETERIORATE.developmentDelta();
@@ -847,7 +822,7 @@ public class Town {
      *
      * @return
      */
-    public Faction getFaction() {
+    public Tribe.Faction getFaction() {
 
         return faction;
     }
@@ -913,7 +888,7 @@ public class Town {
      */
     public boolean isOccupying() {
 
-        return (occupyingFaction != Faction.NEUTRAL && getBattle() == null &&
+        return (occupyingFaction != Tribe.Faction.NEUTRAL && getBattle() == null &&
                 !squads.get(0).isEliminated());
     }
 
@@ -952,13 +927,13 @@ public class Town {
     private Event eventHandler;
     private OffsetCoord mapCoord;
     private Terrain terrain;
-    private Faction faction;
+    private Tribe.Faction faction;
     private boolean focused = false;
     private ArrayList<Town> neighbors = null;
     private boolean firstUpdate = true;
 
     // Occupation
-    private Faction occupyingFaction = Faction.NEUTRAL;
+    private Tribe.Faction occupyingFaction = Tribe.Faction.NEUTRAL;
     private int occupationStep = 0;
     private int occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
 

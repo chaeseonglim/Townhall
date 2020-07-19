@@ -4,7 +4,7 @@ public class Pirate extends Tribe {
 
     public Pirate(Event eventHandler, GameMap map) {
 
-        super(eventHandler, Town.Faction.PIRATE, map);
+        super(eventHandler, Tribe.Faction.PIRATE, map);
     }
 
     /**

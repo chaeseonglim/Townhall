@@ -185,7 +185,7 @@ public class GameWorld extends World
             squadBuilderButton.hide();
         } else {
             infoButton.show();
-            if (focusedTown != null && focusedTown.getFaction() == Town.Faction.VILLAGER &&
+            if (focusedTown != null && focusedTown.getFaction() == Tribe.Faction.VILLAGER &&
                     focusedTown.getSquads().isEmpty()) {
                 squadBuilderButton.show();
             } else {
@@ -201,7 +201,7 @@ public class GameWorld extends World
     @Override
     public void onMapTownOccupied(Town town) {
 
-        if (focusedTown == town && focusedTown.getFaction() == Town.Faction.VILLAGER &&
+        if (focusedTown == town && focusedTown.getFaction() == Tribe.Faction.VILLAGER &&
                 focusedTown.getSquads().isEmpty()) {
             squadBuilderButton.show();
         } else {
@@ -298,7 +298,7 @@ public class GameWorld extends World
     public void onSquadUnitAdded(Squad squad, Unit unit) {
 
         addUnit(unit);
-        if (squad.getFaction() == Town.Faction.VILLAGER) {
+        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             economyBar.refresh();
         }
     }
@@ -312,7 +312,7 @@ public class GameWorld extends World
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
         removeUnit(unit);
-        if (squad.getFaction() == Town.Faction.VILLAGER) {
+        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             economyBar.refresh();
         }
     }
@@ -347,7 +347,7 @@ public class GameWorld extends World
         } else if (button == squadBuilderButton) {
             // Squad builder button is pressed
             Squad squad = tribes.get(0).spawnSquad(focusedTown.getMapCoord().toGameCoord(),
-                    Town.Faction.VILLAGER);
+                    Tribe.Faction.VILLAGER);
             focusedTown.setFocus(false);
             focusedTown = null;
             squad.setFocus(true);

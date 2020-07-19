@@ -43,9 +43,9 @@ public class Squad extends Object implements Controllable {
         private Event listener;
         private PointF position;
         private GameMap map;
-        private Town.Faction faction;
+        private Tribe.Faction faction;
 
-        public Builder(Event listener, PointF position, GameMap map, Town.Faction faction) {
+        public Builder(Event listener, PointF position, GameMap map, Tribe.Faction faction) {
             this.listener = listener;
             this.position = position;
             this.map = map;
@@ -92,9 +92,9 @@ public class Squad extends Object implements Controllable {
 
         private Event listener;
         private GameMap map;
-        private Town.Faction faction;
+        private Tribe.Faction faction;
 
-        public PrivateBuilder(Event listener, PointF position, GameMap map, Town.Faction faction) {
+        public PrivateBuilder(Event listener, PointF position, GameMap map, Tribe.Faction faction) {
             super(position);
             this.listener = listener;
             this.map = map;
@@ -694,7 +694,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public Town.Faction getFaction() {
+    public Tribe.Faction getFaction() {
 
         return faction;
     }
@@ -703,7 +703,7 @@ public class Squad extends Object implements Controllable {
      *
      * @param faction
      */
-    public void setFaction(Town.Faction faction) {
+    public void setFaction(Tribe.Faction faction) {
 
         this.faction = faction;
     }
@@ -1000,7 +1000,7 @@ public class Squad extends Object implements Controllable {
 
     private Event eventHandler;
     private GameMap map;
-    private Town.Faction faction;
+    private Tribe.Faction faction;
     private SizeF spriteSize;
     private ArrayList<Unit> units = new ArrayList<>();
     private boolean focused = false;

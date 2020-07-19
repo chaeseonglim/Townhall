@@ -242,7 +242,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             townStatus += " (전투중)";
         } else if (town.isOccupying()) {
             townStatus += " (점령중)";
-        } else if (town.getFaction() == Town.Faction.VILLAGER &&
+        } else if (town.getFaction() == Tribe.Faction.VILLAGER &&
             town.getTotalFacilityLevel() < 5){
             townStatus += " (개발중)";
         }
@@ -297,7 +297,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             }
 
             // Development buttons
-            if (town.getFaction() == Town.Faction.VILLAGER) {
+            if (town.getFaction() == Tribe.Faction.VILLAGER) {
                 textPosition.offset(0, 30);
                 addText("개발 방향",
                         new SizeF(150, 40), textPosition.clone(),
@@ -359,7 +359,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             }
         }
 
-        if (town.getFaction() == Town.Faction.VILLAGER) {
+        if (town.getFaction() == Tribe.Faction.VILLAGER) {
             // Population
             textPosition.setTo(100, -155);
             addText("인구",
@@ -463,7 +463,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                     Color.rgb(255, 255, 255));
         }
 
-        if (squad.getFaction() == Town.Faction.VILLAGER) {
+        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             // Recruiting
             textPosition.offset(-75, 30);
             addText("모집", new SizeF(150, 40), textPosition.clone(),
