@@ -37,7 +37,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         SWORD_MAN(
                 "검병",
                 UnitClassType.MELEE_FIGHTER,
-                "균형잡힌 근접 보병입니다.\n무난한 편입니다.",
+                "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.",
                 "균형잡힘",
                 "기병",
                 new Point(1, 0),
@@ -58,18 +58,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 20,
                 100,
                 10,
-                Projectile.ProjectileClass.ARROW,
+                null,
                 2.0f,
                 3.0f,
                 5.0f,
                 false
         ),
-        LONGBOW_MAN(
+        LONGBOW_ARCHER(
                 "궁수",
                 UnitClassType.RANGED_FIGHTER,
-                "원거리 공격이 가능하며\n원거리 지원에 적합합니다.",
+                "원거리 공격이 가능하며\n전투 및 지원에 적합합니다.",
                 "원거리 공격",
-                "근접 방어력",
+                "근접 방어",
                 new Point(2, 0),
                 new Shape(8.0f),
                 200,
@@ -80,7 +80,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 26.0f,
                 150.0f,
                 50,
-                0,
+                30,
                 3,
                 5,
                 5,
@@ -93,7 +93,37 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1.5f,
                 3.0f,
                 true
-        );
+        ),
+        WORKER(
+                "일꾼",
+                UnitClassType.RANGED_SUPPORTER,
+                "지역 발전 속도를 향상합니다.\n수입에도 기여합니다.\n하지만 전투 능력이 없습니다.",
+                "지역 발전",
+                "전투능력 없음",
+                new Point(2, 0),
+                new Shape(8.0f),
+                200,
+                30,
+                5,
+                new float[] {-0.5f, -0.3f, -0.3f, -0.1f, -0.1f, -0.1f},
+                10.0f,
+                26.0f,
+                0.0f,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                30,
+                10,
+                null,
+                1.0f,
+                0.5f,
+                1.0f,
+                false
+                );
 
         private UnitClassType unitClassType;
         private String word;
@@ -117,7 +147,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         private float rangedEvasion;
         private float armor;
         private float bountyExp;
-        private int health;
+        private float health;
         private Projectile.ProjectileClass projectileClass;
         private float maxVelocity;
         private float maxForce;
@@ -129,7 +159,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                   int costUpkeep, int population, float[] favors, float awareness,
                   float meleeAttackRange, float rangedAttackRange, int meleeAttackSpeed,
                   int rangedAttackSpeed, float meleeAttackDamage, float rangedAttackDamage,
-                  float meleeEvasion, float rangedEvasion, float armor, int health, float bountyExp,
+                  float meleeEvasion, float rangedEvasion, float armor, float health, float bountyExp,
                   Projectile.ProjectileClass projectileClass, float maxVelocity, float maxForce,
                   float mass, boolean supportable) {
             this.word = word;
@@ -228,7 +258,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public float armor() {
             return armor;
         }
-        public int health() {
+        public float health() {
             return health;
         }
         public int earnedExp(int level) {
@@ -487,7 +517,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Find favored enemy for melee attack
         Unit targetCandidate = null;
         float highestFavor = -Float.MAX_VALUE;
-        int highestHealth = Integer.MAX_VALUE;
+        float highestHealth = Float.MAX_VALUE;
         for (Unit opponent : opponents) {
             if (opponent.isRecruiting()) {
                 continue;
@@ -519,7 +549,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         Unit targetCandidate = null;
         float highestFavor = -Float.MAX_VALUE;
-        float highestHealth = Integer.MAX_VALUE;
+        float highestHealth = Float.MAX_VALUE;
 
         // Select highest favored enemy for ranged attack
         for (Unit opponent : opponents) {
@@ -553,7 +583,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
 
             // Deal damage
-            int damage = Math.max((int) (getMeleeDamage() * opponent.getArmor()), 1);
+            float damage = Math.max(getMeleeDamage() * opponent.getArmor(), 1.0f);
             opponent.gotDamage(damage);
 
             meleeAttackLeft = getUnitClass().meleeAttackSpeed();
@@ -585,7 +615,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             }
 
             // Deal damage
-            int damage = Math.max((int) (getRangedDamage() * opponent.getArmor()), 1);
+            float damage = Math.max(getRangedDamage() * opponent.getArmor(), 1.0f);
             opponent.gotDamage(damage);
 
             rangedAttackLeft = getUnitClass().rangedAttackSpeed();
@@ -598,7 +628,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      * @param damage
      */
-    private void gotDamage(int damage) {
+    private void gotDamage(float damage) {
 
         health -= damage;
         if (health < 0) {
@@ -606,7 +636,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         Sprite healthSprite = getSprite(2);
-        healthSprite.setGridIndex((int) ((1.0f - health / (float)getMaxHealth()) / 0.1275f), 0);
+        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
 
         // Blinking
         Sprite classSprite = getSprite(0);
@@ -625,17 +655,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public boolean isKilled() {
 
-        return health <= 0;
-    }
-
-    /**
-     *
-     * @param value
-     * @return
-     */
-    private int adjustByLevel(int value) {
-
-        return (int) (value * (1.0f + 0.1f * level));
+        return health <= 0.0f;
     }
 
     /**
@@ -672,7 +692,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      * @return
      */
-    public int getMaxHealth() {
+    public float getMaxHealth() {
 
         return adjustByLevel(getUnitClass().health());
     }
@@ -681,7 +701,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      * @return
      */
-    public int getHealth() {
+    public float getHealth() {
 
         return health;
     }
@@ -880,7 +900,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private UnitClass unitClass;
     private int level;
     private int exp;
-    private int health;
+    private float health;
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private Tribe.Faction faction;

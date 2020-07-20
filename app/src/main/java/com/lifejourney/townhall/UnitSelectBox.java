@@ -136,7 +136,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
             addText(selectedUnitClass.population()+"", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
-            // Gold/Upkeep
+            // Purchase gold
             textPosition.offset(-150, 30);
             addText("구매 비용", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
@@ -144,6 +144,7 @@ public class UnitSelectBox extends Widget implements Button.Event{
             addText(selectedUnitClass.costToPurchase()+"", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
+            // Upkeep gold
             textPosition.offset(150, -30);
             addText("유지 비용", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
@@ -151,43 +152,17 @@ public class UnitSelectBox extends Widget implements Button.Event{
             addText(selectedUnitClass.costUpkeep()+"", new SizeF(150, 40),
                     textPosition.clone(), Color.rgb(255, 255, 255));
 
-            // stats
+            // Health
             textPosition.offset(-150, 30);
-            addText("공격력", new SizeF(150, 40), textPosition.clone(),
+            addText("체력", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((int)selectedUnitClass.meleeAttackDamage() + "/" +
-                    ((selectedUnitClass.rangedAttackDamage() == 0.0f)?"-":(int)selectedUnitClass.rangedAttackDamage()),
+            addText((int)selectedUnitClass.health() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
+            // Velocity
             textPosition.offset(150, -30);
-            addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText(selectedUnitClass.meleeAttackSpeed() + "/" +
-                    ((selectedUnitClass.rangedAttackSpeed() == 0.0f)?"-":selectedUnitClass.rangedAttackSpeed()),
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
-
-            textPosition.offset(-150, 30);
-            addText("방어력", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText((int)selectedUnitClass.armor() + "",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
-
-            textPosition.offset(150, -30);
-            addText("회피", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText((int)selectedUnitClass.meleeEvasion() + "/" +
-                            (int)selectedUnitClass.rangedEvasion(),
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
-
-            textPosition.offset(-150, 30);
             addText("이동 속도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
@@ -195,16 +170,63 @@ public class UnitSelectBox extends Widget implements Button.Event{
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
+
+            // Attack damage
+            textPosition.offset(-150, 30);
+            addText("공격력", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            String attackDamageString =
+                    ((selectedUnitClass.meleeAttackDamage() == 0.0f) ?
+                    "-":(int)selectedUnitClass.meleeAttackDamage()) + "/" +
+                    ((selectedUnitClass.rangedAttackDamage() == 0.0f) ?
+                    "-":(int)selectedUnitClass.rangedAttackDamage());
+            addText(attackDamageString, new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
             textPosition.offset(150, -30);
-            addText("지원", new SizeF(150, 40), textPosition.clone(),
+            addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            String attackSpeedString =
+                    ((selectedUnitClass.meleeAttackSpeed() == 0) ?
+                    "-":100/selectedUnitClass.meleeAttackSpeed()) + "/" +
+                    ((selectedUnitClass.rangedAttackSpeed() == 0) ?
+                    "-":100/selectedUnitClass.rangedAttackSpeed());
+            addText(attackSpeedString, new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Armor
+            textPosition.offset(-150, 30);
+            addText("방어도", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText((selectedUnitClass.armor() == 0.0f)?"-":(int)selectedUnitClass.armor() + "%",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Evasion
+            textPosition.offset(150, -30);
+            addText("회피", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            String evasionString =
+                    ((selectedUnitClass.meleeEvasion() == 0) ?
+                    "-":(int)selectedUnitClass.meleeEvasion()+"%") + "/" +
+                    ((selectedUnitClass.rangedEvasion() == 0) ?
+                    "-":(int)selectedUnitClass.rangedEvasion()+"%");
+            addText(evasionString, new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Strong/Weakness
+            textPosition.setTo(100, -165);
+            addText("전투 지원", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
             addText(selectedUnitClass.isSupportable()?"가능":"불가",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
-
-            // Strong/Weakness
-            textPosition.setTo(100, -165);
+            textPosition.offset(0, 30);
             addText("강점",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
@@ -224,9 +246,9 @@ public class UnitSelectBox extends Widget implements Button.Event{
             addText("설명",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(75, 50);
+            textPosition.offset(75, 70);
             addText(selectedUnitClass.description(),
-                    new SizeF(300, 80), textPosition.clone(),
+                    new SizeF(300, 120), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         } else {
             PointF textPosition = new PointF(-250 + 75, -165);

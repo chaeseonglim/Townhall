@@ -7,7 +7,7 @@ public class Bandit extends Tribe {
         super(eventHandler, Tribe.Faction.BANDIT, map);
 
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                Unit.UnitClass.SWORD_MAN, Unit.UnitClass.LONGBOW_MAN, Unit.UnitClass.LONGBOW_MAN);
+                Unit.UnitClass.SWORD_MAN, Unit.UnitClass.LONGBOW_ARCHER, Unit.UnitClass.LONGBOW_ARCHER);
     }
 
     /**
