@@ -121,32 +121,115 @@ public class UnitSelectBox extends Widget implements Button.Event{
 
         if (selectedUnitClass != null) {
             // Unit Class
-            PointF textPosition = new PointF(-250, -155);
+            PointF textPosition = new PointF(-250, -165);
             addText("클래스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText(selectedUnitClass.toGameString(), new SizeF(150, 40), textPosition.clone(),
+            addText(selectedUnitClass.word(), new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Population
+            textPosition.offset(150, -30);
+            addText("인구", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(selectedUnitClass.population()+"", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            // Gold/Upkeep
+            textPosition.offset(-150, 30);
+            addText("구매 비용", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(selectedUnitClass.costToPurchase()+"", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            textPosition.offset(150, -30);
+            addText("유지 비용", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(selectedUnitClass.costUpkeep()+"", new SizeF(150, 40),
+                    textPosition.clone(), Color.rgb(255, 255, 255));
+
+            // stats
+            textPosition.offset(-150, 30);
+            addText("공격력", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText((int)selectedUnitClass.meleeAttackDamage() + "/" +
+                    ((selectedUnitClass.rangedAttackDamage() == 0.0f)?"-":(int)selectedUnitClass.rangedAttackDamage()),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            textPosition.offset(150, -30);
+            addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(selectedUnitClass.meleeAttackSpeed() + "/" +
+                    ((selectedUnitClass.rangedAttackSpeed() == 0.0f)?"-":selectedUnitClass.rangedAttackSpeed()),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            textPosition.offset(-150, 30);
+            addText("방어력", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText((int)selectedUnitClass.armor() + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            textPosition.offset(150, -30);
+            addText("회피", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText((int)selectedUnitClass.meleeEvasion() + "/" +
+                            (int)selectedUnitClass.rangedEvasion(),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            textPosition.offset(-150, 30);
+            addText("이동 속도", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText((int)(selectedUnitClass.maxVelocity() * 10) + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+
+            textPosition.offset(150, -30);
+            addText("지원", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            addText(selectedUnitClass.isSupportable()?"가능":"불가",
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
             // Strong/Weakness
-            textPosition.setTo(100, -155);
+            textPosition.setTo(100, -165);
             addText("강점",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText("없음",
-                    new SizeF(150, 40), textPosition.clone(),
+            textPosition.offset(75, 30);
+            addText(selectedUnitClass.strongPoint(),
+                    new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
-            textPosition.offset(0, 30);
+            textPosition.offset(-75, 30);
             addText("약점",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText("없음",
+            textPosition.offset(75, 30);
+            addText(selectedUnitClass.weaknessPoint(),
+                    new SizeF(300, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 255));
+            textPosition.offset(-75, 30);
+            addText("설명",
                     new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(75, 50);
+            addText(selectedUnitClass.description(),
+                    new SizeF(300, 80), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         } else {
-            PointF textPosition = new PointF(-250 + 75, -155);
+            PointF textPosition = new PointF(-250 + 75, -165);
             addText("클래스를 선택하세요.", new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
         }

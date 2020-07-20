@@ -235,8 +235,8 @@ public class Squad extends Object implements Controllable {
 
         // Set unit to bonus
         for (Unit unit: units) {
-            unit.setOffensiveBonus(getOffensiveBonus());
-            unit.setDefensiveBonus(getDefensiveBonus());
+            unit.setOffensiveBonus(collectOffensiveBonus());
+            unit.setDefensiveBonus(collectDefensiveBonus());
         }
     }
 
@@ -244,18 +244,28 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int getOffensiveBonus() {
+    public int collectOffensiveBonus() {
 
-        return map.getTown(getMapCoord()).getDeltas(Town.DeltaAttribute.OFFENSIVE);
+        Town town = map.getTown(getMapCoord());
+        if (town.getFaction() == faction) {
+            return map.getTown(getMapCoord()).getDeltas(Town.DeltaAttribute.OFFENSIVE);
+        } else {
+            return 0;
+        }
     }
 
     /**
      *
      * @return
      */
-    public int getDefensiveBonus() {
+    public int collectDefensiveBonus() {
 
-        return map.getTown(getMapCoord()).getDeltas(Town.DeltaAttribute.DEFENSIVE);
+        Town town = map.getTown(getMapCoord());
+        if (town.getFaction() == faction) {
+            return map.getTown(getMapCoord()).getDeltas(Town.DeltaAttribute.DEFENSIVE);
+        } else {
+            return 0;
+        }
     }
 
     /**

@@ -20,153 +20,160 @@ public class Town {
     }
 
     enum Terrain {
-        GRASS,
-        BADLANDS,
-        FOREST,
-        HILL,
-        MOUNTAIN,
-        RIVER,
-        HEADQUARTER_GRASS,
-        HEADQUARTER_BADLANDS,
-        UNKNOWN;
+        GRASS(
+                "초원",
+                3,
+                 new boolean[] { true, true, true, true, true },
+                 new int[] {1, 1, 0, 0},
+                0,
+                0,
+                1,
+                0,
+                0
+        ),
+        BADLANDS(
+                "황무지",
+                3,
+                new boolean[] { true, true, true, true, true },
+                new int[] {1, 0, 1, 0},
+                0,
+                0,
+                -1,
+                0,
+                0
+        ),
+        FOREST(
+                "숲",
+                2,
+                new boolean[] { true, true, true, true, true },
+                new int[] {-1, 1, 0, 1},
+                0,
+                0,
+                0,
+                0,
+                1
+        ),
+        HILL(
+                "언덕",
+                2,
+                new boolean[] { true, true, true, true, true },
+                new int[] {-1, -1, 0, 2},
+                0,
+                0,
+                0,
+                0,
+                2
+        ),
+        MOUNTAIN(
+                "산",
+                0,
+                new boolean[] { false, false, true, false, false },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                0,
+                0,
+                3
+        ),
+        RIVER(
+                "강",
+                0,
+                new boolean[] { false, false, false, true, false },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                0,
+                0,
+                3
+        ),
+        HEADQUARTER_GRASS(
+                "본부",
+                0,
+                new boolean[] { true, true, true, true, true },
+                new int[] {0, 0, 0, 0},
+                5,
+                5,
+                5,
+                5,
+                5
+        ),
+        HEADQUARTER_BADLANDS(
+                "본부",
+                0,
+                new boolean[] { true, true, true, true, true },
+                new int[] {0, 0, 0, 0},
+                5,
+                5,
+                5,
+                5,
+                5
+        ),
+        UNKNOWN(
+                "모름",
+                0,
+                new boolean[] { false, false, false, false, false },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                0,
+                0,
+                0
+        );
 
-        String toGameString() {
-            switch (this) {
-                case GRASS:
-                    return "초원";
-                case BADLANDS:
-                    return "황무지";
-                case FOREST:
-                    return "숲";
-                case HILL:
-                    return "언덕";
-                case MOUNTAIN:
-                    return "산";
-                case RIVER:
-                    return "강";
-                case HEADQUARTER_GRASS:
-                case HEADQUARTER_BADLANDS:
-                    return "본부";
-                case UNKNOWN:
-                default:
-                    return "모름";
-            }
+        private String word;
+        private int facilitySlots;
+        private boolean[] movable;
+        private boolean canDevelop;
+        private int[] developmentDelta;
+        private int goldDelta;
+        private int populationDelta;
+        private int happinessDelta;
+        private int offenseDelta;
+        private int defenseDelta;
+
+        Terrain(String word, int facilitySlots, boolean[] movable, int[] developmentDeltas, int goldDelta,
+                int populationDelta, int happinessDelta, int offenseDelta, int defenseDelta) {
+            this.word = word;
+            this.facilitySlots = facilitySlots;
+            this.movable = movable;
+            this.canDevelop = (facilitySlots > 0);
+            this.developmentDelta = developmentDeltas;
+            this.goldDelta = goldDelta;
+            this.populationDelta = populationDelta;
+            this.happinessDelta = happinessDelta;
+            this.offenseDelta = offenseDelta;
+            this.defenseDelta = defenseDelta;
         }
 
+        String word() {
+            return word;
+        }
         int facilitySlots() {
-            switch (this) {
-                case GRASS:
-                case BADLANDS:
-                    return 3;
-                case FOREST:
-                case HILL:
-                    return 2;
-                case MOUNTAIN:
-                case RIVER:
-                case HEADQUARTER_GRASS:
-                case HEADQUARTER_BADLANDS:
-                case UNKNOWN:
-                default:
-                    return 0;
-            }
+            return facilitySlots;
         }
-
         boolean isMovable(Squad squad) {
-            switch (this) {
-                case GRASS:
-                case BADLANDS:
-                case FOREST:
-                case HILL:
-                case HEADQUARTER_GRASS:
-                case HEADQUARTER_BADLANDS:
-                    return true;
-                case MOUNTAIN:
-                    return squad.getFaction() == Tribe.Faction.BANDIT;
-                case RIVER:
-                    return squad.getFaction() == Tribe.Faction.PIRATE;
-                case UNKNOWN:
-                default:
-                    return false;
-            }
+            return movable[squad.getFaction().ordinal()];
         }
-
         public boolean canDevelop() {
-            switch (this) {
-                case GRASS:
-                case BADLANDS:
-                case FOREST:
-                case HILL:
-                    return true;
-                case MOUNTAIN:
-                case RIVER:
-                case HEADQUARTER_GRASS:
-                case HEADQUARTER_BADLANDS:
-                case UNKNOWN:
-                default:
-                    return false;
-            }
+            return canDevelop;
         }
-
         public int developmentDelta(Facility facility) {
-            switch (this) {
-                case GRASS:
-                    if (facility == Facility.DOWNTOWN || facility == Facility.FARM) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                case BADLANDS:
-                    if (facility == Facility.DOWNTOWN || facility == Facility.MARKET) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                case FOREST:
-                    if (facility == Facility.FARM || facility == Facility.FORTRESS) {
-                        return 1;
-                    } else if (facility == Facility.DOWNTOWN) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                case HILL:
-                    if (facility == Facility.FORTRESS) {
-                        return 2;
-                    } else if (facility == Facility.DOWNTOWN || facility == Facility.FARM) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                default:
-                    return 0;
-            }
+            return developmentDelta[facility.ordinal()];
         }
-
+        public int goldDelta() {
+            return goldDelta;
+        }
+        public int populationDelta() {
+            return populationDelta;
+        }
         public int happinessDelta() {
-            switch (this) {
-                case GRASS:
-                    return 1;
-                case BADLANDS:
-                    return -1;
-                case FOREST:
-                case HILL:
-                default:
-                    return 0;
-            }
+            return happinessDelta;
         }
-
+        public int offenseDelta() {
+            return offenseDelta;
+        }
         public int defenseDelta() {
-            switch (this) {
-                case GRASS:
-                case BADLANDS:
-                    return 0;
-                case FOREST:
-                    return 1;
-                case HILL:
-                    return 2;
-                default:
-                    return 0;
-            }
+            return defenseDelta;
         }
     }
 
@@ -178,20 +185,18 @@ public class Town {
     }
 
     enum DevelopmentPolicy {
-        PROSPER,
-        STALL,
-        DETERIORATE;
+        PROSPER(1),
+        STALL(1),
+        DETERIORATE(-5);
+
+        private int developmentDelta;
+
+        DevelopmentPolicy(int developmentDelta) {
+            this.developmentDelta = developmentDelta;
+        }
 
         public int developmentDelta() {
-            switch (this) {
-                case PROSPER:
-                case STALL:
-                    return 1;
-                case DETERIORATE:
-                    return -5;
-                default:
-                    return 0;
-            }
+            return developmentDelta;
         }
     }
 
@@ -322,19 +327,14 @@ public class Town {
                 deltas[i] = developmentPolicy[i].developmentDelta() +
                         terrain.developmentDelta(Facility.values()[i]);
             }
-            deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET);
-            deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM);
+            deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET) +
+                    terrain.goldDelta();
+            deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM) +
+                    terrain.populationDelta();
             deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.happinessDelta();
-            deltas[DeltaAttribute.OFFENSIVE.ordinal()] = 0;
+            deltas[DeltaAttribute.OFFENSIVE.ordinal()] = terrain.offenseDelta();
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] = getFacilityLevel(Facility.FORTRESS) * 2 +
                     terrain.defenseDelta();
-            if (terrain == Terrain.HEADQUARTER_GRASS || terrain == Terrain.HEADQUARTER_BADLANDS) {
-                deltas[DeltaAttribute.GOLD.ordinal()] = 5;
-                deltas[DeltaAttribute.POPULATION.ordinal()] = 5;
-                deltas[DeltaAttribute.OFFENSIVE.ordinal()] = 5;
-                deltas[DeltaAttribute.DEFENSIVE.ordinal()] = 5;
-                deltas[DeltaAttribute.HAPPINESS.ordinal()] = 5;
-            }
 
             // Calculate delta from neighbors
             int maxDowntownLvl = 0;
@@ -364,16 +364,18 @@ public class Town {
             deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] += maxFortressLvl;
-        } else if (faction != Tribe.Faction.NEUTRAL) {
-            // Facility is deteriorated if it's on enemy's hand
-            for (int i = 0; i < Facility.values().length; ++i) {
-                deltas[i] = DevelopmentPolicy.DETERIORATE.developmentDelta();
+        } else {
+            if (faction != Tribe.Faction.NEUTRAL) {
+                // Facility is deteriorated if it's on enemy's hand
+                for (int i = 0; i < Facility.values().length; ++i) {
+                    deltas[i] = DevelopmentPolicy.DETERIORATE.developmentDelta();
+                }
             }
             deltas[DeltaAttribute.HAPPINESS.ordinal()] = 0;
             deltas[DeltaAttribute.OFFENSIVE.ordinal()] = 0;
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] = terrain.defenseDelta();
+        }
     }
-}
 
     /**
      *

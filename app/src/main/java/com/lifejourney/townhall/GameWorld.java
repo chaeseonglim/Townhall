@@ -109,6 +109,25 @@ public class GameWorld extends World
         super.updateObjects();
     }
 
+    @Override
+    protected void preUpdate() {
+
+        if (paused) {
+            return;
+        }
+
+        // Update tribes
+        for (Tribe tribe: tribes) {
+            tribe.update();
+        }
+
+        // Update towns
+        ArrayList<Town> towns = map.getTowns();
+        for (Town town: towns) {
+            town.update();
+        }
+    }
+
     /**
      *
      */
@@ -143,17 +162,6 @@ public class GameWorld extends World
                 iterBattle.remove();
                 map.getTown(battle.getMapCoord()).setBattle(null);
             }
-        }
-
-        // Update towns
-        ArrayList<Town> towns = map.getTowns();
-        for (Town town: towns) {
-            town.update();
-        }
-
-        // Update tribes
-        for (Tribe tribe: tribes) {
-            tribe.update();
         }
     }
 

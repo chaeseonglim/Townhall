@@ -14,238 +14,246 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     private static final String LOG_TAG = "Unit";
 
-    enum UnitClass {
-        SWORDMAN,
-        LONGBOWMAN;
+    enum UnitClassType {
+        MELEE_FIGHTER("근접 전투형"),
+        MELEE_SUPPORTER("근접 지원형"),
+        MELEE_HEALER("근접 회복형"),
+        RANGED_FIGHTER("원거리 전투형"),
+        RANGED_SUPPORTER("원거리 지원형"),
+        RANGED_HEALER("원거리 회복형");
 
-        String toGameString() {
-            switch (this) {
-                case SWORDMAN:
-                    return "검병";
-                case LONGBOWMAN:
-                    return "장궁병";
-                default:
-                    return "";
-            }
+        private String word;
+
+        UnitClassType(String word) {
+            this.word = word;
+        }
+
+        String word() {
+            return word;
+        }
+    };
+
+    enum UnitClass {
+        SWORD_MAN(
+                "검병",
+                UnitClassType.MELEE_FIGHTER,
+                "균형잡힌 근접 보병입니다.\n무난한 편입니다.",
+                "균형잡힘",
+                "기병",
+                new Point(1, 0),
+                new Shape(8.0f),
+                200,
+                50,
+                5,
+                new float[] {0.1f, 0.2f, 0.2f, 0.4f, 0.4f, 0.5f},
+                150.0f,
+                26.0f,
+                0.0f,
+                30,
+                0,
+                10,
+                0,
+                20,
+                5,
+                20,
+                100,
+                10,
+                Projectile.ProjectileClass.ARROW,
+                2.0f,
+                3.0f,
+                5.0f,
+                false
+        ),
+        LONGBOW_MAN(
+                "궁수",
+                UnitClassType.RANGED_FIGHTER,
+                "원거리 공격이 가능하며\n원거리 지원에 적합합니다.",
+                "원거리 공격",
+                "근접 방어력",
+                new Point(2, 0),
+                new Shape(8.0f),
+                200,
+                50,
+                5,
+                new float[] {-0.5f, -0.3f, -0.3f, -0.1f, -0.1f, -0.1f},
+                64.0f,
+                26.0f,
+                150.0f,
+                50,
+                0,
+                3,
+                5,
+                5,
+                5,
+                5,
+                50,
+                10,
+                Projectile.ProjectileClass.ARROW,
+                2.0f,
+                1.5f,
+                3.0f,
+                true
+        );
+
+        private UnitClassType unitClassType;
+        private String word;
+        private String description;
+        private String strongPoint;
+        private String weaknessPoint;
+        private Point spriteGridIndex;
+        private Shape shape;
+        private int costToPurchase;
+        private int costUpkeep;
+        private int population;
+        private float[] favors;
+        private float awareness;
+        private float meleeAttackRange;
+        private float rangedAttackRange;
+        private int meleeAttackSpeed;
+        private int rangedAttackSpeed;
+        private float meleeAttackDamage;
+        private float rangedAttackDamage;
+        private float meleeEvasion;
+        private float rangedEvasion;
+        private float armor;
+        private float bountyExp;
+        private int health;
+        private Projectile.ProjectileClass projectileClass;
+        private float maxVelocity;
+        private float maxForce;
+        private float mass;
+        private boolean supportable;
+
+        UnitClass(String word, UnitClassType unitClassType, String description, String strongPoint,
+                  String weaknessPoint, Point spriteGridIndex, Shape shape, int costToPurchase,
+                  int costUpkeep, int population, float[] favors, float awareness,
+                  float meleeAttackRange, float rangedAttackRange, int meleeAttackSpeed,
+                  int rangedAttackSpeed, float meleeAttackDamage, float rangedAttackDamage,
+                  float meleeEvasion, float rangedEvasion, float armor, int health, float bountyExp,
+                  Projectile.ProjectileClass projectileClass, float maxVelocity, float maxForce,
+                  float mass, boolean supportable) {
+            this.word = word;
+            this.unitClassType = unitClassType;
+            this.description = description;
+            this.strongPoint = strongPoint;
+            this.weaknessPoint = weaknessPoint;
+            this.spriteGridIndex = spriteGridIndex;
+            this.shape = shape;
+            this.costToPurchase = costToPurchase;
+            this.costUpkeep = costUpkeep;
+            this.population = population;
+            this.favors = favors;
+            this.awareness = awareness;
+            this.meleeAttackRange = meleeAttackRange;
+            this.rangedAttackRange = rangedAttackRange;
+            this.meleeAttackSpeed = meleeAttackSpeed;
+            this.rangedAttackSpeed = rangedAttackSpeed;
+            this.meleeAttackDamage = meleeAttackDamage;
+            this.rangedAttackDamage = rangedAttackDamage;
+            this.meleeEvasion = meleeEvasion;
+            this.rangedEvasion = rangedEvasion;
+            this.armor = armor;
+            this.health = health;
+            this.bountyExp = bountyExp;
+            this.projectileClass = projectileClass;
+            this.maxVelocity = maxVelocity;
+            this.maxForce = maxForce;
+            this.mass = mass;
+            this.supportable = supportable;
+        }
+
+        String word() {
+            return word;
+        }
+        UnitClassType unitClassType() {
+            return unitClassType;
+        }
+        String description() {
+            return description;
+        }
+        String strongPoint() {
+            return strongPoint;
+        }
+        String weaknessPoint() {
+            return weaknessPoint;
         }
         Point spriteGridIndex() {
-            switch (this) {
-                case SWORDMAN:
-                    return new Point(1, 0);
-                case LONGBOWMAN:
-                    return new Point(2, 0);
-                default:
-                    return null;
-            }
+            return spriteGridIndex;
         }
         public Shape shape() {
-            switch (this) {
-                case SWORDMAN:
-                case LONGBOWMAN:
-                    return new Shape(8.0f);
-                default:
-                    return null;
-            }
+            return shape;
         }
         public int costToPurchase() {
-            switch (this) {
-                case SWORDMAN:
-                    return 200;
-                case LONGBOWMAN:
-                    return 200;
-                default:
-                    return 0;
-            }
+            return costToPurchase;
         }
         public int costUpkeep() {
-            switch (this) {
-                case SWORDMAN:
-                    return 50;
-                case LONGBOWMAN:
-                    return 50;
-                default:
-                    return 0;
-            }
+            return costUpkeep;
         }
         public int population() {
-            switch (this) {
-                case SWORDMAN:
-                    return 5;
-                case LONGBOWMAN:
-                    return 5;
-                default:
-                    return 0;
-            }
+            return population;
         }
-        public float favor(UnitClass unitClassType) {
-            switch (this) {
-                case SWORDMAN:
-                    if (unitClassType == SWORDMAN) {
-                        return 0.1f;
-                    }
-                    else if (unitClassType == LONGBOWMAN) {
-                        return 0.5f;
-                    }
-                    break;
-                case LONGBOWMAN:
-                    if (unitClassType == SWORDMAN) {
-                        return -0.5f;
-                    }
-                    else if (unitClassType == LONGBOWMAN) {
-                        return -0.1f;
-                    }
-                    break;
-            }
-            return 0.0f;
+        public float favor(UnitClass unitClass) {
+            return favors[unitClass.unitClassType.ordinal()];
         }
         public float awareness() {
-            switch (this) {
-                case SWORDMAN:
-                    return 150.0f;
-                case LONGBOWMAN:
-                    return 64.0f;
-            }
-            return 0.0f;
+            return awareness;
         }
         public int seekingFavorRange() {
             return 20;
         }
         public float meleeAttackRange() {
-            switch (this) {
-                case SWORDMAN:
-                case LONGBOWMAN:
-                    return 26.0f;
-            }
-            return 0.0f;
+            return meleeAttackRange;
         }
         public float rangedAttackRange() {
-            switch (this) {
-                case SWORDMAN:
-                    return 0.0f;
-                case LONGBOWMAN:
-                    return 150.0f;
-            }
-            return 0.0f;
+            return rangedAttackRange;
         }
         public int meleeAttackSpeed() {
-            switch (this) {
-                case SWORDMAN:
-                    return 30;
-                case LONGBOWMAN:
-                    return 50;
-            }
-            return 0;
+            return meleeAttackSpeed;
         }
         public int rangedAttackSpeed() {
-            switch (this) {
-                case SWORDMAN:
-                    return 0;
-                case LONGBOWMAN:
-                    return 40;
-            }
-            return 0;
+            return rangedAttackSpeed;
         }
-        public float meleeDamage() {
-            switch (this) {
-                case SWORDMAN:
-                    return 10.0f;
-                case LONGBOWMAN:
-                    return 5.0f;
-            }
-            return 0.0f;
+        public float meleeAttackDamage() {
+            return meleeAttackDamage;
         }
-        public float rangedDamage() {
-            switch (this) {
-                case SWORDMAN:
-                    return 0.0f;
-                case LONGBOWMAN:
-                    return 5.0f;
-            }
-            return 0.0f;
+        public float rangedAttackDamage() {
+            return rangedAttackDamage;
         }
         public float meleeEvasion() {
-            switch (this) {
-                case SWORDMAN:
-                    return 0.2f;
-                case LONGBOWMAN:
-                    return 0.05f;
-            }
-            return 0.0f;
+            return meleeEvasion;
         }
         public float rangedEvasion() {
-            switch (this) {
-                case SWORDMAN:
-                    return 0.5f;
-                case LONGBOWMAN:
-                    return 0.1f;
-            }
-            return 0.0f;
+            return rangedEvasion;
         }
         public float armor() {
-            switch (this) {
-                case SWORDMAN:
-                    return 0.2f;
-                case LONGBOWMAN:
-                    return 0.05f;
-            }
-            return 0.0f;
+            return armor;
+        }
+        public int health() {
+            return health;
         }
         public int earnedExp(int level) {
-            int expEarned = 0;
-            switch (this) {
-                case SWORDMAN:
-                    expEarned = 10;
-                    break;
-                case LONGBOWMAN:
-                    expEarned = 10;
-                    break;
-            }
-            return (int) (expEarned * (1.0 + level*0.2));
+            return (int) (bountyExp * (1.0 + level * 0.2));
         }
         public int requiredExp(int level) {
             return 100*level;
         }
-        public int health() {
-            switch (this) {
-                case SWORDMAN:
-                    return 100;
-                case LONGBOWMAN:
-                    return 50;
-            }
-            return 0;
-        }
         public Projectile.ProjectileClass projectileClass() {
-            return Projectile.ProjectileClass.ARROW;
+            return projectileClass;
         }
         public float friction() {
             return 0.1f;
         }
-        public float maxForce() {
-            switch (this) {
-                case SWORDMAN:
-                    return 3.0f;
-                case LONGBOWMAN:
-                    return 1.5f;
-            }
-            return 0;
-        }
         public float maxVelocity() {
-            switch (this) {
-                case SWORDMAN:
-                    return 2.0f;
-                case LONGBOWMAN:
-                    return 2.0f;
-            }
-            return 0;
+            return maxVelocity;
+        }
+        public float maxForce() {
+            return maxForce;
         }
         public float mass() {
-            switch (this) {
-                case SWORDMAN:
-                    return 5.0f;
-                case LONGBOWMAN:
-                    return 3.0f;
-            }
-            return 0;
+            return mass;
+        }
+        public boolean isSupportable() {
+            return supportable;
         }
     }
 
@@ -684,7 +692,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getMeleeDamage() {
 
-        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().meleeDamage()));
+        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().meleeAttackDamage()));
     }
 
     /**
@@ -693,7 +701,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getRangedDamage() {
 
-        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().rangedDamage()));
+        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().rangedAttackDamage()));
     }
 
     /**
@@ -702,7 +710,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getMeleeEvasion() {
 
-        return adjustByLevel(getUnitClass().meleeEvasion());
+        return adjustByLevel(getUnitClass().meleeEvasion()/100);
     }
 
     /**
@@ -711,7 +719,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getRangedEvasion() {
 
-        return adjustByLevel(getUnitClass().rangedEvasion());
+        return adjustByLevel(getUnitClass().rangedEvasion()/100);
     }
 
     /**
@@ -720,7 +728,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getArmor() {
 
-        return adjustByDefensiveBonus(adjustByLevel(getUnitClass().armor()));
+        return adjustByDefensiveBonus(adjustByLevel(getUnitClass().armor()/100));
     }
 
     /**
