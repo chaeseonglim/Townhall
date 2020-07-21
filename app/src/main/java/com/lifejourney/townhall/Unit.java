@@ -97,10 +97,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         WORKER(
                 "일꾼",
                 UnitClassType.RANGED_SUPPORTER,
-                "지역 발전 속도를 향상합니다.\n수입에도 기여합니다.\n하지만 전투 능력이 없습니다.",
+                "지역 발전 속도를 높이며\n수입에도 기여합니다.\n하지만 전투 능력이 없습니다.",
                 "지역 발전",
                 "전투능력 없음",
-                new Point(2, 0),
+                new Point(3, 0),
                 new Shape(8.0f),
                 200,
                 30,
@@ -119,9 +119,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 30,
                 10,
                 null,
+                1.5f,
                 1.0f,
-                0.5f,
-                1.0f,
+                2.0f,
                 false
                 );
 
@@ -406,15 +406,23 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
             if (!currentMapOffset.equals(targetMapPosition)) {
                 seek(targetPosition, 1.0f);
+
+                // Wander a little
+                wander(80.0f, 1.0f, 0.3f);
             } else {
                 seek(targetPosition, 0.5f);
+
+                if (companions.size() == 1) {
+                    // Wander a big
+                    wander(80.0f, 1.0f, 1.0f);
+                } else {
+                    // Wander a little
+                    wander(80.0f, 1.0f, 0.3f);
+                }
             }
 
-            // Wander a little
-            wander(80.0f, 1.0f, 0.3f);
-
             // Separation
-            separate(companions, 20.0f, 1.0f);
+            separate(companions, 30.0f, 1.0f);
         }
 
         // Add gravity to target

@@ -17,6 +17,7 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.Waypoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ListIterator;
 
 public class Squad extends Object implements Controllable {
@@ -134,6 +135,42 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
+    private void setSpritesToSupport() {
+
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(4, 0, 8);
+            squadIcon.addAnimationFrame(0, 0, 8);
+            squadIcon.addAnimationFrame(4, 0, 200);
+        }
+    }
+
+    /**
+     *
+     */
+    private void setSpritesToWork() {
+
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(7, 0))) {
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(7, 0, 8);
+            squadIcon.addAnimationFrame(0, 0, 8);
+            squadIcon.addAnimationFrame(7, 0, 200);
+        }
+    }
+
+    /**
+     *
+     */
     @Override
     public void update() {
 
@@ -185,13 +222,19 @@ public class Squad extends Object implements Controllable {
                         if (neighborTown.getBattle() != null) {
                             neighborTown.getBattle().addSupporter(this);
                             isSupporting = true;
+                            setSpritesToSupport();
                             break;
                         }
                     }
 
+                    // Check if it's working
+                    if (isWorking() && town.getTerrain().facilitySlots() > 0) {
+                        setSpritesToWork();
+                    }
+
                     // Reset squad state at peace
-                    if (!isSupporting && !isDragging()) {
-                        peace();
+                    if (!isSupporting && !isWorking() && !isDragging()) {
+                        resetSprites();
                     }
                 }
             }
@@ -266,6 +309,47 @@ public class Squad extends Object implements Controllable {
         } else {
             return 0;
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int[] collectDevelopmentBonus() {
+
+        int workerCount = 0;
+
+        if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
+            for (Unit unit : units) {
+                if (!unit.isRecruiting() && unit.getUnitClass() == Unit.UnitClass.WORKER) {
+                    workerCount++;
+                }
+            }
+        }
+
+        int[] deltas = new int[Town.Facility.values().length];
+        Arrays.fill(deltas, workerCount);
+
+        return deltas;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int collectGoldBonus() {
+
+        int workerCount = 0;
+
+        if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
+            for (Unit unit : units) {
+                if (!unit.isRecruiting() && unit.getUnitClass() == Unit.UnitClass.WORKER) {
+                    workerCount++;
+                }
+            }
+        }
+
+        return workerCount;
     }
 
     /**
@@ -589,19 +673,6 @@ public class Squad extends Object implements Controllable {
      */
     void support(Squad companion, Squad opponent) {
 
-        // Set squad Icon
-        Sprite currentStick = getSprite("SquadStick");
-        Sprite squadIcon = getSprite("SquadIcon");
-        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
-        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
-            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-            squadIcon.setAnimationWrap(true);
-            squadIcon.clearAnimation();
-            squadIcon.addAnimationFrame(4, 0, 8);
-            squadIcon.addAnimationFrame(0, 0, 8);
-            squadIcon.addAnimationFrame(4, 0, 200);
-        }
-
         // Set companions and opponents to all units
         ArrayList<Unit> companionUnits = new ArrayList<>();
         companionUnits.addAll(companion.getUnits());
@@ -643,7 +714,7 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    private void peace() {
+    private void resetSprites() {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
@@ -957,7 +1028,7 @@ public class Squad extends Object implements Controllable {
      */
     public boolean isSupporting() {
 
-        if (isFighting() || isOccupying()) {
+        if (isMoving() || isFighting() || isOccupying()) {
             return false;
         }
 
@@ -969,6 +1040,25 @@ public class Squad extends Object implements Controllable {
         }
         return false;
     }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isWorking() {
+
+        if (isMoving() || isFighting() || isOccupying() || isSupporting()) {
+            return false;
+        }
+
+        for (Unit unit: units) {
+            if (!unit.isRecruiting() && unit.getUnitClass() == Unit.UnitClass.WORKER) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      *

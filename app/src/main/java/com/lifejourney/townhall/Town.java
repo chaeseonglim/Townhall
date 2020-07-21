@@ -364,6 +364,22 @@ public class Town {
             deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] += maxFortressLvl;
+
+            // Calculate delta from squads
+            for (Squad squad: squads) {
+                if (squad.getFaction() == faction) {
+                    int[] developmentDeltasFromSquad = squad.collectDevelopmentBonus();
+                    deltas[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()] +=
+                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()];
+                    deltas[DeltaAttribute.DEVELOPMENT_FARM.ordinal()] +=
+                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FARM.ordinal()];
+                    deltas[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()] +=
+                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()];
+                    deltas[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()] +=
+                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()];
+                    deltas[DeltaAttribute.GOLD.ordinal()] += squad.collectGoldBonus();
+                }
+            }
         } else {
             if (faction != Tribe.Faction.NEUTRAL) {
                 // Facility is deteriorated if it's on enemy's hand

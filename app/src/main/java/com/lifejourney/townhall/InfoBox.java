@@ -254,7 +254,8 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
         } else if (town.isOccupying()) {
             status = "점령중";
         } else if (town.getFaction() == Tribe.Faction.VILLAGER &&
-            town.getTotalFacilityLevel() < 5){
+            town.getTotalFacilityLevel() < 5 &&
+            town.getTerrain().facilitySlots() > 0) {
             status = "개발중";
         }
         textPosition.offset(0, 30);
@@ -391,7 +392,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
-            // Bonus
+            // Happiness
             textPosition.offset(-150, 30);
             addText("행복도",
                     new SizeF(150, 40), textPosition.clone(),
@@ -401,7 +402,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
-            // Happiness
+            // Defense
             textPosition.offset(150, -30);
             addText("방어도",
                     new SizeF(150, 40), textPosition.clone(),
@@ -412,6 +413,28 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
+            // Bonus
+            textPosition.offset(-150, 30);
+            addText("보너스",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
+            textPosition.offset(0, 30);
+            boolean isSquadWorking = false;
+            for (Squad squad: town.getSquads()) {
+                if (squad.isWorking()) {
+                    isSquadWorking = true;
+                    break;
+                }
+            }
+            if (isSquadWorking) {
+                addText("일꾼 개발",
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            } else {
+                addText("-",
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            }
         } else {
             // Bonus
             textPosition.setTo(100, -155);
@@ -572,7 +595,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
                         Color.rgb(255, 255, 255));
             } else {
                 textPosition.offset(0, 30);
-                addText("없음", new SizeF(150, 40), textPosition.clone(),
+                addText("-", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 255));
             }
         }
