@@ -4,6 +4,8 @@ import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
 
+import com.lifejourney.engine2d.CollidableObject;
+import com.lifejourney.engine2d.CollisionDetector;
 import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.CubeCoord;
 import com.lifejourney.engine2d.Engine2D;
@@ -280,6 +282,29 @@ public class Squad extends Object implements Controllable {
         for (Unit unit: units) {
             unit.setOffensiveBonus(collectOffensiveBonus());
             unit.setDefensiveBonus(collectDefensiveBonus());
+        }
+
+        if (!isFighting()) {
+            // Collision detection
+            CollisionDetector collisionDetector = Engine2D.GetInstance().getCollisionDetector();
+            for (CollidableObject refUnit : units) {
+                if (!refUnit.isCollisionEnabled())
+                    continue;
+
+                for (CollidableObject candidateUnit : units) {
+                    if (refUnit == candidateUnit || candidateUnit.isCollisionChecked() ||
+                            !candidateUnit.isCollisionEnabled()) {
+                        continue;
+                    }
+
+                    collisionDetector.checkAndReponseCollision(refUnit, candidateUnit, false);
+                }
+
+                refUnit.setCollisionChecked(true);
+            }
+            for (CollidableObject unit : units) {
+                unit.setCollisionChecked(false);
+            }
         }
     }
 
@@ -676,7 +701,6 @@ public class Squad extends Object implements Controllable {
         // Set companions and opponents to all units
         ArrayList<Unit> companionUnits = new ArrayList<>();
         companionUnits.addAll(companion.getUnits());
-        companionUnits.addAll(getUnits());
         for (Unit unit: units) {
             unit.setCompanions(companionUnits);
             unit.setOpponents(opponent.getUnits());

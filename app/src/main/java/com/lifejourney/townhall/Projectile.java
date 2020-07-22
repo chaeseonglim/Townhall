@@ -1,13 +1,10 @@
 package com.lifejourney.townhall;
 
 import com.lifejourney.engine2d.CollidableObject;
-import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
-
-import java.util.ArrayList;
 
 public class Projectile extends CollidableObject {
 
@@ -17,7 +14,7 @@ public class Projectile extends CollidableObject {
         void onProjectileReached(Projectile projectile);
     }
 
-    enum ProjectileClass {
+    enum ProjectileType {
         ARROW;
 
         Sprite sprite() {
@@ -48,13 +45,13 @@ public class Projectile extends CollidableObject {
     public static class Builder {
 
         private Event event;
-        private ProjectileClass projectileClass;
+        private ProjectileType projectileType;
         private Unit target;
         private PointF position = new PointF();
 
-        public Builder(Event event, ProjectileClass projectileClass, Unit target) {
+        public Builder(Event event, ProjectileType projectileType, Unit target) {
             this.event = event;
-            this.projectileClass = projectileClass;
+            this.projectileType = projectileType;
             this.target = target;
         }
         public Builder position(PointF position) {
@@ -62,11 +59,11 @@ public class Projectile extends CollidableObject {
             return this;
         }
         public Projectile build() {
-            return (Projectile) new PrivateBuilder<>(event, position, projectileClass, target)
-                    .sprite(projectileClass.sprite())
-                    .maxForce(projectileClass.maxForce()).maxVelocity(projectileClass.maxVelocity())
+            return (Projectile) new PrivateBuilder<>(event, position, projectileType, target)
+                    .sprite(projectileType.sprite())
+                    .maxForce(projectileType.maxForce()).maxVelocity(projectileType.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
-                    .mass(projectileClass.mass()).friction(0.1f)
+                    .mass(projectileType.mass()).friction(0.1f)
                     .layer(SPRITE_LAYER).build();
         }
     }
@@ -75,10 +72,10 @@ public class Projectile extends CollidableObject {
     private static class PrivateBuilder<T extends Projectile.PrivateBuilder<T>> extends CollidableObject.Builder<T> {
 
         private Event event;
-        private ProjectileClass unitClass;
+        private ProjectileType unitClass;
         private Unit target;
 
-        public PrivateBuilder(Event event, PointF position, ProjectileClass unitClass, Unit target) {
+        public PrivateBuilder(Event event, PointF position, ProjectileType unitClass, Unit target) {
             super(position);
             this.event = event;
             this.unitClass = unitClass;
@@ -94,7 +91,7 @@ public class Projectile extends CollidableObject {
         super(builder);
 
         event = builder.event;
-        projectileClass = builder.unitClass;
+        projectileType = builder.unitClass;
         target = builder.target;
     }
 
@@ -118,14 +115,14 @@ public class Projectile extends CollidableObject {
      *
      * @return
      */
-    public ProjectileClass getProjectileClass() {
+    public ProjectileType getProjectileType() {
 
-        return projectileClass;
+        return projectileType;
     }
 
     private final static int SPRITE_LAYER = 8;
 
-    private ProjectileClass projectileClass;
+    private ProjectileType projectileType;
     private Unit target;
     private Event event;
 }

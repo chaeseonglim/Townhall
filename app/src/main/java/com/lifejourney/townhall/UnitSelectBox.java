@@ -171,30 +171,54 @@ public class UnitSelectBox extends Widget implements Button.Event{
                     Color.rgb(255, 255, 255));
 
 
-            // Attack damage
-            textPosition.offset(-150, 30);
-            addText("공격력", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            String attackDamageString =
-                    ((selectedUnitClass.meleeAttackDamage() == 0.0f) ?
-                    "-":(int)selectedUnitClass.meleeAttackDamage()) + "/" +
-                    ((selectedUnitClass.rangedAttackDamage() == 0.0f) ?
-                    "-":(int)selectedUnitClass.rangedAttackDamage());
-            addText(attackDamageString, new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+            if (selectedUnitClass.unitClassType() == Unit.UnitClassType.MELEE_HEALER ||
+                selectedUnitClass.unitClassType() == Unit.UnitClassType.RANGED_HEALER) {
+                // Heal power
+                textPosition.offset(-150, 30);
+                addText("치유력", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 0));
+                textPosition.offset(0, 30);
+                String healPowerString = (selectedUnitClass.healPower() == 0.0f) ?
+                        "-" : (int) selectedUnitClass.healPower() + "";
+                addText(healPowerString, new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
 
-            textPosition.offset(150, -30);
-            addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            String attackSpeedString =
-                    ((selectedUnitClass.meleeAttackSpeed() == 0) ?
-                    "-":100/selectedUnitClass.meleeAttackSpeed()) + "/" +
-                    ((selectedUnitClass.rangedAttackSpeed() == 0) ?
-                    "-":100/selectedUnitClass.rangedAttackSpeed());
-            addText(attackSpeedString, new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                // Heal speed
+                textPosition.offset(150, -30);
+                addText("치유 속도", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 0));
+                textPosition.offset(0, 30);
+                String healSpeedString = (selectedUnitClass.healSpeed() == 0)?
+                        "-" : 100 / selectedUnitClass.healSpeed() + "";
+                addText(healSpeedString, new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            } else {
+                // Attack damage
+                textPosition.offset(-150, 30);
+                addText("공격력", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 0));
+                textPosition.offset(0, 30);
+                String attackDamageString =
+                        ((selectedUnitClass.meleeAttackDamage() == 0.0f) ?
+                                "-" : (int) selectedUnitClass.meleeAttackDamage()) + "/" +
+                                ((selectedUnitClass.rangedAttackDamage() == 0.0f) ?
+                                        "-" : (int) selectedUnitClass.rangedAttackDamage());
+                addText(attackDamageString, new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+
+                // Attack speed
+                textPosition.offset(150, -30);
+                addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 0));
+                textPosition.offset(0, 30);
+                String attackSpeedString =
+                        ((selectedUnitClass.meleeAttackSpeed() == 0) ?
+                                "-" : 100 / selectedUnitClass.meleeAttackSpeed()) + "/" +
+                                ((selectedUnitClass.rangedAttackSpeed() == 0) ?
+                                        "-" : 100 / selectedUnitClass.rangedAttackSpeed());
+                addText(attackSpeedString, new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 255));
+            }
 
             // Armor
             textPosition.offset(-150, 30);

@@ -108,9 +108,13 @@ public class Battle {
             }
         }
 
+        // Share exp to fighters
+        attacker.addExp(FIGHTING_EXP);
+        defender.addExp(FIGHTING_EXP);
+
         // Share exp to supporters
         for (Squad supporter: supporters) {
-            supporter.addExp(SUPPORTER_EXP);
+            supporter.addExp(SUPPORTING_EXP);
         }
     }
 
@@ -211,7 +215,8 @@ public class Battle {
     }
 
     private int WINNER_EXP = 50;
-    private int SUPPORTER_EXP  = 25;
+    private int FIGHTING_EXP = 1;
+    private int SUPPORTING_EXP = 1;
 
     private OffsetCoord mapCoord;
     private GameMap map;

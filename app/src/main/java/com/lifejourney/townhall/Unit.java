@@ -41,6 +41,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "균형잡힘",
                 "기병",
                 new Point(1, 0),
+                new SizeF(16, 16),
                 new Shape(8.0f),
                 200,
                 50,
@@ -49,11 +50,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 150.0f,
                 26.0f,
                 0.0f,
+                0.0f,
                 30,
                 0,
                 10,
                 0,
+                0,
                 20,
+                0,
                 5,
                 20,
                 100,
@@ -71,6 +75,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "원거리 공격",
                 "근접 방어",
                 new Point(2, 0),
+                new SizeF(16, 16),
                 new Shape(8.0f),
                 200,
                 50,
@@ -79,19 +84,22 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 64.0f,
                 26.0f,
                 150.0f,
+                0.0f,
                 50,
                 30,
+                0,
                 3,
                 5,
+                0,
                 5,
                 5,
                 5,
                 50,
                 10,
-                Projectile.ProjectileClass.ARROW,
+                Projectile.ProjectileType.ARROW,
                 2.0f,
-                1.5f,
-                3.0f,
+                2.0f,
+                4.0f,
                 true
         ),
         WORKER(
@@ -101,6 +109,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "지역 발전",
                 "전투능력 없음",
                 new Point(3, 0),
+                new SizeF(16, 16),
                 new Shape(8.0f),
                 200,
                 30,
@@ -109,6 +118,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 10.0f,
                 26.0f,
                 0.0f,
+                0.0f,
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -117,12 +129,46 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0,
                 0,
                 30,
-                10,
+                5,
                 null,
                 1.5f,
-                1.0f,
-                2.0f,
+                1.5f,
+                3.0f,
                 false
+                ),
+        HEALER(
+                "치유사",
+                UnitClassType.RANGED_HEALER,
+                "주변 유닛을 치유합니다.\n하지만 전투 능력이 없습니다.",
+                "치유력",
+                "전투능력 없음",
+                new Point(4, 0),
+                new SizeF(16, 16),
+                new Shape(8.0f),
+                500,
+                50,
+                10,
+                new float[] {-0.5f, -0.3f, -0.3f, -0.1f, -0.1f, -0.1f},
+                10.0f,
+                26.0f,
+                0.0f,
+                150.0f,
+                0,
+                0,
+                30,
+                0,
+                0,
+                3,
+                0,
+                5,
+                0,
+                50,
+                20,
+                Projectile.ProjectileType.ARROW,
+                1.5f,
+                1.5f,
+                3.0f,
+                true
                 );
 
         private UnitClassType unitClassType;
@@ -131,6 +177,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         private String strongPoint;
         private String weaknessPoint;
         private Point spriteGridIndex;
+        private SizeF spriteSize;
         private Shape shape;
         private int costToPurchase;
         private int costUpkeep;
@@ -139,35 +186,40 @@ public class Unit extends CollidableObject implements Projectile.Event {
         private float awareness;
         private float meleeAttackRange;
         private float rangedAttackRange;
+        private float healRange;
         private int meleeAttackSpeed;
         private int rangedAttackSpeed;
+        private int healSpeed;
         private float meleeAttackDamage;
         private float rangedAttackDamage;
+        private float healPower;
         private float meleeEvasion;
         private float rangedEvasion;
         private float armor;
         private float bountyExp;
         private float health;
-        private Projectile.ProjectileClass projectileClass;
+        private Projectile.ProjectileType projectileType;
         private float maxVelocity;
         private float maxForce;
         private float mass;
         private boolean supportable;
 
         UnitClass(String word, UnitClassType unitClassType, String description, String strongPoint,
-                  String weaknessPoint, Point spriteGridIndex, Shape shape, int costToPurchase,
-                  int costUpkeep, int population, float[] favors, float awareness,
-                  float meleeAttackRange, float rangedAttackRange, int meleeAttackSpeed,
-                  int rangedAttackSpeed, float meleeAttackDamage, float rangedAttackDamage,
-                  float meleeEvasion, float rangedEvasion, float armor, float health, float bountyExp,
-                  Projectile.ProjectileClass projectileClass, float maxVelocity, float maxForce,
-                  float mass, boolean supportable) {
+                  String weaknessPoint, Point spriteGridIndex, SizeF spriteSize, Shape shape,
+                  int costToPurchase, int costUpkeep, int population, float[] favors, float awareness,
+                  float meleeAttackRange, float rangedAttackRange, float healRange,
+                  int meleeAttackSpeed, int rangedAttackSpeed, int healSpeed,
+                  float meleeAttackDamage, float rangedAttackDamage, float healPower,
+                  float meleeEvasion, float rangedEvasion, float armor, float health,
+                  float bountyExp, Projectile.ProjectileType projectileType, float maxVelocity,
+                  float maxForce, float mass, boolean supportable) {
             this.word = word;
             this.unitClassType = unitClassType;
             this.description = description;
             this.strongPoint = strongPoint;
             this.weaknessPoint = weaknessPoint;
             this.spriteGridIndex = spriteGridIndex;
+            this.spriteSize = spriteSize;
             this.shape = shape;
             this.costToPurchase = costToPurchase;
             this.costUpkeep = costUpkeep;
@@ -176,39 +228,45 @@ public class Unit extends CollidableObject implements Projectile.Event {
             this.awareness = awareness;
             this.meleeAttackRange = meleeAttackRange;
             this.rangedAttackRange = rangedAttackRange;
+            this.healRange = healRange;
             this.meleeAttackSpeed = meleeAttackSpeed;
             this.rangedAttackSpeed = rangedAttackSpeed;
+            this.healSpeed = healSpeed;
             this.meleeAttackDamage = meleeAttackDamage;
             this.rangedAttackDamage = rangedAttackDamage;
+            this.healPower = healPower;
             this.meleeEvasion = meleeEvasion;
             this.rangedEvasion = rangedEvasion;
             this.armor = armor;
             this.health = health;
             this.bountyExp = bountyExp;
-            this.projectileClass = projectileClass;
+            this.projectileType = projectileType;
             this.maxVelocity = maxVelocity;
             this.maxForce = maxForce;
             this.mass = mass;
             this.supportable = supportable;
         }
 
-        String word() {
+        public String word() {
             return word;
         }
-        UnitClassType unitClassType() {
+        public UnitClassType unitClassType() {
             return unitClassType;
         }
-        String description() {
+        public String description() {
             return description;
         }
-        String strongPoint() {
+        public String strongPoint() {
             return strongPoint;
         }
-        String weaknessPoint() {
+        public String weaknessPoint() {
             return weaknessPoint;
         }
-        Point spriteGridIndex() {
+        public Point spriteGridIndex() {
             return spriteGridIndex;
+        }
+        public SizeF spriteSize() {
+            return spriteSize;
         }
         public Shape shape() {
             return shape;
@@ -237,17 +295,26 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public float rangedAttackRange() {
             return rangedAttackRange;
         }
+        public float healRange() {
+            return healRange;
+        }
         public int meleeAttackSpeed() {
             return meleeAttackSpeed;
         }
         public int rangedAttackSpeed() {
             return rangedAttackSpeed;
         }
+        public int healSpeed() {
+            return healSpeed;
+        }
         public float meleeAttackDamage() {
             return meleeAttackDamage;
         }
         public float rangedAttackDamage() {
             return rangedAttackDamage;
+        }
+        public float healPower() {
+            return healPower;
         }
         public float meleeEvasion() {
             return meleeEvasion;
@@ -267,8 +334,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public int requiredExp(int level) {
             return 100*level;
         }
-        public Projectile.ProjectileClass projectileClass() {
-            return projectileClass;
+        public Projectile.ProjectileType projectileClass() {
+            return projectileType;
         }
         public float friction() {
             return 0.1f;
@@ -303,15 +370,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return this;
         }
         public Unit build() {
+            Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png").gridSize(4,1)
+                    .size(unitClass.spriteSize().clone().multiply(2.0f)).smooth(true).opaque(0.0f).build();
             Sprite unitClassSprite = new Sprite.Builder("class", "unit_class.png").gridSize(5,1)
-                    .size(new SizeF(16, 16)).smooth(true).opaque(0.0f).build();
+                    .size(unitClass.spriteSize()).smooth(true).opaque(0.0f).build();
             unitClassSprite.setGridIndex(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y);
             Sprite unitFrameSprite = new Sprite.Builder("frame", "unit_frame.png").gridSize(5,1)
-                    .size(new SizeF(16, 16)).smooth(true).opaque(0.0f).build();
+                    .size(unitClass.spriteSize()).smooth(true).opaque(0.0f).build();
             unitFrameSprite.setGridIndex(faction.ordinal(), 0);
             Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(9,1)
-                    .size(new SizeF(16, 16)).smooth(true).opaque(0.0f).build();
+                    .size(unitClass.spriteSize()).smooth(true).opaque(0.0f).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
+                    .sprite(unitEffectSprite)
                     .sprite(unitClassSprite)
                     .sprite(unitFrameSprite)
                     .sprite(unitHealthSprite)
@@ -412,17 +482,12 @@ public class Unit extends CollidableObject implements Projectile.Event {
             } else {
                 seek(targetPosition, 0.5f);
 
-                if (companions.size() == 1) {
-                    // Wander a big
-                    wander(80.0f, 1.0f, 1.0f);
-                } else {
-                    // Wander a little
-                    wander(80.0f, 1.0f, 0.3f);
-                }
+                // Wander a big
+                wander(80.0f, 1.0f, 0.5f);
             }
 
             // Separation
-            separate(companions, 30.0f, 1.0f);
+            separate(companions, 20.0f, 1.0f);
         }
 
         // Add gravity to target
@@ -487,15 +552,39 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         // Do the melee attack
         Unit meleeTarget = searchFavoredMeleeTarget();
-        if (meleeTarget != null) {
-            attackMelee(meleeTarget);
+        if (unitClass.meleeAttackSpeed() > 0 && meleeAttackLeft == 0) {
+            if (meleeTarget != null) {
+                attackMelee(meleeTarget);
+            }
+            meleeAttackLeft = unitClass.meleeAttackSpeed();
+        } else {
+            meleeAttackLeft--;
         }
 
-        // Do the ranged attack
+        // Do the ranged attack if if doesn't attack melee
         if (meleeTarget == null) {
-            Unit rangedTarget = searchFavoredRangedTarget();
-            if (rangedTarget != null) {
-                attackRanged(rangedTarget);
+            if (unitClass.rangedAttackSpeed() > 0 && rangedAttackLeft == 0) {
+                Unit rangedTarget = searchFavoredRangedTarget();
+                if (rangedTarget != null) {
+                    attackRanged(rangedTarget);
+                }
+                rangedAttackLeft = unitClass.rangedAttackSpeed();
+            } else {
+                rangedAttackLeft--;
+            }
+        }
+
+        // Do healing
+        if (unitClass.unitClassType() == UnitClassType.MELEE_HEALER ||
+            unitClass.unitClassType() == UnitClassType.RANGED_HEALER) {
+            if (unitClass.healSpeed() > 0 && healLeft == 0) {
+                Unit healTarget = searchFavoredHealTarget();
+                if (healTarget != null) {
+                    heal(healTarget);
+                }
+                healLeft = unitClass.healSpeed();
+            } else {
+                healLeft--;
             }
         }
     }
@@ -509,10 +598,28 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return;
         }
 
-        // Do ranged attack
-        Unit rangedTarget = searchFavoredRangedTarget();
-        if (rangedTarget != null) {
-            attackRanged(rangedTarget);
+        if (unitClass.rangedAttackSpeed() > 0 && rangedAttackLeft == 0) {
+            Unit rangedTarget = searchFavoredRangedTarget();
+            if (rangedTarget != null) {
+                attackRanged(rangedTarget);
+            }
+            rangedAttackLeft = unitClass.rangedAttackSpeed();
+        } else {
+            rangedAttackLeft--;
+        }
+
+        // Do healing
+        if (unitClass.unitClassType() == UnitClassType.MELEE_HEALER ||
+                unitClass.unitClassType() == UnitClassType.RANGED_HEALER) {
+            if (unitClass.healSpeed() > 0 && healLeft == 0) {
+                Unit healTarget = searchFavoredHealTarget();
+                if (healTarget != null) {
+                    heal(healTarget);
+                }
+                healLeft = unitClass.healSpeed();
+            } else {
+                healLeft--;
+            }
         }
     }
 
@@ -578,27 +685,52 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         return targetCandidate;
     }
+
+
+    /**
+     *
+     * @return
+     */
+    private Unit searchFavoredHealTarget() {
+
+        if (getUnitClass().healRange() == 0.0f) {
+            return null;
+        }
+
+        Unit targetCandidate = null;
+        float lowestHealthPercentage = Float.MAX_VALUE;
+
+        // Select highest favored companion for heal
+        for (Unit companion : companions) {
+            if (companion.isRecruiting()) {
+                continue;
+            }
+            if (companion.getPosition().distance(getPosition()) <= getUnitClass().healRange()) {
+                float healthPercentage = companion.getHealth() / companion.getMaxHealth();
+                if (healthPercentage < 1.0f && healthPercentage < lowestHealthPercentage) {
+                    targetCandidate = companion;
+                    lowestHealthPercentage = healthPercentage;
+                }
+            }
+        }
+
+        return targetCandidate;
+    }
+
     /**
      *
      * @param opponent
      */
     private void attackMelee(Unit opponent) {
 
-        if (meleeAttackLeft == 0) {
-            // Check evading
-            if (Math.random() < opponent.getMeleeEvasion()) {
-                return;
-            }
-
-            // Deal damage
-            float damage = Math.max(getMeleeDamage() * opponent.getArmor(), 1.0f);
-            opponent.gotDamage(damage);
-
-            meleeAttackLeft = getUnitClass().meleeAttackSpeed();
+        // Check evading
+        if (Math.random() < opponent.getMeleeEvasion()) {
+            return;
         }
-        else {
-            meleeAttackLeft--;
-        }
+
+        // Deal damage
+        float damage = Math.max(getMeleeDamage() * opponent.getArmor(), 1.0f);
+        opponent.gotDamage(damage);
     }
 
     /**
@@ -607,29 +739,33 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void attackRanged(Unit opponent) {
 
-        if (rangedAttackLeft == 0) {
-            // Create projectile for ranged attack
-            // NOTE: This is just an graphical effect yet
-            if (projectile != null) {
-                projectile.close();
-            }
-            projectile = new Projectile.Builder(this, unitClass.projectileClass(), opponent).build();
-            projectile.setPosition(this.getPosition().clone());
-            projectile.setVisible(true);
-
-            // Check evading
-            if (Math.random() < opponent.getRangedEvasion()) {
-                return;
-            }
-
-            // Deal damage
-            float damage = Math.max(getRangedDamage() * opponent.getArmor(), 1.0f);
-            opponent.gotDamage(damage);
-
-            rangedAttackLeft = getUnitClass().rangedAttackSpeed();
-        } else {
-            rangedAttackLeft--;
+        // Create projectile for ranged attack
+        // NOTE: This is just an graphical effect yet
+        if (projectile != null) {
+            projectile.close();
         }
+        projectile = new Projectile.Builder(this, unitClass.projectileClass(), opponent).build();
+        projectile.setPosition(this.getPosition().clone());
+        projectile.setVisible(true);
+
+        // Check evading
+        if (Math.random() < opponent.getRangedEvasion()) {
+            return;
+        }
+
+        // Deal damage
+        float damage = Math.max(getRangedDamage() * opponent.getArmor(), 1.0f);
+        opponent.gotDamage(damage);
+    }
+
+    /**
+     *
+     * @param companion
+     */
+    private void heal(Unit companion) {
+
+        // Heal
+        companion.gotHeal(getHealPower());
     }
 
     /**
@@ -643,11 +779,12 @@ public class Unit extends CollidableObject implements Projectile.Event {
             health = 0;
         }
 
-        Sprite healthSprite = getSprite(2);
+        // Adjust health sprite
+        Sprite healthSprite = getSprite("health");
         healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
 
         // Blinking
-        Sprite classSprite = getSprite(0);
+        Sprite classSprite = getSprite("class");
         classSprite.clearAnimation();
         classSprite.addAnimationFrame(0, 0, 5);
         classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
@@ -655,7 +792,30 @@ public class Unit extends CollidableObject implements Projectile.Event {
         classSprite.addAnimationFrame(0, 0, 5);
         classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
                 unitClass.spriteGridIndex().y,5);
+    }
 
+    /**
+     *
+     * @param healPower
+     */
+    private void gotHeal(float healPower) {
+
+        health += healPower;
+        if (health > getMaxHealth()) {
+            health = getMaxHealth();
+        }
+
+        // Adjust health sprite
+        Sprite healthSprite = getSprite("health");
+        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
+
+        // Healing effect
+        Sprite effectSprite = getSprite("effect");
+        effectSprite.clearAnimation();
+        effectSprite.addAnimationFrame(1, 0, 5);
+        effectSprite.addAnimationFrame(2, 0, 5);
+        effectSprite.addAnimationFrame(3, 0, 5);
+        effectSprite.addAnimationFrame(0, 0, 5);
     }
 
     /**
@@ -730,6 +890,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private float getRangedDamage() {
 
         return adjustByOffensiveBonus(adjustByLevel(getUnitClass().rangedAttackDamage()));
+    }
+
+    /**
+     *
+     * @return
+     */
+    private float getHealPower() {
+
+        return adjustByDefensiveBonus(adjustByLevel(getUnitClass().healPower()));
     }
 
     /**
@@ -919,5 +1088,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private OffsetCoord targetMapPosition;
     private int meleeAttackLeft = 0;
     private int rangedAttackLeft = 0;
+    private int healLeft = 0;
     private Projectile projectile;
 }

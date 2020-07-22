@@ -935,8 +935,8 @@ public class Town {
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
             new int[] { 100, 200, 300, 400, 500};
     private final static int FACILITY_EXP_STEP = 10;
-    private final static int GOLD_STEP = 5;
-    private final static int POPULATION_STEP = 1;
+    private final static int GOLD_STEP = 50;
+    private final static int POPULATION_STEP = 10;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;
     private final static int OCCUPATION_TOTAL_STEP = 5;
