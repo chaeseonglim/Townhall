@@ -197,6 +197,8 @@ public class Townhall extends FragmentActivity
         Engine2D.GetInstance().setSurface(surface, width, height);
 
         if (!surfacePrepared) {
+            Log.i(LOG_TAG, "surfaceChanged");
+
             onEngine2DPrepared();
             surfacePrepared = true;
         }
@@ -220,7 +222,7 @@ public class Townhall extends FragmentActivity
         world = new GameWorld("map.png");
     }
 
-    private GameWorld world;
+    private GameWorld world = null;
     private boolean isRunning;
     private boolean surfacePrepared = false;
     private int fpsMarkerCount = 0;

@@ -105,6 +105,9 @@ class GameMap extends HexTileMap implements View, Town.Event {
     @Override
     public void close() {
 
+        for (Town town: towns.values()) {
+            town.removeTileSprites();
+        }
         super.close();
     }
 

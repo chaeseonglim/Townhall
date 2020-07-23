@@ -713,6 +713,10 @@ public class Town {
             glowingSprite.close();
             glowingSprite = null;
         }
+        if (selectionSprite != null) {
+            selectionSprite.close();
+            selectionSprite = null;
+        }
     }
 
     /**

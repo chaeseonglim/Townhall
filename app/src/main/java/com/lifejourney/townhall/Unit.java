@@ -370,8 +370,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return this;
         }
         public Unit build() {
-            Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png").gridSize(4,1)
-                    .size(unitClass.spriteSize().clone().multiply(2.0f)).smooth(true).opaque(0.0f).build();
             Sprite unitClassSprite = new Sprite.Builder("class", "unit_class.png").gridSize(5,1)
                     .size(unitClass.spriteSize()).smooth(true).opaque(0.0f).build();
             unitClassSprite.setGridIndex(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y);
@@ -380,6 +378,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
             unitFrameSprite.setGridIndex(faction.ordinal(), 0);
             Sprite unitHealthSprite = new Sprite.Builder("health", "unit_health.png").gridSize(9,1)
                     .size(unitClass.spriteSize()).smooth(true).opaque(0.0f).build();
+            Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png").gridSize(4,1)
+                    .size(unitClass.spriteSize().clone().multiply(2.0f)).smooth(false).opaque(0.0f).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitEffectSprite)
                     .sprite(unitClassSprite)
@@ -787,11 +787,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
         Sprite classSprite = getSprite("class");
         classSprite.clearAnimation();
         classSprite.addAnimationFrame(0, 0, 5);
-        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
-                unitClass.spriteGridIndex().y,5);
+        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y,
+                5);
         classSprite.addAnimationFrame(0, 0, 5);
-        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x,
-                unitClass.spriteGridIndex().y,5);
+        classSprite.addAnimationFrame(unitClass.spriteGridIndex().x, unitClass.spriteGridIndex().y,
+                5);
     }
 
     /**
@@ -812,10 +812,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Healing effect
         Sprite effectSprite = getSprite("effect");
         effectSprite.clearAnimation();
-        effectSprite.addAnimationFrame(1, 0, 5);
-        effectSprite.addAnimationFrame(2, 0, 5);
-        effectSprite.addAnimationFrame(3, 0, 5);
-        effectSprite.addAnimationFrame(0, 0, 5);
+        effectSprite.addAnimationFrame(1, 0, 10);
+        effectSprite.addAnimationFrame(2, 0, 10);
+        effectSprite.addAnimationFrame(3, 0, 10);
+        effectSprite.addAnimationFrame(0, 0, 10);
     }
 
     /**

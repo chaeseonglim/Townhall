@@ -6,6 +6,7 @@ import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ListIterator;
 
 public class GameWorld extends World
@@ -19,7 +20,7 @@ public class GameWorld extends World
         super();
 
         // Set FPS
-        setDesiredFPS(15.0f);
+        setDesiredFPS(20.0f);
 
         // Build map
         map = new GameMap(this, mapFileName);
@@ -91,6 +92,8 @@ public class GameWorld extends World
      */
     @Override
     public void close() {
+
+        super.close();
 
         map.close();
         map = null;
@@ -372,19 +375,19 @@ public class GameWorld extends World
 
         if (speedControl.getPlaySpeed() == 0) {
             // Pause
-            setDesiredFPS(15.0f);
+            setDesiredFPS(20.0f);
             paused = true;
         } else if (speedControl.getPlaySpeed() == 1) {
             // 1x
-            setDesiredFPS(15.0f);
+            setDesiredFPS(20.0f);
             paused = false;
         } else if (speedControl.getPlaySpeed() == 2) {
             // 2x
-            setDesiredFPS(25.0f);
+            setDesiredFPS(30.0f);
             paused = false;
         } else if (speedControl.getPlaySpeed() == 3) {
             // 3x
-            setDesiredFPS(35.0f);
+            setDesiredFPS(40.0f);
             paused = false;
         }
     }
