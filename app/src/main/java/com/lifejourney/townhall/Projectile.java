@@ -15,27 +15,45 @@ public class Projectile extends CollidableObject {
     }
 
     enum ProjectileType {
-        ARROW;
+        ARROW,
+        HEAL;
 
         Sprite sprite() {
-            Sprite sprite = new Sprite.Builder("bullet.png").gridSize(1,1)
-                    .size(new SizeF(3, 3)).smooth(false).build();
-            sprite.setGridIndex(spriteGridIndex().x, spriteGridIndex().y);
+            Sprite sprite = new Sprite.Builder("projectile.png").gridSize(2,1)
+                    .size(new SizeF(6, 6)).smooth(false).build();
+            Point gridIndex = spriteGridIndex();
+            sprite.setGridIndex(gridIndex.x, gridIndex.y);
             return sprite;
         }
         Point spriteGridIndex() {
             switch (this) {
                 case ARROW:
                     return new Point(0, 0);
+                case HEAL:
+                    return new Point(1, 0);
                 default:
-                    return null;
+                    return new Point(0, 0);
             }
         }
         public float maxForce() {
-            return 10.0f;
+            switch (this) {
+                case ARROW:
+                    return 10.0f;
+                case HEAL:
+                    return 5.0f;
+                default:
+                    return 0.0f;
+            }
         }
         public float maxVelocity() {
-            return 10.0f;
+            switch (this) {
+                case ARROW:
+                    return 10.0f;
+                case HEAL:
+                    return 5.0f;
+                default:
+                    return 0.0f;
+            }
         }
         public float mass() {
             return 1.0f;
@@ -47,16 +65,13 @@ public class Projectile extends CollidableObject {
         private Event event;
         private ProjectileType projectileType;
         private Unit target;
-        private PointF position = new PointF();
+        private PointF position;
 
-        public Builder(Event event, ProjectileType projectileType, Unit target) {
+        public Builder(Event event, ProjectileType projectileType, Unit target, PointF position) {
             this.event = event;
             this.projectileType = projectileType;
             this.target = target;
-        }
-        public Builder position(PointF position) {
             this.position = position;
-            return this;
         }
         public Projectile build() {
             return (Projectile) new PrivateBuilder<>(event, position, projectileType, target)
@@ -64,21 +79,24 @@ public class Projectile extends CollidableObject {
                     .maxForce(projectileType.maxForce()).maxVelocity(projectileType.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
                     .mass(projectileType.mass()).friction(0.1f)
-                    .layer(SPRITE_LAYER).build();
+                    .layer(SPRITE_LAYER).visible(true).build();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static class PrivateBuilder<T extends Projectile.PrivateBuilder<T>> extends CollidableObject.Builder<T> {
+    private static class PrivateBuilder<T extends Projectile.PrivateBuilder<T>>
+            extends CollidableObject.Builder<T> {
 
         private Event event;
-        private ProjectileType unitClass;
+        private ProjectileType type;
         private Unit target;
+        private float damage = 0.0f;
+        private float heal = 0.0f;
 
-        public PrivateBuilder(Event event, PointF position, ProjectileType unitClass, Unit target) {
+        public PrivateBuilder(Event event, PointF position, ProjectileType type, Unit target) {
             super(position);
             this.event = event;
-            this.unitClass = unitClass;
+            this.type = type;
             this.target = target;
         }
         public Projectile build() {
@@ -91,7 +109,7 @@ public class Projectile extends CollidableObject {
         super(builder);
 
         event = builder.event;
-        projectileType = builder.unitClass;
+        type = builder.type;
         target = builder.target;
     }
 
@@ -115,14 +133,23 @@ public class Projectile extends CollidableObject {
      *
      * @return
      */
-    public ProjectileType getProjectileType() {
+    public ProjectileType getType() {
 
-        return projectileType;
+        return type;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Unit getTarget() {
+
+        return target;
     }
 
     private final static int SPRITE_LAYER = 8;
 
-    private ProjectileType projectileType;
+    private ProjectileType type;
     private Unit target;
     private Event event;
 }

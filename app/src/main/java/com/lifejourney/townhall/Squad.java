@@ -217,15 +217,17 @@ public class Squad extends Object implements Controllable {
                 if (town.isOccupying()) {
                     occupy();
                 } else {
-                    // And check if it's supporting others
+                    // And check if it's supporting other squad
                     boolean isSupporting = false;
-                    ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
-                    for (Town neighborTown: neighborTowns) {
-                        if (neighborTown.getBattle() != null) {
-                            neighborTown.getBattle().addSupporter(this);
-                            isSupporting = true;
-                            setSpritesToSupport();
-                            break;
+                    if (isSupportable()) {
+                        ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapCoord(), false);
+                        for (Town neighborTown : neighborTowns) {
+                            if (neighborTown.getBattle() != null) {
+                                neighborTown.getBattle().addSupporter(this);
+                                isSupporting = true;
+                                setSpritesToSupport();
+                                break;
+                            }
                         }
                     }
 
@@ -775,11 +777,17 @@ public class Squad extends Object implements Controllable {
      */
     boolean isWillingToRetreat() {
 
+        boolean aggressiveness = false;
         int totalUnitHealth = 0;
         for (Unit unit: units) {
             totalUnitHealth += unit.getHealth();
+            if (unit.getUnitClass().isAggressive()) {
+                aggressiveness = true;
+            }
         }
-        return (float) totalUnitHealth / totalHealthAtBeginningOfFight < RETREAT_THRESHOLD;
+
+        return  ((float) totalUnitHealth / totalHealthAtBeginningOfFight < RETREAT_THRESHOLD) ||
+                !aggressiveness;
     }
 
     /**
@@ -1050,9 +1058,23 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
+    public boolean isSupportable() {
+
+        for (Unit unit: units) {
+            if (!unit.isRecruiting() && unit.getUnitClass().isSupportable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return
+     */
     public boolean isSupporting() {
 
-        if (isMoving() || isFighting() || isOccupying()) {
+        if (isMoving() || isFighting() || isOccupying() || !isSupportable()) {
             return false;
         }
 
@@ -1082,7 +1104,6 @@ public class Squad extends Object implements Controllable {
         }
         return false;
     }
-
 
     /**
      *

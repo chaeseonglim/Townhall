@@ -27,7 +27,7 @@ public class GameWorld extends World
         map.show();
         addView(map);
 
-        // Build tribes
+        // Build tribe
         Villager villager = new Villager(this, map);
         tribes.add(villager);
         tribes.add(new Bandit(this, map));
@@ -309,7 +309,7 @@ public class GameWorld extends World
     public void onSquadUnitAdded(Squad squad, Unit unit) {
 
         addUnit(unit);
-        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
+        if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
         }
     }
@@ -323,7 +323,7 @@ public class GameWorld extends World
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
         removeUnit(unit);
-        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
+        if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
         }
     }
