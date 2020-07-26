@@ -29,7 +29,9 @@ public class Town {
                 0,
                 1,
                 0,
-                0
+                0,
+                null,
+                0.0f
         ),
         BADLANDS(
                 "황무지",
@@ -40,7 +42,9 @@ public class Town {
                 0,
                 -1,
                 0,
-                0
+                0,
+                null,
+                0.0f
         ),
         FOREST(
                 "숲",
@@ -51,7 +55,9 @@ public class Town {
                 0,
                 0,
                 0,
-                1
+                1,
+                null,
+                0.0f
         ),
         HILL(
                 "언덕",
@@ -62,7 +68,9 @@ public class Town {
                 0,
                 0,
                 0,
-                2
+                2,
+                null,
+                0.0f
         ),
         MOUNTAIN(
                 "산",
@@ -73,7 +81,9 @@ public class Town {
                 0,
                 0,
                 0,
-                3
+                3,
+                null,
+                0.0f
         ),
         RIVER(
                 "강",
@@ -84,10 +94,12 @@ public class Town {
                 0,
                 0,
                 0,
-                3
+                3,
+                null,
+                0.0f
         ),
-        HEADQUARTER_GRASS(
-                "본부",
+        HEADQUARTER_VILLAGER(
+                "타운홀",
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -95,10 +107,12 @@ public class Town {
                 5,
                 5,
                 5,
-                5
+                5,
+                null,
+                0.0f
         ),
-        HEADQUARTER_BADLANDS(
-                "본부",
+        HEADQUARTER_BANDIT(
+                "도적 소굴",
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -106,7 +120,61 @@ public class Town {
                 5,
                 5,
                 5,
-                5
+                5,
+                null,
+                0.0f
+        ),
+        SHRINE_WIND(
+                "바람의 제단",
+                0,
+                new boolean[] { true, true, true, true, true },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                10,
+                0,
+                3,
+                Tribe.GlobalBonusFactor.UNIT_ATTACK_SPEED,
+                0.5f
+        ),
+        SHRINE_HEAL(
+                "치유의 제단",
+                0,
+                new boolean[] { true, true, true, true, true },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                10,
+                0,
+                3,
+                Tribe.GlobalBonusFactor.UNIT_HEAL_POWER,
+                0.5f
+        ),
+        SHRINE_LOVE(
+                "사랑의 제단",
+                0,
+                new boolean[] { true, true, true, true, true },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                10,
+                0,
+                3,
+                Tribe.GlobalBonusFactor.TOWN_POPULATION_BOOST,
+                0.5f
+        ),
+        SHRINE_PROSPER(
+                "풍요의 제단",
+                0,
+                new boolean[] { true, true, true, true, true },
+                new int[] {0, 0, 0, 0},
+                0,
+                0,
+                10,
+                0,
+                3,
+                Tribe.GlobalBonusFactor.TOWN_GOLD_BOOST,
+                0.5f
         ),
         UNKNOWN(
                 "모름",
@@ -117,7 +185,9 @@ public class Town {
                 0,
                 0,
                 0,
-                0
+                0,
+                null,
+                0.0f
         );
 
         private String word;
@@ -130,9 +200,12 @@ public class Town {
         private int happinessDelta;
         private int offenseDelta;
         private int defenseDelta;
+        private Tribe.GlobalBonusFactor bonusFactor;
+        private float bonusValue;
 
-        Terrain(String word, int facilitySlots, boolean[] movable, int[] developmentDeltas, int goldDelta,
-                int populationDelta, int happinessDelta, int offenseDelta, int defenseDelta) {
+        Terrain(String word, int facilitySlots, boolean[] movable, int[] developmentDeltas,
+                int goldDelta, int populationDelta, int happinessDelta, int offenseDelta,
+                int defenseDelta, Tribe.GlobalBonusFactor bonusFactor, float bonusValue) {
             this.word = word;
             this.facilitySlots = facilitySlots;
             this.movable = movable;
@@ -143,6 +216,8 @@ public class Town {
             this.happinessDelta = happinessDelta;
             this.offenseDelta = offenseDelta;
             this.defenseDelta = defenseDelta;
+            this.bonusFactor = bonusFactor;
+            this.bonusValue = bonusValue;
         }
 
         String word() {
@@ -174,6 +249,12 @@ public class Town {
         }
         public int defenseDelta() {
             return defenseDelta;
+        }
+        public Tribe.GlobalBonusFactor bonusFactor() {
+            return bonusFactor;
+        }
+        public float bonusValue() {
+            return bonusValue;
         }
     }
 
@@ -882,7 +963,7 @@ public class Town {
         if (getBattle() != null) {
             return 0;
         } else {
-            return (int) (GOLD_STEP * deltas[DeltaAttribute.GOLD.ordinal()] * (100.0f / happiness));
+            return (int) (GOLD_STEP * deltas[DeltaAttribute.GOLD.ordinal()] * (happiness / 100.0f));
         }
     }
 

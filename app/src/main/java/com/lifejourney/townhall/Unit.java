@@ -655,39 +655,39 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         // Do the melee attack
         Unit meleeTarget = searchFavoredMeleeTarget();
-        if (unitClass.meleeAttackSpeed() > 0 && meleeAttackLeft == 0) {
+        if (getMeleeAttackSpeed() > 0 && meleeAttackTimeLeft == 0) {
             if (meleeTarget != null) {
                 attackMelee(meleeTarget);
             }
-            meleeAttackLeft = unitClass.meleeAttackSpeed();
+            meleeAttackTimeLeft = getMeleeAttackSpeed();
         } else {
-            meleeAttackLeft--;
+            meleeAttackTimeLeft--;
         }
 
         // Do the ranged attack if if doesn't attack melee
         if (meleeTarget == null) {
-            if (unitClass.rangedAttackSpeed() > 0 && rangedAttackLeft == 0) {
+            if (getRangedAttackSpeed() > 0 && rangedAttackTimeLeft == 0) {
                 Unit rangedTarget = searchFavoredRangedTarget();
                 if (rangedTarget != null) {
                     attackRanged(rangedTarget);
                 }
-                rangedAttackLeft = unitClass.rangedAttackSpeed();
+                rangedAttackTimeLeft = getRangedAttackSpeed();
             } else {
-                rangedAttackLeft--;
+                rangedAttackTimeLeft--;
             }
         }
 
         // Do healing
         if (unitClass.unitClassType() == UnitClassType.MELEE_HEALER ||
             unitClass.unitClassType() == UnitClassType.RANGED_HEALER) {
-            if (unitClass.healSpeed() > 0 && healLeft == 0) {
+            if (unitClass.healSpeed() > 0 && healTimeLeft == 0) {
                 Unit healTarget = searchFavoredHealTarget();
                 if (healTarget != null) {
                     heal(healTarget);
                 }
-                healLeft = unitClass.healSpeed();
+                healTimeLeft = unitClass.healSpeed();
             } else {
-                healLeft--;
+                healTimeLeft--;
             }
         }
     }
@@ -701,27 +701,27 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return;
         }
 
-        if (unitClass.rangedAttackSpeed() > 0 && rangedAttackLeft == 0) {
+        if (unitClass.rangedAttackSpeed() > 0 && rangedAttackTimeLeft == 0) {
             Unit rangedTarget = searchFavoredRangedTarget();
             if (rangedTarget != null) {
                 attackRanged(rangedTarget);
             }
-            rangedAttackLeft = unitClass.rangedAttackSpeed();
+            rangedAttackTimeLeft = unitClass.rangedAttackSpeed();
         } else {
-            rangedAttackLeft--;
+            rangedAttackTimeLeft--;
         }
 
         // Do healing
         if (unitClass.unitClassType() == UnitClassType.MELEE_HEALER ||
                 unitClass.unitClassType() == UnitClassType.RANGED_HEALER) {
-            if (unitClass.healSpeed() > 0 && healLeft == 0) {
+            if (unitClass.healSpeed() > 0 && healTimeLeft == 0) {
                 Unit healTarget = searchFavoredHealTarget();
                 if (healTarget != null) {
                     heal(healTarget);
                 }
-                healLeft = unitClass.healSpeed();
+                healTimeLeft = unitClass.healSpeed();
             } else {
-                healLeft--;
+                healTimeLeft--;
             }
         }
     }
@@ -933,19 +933,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param value
      * @return
      */
-    private float adjustByDefensiveBonus(float value) {
+    private float adjustByBonus(float value, float bonus) {
 
-        return value * (1.0f + 0.05f * defensiveBonus);
-    }
-
-    /**
-     *
-     * @param value
-     * @return
-     */
-    private float adjustByOffensiveBonus(float value) {
-
-        return value * (1.0f + 0.05f * offensiveBonus);
+        return value * (1.0f + bonus);
     }
 
     /**
@@ -972,7 +962,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getMeleeDamage() {
 
-        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().meleeAttackDamage()));
+        return adjustByBonus(adjustByLevel(getUnitClass().meleeAttackDamage()), attackDamageBonus);
     }
 
     /**
@@ -981,7 +971,25 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getRangedDamage() {
 
-        return adjustByOffensiveBonus(adjustByLevel(getUnitClass().rangedAttackDamage()));
+        return adjustByBonus(adjustByLevel(getUnitClass().rangedAttackDamage()), attackDamageBonus);
+    }
+
+    /**
+     *
+     * @return
+     */
+    private int getMeleeAttackSpeed() {
+
+        return (int) (adjustByBonus(getUnitClass().meleeAttackSpeed(), attackSpeedBonus));
+    }
+
+    /**
+     *
+     * @return
+     */
+    private int getRangedAttackSpeed() {
+
+        return (int) (adjustByBonus(getUnitClass().rangedAttackSpeed(), attackSpeedBonus));
     }
 
     /**
@@ -990,7 +998,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getHealPower() {
 
-        return adjustByDefensiveBonus(adjustByLevel(getUnitClass().healPower()));
+        return adjustByBonus(adjustByLevel(getUnitClass().healPower()), healPowerBonus);
     }
 
     /**
@@ -1017,7 +1025,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private float getArmor() {
 
-        return adjustByDefensiveBonus(adjustByLevel(getUnitClass().armor()/100));
+        return adjustByBonus(adjustByLevel(getUnitClass().armor()/100), armorBonus);
     }
 
     /**
@@ -1088,6 +1096,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getLevel() {
+
         return level;
     }
 
@@ -1095,6 +1104,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      */
     public void addExp(int expEarned) {
+
         if (isRecruiting()) {
             return;
         }
@@ -1120,6 +1130,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public boolean isRecruiting() {
+
         return recruitingTimeLeft > 0;
     }
 
@@ -1128,6 +1139,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public boolean isFighting() {
+
         return opponents != null;
     }
 
@@ -1136,6 +1148,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getGoldUpkeep() {
+
         return unitClass.costUpkeep();
     }
 
@@ -1144,6 +1157,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getPopulationUpkeep() {
+
         return unitClass.population();
     }
 
@@ -1152,23 +1166,44 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public Tribe.Faction getFaction() {
+
         return faction;
     }
 
     /**
      *
-     * @param defenseBonus
+     * @param bonus
      */
-    public void setDefensiveBonus(int defenseBonus) {
-        this.defensiveBonus = defenseBonus;
+    public void setAttackDamageBonus(float bonus) {
+
+        this.attackDamageBonus = bonus;
     }
 
     /**
      *
-     * @param offensiveBonus
+     * @param bonus
      */
-    public void setOffensiveBonus(int offensiveBonus) {
-        this.offensiveBonus = offensiveBonus;
+    public void setAttackSpeedBonus(float bonus) {
+
+        this.attackSpeedBonus = bonus;
+    }
+
+    /**
+     *
+     * @param bonus
+     */
+    public void setHealPowerBonus(float bonus) {
+
+        this.healPowerBonus = bonus;
+    }
+
+    /**
+     *
+     * @param bonus
+     */
+    public void setArmorBonus(float bonus) {
+
+        this.armorBonus = bonus;
     }
 
     private final static int MAX_LEVEL = 10;
@@ -1182,13 +1217,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private Tribe.Faction faction;
-    private int offensiveBonus;
-    private int defensiveBonus;
+    private float attackDamageBonus = 0.0f;
+    private float attackSpeedBonus = 0.0f;
+    private float healPowerBonus = 0.0f;
+    private float armorBonus = 0.0f;
 
-    private int recruitingTimeLeft = RECRUITING_TIME;
     private OffsetCoord targetMapPosition;
-    private int meleeAttackLeft = 0;
-    private int rangedAttackLeft = 0;
-    private int healLeft = 0;
+    private int recruitingTimeLeft = RECRUITING_TIME;
+    private int meleeAttackTimeLeft = 0;
+    private int rangedAttackTimeLeft = 0;
+    private int healTimeLeft = 0;
     private ArrayList<Projectile> projectiles = new ArrayList<>();
 }

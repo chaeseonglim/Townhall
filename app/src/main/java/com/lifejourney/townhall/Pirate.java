@@ -4,14 +4,6 @@ public class Pirate extends Tribe {
 
     public Pirate(Event eventHandler, GameMap map) {
 
-        super(eventHandler, Tribe.Faction.PIRATE, map);
-    }
-
-    /**
-     *
-     */
-    @Override
-    void update() {
-
+        super(eventHandler, Faction.PIRATE, map);
     }
 }

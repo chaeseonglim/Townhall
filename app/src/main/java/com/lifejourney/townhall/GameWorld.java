@@ -6,7 +6,6 @@ import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ListIterator;
 
 public class GameWorld extends World
@@ -143,7 +142,7 @@ public class GameWorld extends World
 
         // Check if new battle is arisen
         for (Squad squad: squads) {
-            Town thisTown = map.getTown(squad.getMapCoord());
+            Town thisTown = map.getTown(squad.getMapPosition());
             ArrayList<Squad> squadsInSameMap = thisTown.getSquads();
             assert squadsInSameMap.size() <= 2;
             if (squadsInSameMap.size() == 2 && thisTown.getBattle() == null) {
@@ -208,10 +207,25 @@ public class GameWorld extends World
     /**
      *
      * @param town
+     * @param prevFaction
      */
     @Override
-    public void onMapTownOccupied(Town town) {
+    public void onMapTownOccupied(Town town, Tribe.Faction prevFaction) {
 
+        // Check if it's shrine
+        if (town.getTerrain() == Town.Terrain.SHRINE_WIND ||
+            town.getTerrain() == Town.Terrain.SHRINE_HEAL ||
+            town.getTerrain() == Town.Terrain.SHRINE_LOVE ||
+            town.getTerrain() == Town.Terrain.SHRINE_PROSPER) {
+            Tribe.GlobalBonusFactor factor = town.getTerrain().bonusFactor();
+            float value = town.getTerrain().bonusValue();
+            if (prevFaction != Tribe.Faction.NEUTRAL) {
+                getTribe(prevFaction).addGlobalFactor(factor, -value);
+            }
+            getTribe(town.getFaction()).addGlobalFactor(factor, value);
+        }
+
+        // Check UI
         if (focusedTown == town && focusedTown.getFaction() == Tribe.Faction.VILLAGER &&
                 focusedTown.getSquads().isEmpty()) {
             squadBuilderButton.show();
@@ -237,7 +251,7 @@ public class GameWorld extends World
     @Override
     public void onSquadCreated(Squad squad) {
 
-        map.getTown(squad.getMapCoord()).addSquad(squad);
+        map.getTown(squad.getMapPosition()).addSquad(squad);
         addSquad(squad);
     }
 
@@ -248,7 +262,7 @@ public class GameWorld extends World
     @Override
     public void onSquadDestroyed(Squad squad) {
 
-        map.getTown(squad.getMapCoord()).removeSquad(squad);
+        map.getTown(squad.getMapPosition()).removeSquad(squad);
         removeSquad(squad);
 
         // Check if destroyed squad is focused
@@ -290,14 +304,14 @@ public class GameWorld extends World
     /**
      *
      * @param squad
-     * @param prevMapCoord
-     * @param newMapCoord
+     * @param prevMapPosition
+     * @param newMapPosition
      */
     @Override
-    public void onSquadMoved(Squad squad, OffsetCoord prevMapCoord, OffsetCoord newMapCoord) {
+    public void onSquadMoved(Squad squad, OffsetCoord prevMapPosition, OffsetCoord newMapPosition) {
 
-        map.getTown(prevMapCoord).removeSquad(squad);
-        map.getTown(newMapCoord).addSquad(squad);
+        map.getTown(prevMapPosition).removeSquad(squad);
+        map.getTown(newMapPosition).addSquad(squad);
     }
 
     /**
@@ -399,7 +413,7 @@ public class GameWorld extends World
     @Override
     public void onInfoBoxSwitchToTown(InfoBox infoBox) {
 
-        popupNewInfoBox(map.getTown(focusedSquad.getMapCoord()));
+        popupNewInfoBox(map.getTown(focusedSquad.getMapPosition()));
 
         infoBox.close();
         removeWidget(infoBox);
@@ -419,7 +433,7 @@ public class GameWorld extends World
 
         // In case of building new squad
         if (focusedSquad != null && focusedSquad.getUnits().isEmpty()) {
-            Town town = map.getTown(focusedSquad.getMapCoord());
+            Town town = map.getTown(focusedSquad.getMapPosition());
             Squad squad = focusedSquad;
             squad.close();
             town.setFocus(true);
@@ -496,6 +510,21 @@ public class GameWorld extends World
 
         units.remove(unit);
         removeObject(unit);
+    }
+
+    /**
+     *
+     * @param faction
+     * @return
+     */
+    public Tribe getTribe(Tribe.Faction faction) {
+
+        for (Tribe tribe: tribes) {
+            if (tribe.getFaction() == faction) {
+                return tribe;
+            }
+        }
+        return null;
     }
 
     private boolean paused = false;

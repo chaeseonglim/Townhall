@@ -18,7 +18,7 @@ public class Battle {
         this.defender = defender;
         this.attacker.beginFight(defender);
         this.defender.beginFight(attacker);
-        this.mapCoord = defender.getMapCoord();
+        this.mapCoord = defender.getMapPosition();
     }
 
     /**

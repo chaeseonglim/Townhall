@@ -3,6 +3,7 @@ import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class Tribe implements Squad.Event {
 
@@ -33,6 +34,13 @@ public abstract class Tribe implements Squad.Event {
         }
     }
 
+    enum GlobalBonusFactor {
+        UNIT_ATTACK_SPEED,
+        UNIT_HEAL_POWER,
+        TOWN_GOLD_BOOST,
+        TOWN_POPULATION_BOOST;
+    }
+
     public interface Event extends Squad.Event {
 
         void onTribeCollected(Tribe tribe);
@@ -46,16 +54,26 @@ public abstract class Tribe implements Squad.Event {
         this.map = map;
         this.towns = map.getTownsBySide(faction);
         for (Town town: towns) {
-            if (town.getTerrain() == Town.Terrain.HEADQUARTER_GRASS) {
+            if (town.getTerrain() == Town.Terrain.HEADQUARTER_VILLAGER) {
                 this.headquarterPosition = town.getMapCoord();
             }
         }
+        Arrays.fill(this.globalFactors, 0.0f);
     }
 
     /**
      *
      */
-    abstract void update();
+    public void update() {
+
+        // Set squad bonus
+        for (Squad squad : squads) {
+            squad.setGlobalFactor(GlobalBonusFactor.UNIT_ATTACK_SPEED,
+                    getGlobalFactor(GlobalBonusFactor.UNIT_ATTACK_SPEED));
+            squad.setGlobalFactor(GlobalBonusFactor.UNIT_HEAL_POWER,
+                    getGlobalFactor(GlobalBonusFactor.UNIT_HEAL_POWER));
+        }
+    }
 
     /**
      *
@@ -90,13 +108,13 @@ public abstract class Tribe implements Squad.Event {
     /**
      *
      * @param squad
-     * @param oldMapCoord
-     * @param newMapCoord
+     * @param prevMapPosition
+     * @param newMapPosition
      */
     @Override
-    public void onSquadMoved(Squad squad, OffsetCoord oldMapCoord, OffsetCoord newMapCoord) {
+    public void onSquadMoved(Squad squad, OffsetCoord prevMapPosition, OffsetCoord newMapPosition) {
 
-        eventHandler.onSquadMoved(squad, oldMapCoord, newMapCoord);
+        eventHandler.onSquadMoved(squad, prevMapPosition, newMapPosition);
     }
 
     /**
@@ -191,10 +209,41 @@ public abstract class Tribe implements Squad.Event {
         return eventHandler;
     }
 
+    /**
+     *
+     * @param factor
+     * @return
+     */
+    public float getGlobalFactor(GlobalBonusFactor factor) {
+
+        return globalFactors[factor.ordinal()];
+    }
+
+    /**
+     *
+     * @param factor
+     * @param value
+     */
+    public void setGlobalFactor(GlobalBonusFactor factor, float value) {
+
+        globalFactors[factor.ordinal()] = value;
+    }
+
+    /**
+     *
+     * @param factor
+     * @param value
+     */
+    public void addGlobalFactor(GlobalBonusFactor factor, float value) {
+
+        globalFactors[factor.ordinal()] += value;
+    }
+
     private Event eventHandler;
     private Faction faction;
     private GameMap map;
     private OffsetCoord headquarterPosition;
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Town> towns;
+    private float[] globalFactors = new float[GlobalBonusFactor.values().length];
 }

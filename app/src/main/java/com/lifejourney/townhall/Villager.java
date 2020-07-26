@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.OffsetCoord;
 
 public class Villager extends Tribe {
@@ -8,7 +10,7 @@ public class Villager extends Tribe {
 
     public Villager(Tribe.Event eventHandler, GameMap map) {
 
-        super(eventHandler, Tribe.Faction.VILLAGER, map);
+        super(eventHandler, Faction.VILLAGER, map);
 
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
                 Unit.UnitClass.HORSE_MAN, Unit.UnitClass.LONGBOW_ARCHER, Unit.UnitClass.HEALER);
@@ -17,30 +19,46 @@ public class Villager extends Tribe {
     @Override
     public void update() {
 
+        super.update();
+
+        collect();
+    }
+
+    /**
+     *
+     */
+    private void collect() {
+
         if (collectTimeLeft-- > 0) {
             return;
         }
 
-        // Collect taxes
+        // Collect resources
         population = 0;
         happiness = 0;
-        for (Town town: getTowns()) {
-            gold += town.getTax();
-            population += town.getPopulation();
+        float tax = 0.0f;
+        for (Town town : getTowns()) {
+            tax += town.getTax() *
+                    (1.0f + getGlobalFactor(GlobalBonusFactor.TOWN_GOLD_BOOST));
+            population += town.getPopulation() *
+                    (1.0f + getGlobalFactor(GlobalBonusFactor.TOWN_POPULATION_BOOST));
             happiness += town.getHappiness();
         }
+        gold += tax;
         happiness /= getTowns().size();
 
         // Pay upkeep
-        for (Squad squad: getSquads()) {
+        for (Squad squad : getSquads()) {
             gold -= squad.getUpkeepGold();
             population -= squad.getPopulation();
         }
 
-        getEventHandler().onTribeCollected(this);
+        /*
+        Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold + "(" + tax + ")" +
+                " population: " + population + " happiness: " + happiness);
+        */
 
-        //Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold +
-        //        " max population: " + maxPopulation + " happiness: " + happiness);
+        getEventHandler().onTribeCollected(this);
 
         collectTimeLeft = COLLECT_UPDATE_TIME;
     }

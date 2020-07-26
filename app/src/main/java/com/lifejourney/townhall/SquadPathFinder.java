@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PathFinder;
 import com.lifejourney.engine2d.Point;
@@ -15,8 +13,8 @@ public class SquadPathFinder extends PathFinder {
 
     public SquadPathFinder(Squad squad, OffsetCoord targetMapCoord, boolean useNextCoord) {
 
-        OffsetCoord startMapCoord = (useNextCoord)?squad.getNextMapCoordToMove():
-                squad.getMapCoord();
+        OffsetCoord startMapCoord = (useNextCoord)?squad.getNextMapPositionToMove():
+                squad.getMapPosition();
         Point start = new Point(startMapCoord.getX(), startMapCoord.getY());
         Point target = new Point(targetMapCoord.getX(), targetMapCoord.getY());
         set(start, target);
@@ -32,7 +30,7 @@ public class SquadPathFinder extends PathFinder {
     public ArrayList<Waypoint> findOptimalPath() {
         ArrayList<Waypoint> optimalPath = super.findOptimalPath();
         if (useNextCoord) {
-            OffsetCoord squadMapCoord = squad.getMapCoord();
+            OffsetCoord squadMapCoord = squad.getMapPosition();
             optimalPath.add(0,
                     new Waypoint(new Point(squadMapCoord.getX(), squadMapCoord.getY()),
                             null, 0.0f));

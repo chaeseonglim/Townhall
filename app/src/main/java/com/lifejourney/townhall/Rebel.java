@@ -4,14 +4,6 @@ public class Rebel extends Tribe {
 
     public Rebel(Event eventHandler, GameMap map) {
 
-        super(eventHandler, Tribe.Faction.VILLAGER, map);
-    }
-
-    /**
-     *
-     */
-    @Override
-    void update() {
-
+        super(eventHandler, Faction.REBEL, map);
     }
 }

@@ -27,7 +27,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
 
         void onMapTownFocused(Town town);
 
-        void onMapTownOccupied(Town town);
+        void onMapTownOccupied(Town town, Tribe.Faction prevFaction);
     }
 
     /**
@@ -72,8 +72,8 @@ class GameMap extends HexTileMap implements View, Town.Event {
                 towns.put(mapCoord, town);
                 townsBySide.get(faction.ordinal()).add(town);
 
-                if ((terrain == Town.Terrain.HEADQUARTER_BADLANDS ||
-                        terrain == Town.Terrain.HEADQUARTER_GRASS) &&
+                if ((terrain == Town.Terrain.HEADQUARTER_BANDIT ||
+                        terrain == Town.Terrain.HEADQUARTER_VILLAGER) &&
                         faction == Tribe.Faction.VILLAGER) {
                     villagerHq = town;
                 }
@@ -137,7 +137,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
         }
         redrawTileSprites(town.getFaction());
 
-        listener.onMapTownOccupied(town);
+        listener.onMapTownOccupied(town, prevFaction);
     }
 
     /**
@@ -152,7 +152,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
         int eventAction = event.getAction();
         PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
         PointF touchedGameCoord =
-                Engine2D.GetInstance().translateScreenToGameCoord(touchedScreenCoord);
+                Engine2D.GetInstance().translateScreenToGamePosition(touchedScreenCoord);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             setDragging(true);
@@ -168,9 +168,9 @@ class GameMap extends HexTileMap implements View, Town.Event {
                 setDragging(false);
 
                 PointF lastTouchedWidgetCoord =
-                        Engine2D.GetInstance().translateScreenToWidgetCoord(lastTouchedScreenCoord);
+                        Engine2D.GetInstance().translateScreenToWidgetPosition(lastTouchedScreenCoord);
                 PointF touchedWidgetCoord =
-                        Engine2D.GetInstance().translateScreenToWidgetCoord(touchedScreenCoord);
+                        Engine2D.GetInstance().translateScreenToWidgetPosition(touchedScreenCoord);
                 if (lastTouchedWidgetCoord.distance(touchedWidgetCoord) < 60.0f) {
                     OffsetCoord touchedMapCoord = new OffsetCoord(touchedGameCoord);
                     Town townToFocus = getTown(touchedMapCoord);
@@ -301,7 +301,7 @@ class GameMap extends HexTileMap implements View, Town.Event {
      */
     public ArrayList<OffsetCoord> findRetreatableMapCoords(Squad squad) {
 
-        OffsetCoord mapCoord = squad.getMapCoord();
+        OffsetCoord mapCoord = squad.getMapPosition();
         ArrayList<OffsetCoord> retreatableMapCoords = new ArrayList<>();
 
         ArrayList<Town> neighborTowns = getNeighborTowns(mapCoord, false);
