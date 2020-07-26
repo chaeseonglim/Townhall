@@ -476,20 +476,8 @@ public class Town {
             baseSprite =
                     new Sprite.Builder("Base", "tiles.png")
                             .position(new PointF(mapCoord.toGameCoord()))
-                            .size(TileSize).gridSize(4, 7).smooth(false)
+                            .size(TileSize).gridSize(4, Terrain.values().length).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
-        }
-
-        if (facilitySprites == null) {
-            facilitySprites = new ArrayList<>();
-            for (int i = 0; i < 3; ++i) {
-                Sprite facilitySprite =
-                        new Sprite.Builder("Facility", "tiles_facility_objects.png")
-                                .position(new PointF(mapCoord.toGameCoord()))
-                                .size(TileSize.clone().multiply(0.5f)).gridSize(5, 5).smooth(false)
-                                .layer(SPRITE_LAYER).depth(0.1f).visible(false).build();
-                facilitySprites.add(facilitySprite);
-            }
         }
 
         if (factionSprite == null) {
@@ -497,7 +485,7 @@ public class Town {
                     new Sprite.Builder("TownFaction", "tiles_territory.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(7, 5).smooth(false)
-                            .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
+                            .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
         }
 
         if (borderSprites == null) {
@@ -507,7 +495,7 @@ public class Town {
                         new Sprite.Builder("TownTerritory", "tiles_territory.png")
                                 .position(new PointF(mapCoord.toGameCoord()))
                                 .size(TileSize).gridSize(7, 5).smooth(false)
-                                .layer(SPRITE_LAYER).depth(0.3f).visible(true).build();
+                                .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
                 border.setGridIndex(i, faction.ordinal());
                 borderSprites.add(border);
             }
@@ -518,7 +506,19 @@ public class Town {
                     new Sprite.Builder("TerritoryOccupation", "tiles_occupation.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(6, 5).smooth(false)
-                            .layer(SPRITE_LAYER).depth(0.4f).visible(true).build();
+                            .layer(SPRITE_LAYER).depth(0.3f).visible(true).build();
+        }
+
+        if (facilitySprites == null) {
+            facilitySprites = new ArrayList<>();
+            for (int i = 0; i < 3; ++i) {
+                Sprite facilitySprite =
+                        new Sprite.Builder("Facility", "tiles_facility_objects.png")
+                                .position(new PointF(mapCoord.toGameCoord()))
+                                .size(TileSize.clone().multiply(0.5f)).gridSize(6, 5).smooth(false)
+                                .layer(SPRITE_LAYER).depth(0.4f).visible(false).build();
+                facilitySprites.add(facilitySprite);
+            }
         }
 
         if (glowingSprite == null) {
@@ -574,13 +574,17 @@ public class Town {
                 sprite.commit();
             }
         } else {
-            int i = 0;
+            int i = 0, highLevelIndex = 0;
             for (; i < facilitySlots.size(); ++i) {
                 Sprite sprite = facilitySprites.get(i);
 
                 Facility facility = facilitySlots.get(i);
                 int level = getFacilityLevel(facility);
-                sprite.setGridIndex(level - 1, facility.ordinal());
+                if (level <= 3) {
+                    sprite.setGridIndex(level - 1, facility.ordinal());
+                } else {
+                    sprite.setGridIndex(3 + highLevelIndex++, facility.ordinal());
+                }
 
                 int placement = (i + facilitySpriteSelection) % 3;
                 if (placement == 0) {
