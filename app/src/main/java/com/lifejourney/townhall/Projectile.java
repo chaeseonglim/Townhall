@@ -16,10 +16,12 @@ public class Projectile extends CollidableObject {
 
     enum ProjectileType {
         ARROW,
-        HEAL;
+        HEAL,
+        CANNON;
 
         Sprite sprite() {
-            Sprite sprite = new Sprite.Builder("projectile.png").gridSize(2,1)
+            Sprite sprite = new Sprite.Builder("projectile.png")
+                    .gridSize(ProjectileType.values().length,1)
                     .size(new SizeF(6, 6)).smooth(false).build();
             Point gridIndex = spriteGridIndex();
             sprite.setGridIndex(gridIndex.x, gridIndex.y);
@@ -31,6 +33,8 @@ public class Projectile extends CollidableObject {
                     return new Point(0, 0);
                 case HEAL:
                     return new Point(1, 0);
+                case CANNON:
+                    return new Point(2, 0);
                 default:
                     return new Point(0, 0);
             }
@@ -41,6 +45,8 @@ public class Projectile extends CollidableObject {
                     return 10.0f;
                 case HEAL:
                     return 5.0f;
+                case CANNON:
+                    return 20.0f;
                 default:
                     return 0.0f;
             }
@@ -51,6 +57,8 @@ public class Projectile extends CollidableObject {
                     return 10.0f;
                 case HEAL:
                     return 5.0f;
+                case CANNON:
+                    return 10.0f;
                 default:
                     return 0.0f;
             }

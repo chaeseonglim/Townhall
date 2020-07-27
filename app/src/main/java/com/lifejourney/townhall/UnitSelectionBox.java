@@ -11,17 +11,17 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class UnitSelectBox extends Widget implements Button.Event{
+public class UnitSelectionBox extends Widget implements Button.Event{
 
-    private final String LOG_TAG = "UnitSelectBox";
+    private final String LOG_TAG = "UnitSelectionBox";
 
     public interface Event {
 
-        void onUnitBuilderBoxSelected(UnitSelectBox infoBox, Unit.UnitClass unitClass);
+        void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass);
     }
 
-    public UnitSelectBox(Event eventHandler, Villager villager, Unit.UnitClass replacementClass,
-                         Rect region, int layer, float depth) {
+    public UnitSelectionBox(Event eventHandler, Villager villager, Unit.UnitClass replacementClass,
+                            Rect region, int layer, float depth) {
 
         super(region, layer, depth);
 
@@ -244,29 +244,13 @@ public class UnitSelectBox extends Widget implements Button.Event{
 
             // Strong/Weakness
             textPosition.setTo(100, -165);
-            addText("전투 지원", new SizeF(150, 40), textPosition.clone(),
+            addText("지원", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
             addText(selectedUnitClass.isSupportable()?"가능":"불가",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
             textPosition.offset(0, 30);
-            addText("강점",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(75, 30);
-            addText(selectedUnitClass.strongPoint(),
-                    new SizeF(300, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
-            textPosition.offset(-75, 30);
-            addText("약점",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-            textPosition.offset(75, 30);
-            addText(selectedUnitClass.weaknessPoint(),
-                    new SizeF(300, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
-            textPosition.offset(-75, 30);
             addText("설명",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));

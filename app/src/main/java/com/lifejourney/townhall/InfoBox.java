@@ -11,7 +11,7 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event {
+public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Event {
 
     private final String LOG_TAG = "InfoBox";
 
@@ -183,10 +183,10 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
             Rect unitSelectBoxRegion = getRegion().clone();
             unitSelectBoxRegion.y -= 10;
             unitSelectBoxRegion.height += 20;
-            UnitSelectBox unitSelectBox = new UnitSelectBox(this, villager,
+            UnitSelectionBox unitSelectionBox = new UnitSelectionBox(this, villager,
                     replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
-            addWidget(unitSelectBox);
-            unitSelectBox.show();
+            addWidget(unitSelectionBox);
+            unitSelectionBox.show();
         }
     }
 
@@ -196,7 +196,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectBox.Event
      * @param unitClass
      */
     @Override
-    public void onUnitBuilderBoxSelected(UnitSelectBox infoBox, Unit.UnitClass unitClass) {
+    public void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass) {
 
         removeWidget(infoBox);
         show();

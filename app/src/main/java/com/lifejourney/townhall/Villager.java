@@ -1,9 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
-import com.lifejourney.engine2d.OffsetCoord;
-
 public class Villager extends Tribe {
 
     private static final String LOG_TAG = "Villager";
@@ -13,7 +9,7 @@ public class Villager extends Tribe {
         super(eventHandler, Faction.VILLAGER, map);
 
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                Unit.UnitClass.HORSE_MAN, Unit.UnitClass.LONGBOW_ARCHER, Unit.UnitClass.HEALER);
+                Unit.UnitClass.HORSE_MAN, Unit.UnitClass.CANNON, Unit.UnitClass.HEALER);
     }
 
     @Override

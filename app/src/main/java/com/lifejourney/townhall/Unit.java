@@ -38,17 +38,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "일꾼",
                 UnitClassType.RANGED_SUPPORTER,
                 "지역 발전 속도를 높이며\n수입에도 기여합니다.\n하지만 전투 능력이 없습니다.",
-                "지역 발전",
-                "전투능력 없음",
                 new Point(1, 0),
                 new SizeF(16, 16),
                 new Shape(8.0f),
                 200,
                 30,
                 5,
-                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f},
-                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f},
+                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f},
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
                 10.0f,
                 26.0f,
                 0.0f,
@@ -74,18 +72,16 @@ public class Unit extends CollidableObject implements Projectile.Event {
         SWORD_MAN(
                 "검병",
                 UnitClassType.MELEE_FIGHTER,
-                "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.",
-                "균형잡힘",
-                "기병",
+                "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.\n기병에 약합니다.",
                 new Point(2, 0),
                 new SizeF(16, 16),
                 new Shape(8.0f),
                 200,
                 50,
                 5,
-                new float[] {0.1f, 0.2f, 0.4f, 0.1f, 0.5f},
-                new float[] {0.1f, 0.2f, 0.4f, 0.1f, 0.5f},
-                new float[] {1.0f, 1.0f, 1.0f, 0.8f, 1.0f},
+                new float[] {0.1f, 0.2f, 0.4f, 0.1f, 0.5f, 0.6f},
+                new float[] {0.1f, 0.2f, 0.4f, 0.1f, 0.5f, 0.6f},
+                new float[] {1.0f, 1.0f, 1.0f, 0.8f, 1.0f, 1.0f},
                 150.0f,
                 26.0f,
                 0.0f,
@@ -112,17 +108,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "궁수",
                 UnitClassType.RANGED_FIGHTER,
                 "원거리 공격이 가능하며\n전투 및 지원에 적합합니다.",
-                "원거리 공격",
-                "근접 방어",
                 new Point(3, 0),
                 new SizeF(16, 16),
                 new Shape(8.0f),
                 200,
                 50,
                 5,
-                new float[] {-0.1f, -0.3f, -0.1f, -0.3f, -0.1f},
-                new float[] {0.1f, 0.2f, 0.3f, 0.5f, 0.4f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.5f, 1.0f},
+                new float[] {-0.1f, -0.3f, -0.1f, -0.3f, -0.1f, -0.3f},
+                new float[] {0.1f, 0.2f, 0.3f, 0.5f, 0.4f, 0.5f},
+                new float[] {1.0f, 1.0f, 1.0f, 1.5f, 1.0f, 1.0f},
                 64.0f,
                 26.0f,
                 150.0f,
@@ -149,17 +143,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "기마병",
                 UnitClassType.MELEE_FIGHTER,
                 "빠른 속도의 기마 보병입니다.\n근접과 치유사에 강합니다.\n원거리 유닛에 약합니다.",
-                "빠름",
-                "원거리 방어력",
                 new Point(4, 0),
                 new SizeF(16, 16),
                 new Shape(8.0f),
                 500,
                 200,
                 5,
-                new float[] {0.2f, 0.4f, 0.3f, 0.1f, 0.5f},
-                new float[] {0.1f, 0.4f, 0.3f, 0.1f, 0.5f},
-                new float[] {1.3f, 1.3f, 0.8f, 1.0f, 1.5f},
+                new float[] {0.2f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f},
+                new float[] {0.1f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f},
+                new float[] {1.3f, 1.3f, 0.8f, 1.0f, 1.5f, 1.5f},
                 300.0f,
                 26.0f,
                 0.0f,
@@ -174,7 +166,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0,
                 10,
                 90,
-                10,
+                30,
                 null,
                 4.0f,
                 8.0f,
@@ -186,17 +178,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 "치유사",
                 UnitClassType.RANGED_HEALER,
                 "주변 유닛을 치유합니다.\n하지만 전투 능력이 없습니다.",
-                "치유력",
-                "전투능력 없음",
                 new Point(5, 0),
                 new SizeF(16, 16),
                 new Shape(8.0f),
                 500,
                 200,
                 10,
-                new float[] {0.0f, -0.4f, 1.0f, -0.5f, 0.0f},
-                new float[] {0.1f, 0.1f, 0.1f, 0.1f, 0.1f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                new float[] {0.0f, -0.4f, 0.9f, -0.5f, 0.0f, 1.0f},
+                new float[] {0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f},
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
                 10.0f,
                 26.0f,
                 0.0f,
@@ -211,20 +201,53 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 0,
                 50,
-                20,
+                30,
                 Projectile.ProjectileType.HEAL,
                 1.5f,
                 1.5f,
                 3.0f,
                 true,
                 false
+                ),
+        CANNON(
+                "대포",
+                UnitClassType.RANGED_SUPPORTER,
+                "강력한 원거리 공격으로 \n주변을 초토화합니다.\n하지만 쉽게 취약해집니다.",
+                new Point(6, 0),
+                new SizeF(16, 16),
+                new Shape(8.0f),
+                1000,
+                400,
+                20,
+                new float[] {0.0f, -0.4f, -0.2f, -0.5f, -0.1f, 0.0f},
+                new float[] {0.4f, 0.8f, 0.6f, 0.8f, 0.6f, 0.3f},
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                200.0f,
+                36.0f,
+                300.0f,
+                0.0f,
+                0,
+                90,
+                0,
+                0,
+                50,
+                0,
+                0,
+                0,
+                0,
+                120,
+                40,
+                 Projectile.ProjectileType.CANNON,
+                1.5f,
+                2.0f,
+                4.0f,
+                true,
+                true
                 );
 
         private UnitClassType unitClassType;
         private String word;
         private String description;
-        private String strongPoint;
-        private String weaknessPoint;
         private Point spriteGridIndex;
         private SizeF spriteSize;
         private Shape shape;
@@ -256,8 +279,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
         private boolean supportable;
         private boolean aggressive;
 
-        UnitClass(String word, UnitClassType unitClassType, String description, String strongPoint,
-                  String weaknessPoint, Point spriteGridIndex, SizeF spriteSize, Shape shape,
+        UnitClass(String word, UnitClassType unitClassType, String description,
+                  Point spriteGridIndex, SizeF spriteSize, Shape shape,
                   int costToPurchase, int costUpkeep, int population, float[] steeringFavors,
                   float[] targetFavors, float[] strengthMetrics, float awareness,
                   float meleeAttackRange, float rangedAttackRange, float healRange,
@@ -269,8 +292,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
             this.word = word;
             this.unitClassType = unitClassType;
             this.description = description;
-            this.strongPoint = strongPoint;
-            this.weaknessPoint = weaknessPoint;
             this.spriteGridIndex = spriteGridIndex;
             this.spriteSize = spriteSize;
             this.shape = shape;
@@ -311,12 +332,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public String description() {
             return description;
-        }
-        public String strongPoint() {
-            return strongPoint;
-        }
-        public String weaknessPoint() {
-            return weaknessPoint;
         }
         public Point spriteGridIndex() {
             return spriteGridIndex;
@@ -448,7 +463,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     .gridSize(9,1).size(unitClass.spriteSize()).smooth(true).opaque(0.0f)
                     .build();
             Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png")
-                    .gridSize(6,1).size(unitClass.spriteSize().clone().multiply(2.0f))
+                    .gridSize(8,1).size(unitClass.spriteSize().clone().multiply(2.0f))
                     .smooth(false).opaque(0.0f).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitEffectSprite)
@@ -630,8 +645,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         if (projectile.getType() == Projectile.ProjectileType.ARROW) {
-            // Check evading
+            // Arrow
+
             if (Math.random() < target.getRangedEvasion()) {
+                // Check evading
                 return;
             }
 
@@ -642,6 +659,27 @@ public class Unit extends CollidableObject implements Projectile.Event {
         } else if (projectile.getType() == Projectile.ProjectileType.HEAL) {
             // Heal
             target.gotHeal(getHealPower());
+        } else if (projectile.getType() == Projectile.ProjectileType.CANNON) {
+            // Cannon
+
+            if (Math.random() < target.getRangedEvasion()) {
+                // Check evading
+                return;
+            }
+
+            // Deal damage
+            float damage = Math.max(getRangedDamage() *
+                    unitClass.strengthMetric(target.unitClass) * target.getArmor(), 1.0f);
+            target.gotDamage(damage);
+
+            for (Unit opponent : target.getCompanions()) {
+                float splashDamage = Math.max(getRangedDamage() *
+                        unitClass.strengthMetric(target.unitClass) * target.getArmor() *
+                        SPLASH_DAMAGE_PROPORTION, 1.0f);
+                if (opponent.getPosition().distance(target.getPosition()) < SPLASH_DAMAGE_RANGE) {
+                    opponent.gotSplashDamage(splashDamage);
+                }
+            }
         }
     }
 
@@ -886,6 +924,38 @@ public class Unit extends CollidableObject implements Projectile.Event {
         classSprite.addAnimationFrame(unitGridIndex.x, unitGridIndex.y,5);
         classSprite.addAnimationFrame(0, 0, 5);
         classSprite.addAnimationFrame(unitGridIndex.x, unitGridIndex.y,5);
+    }
+
+    /**
+     *
+     * @param damage
+     */
+    private void gotSplashDamage(float damage) {
+
+        health -= damage;
+        if (health < 0) {
+            health = 0;
+        }
+
+        // Adjust health sprite
+        Sprite healthSprite = getSprite("health");
+        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
+
+        // Blinking
+        Sprite classSprite = getSprite("class");
+        classSprite.clearAnimation();
+        classSprite.addAnimationFrame(0, 0, 5);
+        Point unitGridIndex = unitClass.spriteGridIndex();
+        classSprite.addAnimationFrame(unitGridIndex.x, unitGridIndex.y,5);
+        classSprite.addAnimationFrame(0, 0, 5);
+        classSprite.addAnimationFrame(unitGridIndex.x, unitGridIndex.y,5);
+
+        // Splashing effect
+        Sprite effectSprite = getSprite("effect");
+        effectSprite.clearAnimation();
+        effectSprite.addAnimationFrame(6, 0, 10);
+        effectSprite.addAnimationFrame(7, 0, 10);
+        effectSprite.addAnimationFrame(0, 0, 5);
     }
 
     /**
@@ -1209,6 +1279,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
+    private final static float SPLASH_DAMAGE_RANGE = 40.0f;
+    private final static float SPLASH_DAMAGE_PROPORTION = 0.5f;
 
     private UnitClass unitClass;
     private int level;
