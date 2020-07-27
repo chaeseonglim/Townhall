@@ -138,42 +138,6 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    private void setSpritesToSupport() {
-
-        Sprite currentStick = getSprite("SquadStick");
-        Sprite squadIcon = getSprite("SquadIcon");
-        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
-        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
-            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-            squadIcon.setAnimationWrap(true);
-            squadIcon.clearAnimation();
-            squadIcon.addAnimationFrame(4, 0, 8);
-            squadIcon.addAnimationFrame(0, 0, 8);
-            squadIcon.addAnimationFrame(4, 0, 200);
-        }
-    }
-
-    /**
-     *
-     */
-    private void setSpritesToWork() {
-
-        Sprite currentStick = getSprite("SquadStick");
-        Sprite squadIcon = getSprite("SquadIcon");
-        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
-        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(7, 0))) {
-            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-            squadIcon.setAnimationWrap(true);
-            squadIcon.clearAnimation();
-            squadIcon.addAnimationFrame(7, 0, 8);
-            squadIcon.addAnimationFrame(0, 0, 8);
-            squadIcon.addAnimationFrame(7, 0, 200);
-        }
-    }
-
-    /**
-     *
-     */
     @Override
     public void update() {
 
@@ -240,6 +204,11 @@ public class Squad extends Object implements Controllable {
                     // Reset squad state at peace
                     if (!isSupporting && !isWorking() && !isDragging()) {
                         resetSprites();
+                    }
+
+                    // Heal units
+                    if (!isSupporting) {
+                        healUnits();
                     }
                 }
             }
@@ -321,7 +290,7 @@ public class Squad extends Object implements Controllable {
 
         Town town = map.getTown(getMapPosition());
         if (town.getFaction() == faction) {
-            return map.getTown(getMapPosition()).getDeltas(Town.DeltaAttribute.OFFENSIVE);
+            return map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.OFFENSIVE);
         } else {
             return 0;
         }
@@ -335,7 +304,7 @@ public class Squad extends Object implements Controllable {
 
         Town town = map.getTown(getMapPosition());
         if (town.getFaction() == faction) {
-            return map.getTown(getMapPosition()).getDeltas(Town.DeltaAttribute.DEFENSIVE);
+            return map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.DEFENSIVE);
         } else {
             return 0;
         }
@@ -1163,6 +1132,53 @@ public class Squad extends Object implements Controllable {
         globalFactors[factor.ordinal()] += value;
     }
 
+    /**
+     *
+     */
+    private void setSpritesToSupport() {
+
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(4, 0, 8);
+            squadIcon.addAnimationFrame(0, 0, 8);
+            squadIcon.addAnimationFrame(4, 0, 200);
+        }
+    }
+
+    /**
+     *
+     */
+    private void setSpritesToWork() {
+
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(7, 0))) {
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(7, 0, 8);
+            squadIcon.addAnimationFrame(0, 0, 8);
+            squadIcon.addAnimationFrame(7, 0, 200);
+        }
+    }
+
+    /**
+     *
+     */
+    private void healUnits() {
+
+        for (Unit unit: units) {
+            unit.rest(HEAL_PERCENTAGE *
+                    (1 + map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.DEFENSIVE)));
+        }
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static float MIN_DISTANCE_START_DRAGGING = 30;
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
@@ -1177,6 +1193,7 @@ public class Squad extends Object implements Controllable {
     private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
     private final static float UNIT_BONUS_DELTA = 0.05f;
+    private final static float HEAL_PERCENTAGE = 0.01f;
 
     private Event eventHandler;
     private GameMap map;

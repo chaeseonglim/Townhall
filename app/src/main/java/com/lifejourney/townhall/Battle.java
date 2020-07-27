@@ -170,16 +170,22 @@ public class Battle {
                 defender.endFight();
                 winner.addExp(WINNER_EXP);
 
-                // Move loser to other tile
+                // Move loser to an other tile
                 ArrayList<OffsetCoord> retreatableSameFactionCoords = new ArrayList<>();
+                ArrayList<OffsetCoord> retretableNeutralFactionCoords = new ArrayList<>();
                 for (OffsetCoord retreatableCoord: retreatableCoords) {
                     if (map.getTown(retreatableCoord).getFaction() == loser.getFaction()) {
                         retreatableSameFactionCoords.add(retreatableCoord);
+                    } else if (map.getTown(retreatableCoord).getFaction() == Tribe.Faction.NEUTRAL) {
+                        retretableNeutralFactionCoords.add(retreatableCoord);
                     }
                 }
                 if (retreatableSameFactionCoords.size() > 0) {
                     loser.moveTo(retreatableSameFactionCoords.get(
                             (int)(Math.random()*retreatableSameFactionCoords.size())));
+                } else if (retretableNeutralFactionCoords.size() > 0) {
+                    loser.moveTo(retretableNeutralFactionCoords.get(
+                            (int)(Math.random()*retretableNeutralFactionCoords.size())));
                 } else {
                     loser.moveTo(retreatableCoords.get(
                             (int)(Math.random()*retreatableCoords.size())));

@@ -39,8 +39,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 UnitClassType.RANGED_SUPPORTER,
                 "지역 발전 속도를 높이며\n수입에도 기여합니다.\n하지만 전투 능력이 없습니다.",
                 new Point(1, 0),
-                new SizeF(16, 16),
-                new Shape(8.0f),
+                new SizeF(18, 18),
+                new Shape(9.0f),
                 200,
                 30,
                 5,
@@ -74,8 +74,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 UnitClassType.MELEE_FIGHTER,
                 "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.\n기병에 약합니다.",
                 new Point(2, 0),
-                new SizeF(16, 16),
-                new Shape(8.0f),
+                new SizeF(18, 18),
+                new Shape(9.0f),
                 200,
                 50,
                 5,
@@ -109,8 +109,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 UnitClassType.RANGED_FIGHTER,
                 "원거리 공격이 가능하며\n전투 및 지원에 적합합니다.",
                 new Point(3, 0),
-                new SizeF(16, 16),
-                new Shape(8.0f),
+                new SizeF(18, 18),
+                new Shape(9.0f),
                 200,
                 50,
                 5,
@@ -144,8 +144,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 UnitClassType.MELEE_FIGHTER,
                 "빠른 속도의 기마 보병입니다.\n근접과 치유사에 강합니다.\n원거리 유닛에 약합니다.",
                 new Point(4, 0),
-                new SizeF(16, 16),
-                new Shape(8.0f),
+                new SizeF(18, 18),
+                new Shape(9.0f),
                 500,
                 200,
                 5,
@@ -179,8 +179,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 UnitClassType.RANGED_HEALER,
                 "주변 유닛을 치유합니다.\n하지만 전투 능력이 없습니다.",
                 new Point(5, 0),
-                new SizeF(16, 16),
-                new Shape(8.0f),
+                new SizeF(18, 18),
+                new Shape(9.0f),
                 500,
                 200,
                 10,
@@ -214,8 +214,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 UnitClassType.RANGED_SUPPORTER,
                 "강력한 원거리 공격으로 \n주변을 초토화합니다.\n하지만 쉽게 취약해집니다.",
                 new Point(6, 0),
-                new SizeF(16, 16),
-                new Shape(8.0f),
+                new SizeF(18, 18),
+                new Shape(9.0f),
                 1000,
                 400,
                 20,
@@ -463,7 +463,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     .gridSize(9,1).size(unitClass.spriteSize()).smooth(true).opaque(0.0f)
                     .build();
             Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png")
-                    .gridSize(8,1).size(unitClass.spriteSize().clone().multiply(2.0f))
+                    .gridSize(12,1).size(unitClass.spriteSize().clone().multiply(2.0f))
                     .smooth(false).opaque(0.0f).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitEffectSprite)
@@ -606,6 +606,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         } else if (opponents == null) {
             recruitingTimeLeft--;
         }
+
+        // Adjust health sprite
+        Sprite healthSprite = getSprite("health");
+        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
     }
 
     /**
@@ -721,7 +725,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             if (unitClass.healSpeed() > 0 && healTimeLeft == 0) {
                 Unit healTarget = searchFavoredHealTarget();
                 if (healTarget != null) {
-                    heal(healTarget);
+                    rest(healTarget);
                 }
                 healTimeLeft = unitClass.healSpeed();
             } else {
@@ -755,7 +759,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             if (unitClass.healSpeed() > 0 && healTimeLeft == 0) {
                 Unit healTarget = searchFavoredHealTarget();
                 if (healTarget != null) {
-                    heal(healTarget);
+                    rest(healTarget);
                 }
                 healTimeLeft = unitClass.healSpeed();
             } else {
@@ -892,7 +896,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      * @param target
      */
-    private void heal(Unit target) {
+    private void rest(Unit target) {
 
         // Create a projectile
         Projectile projectile =
@@ -912,10 +916,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
             health = 0;
         }
 
-        // Adjust health sprite
-        Sprite healthSprite = getSprite("health");
-        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
-
         // Blinking
         Sprite classSprite = getSprite("class");
         classSprite.clearAnimation();
@@ -932,14 +932,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void gotSplashDamage(float damage) {
 
-        health -= damage;
-        if (health < 0) {
-            health = 0;
-        }
-
-        // Adjust health sprite
-        Sprite healthSprite = getSprite("health");
-        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
+        health = Math.max(health - damage, 0);
 
         // Blinking
         Sprite classSprite = getSprite("class");
@@ -964,14 +957,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void gotHeal(float healPower) {
 
-        health += healPower;
-        if (health > getMaxHealth()) {
-            health = getMaxHealth();
-        }
-
-        // Adjust health sprite
-        Sprite healthSprite = getSprite("health");
-        healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
+        health = Math.min(health + healPower, getMaxHealth());
 
         // Healing effect
         Sprite effectSprite = getSprite("effect");
@@ -1276,10 +1262,33 @@ public class Unit extends CollidableObject implements Projectile.Event {
         this.armorBonus = bonus;
     }
 
+    /**
+     *
+     * @param percentage
+     */
+    public void rest(float percentage) {
+
+        if (health < getMaxHealth() && restingTimeLeft-- == 0) {
+            health = Math.min(health + getMaxHealth() * percentage, getMaxHealth());
+
+            // Level up effect
+            Sprite effectSprite = getSprite("effect");
+            effectSprite.clearAnimation();
+            effectSprite.addAnimationFrame(8, 0, 15);
+            effectSprite.addAnimationFrame(9, 0, 15);
+            effectSprite.addAnimationFrame(10, 0, 10);
+            effectSprite.addAnimationFrame(11, 0, 10);
+            effectSprite.addAnimationFrame(0, 0, 10);
+
+            restingTimeLeft = RESTING_TIME;
+        }
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
-    private final static float SPLASH_DAMAGE_RANGE = 40.0f;
+    private final static int RESTING_TIME = 30;
+    private final static float SPLASH_DAMAGE_RANGE = 30.0f;
     private final static float SPLASH_DAMAGE_PROPORTION = 0.5f;
 
     private UnitClass unitClass;
@@ -1299,5 +1308,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private int meleeAttackTimeLeft = 0;
     private int rangedAttackTimeLeft = 0;
     private int healTimeLeft = 0;
+    private int restingTimeLeft = RESTING_TIME;
     private ArrayList<Projectile> projectiles = new ArrayList<>();
 }

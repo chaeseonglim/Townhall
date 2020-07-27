@@ -1013,7 +1013,7 @@ public class Town {
      * @param attribute
      * @return
      */
-    public int getDeltas(DeltaAttribute attribute) {
+    public int getDelta(DeltaAttribute attribute) {
 
         return deltas[attribute.ordinal()];
     }

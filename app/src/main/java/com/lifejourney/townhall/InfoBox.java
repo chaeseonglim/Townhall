@@ -408,8 +408,8 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((town.getDeltas(Town.DeltaAttribute.DEFENSIVE)==0)?
-                            "-" : town.getDeltas(Town.DeltaAttribute.DEFENSIVE) + "",
+            addText((town.getDelta(Town.DeltaAttribute.DEFENSIVE)==0)?
+                            "-" : town.getDelta(Town.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
@@ -442,8 +442,8 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((town.getDeltas(Town.DeltaAttribute.DEFENSIVE)==0)?
-                            "-" : town.getDeltas(Town.DeltaAttribute.DEFENSIVE) + "",
+            addText((town.getDelta(Town.DeltaAttribute.DEFENSIVE)==0)?
+                            "-" : town.getDelta(Town.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 255));
 
