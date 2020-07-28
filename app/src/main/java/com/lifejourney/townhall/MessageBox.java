@@ -13,41 +13,47 @@ import com.lifejourney.engine2d.Widget;
 
 import java.util.ArrayList;
 
-public class MessageBox extends Widget {
+public class MessageBox extends Widget implements Button.Event {
 
     private final String LOG_TAG = "MessageBox";
 
+    enum Type {
+        CLOSE,
+        YES_OR_NO,
+        OK_OR_CANCEL
+    }
+
+    enum ButtonType {
+        CLOSE,
+        YES,
+        NO,
+        OK,
+        CANCEL
+    }
+
     public interface Event {
 
-        void onMessageBoxTouched(MessageBox messageBox);
+        void onMessageBoxButtonPressed(MessageBox messageBox, ButtonType buttonType);
     }
 
     public static class Builder {
 
         private Event listener;
         private Rect region;
-        private ArrayList<String> messages;
+        private Type type;
+        private String message;
 
         private String imageSpriteAsset = "messagebox_bg.png";
         private float fontSize = 35.0f;
-        private int textColor = Color.argb(255, 255, 255, 255);
+        private int textColor = Color.rgb(255, 255, 255);
         private int layer = 0;
         private float depth = 0.0f;
 
-        Builder(Event listener, Rect region, String message) {
+        Builder(Event listener, Type type, Rect region, String message) {
             this.listener = listener;
+            this.type = type;
             this.region = region;
-            this.messages = new ArrayList<>();
-            messages.add(message);
-        }
-        Builder(Event listener, Rect region, ArrayList<String> messages) {
-            this.listener = listener;
-            this.region = region;
-            this.messages = messages;
-        }
-        Builder imageSpriteAsset(String imageSpriteAsset) {
-            this.imageSpriteAsset = imageSpriteAsset;
-            return this;
+            this.message = message;
         }
         Builder fontSize(float fontSize) {
             this.fontSize = fontSize;
@@ -73,54 +79,98 @@ public class MessageBox extends Widget {
     private MessageBox(Builder builder) {
 
         super(builder.region, builder.layer, builder.depth);
-        eventHandler = builder.listener;
+        listener = builder.listener;
+        type = builder.type;
 
-        Sprite imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
+        Sprite bgSprite = new Sprite.Builder(builder.imageSpriteAsset)
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(builder.layer).depth(0.2f)
                 .gridSize(2, 1).visible(false).build();
-        addSprite(imageSprite);
-        Sprite shadowSprite = new Sprite.Builder(builder.imageSpriteAsset)
-                .size(new SizeF(getRegion().size()))
-                .positionOffset(new PointF(5, 5))
-                .smooth(false).layer(builder.layer).depth(0.1f).opaque(0.2f)
-                .gridSize(2, 1).visible(false).build();
-        shadowSprite.setGridIndex(1, 0);
-        addSprite(shadowSprite);
+        addSprite(bgSprite);
 
-        pages = new ArrayList<>();
-        for (int i = 0; i < builder.messages.size(); ++i) {
-            Sprite textSprite =
-                new TextSprite.Builder("messagebox"+i, builder.messages.get(i), builder.fontSize)
-                    .fontColor(builder.textColor)
-                    .bgColor(Color.argb(0, 0, 0, 0))
-                    .textAlign(Paint.Align.LEFT)
-                    .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
-                    .positionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN))
-                    .smooth(true).depth(0.3f)
-                    .layer(builder.layer).visible(false).build();
-            pages.add(textSprite);
-            addSprite(textSprite);
+        if (type == Type.CLOSE) {
+            bgSprite.setGridIndex(0, 0);
+
+            // Close button
+            Rect closeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
+                    136, 60);
+            closeButton = new Button.Builder(this, closeButtonRegion)
+                    .message("닫기").imageSpriteAsset("")
+                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .build();
+            addWidget(closeButton);
+        } else if (type == Type.YES_OR_NO) {
+            bgSprite.setGridIndex(1, 0);
+
+            // Yes button
+            Rect yesButtonRegion = new Rect(getRegion().right() - 283, getRegion().bottom() - 65,
+                    136, 60);
+            yesButton = new Button.Builder(this, yesButtonRegion)
+                    .message("예").imageSpriteAsset("")
+                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .build();
+            addWidget(yesButton);
+
+            // No button
+            Rect noButtonRegion = new Rect(getRegion().right() - 143, getRegion().bottom() - 65,
+                    136, 60);
+            noButton = new Button.Builder(this, noButtonRegion)
+                    .message("아니오").imageSpriteAsset("")
+                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .build();
+            addWidget(noButton);
+        } else if (type == Type.OK_OR_CANCEL) {
+            bgSprite.setGridIndex(1, 0);
+
+            // OK button
+            Rect okButtonRegion = new Rect(getRegion().right() - 283, getRegion().bottom() - 65,
+                    136, 60);
+            okButton = new Button.Builder(this, okButtonRegion)
+                    .message("확인").imageSpriteAsset("")
+                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .build();
+            addWidget(okButton);
+
+            // Cancel button
+            Rect cancelButtonRegion = new Rect(getRegion().right() - 143, getRegion().bottom() - 65,
+                    136, 60);
+            cancelButton = new Button.Builder(this, cancelButtonRegion)
+                    .message("취소").imageSpriteAsset("")
+                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .build();
+            addWidget(cancelButton);
         }
+
+        textSprite =
+            new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
+                .fontColor(builder.textColor)
+                .bgColor(Color.argb(0, 0, 0, 0))
+                .textAlign(Paint.Align.LEFT)
+                .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
+                .positionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN))
+                .smooth(true).depth(0.3f)
+                .layer(builder.layer).visible(false).build();
+        addSprite(textSprite);
     }
 
     /**
      *
+     * @param button
      */
     @Override
-    public void close() {
+    public void onButtonPressed(Button button) {
 
-        super.close();
-        pages = null;
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void commit() {
-
-        super.commit();
+        if (button == yesButton) {
+            listener.onMessageBoxButtonPressed(this, ButtonType.YES);
+        } else if (button == noButton) {
+            listener.onMessageBoxButtonPressed(this, ButtonType.NO);
+        } else if (button == okButton) {
+            listener.onMessageBoxButtonPressed(this, ButtonType.OK);
+        } else if (button == cancelButton) {
+            listener.onMessageBoxButtonPressed(this, ButtonType.CANCEL);
+        } else if (button == closeButton) {
+            listener.onMessageBoxButtonPressed(this, ButtonType.CLOSE);
+        }
     }
 
     /**
@@ -131,87 +181,19 @@ public class MessageBox extends Widget {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (!isVisible()) {
-            return false;
-        }
-
-        if (super.onTouchEvent(event)) {
-            return true;
-        }
-
-        int eventAction = event.getAction();
-
-        switch (eventAction) {
-            case MotionEvent.ACTION_DOWN:
-                if (checkIfInputEventInRegion(event)) {
-                    touched = true;
-                    currentPage++;
-                    currentPage %= pages.size();
-                    for (Sprite sprite: pages) {
-                        sprite.hide();
-                    }
-                    pages.get(currentPage).show();
-
-                    if (eventHandler != null) {
-                        eventHandler.onMessageBoxTouched(this);
-                    }
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            case MotionEvent.ACTION_MOVE:
-                return touched;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if (touched) {
-                    touched = false;
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            default:
-                return false;
-        }
-    }
-
-    /**
-     *
-     * @param visible
-     */
-    @Override
-    public void setVisible(boolean visible) {
-
-        super.setVisible(visible);
-
-        if (currentPage < pages.size()) {
-            pages.get(currentPage).setVisible(visible);
-        }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getTotalPage() {
-
-        return pages.size();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getCurrentPage() {
-
-        return currentPage;
+        // It consumes all input
+        super.onTouchEvent(event);
+        return true;
     }
 
     private final int TEXT_MARGIN = 12;
 
-    private Event eventHandler;
-    private ArrayList<Sprite> pages;
-    private int currentPage = 0;
-    private boolean touched = false;
+    private Event listener;
+    private Sprite textSprite;
+    private Type type;
+    private Button yesButton;
+    private Button noButton;
+    private Button okButton;
+    private Button cancelButton;
+    private Button closeButton;
 }

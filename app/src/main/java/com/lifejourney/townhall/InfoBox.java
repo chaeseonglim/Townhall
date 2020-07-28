@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -11,7 +12,8 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Event {
+public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
+        UnitSelectionBox.Event {
 
     private final String LOG_TAG = "InfoBox";
 
@@ -71,7 +73,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 255))
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(closeButton);
 
@@ -80,7 +82,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                 150, 60);
         toTownButton = new Button.Builder(this, toTownButtonRegion)
                 .message("마을로").imageSpriteAsset("")
-                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 255))
+                .fontSize(25).layer(layer + 1).textColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(toTownButton);
 
@@ -169,25 +171,64 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         } else if (button == recruitingButtons[0] ||
                 button == recruitingButtons[1] ||
                 button == recruitingButtons[2]) {
+
             for (int i = 0;; ++i) {
                 if (button == recruitingButtons[i]) {
                     recruitingSlot = i;
                     break;
                 }
             }
+
+            if (squad.getUnit(recruitingSlot) != null) {
+                Rect viewport = Engine2D.GetInstance().getViewport();
+                recruitingReplacementConfirmBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
+                        new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                                353, 275), "기존 병력이 교체되며 \n비용이 발생합니다.\n\n진행하시겠습니까?")
+                        .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                        .build();
+                recruitingReplacementConfirmBox.show();
+                addWidget(recruitingReplacementConfirmBox);
+            } else {
+                hide();
+                openUnitSelectionBox(null);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param messageBox
+     * @param buttonType
+     */
+    @Override
+    public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
+        if (buttonType == MessageBox.ButtonType.YES) {
             hide();
+
             Unit.UnitClass replacementUnitClass = null;
             if (squad.getUnit(recruitingSlot) != null) {
                 replacementUnitClass = squad.getUnit(recruitingSlot).getUnitClass();
             }
-            Rect unitSelectBoxRegion = getRegion().clone();
-            unitSelectBoxRegion.y -= 10;
-            unitSelectBoxRegion.height += 20;
-            UnitSelectionBox unitSelectionBox = new UnitSelectionBox(this, villager,
-                    replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
-            addWidget(unitSelectionBox);
-            unitSelectionBox.show();
+            openUnitSelectionBox(replacementUnitClass);
         }
+
+        removeWidget(messageBox);
+        recruitingReplacementConfirmBox = null;
+    }
+
+    /**
+     *
+     * @param replacementUnitClass
+     */
+    private void openUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
+
+        Rect unitSelectBoxRegion = getRegion().clone();
+        unitSelectBoxRegion.y -= 10;
+        unitSelectBoxRegion.height += 20;
+        UnitSelectionBox unitSelectionBox = new UnitSelectionBox(this, villager,
+                replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
+        addWidget(unitSelectionBox);
+        unitSelectionBox.show();
     }
 
     /**
@@ -233,7 +274,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
 
         textPosition.offset(0, 30);
         addText(town.getTerrain().word(), new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+                Color.rgb(230, 230, 230));
 
         textPosition.offset(150, -30);
         addText("소유", new SizeF(150, 40), textPosition.clone(),
@@ -241,7 +282,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
 
         textPosition.offset(0, 30);
         addText(town.getFaction().toGameString() + " 소유", new SizeF(150, 40),
-                textPosition.clone(), Color.rgb(255, 255, 255));
+                textPosition.clone(), Color.rgb(230, 230, 230));
 
         // Status
         textPosition.offset(-150, 30);
@@ -260,7 +301,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         }
         textPosition.offset(0, 30);
         addText(status, new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+                Color.rgb(230, 230, 230));
 
         // Facility
         textPosition.offset(0, 30);
@@ -270,7 +311,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         if (town.getTerrain().facilitySlots() == 0) {
             textPosition.offset(0, 30);
             addText("개발 불가", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
         } else {
             int facilityCount = 0;
             if (town.getFacilityLevel(Town.Facility.FARM) > 0) {
@@ -278,34 +319,34 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                 textPosition.offset(0, 30);
                 addText("농장 Lv." + town.getFacilityLevel(Town.Facility.FARM),
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
             if (town.getFacilityLevel(Town.Facility.MARKET) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
                 addText("시장 Lv." + town.getFacilityLevel(Town.Facility.MARKET),
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
             if (town.getFacilityLevel(Town.Facility.DOWNTOWN) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
                 addText("마을 Lv." + town.getFacilityLevel(Town.Facility.DOWNTOWN),
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
             if (town.getFacilityLevel(Town.Facility.FORTRESS) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
                 addText("요새 Lv." + town.getFacilityLevel(Town.Facility.FORTRESS),
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
             if (facilityCount == 0) {
                 textPosition.offset(0, 30);
                 addText("없음",
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
 
             // Development buttons
@@ -380,7 +421,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             textPosition.offset(0, 30);
             addText((town.getPopulation()==0)?"-":town.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
 
             // Income
             textPosition.offset(150, -30);
@@ -390,7 +431,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             textPosition.offset(0, 30);
             addText((town.getTax()==0)?"-":town.getTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
 
             // Happiness
             textPosition.offset(-150, 30);
@@ -400,7 +441,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             textPosition.offset(0, 30);
             addText(town.getHappiness() + "",
                     new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
 
             // Defense
             textPosition.offset(150, -30);
@@ -411,7 +452,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             addText((town.getDelta(Town.DeltaAttribute.DEFENSIVE)==0)?
                             "-" : town.getDelta(Town.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
 
             // Bonus
             textPosition.offset(-150, 30);
@@ -429,11 +470,11 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             if (isSquadWorking) {
                 addText("일꾼 개발",
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             } else {
                 addText("-",
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
         } else {
             // Bonus
@@ -445,7 +486,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             addText((town.getDelta(Town.DeltaAttribute.DEFENSIVE)==0)?
                             "-" : town.getDelta(Town.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
 
         }
     }
@@ -463,7 +504,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
 
         textPosition.offset(0, 30);
         addText(squad.getFaction().toGameString() + " 부대", new SizeF(150, 40),
-                textPosition.clone(), Color.rgb(255, 255, 255));
+                textPosition.clone(), Color.rgb(230, 230, 230));
 
         // Status
         textPosition.offset(150, -30);
@@ -484,7 +525,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         }
         textPosition.offset(0, 30);
         addText(status, new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+                Color.rgb(230, 230, 230));
 
         // Unit information
         textPosition.offset(-150, 30);
@@ -495,7 +536,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         if (squad.getUnits().isEmpty()) {
             textPosition.offset(0, 50);
             addText("유닛이 없습니다.\n하단 모집 버튼을 누르세요.", new SizeF(300, 80), textPosition.clone(),
-                    Color.rgb(255, 255, 255));
+                    Color.rgb(230, 230, 230));
             textPosition.offset(0, 8);
         } else {
             for (Unit unit : squad.getUnits()) {
@@ -505,7 +546,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                     unitStr += " (모집중)";
                 }
                 addText(unitStr, new SizeF(300, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
         }
 
@@ -552,7 +593,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
             } else {
                 textPosition.offset(0, 30);
                 addText("모집 불가", new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
         }
 
@@ -564,7 +605,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         textPosition.offset(0, 30);
         addText((squad.getPopulation() == 0)? "-" : squad.getPopulation() + "",
                 new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+                Color.rgb(230, 230, 230));
 
         textPosition.offset(150, -30);
         addText("유지비", new SizeF(150, 40), textPosition.clone(),
@@ -573,7 +614,7 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
         textPosition.offset(0, 30);
         addText((squad.getUpkeepGold() == 0)? "-" : squad.getUpkeepGold() + "",
                 new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 255));
+                Color.rgb(230, 230, 230));
 
         if (squad.getUnits().size() > 0) {
             int offensiveBonus = squad.collectOffensiveBonus();
@@ -587,16 +628,16 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
                 textPosition.offset(0, 30);
                 addText("공격 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
 
                 textPosition.offset(150, 0);
                 addText("방어 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             } else {
                 textPosition.offset(0, 30);
                 addText("-", new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 255));
+                        Color.rgb(230, 230, 230));
             }
         }
     }
@@ -612,5 +653,6 @@ public class InfoBox extends Widget implements Button.Event, UnitSelectionBox.Ev
     private Button marketDevelopmentButton;
     private Button fortressDevelopmentButton;
     private Button[] recruitingButtons = new Button[3];
+    private MessageBox recruitingReplacementConfirmBox;
     private int recruitingSlot = 0;
 }

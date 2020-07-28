@@ -77,13 +77,6 @@ public class GameWorld extends World
         squadBuilderButton.setImageSpriteSet(0);
         squadBuilderButton.hide();
         addWidget(squadBuilderButton);
-
-        messageBox = new MessageBox.Builder(this,
-                new Rect(100, 100, 500, 400),"한글은?\ntest\ntest")
-                .fontSize(35.0f).layer(9).textColor(Color.rgb(0, 0, 0))
-                .build();
-        messageBox.show();
-        addWidget(messageBox);
     }
 
     /**
@@ -342,14 +335,8 @@ public class GameWorld extends World
         }
     }
 
-    /**
-     *
-     * @param messageBox
-     */
     @Override
-    public void onMessageBoxTouched(MessageBox messageBox) {
-
-        messageBox.hide();
+    public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
     }
 
     /**
