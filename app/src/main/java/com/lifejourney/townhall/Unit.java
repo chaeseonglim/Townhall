@@ -44,9 +44,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 200,
                 30,
                 5,
-                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f},
-                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f, -0.5f},
+                // target favor
+                new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f, -0.5f},
+                // damage attribute
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
                 10.0f,
                 26.0f,
                 0.0f,
@@ -79,9 +83,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 200,
                 50,
                 5,
-                new float[] {0.1f, 0.2f, 0.4f, 0.1f, 0.5f, 0.6f},
-                new float[] {0.1f, 0.2f, 0.4f, 0.1f, 0.5f, 0.6f},
-                new float[] {1.0f, 1.0f, 1.0f, 0.8f, 1.0f, 1.0f},
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {0.1f, 0.1f, 0.2f, 0.1f, 0.2f, 0.1f, 0.1f},
+                // target favor
+                new float[] {0.1f, 0.1f, 0.2f, 0.1f, 0.2f, 0.1f, 0.1f},
+                // damage attribute
+                new float[] {1.0f, 1.0f, 1.0f, 0.8f, 1.0f, 1.0f, 1.0f},
                 150.0f,
                 26.0f,
                 0.0f,
@@ -114,9 +122,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 200,
                 50,
                 5,
-                new float[] {-0.1f, -0.3f, -0.1f, -0.3f, -0.1f, -0.3f},
-                new float[] {0.1f, 0.2f, 0.3f, 0.5f, 0.4f, 0.5f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.5f, 1.0f, 1.0f},
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {-0.1f, -0.3f, -0.1f, -0.3f, -0.1f, -0.3f, -0.3f},
+                // target favor
+                new float[] {0.1f, 0.1f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f},
+                // damage attribute
+                new float[] {1.0f, 1.0f, 1.0f, 1.5f, 1.0f, 1.0f, 1.0f},
                 64.0f,
                 26.0f,
                 150.0f,
@@ -149,9 +161,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 500,
                 200,
                 5,
-                new float[] {0.2f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f},
-                new float[] {0.1f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f},
-                new float[] {1.3f, 1.3f, 0.8f, 1.0f, 1.5f, 1.5f},
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {0.2f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f, 0.4f},
+                // target favor
+                new float[] {0.1f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f, 0.4f},
+                // damage attribute
+                new float[] {1.3f, 1.3f, 0.8f, 1.0f, 1.0f, 0.8f, 1.3f},
                 300.0f,
                 26.0f,
                 0.0f,
@@ -184,9 +200,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 500,
                 200,
                 10,
-                new float[] {0.0f, -0.4f, 0.9f, -0.5f, 0.0f, 1.0f},
-                new float[] {0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {0.0f, -0.4f, 0.9f, -0.5f, 0.0f, 1.0f, -0.4f},
+                // target favor
+                new float[] {0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f},
+                // damage attribute
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
                 10.0f,
                 26.0f,
                 0.0f,
@@ -219,9 +239,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1000,
                 400,
                 20,
-                new float[] {0.0f, -0.4f, -0.2f, -0.5f, -0.1f, 0.0f},
-                new float[] {0.4f, 0.8f, 0.6f, 0.8f, 0.6f, 0.3f},
-                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {0.0f, -0.4f, -0.2f, -0.5f, -0.1f, 0.0f, -0.4f},
+                // target favor
+                new float[] {0.4f, 0.8f, 0.6f, 0.8f, 0.6f, 0.3f, 0.7f},
+                // damage attribute
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
                 200.0f,
                 36.0f,
                 300.0f,
@@ -241,6 +265,45 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1.5f,
                 2.0f,
                 4.0f,
+                true,
+                true
+                ),
+        PALADIN(
+                "성기사",
+                UnitClassType.MELEE_SUPPORTER,
+                "근접 공격과 치유를 \n동시에 할 수 있습니다.\n전선 유지에 효과적입니다.",
+                new Point(7, 0),
+                new SizeF(18, 18),
+                new Shape(9.0f),
+                1000,
+                400,
+                20,
+                // worker / sword / archer / horse / healer / canon / paladin
+                // moving favor
+                new float[] {0.1f, 0.4f, 0.2f, 0.4f, 0.2f, 0.3f, 0.1f},
+                // target favor
+                new float[] {0.1f, 0.4f, 0.2f, 0.4f, 0.2f, 0.3f, 0.1f},
+                // damage attribute
+                new float[] {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                50.0f,
+                26.0f,
+                0.0f,
+                100.0f,
+                40,
+                0,
+                90,
+                8,
+                0,
+                3,
+                10,
+                10,
+                30,
+                200,
+                40,
+                Projectile.ProjectileType.HEAL,
+                2f,
+                3.0f,
+                5.0f,
                 true,
                 true
                 );
@@ -720,17 +783,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         // Do healing
-        if (unitClass.unitClassType() == UnitClassType.MELEE_HEALER ||
-            unitClass.unitClassType() == UnitClassType.RANGED_HEALER) {
-            if (unitClass.healSpeed() > 0 && healTimeLeft == 0) {
-                Unit healTarget = searchFavoredHealTarget();
-                if (healTarget != null) {
-                    rest(healTarget);
-                }
-                healTimeLeft = unitClass.healSpeed();
-            } else {
-                healTimeLeft--;
+        if (unitClass.healSpeed() > 0 && healTimeLeft == 0) {
+            Unit healTarget = searchFavoredHealTarget();
+            if (healTarget != null) {
+                rest(healTarget);
             }
+            healTimeLeft = unitClass.healSpeed();
+        } else {
+            healTimeLeft--;
         }
     }
 

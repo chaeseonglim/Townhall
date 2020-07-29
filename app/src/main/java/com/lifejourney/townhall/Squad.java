@@ -1082,7 +1082,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int getUpkeepGold() {
+    public int getUpkeep() {
         int goldUpkeep = 0;
         for (Unit unit: units) {
             goldUpkeep += unit.getGoldUpkeep();

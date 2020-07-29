@@ -3,7 +3,6 @@ package com.lifejourney.townhall;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import com.lifejourney.engine2d.Controllable;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -76,7 +75,7 @@ public class EconomyBar extends Widget {
         goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(villager.getGold()));
 
         // Set population text
-        int population = villager.getPopulation();
+        int population = villager.getUsablePopulation();
         if (population >= 0) {
             popTextSprite.setFontColor(Color.rgb(255, 255, 0));
         } else {

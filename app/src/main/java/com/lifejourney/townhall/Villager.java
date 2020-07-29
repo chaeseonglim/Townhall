@@ -9,7 +9,7 @@ public class Villager extends Tribe {
         super(eventHandler, Faction.VILLAGER, map);
 
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                Unit.UnitClass.HORSE_MAN, Unit.UnitClass.CANNON, Unit.UnitClass.HEALER);
+                Unit.UnitClass.HORSE_MAN, Unit.UnitClass.CANNON, Unit.UnitClass.PALADIN);
     }
 
     @Override
@@ -30,24 +30,27 @@ public class Villager extends Tribe {
         }
 
         // Collect resources
-        population = 0;
+        income = 0;
+        totalPopulation = 0;
         happiness = 0;
-        float tax = 0.0f;
         for (Town town : getTowns()) {
-            tax += town.getTax() *
+            income += (float)town.getTax() *
                     (1.0f + getGlobalFactor(GlobalBonusFactor.TOWN_GOLD_BOOST));
-            population += town.getPopulation() *
+            totalPopulation += town.getPopulation() *
                     (1.0f + getGlobalFactor(GlobalBonusFactor.TOWN_POPULATION_BOOST));
             happiness += town.getHappiness();
         }
-        gold += tax;
         happiness /= getTowns().size();
 
         // Pay upkeep
+        spend = 0;
+        usingPopulation = 0;
         for (Squad squad : getSquads()) {
-            gold -= squad.getUpkeepGold();
-            population -= squad.getPopulation();
+            spend += squad.getUpkeep();
+            usingPopulation += squad.getPopulation();
         }
+        usablePopulation = totalPopulation - usingPopulation;
+        gold += (income - spend);
 
         /*
         Log.i(LOG_TAG, "Villager " + getFaction().toString() + " gold: " + gold + "(" + tax + ")" +
@@ -57,33 +60,6 @@ public class Villager extends Tribe {
         getEventHandler().onTribeCollected(this);
 
         collectTimeLeft = COLLECT_UPDATE_TIME;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getPopulation() {
-
-        return population;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getGold() {
-
-        return gold;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getHappiness() {
-
-        return happiness;
     }
 
     /**
@@ -103,7 +79,7 @@ public class Villager extends Tribe {
     public void pay(int gold, int population) {
 
         this.gold -= gold;
-        this.population -= population;
+        this.usablePopulation -= population;
     }
 
     /**
@@ -118,14 +94,82 @@ public class Villager extends Tribe {
             replacementPopulation = replacementClass.population();
         }
         return (getGold() >= unitClass.costToPurchase() &&
-                getPopulation() + replacementPopulation >= unitClass.population());
+                getUsablePopulation() + replacementPopulation >= unitClass.population());
     }
+
+    /**
+     *
+     * @return
+     */
+    public int getTotalPopulation() {
+
+        return totalPopulation;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getUsingPopulation() {
+
+        return usingPopulation;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getUsablePopulation() {
+
+        return usablePopulation;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getGold() {
+
+        return gold;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getIncome() {
+
+        return income;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getSpend() {
+
+        return spend;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getHappiness() {
+
+        return happiness;
+    }
+
 
     private final static int COLLECT_UPDATE_TIME = 60;
     private final static int STARTING_GOLD = 250;
 
     private int collectTimeLeft = 1;
-    private int population = 0;
+    private int totalPopulation = 0;
+    private int usingPopulation = 0;
+    private int usablePopulation = 0;
     private int gold = STARTING_GOLD;
+    private int income = 0;
+    private int spend = 0;
     private int happiness = 50;
 }

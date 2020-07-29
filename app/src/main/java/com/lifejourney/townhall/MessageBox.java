@@ -11,8 +11,6 @@ import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
 
-import java.util.ArrayList;
-
 public class MessageBox extends Widget implements Button.Event {
 
     private final String LOG_TAG = "MessageBox";
@@ -79,7 +77,7 @@ public class MessageBox extends Widget implements Button.Event {
     private MessageBox(Builder builder) {
 
         super(builder.region, builder.layer, builder.depth);
-        listener = builder.listener;
+        eventHandler = builder.listener;
         type = builder.type;
 
         Sprite bgSprite = new Sprite.Builder(builder.imageSpriteAsset)
@@ -161,15 +159,15 @@ public class MessageBox extends Widget implements Button.Event {
     public void onButtonPressed(Button button) {
 
         if (button == yesButton) {
-            listener.onMessageBoxButtonPressed(this, ButtonType.YES);
+            eventHandler.onMessageBoxButtonPressed(this, ButtonType.YES);
         } else if (button == noButton) {
-            listener.onMessageBoxButtonPressed(this, ButtonType.NO);
+            eventHandler.onMessageBoxButtonPressed(this, ButtonType.NO);
         } else if (button == okButton) {
-            listener.onMessageBoxButtonPressed(this, ButtonType.OK);
+            eventHandler.onMessageBoxButtonPressed(this, ButtonType.OK);
         } else if (button == cancelButton) {
-            listener.onMessageBoxButtonPressed(this, ButtonType.CANCEL);
+            eventHandler.onMessageBoxButtonPressed(this, ButtonType.CANCEL);
         } else if (button == closeButton) {
-            listener.onMessageBoxButtonPressed(this, ButtonType.CLOSE);
+            eventHandler.onMessageBoxButtonPressed(this, ButtonType.CLOSE);
         }
     }
 
@@ -188,7 +186,7 @@ public class MessageBox extends Widget implements Button.Event {
 
     private final int TEXT_MARGIN = 12;
 
-    private Event listener;
+    private Event eventHandler;
     private Sprite textSprite;
     private Type type;
     private Button yesButton;

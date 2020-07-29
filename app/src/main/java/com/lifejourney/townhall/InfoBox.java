@@ -44,7 +44,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(255, 255, 0))
+                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(closeButton);
 
@@ -190,7 +190,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 addWidget(recruitingReplacementConfirmBox);
             } else {
                 hide();
-                openUnitSelectionBox(null);
+                popupUnitSelectionBox(null);
             }
         }
     }
@@ -209,9 +209,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             if (squad.getUnit(recruitingSlot) != null) {
                 replacementUnitClass = squad.getUnit(recruitingSlot).getUnitClass();
             }
-            openUnitSelectionBox(replacementUnitClass);
+            popupUnitSelectionBox(replacementUnitClass);
         }
 
+        messageBox.close();
         removeWidget(messageBox);
         recruitingReplacementConfirmBox = null;
     }
@@ -220,7 +221,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      *
      * @param replacementUnitClass
      */
-    private void openUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
+    private void popupUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
 
         Rect unitSelectBoxRegion = getRegion().clone();
         unitSelectBoxRegion.y -= 10;
@@ -239,6 +240,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     @Override
     public void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass) {
 
+        infoBox.close();
         removeWidget(infoBox);
         show();
 
@@ -269,7 +271,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         // Tile type
         PointF textPosition = new PointF(-250, -155);
-        addText("지형", new SizeF(150, 40), textPosition.clone(),
+        addText("타일", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
@@ -357,6 +359,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                         Color.rgb(255, 255, 0));
 
                 if (farmDevelopmentButton != null) {
+                    farmDevelopmentButton.close();
                     removeWidget(farmDevelopmentButton);
                 }
                 Rect developmentButtonRegion =
@@ -372,6 +375,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 addWidget(farmDevelopmentButton);
 
                 if (marketDevelopmentButton != null) {
+                    marketDevelopmentButton.close();
                     removeWidget(marketDevelopmentButton);
                 }
                 developmentButtonRegion.offset(73, 0);
@@ -385,6 +389,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 addWidget(marketDevelopmentButton);
 
                 if (downtownDevelopmentButton != null) {
+                    downtownDevelopmentButton.close();
                     removeWidget(downtownDevelopmentButton);
                 }
                 developmentButtonRegion.offset(73, 0);
@@ -398,6 +403,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 addWidget(downtownDevelopmentButton);
 
                 if (fortressDevelopmentButton != null) {
+                    fortressDevelopmentButton.close();
                     removeWidget(fortressDevelopmentButton);
                 }
                 developmentButtonRegion.offset(73, 0);
@@ -565,6 +571,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                                 60, 64);
                 for (int i = 0; i < 3; ++i) {
                     if (recruitingButtons[i] != null) {
+                        recruitingButtons[i].close();
                         removeWidget(recruitingButtons[i]);
                     }
                     if (squad.getUnits().size() >= i) {
@@ -612,7 +619,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText((squad.getUpkeepGold() == 0)? "-" : squad.getUpkeepGold() + "",
+        addText((squad.getUpkeep() == 0)? "-" : squad.getUpkeep() + "",
                 new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 

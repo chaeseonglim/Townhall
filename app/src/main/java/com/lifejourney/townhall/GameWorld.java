@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.graphics.Color;
-
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Rect;
@@ -12,7 +10,7 @@ import java.util.ListIterator;
 
 public class GameWorld extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event,
-                SpeedControl.Event, InfoBox.Event, Tribe.Event {
+                SpeedControl.Event, InfoBox.Event, HomeBox.Event, ResearchBox.Event, Tribe.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -346,18 +344,31 @@ public class GameWorld extends World
     @Override
     public void onButtonPressed(Button button) {
 
-        if (button == infoButton) {
-            // Info button is pressed
+        if (button == homeButton) {
+            // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
 
+            // Pop up home box
+            popupHomeBox();
+        }
+        if (button == infoButton) {
+            // Pause game temporarily
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+
+            // Pop up info box
             if (focusedSquad != null) {
-                popupNewInfoBox(focusedSquad);
+                popupInfoBox(focusedSquad);
             } else if (focusedTown != null) {
-                popupNewInfoBox(focusedTown);
+                popupInfoBox(focusedTown);
             }
         } else if (button == squadBuilderButton) {
-            // Squad builder button is pressed
+            // Pause game temporarily
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+
+            // Spawn a squad
             Squad squad = tribes.get(0).spawnSquad(focusedTown.getMapCoord().toGameCoord(),
                     Tribe.Faction.VILLAGER);
             focusedTown.setFocus(false);
@@ -365,9 +376,8 @@ public class GameWorld extends World
             squad.setFocus(true);
             focusedSquad = squad;
 
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
-            popupNewInfoBox(squad);
+            // Pop up info box
+            popupInfoBox(squad);
         }
     }
 
@@ -393,6 +403,59 @@ public class GameWorld extends World
         }
     }
 
+
+    /**
+     *
+     * @param homeBox
+     */
+    @Override
+    public void onHomeBoxSwitchToResearchBox(HomeBox homeBox) {
+
+        popupResearchBox();
+
+        homeBox.close();
+        removeWidget(homeBox);
+    }
+
+    /**
+     *
+     * @param homeBox
+     */
+    @Override
+    public void onHomeBoxClosed(HomeBox homeBox) {
+
+        homeBox.close();
+        removeWidget(homeBox);
+
+        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+    }
+
+    /**
+     *
+     * @param researchBox
+     */
+    @Override
+    public void onResearchBoxSwitchToHomeBox(ResearchBox researchBox) {
+
+        popupHomeBox();
+
+        researchBox.close();
+        removeWidget(researchBox);
+    }
+
+    /**
+     *
+     * @param researchBox
+     */
+    @Override
+    public void onResearchBoxClosed(ResearchBox researchBox) {
+
+        researchBox.close();
+        removeWidget(researchBox);
+
+        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+    }
+
     /**
      *
      * @param infoBox
@@ -400,7 +463,7 @@ public class GameWorld extends World
     @Override
     public void onInfoBoxSwitchToTown(InfoBox infoBox) {
 
-        popupNewInfoBox(map.getTown(focusedSquad.getMapPosition()));
+        popupInfoBox(map.getTown(focusedSquad.getMapPosition()));
 
         infoBox.close();
         removeWidget(infoBox);
@@ -430,9 +493,38 @@ public class GameWorld extends World
 
     /**
      *
+     */
+    private void popupHomeBox() {
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+                700, 400);
+
+        HomeBox homeBox = new HomeBox(this, boxRegion, 30, 0.0f,
+                (Villager)tribes.get(0));
+        homeBox.show();
+        addWidget(homeBox);
+    }
+
+    /**
+     *
+     */
+    private void popupResearchBox() {
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 500) / 2,
+                800, 500);
+
+        ResearchBox researchBox = new ResearchBox(this, boxRegion, 30, 0.0f);
+        researchBox.show();
+        addWidget(researchBox);
+    }
+
+    /**
+     *
      * @param town
      */
-    private void popupNewInfoBox(Town town) {
+    private void popupInfoBox(Town town) {
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
@@ -447,13 +539,13 @@ public class GameWorld extends World
      *
      * @param squad
      */
-    private void popupNewInfoBox(Squad squad) {
+    private void popupInfoBox(Squad squad) {
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
                 700, 400);
 
-        InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), infoBoxRegion,
+        InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), boxRegion,
                 30, 0.0f, squad);
         infoBox.show();
         addWidget(infoBox);
