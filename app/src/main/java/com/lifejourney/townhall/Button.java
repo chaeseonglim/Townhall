@@ -25,11 +25,12 @@ public class Button extends Widget {
         private Button.Event eventHandler;
         private Rect region;
 
-        private String message;
+        private String name;
+        private String message = null;
         private String imageSpriteAsset = "button_bg.png";
         private int numImageSpriteSet = 1;
         private float fontSize = 35.0f;
-        private int textColor = Color.argb(255, 255, 255, 255);
+        private int fontColor = Color.argb(255, 255, 255, 255);
         private int layer = 0;
         private float depth = 0.0f;
         private boolean shadow = false;
@@ -38,8 +39,8 @@ public class Button extends Widget {
             this.eventHandler = eventHandler;
             this.region = region;
         }
-        Builder message(String message) {
-            this.message = message;
+        Builder name(String name) {
+            this.name = name;
             return this;
         }
         Builder imageSpriteAsset(String imageSpriteAsset) {
@@ -50,12 +51,16 @@ public class Button extends Widget {
             this.numImageSpriteSet = numImageSpriteSet;
             return this;
         }
+        Builder message(String message) {
+            this.message = message;
+            return this;
+        }
         Builder fontSize(float fontSize) {
             this.fontSize = fontSize;
             return this;
         }
-        Builder textColor(int textColor) {
-            this.textColor = textColor;
+        Builder fontColor(int textColor) {
+            this.fontColor = textColor;
             return this;
         }
         Builder layer(int layer) {
@@ -81,6 +86,10 @@ public class Button extends Widget {
 
         eventHandler = builder.eventHandler;
         shadow = builder.shadow;
+        name = builder.name;
+        fontSize = builder.fontSize;
+        fontColor = builder.fontColor;
+        layer = builder.layer;
 
         if (!builder.imageSpriteAsset.equals("")) {
             imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
@@ -104,10 +113,10 @@ public class Button extends Widget {
 
         if (builder.message != null) {
             messageSprite = new TextSprite.Builder("button" + UID++, builder.message, builder.fontSize)
-                    .fontColor(builder.textColor)
+                    .fontColor(builder.fontColor)
                     .bgColor(Color.argb(0, 0, 0, 0))
                     .textAlign(Paint.Align.CENTER)
-                    .size(new SizeF(builder.region.size()))
+                    .size(new SizeF(getRegion().size()))
                     .smooth(true).depth(0.3f)
                     .layer(builder.layer).visible(false).build();
             addSprite(messageSprite);
@@ -230,10 +239,42 @@ public class Button extends Widget {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     *
+     * @param message
+     */
+    public void setMessage(String message) {
+
+        if (messageSprite == null) {
+            messageSprite = new TextSprite.Builder("button" + UID++, message, fontSize)
+                    .fontColor(fontColor)
+                    .bgColor(Color.argb(0, 0, 0, 0))
+                    .textAlign(Paint.Align.CENTER)
+                    .size(new SizeF(getRegion().size()))
+                    .smooth(true).depth(0.3f)
+                    .layer(layer).visible(false).build();
+            addSprite(messageSprite);
+        } else {
+            messageSprite.setText(message);
+        }
+    }
+
     private static int UID = 0;
 
+    private String name;
     private Event eventHandler;
-    private Sprite messageSprite = null;
+    private TextSprite messageSprite = null;
+    private float fontSize;
+    private int fontColor;
+    private int layer;
     private Sprite imageSprite = null;
     private int imageSpriteSet = 0;
     private boolean shadow;

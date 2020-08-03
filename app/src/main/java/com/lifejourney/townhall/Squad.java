@@ -115,7 +115,7 @@ public class Squad extends Object implements Controllable {
         eventHandler = builder.eventHandler;
         faction = builder.faction;
         map = builder.map;
-        Arrays.fill(globalFactors, 1.0f);
+        Arrays.fill(shrineBonus, 1.0f);
 
         eventHandler.onSquadCreated(this);
     }
@@ -252,10 +252,10 @@ public class Squad extends Object implements Controllable {
 
         // Set unit to bonus
         for (Unit unit: units) {
-            unit.setAttackDamageBonus(UNIT_BONUS_DELTA * collectOffensiveBonus());
-            unit.setArmorBonus(UNIT_BONUS_DELTA * collectDefensiveBonus());
-            unit.setAttackSpeedBonus(globalFactors[Tribe.GlobalBonusFactor.UNIT_ATTACK_SPEED.ordinal()]);
-            unit.setHealPowerBonus(globalFactors[Tribe.GlobalBonusFactor.UNIT_HEAL_POWER.ordinal()]);
+            unit.setAttackDamageBonus(UNIT_BONUS_DELTA * getOffensiveBonusFromTown());
+            unit.setArmorBonus(UNIT_BONUS_DELTA * getDefensiveBonusFromTown());
+            unit.setAttackSpeedBonus(shrineBonus[Tribe.ShrineBonus.UNIT_ATTACK_SPEED.ordinal()]);
+            unit.setHealPowerBonus(shrineBonus[Tribe.ShrineBonus.UNIT_HEAL_POWER.ordinal()]);
         }
 
         if (!isFighting()) {
@@ -286,7 +286,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int collectOffensiveBonus() {
+    public int getOffensiveBonusFromTown() {
 
         Town town = map.getTown(getMapPosition());
         if (town.getFaction() == faction) {
@@ -300,7 +300,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int collectDefensiveBonus() {
+    public int getDefensiveBonusFromTown() {
 
         Town town = map.getTown(getMapPosition());
         if (town.getFaction() == faction) {
@@ -329,6 +329,16 @@ public class Squad extends Object implements Controllable {
         int[] deltas = new int[Town.Facility.values().length];
         Arrays.fill(deltas, workerCount);
 
+        if (workerCount > 0) {
+            deltas[Town.Facility.FARM.ordinal()] +=
+                    Upgradable.WORKER_FARM_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+            deltas[Town.Facility.MARKET.ordinal()] +=
+                    Upgradable.WORKER_MARKET_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+            deltas[Town.Facility.DOWNTOWN.ordinal()] +=
+                    Upgradable.WORKER_DOWNTOWN_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+            deltas[Town.Facility.FORTRESS.ordinal()] +=
+                    Upgradable.WORKER_FORTRESS_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+        }
         return deltas;
     }
 
@@ -346,6 +356,52 @@ public class Squad extends Object implements Controllable {
                     workerCount++;
                 }
             }
+        }
+
+        return workerCount;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int collectHappinessBonus() {
+
+        int workerCount = 0;
+
+        if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
+            for (Unit unit : units) {
+                if (!unit.isRecruiting() && unit.getUnitClass() == Unit.UnitClass.WORKER) {
+                    workerCount++;
+                }
+            }
+        }
+
+        if (workerCount > 0) {
+            workerCount += Upgradable.WORKER_HAPPINESS.getLevel(faction) * workerCount;
+        }
+
+        return workerCount;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int collectDefensiveBonus() {
+
+        int workerCount = 0;
+
+        if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
+            for (Unit unit : units) {
+                if (!unit.isRecruiting() && unit.getUnitClass() == Unit.UnitClass.WORKER) {
+                    workerCount++;
+                }
+            }
+        }
+
+        if (workerCount > 0) {
+            workerCount = Upgradable.WORKER_DEFENSE.getLevel(faction) * workerCount;
         }
 
         return workerCount;
@@ -1107,9 +1163,9 @@ public class Squad extends Object implements Controllable {
      * @param factor
      * @return
      */
-    public float getGlobalFactor(Tribe.GlobalBonusFactor factor) {
+    public float getShrineBonus(Tribe.ShrineBonus factor) {
 
-        return globalFactors[factor.ordinal()];
+        return shrineBonus[factor.ordinal()];
     }
 
     /**
@@ -1117,9 +1173,9 @@ public class Squad extends Object implements Controllable {
      * @param factor
      * @param value
      */
-    public void setGlobalFactor(Tribe.GlobalBonusFactor factor, float value) {
+    public void setShrineBonus(Tribe.ShrineBonus factor, float value) {
 
-        globalFactors[factor.ordinal()] = value;
+        shrineBonus[factor.ordinal()] = value;
     }
 
     /**
@@ -1127,9 +1183,9 @@ public class Squad extends Object implements Controllable {
      * @param factor
      * @param value
      */
-    public void addGlobalFactor(Tribe.GlobalBonusFactor factor, float value) {
+    public void addGlobalFactor(Tribe.ShrineBonus factor, float value) {
 
-        globalFactors[factor.ordinal()] += value;
+        shrineBonus[factor.ordinal()] += value;
     }
 
     /**
@@ -1210,5 +1266,5 @@ public class Squad extends Object implements Controllable {
     private int totalHealthAtBeginningOfFight;
     private PointF lastTouchedScreenPosition = null;
     private PointF firstDraggingGamePosition = null;
-    private float[] globalFactors = new float[Tribe.GlobalBonusFactor.values().length];
+    private float[] shrineBonus = new float[Tribe.ShrineBonus.values().length];
 }

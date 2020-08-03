@@ -90,11 +90,11 @@ public class MessageBox extends Widget implements Button.Event {
             bgSprite.setGridIndex(0, 0);
 
             // Close button
-            Rect closeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
+            Rect closeButtonRegion = new Rect(getRegion().right() - 143, getRegion().bottom() - 65,
                     136, 60);
             closeButton = new Button.Builder(this, closeButtonRegion)
                     .message("닫기").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
                     .build();
             addWidget(closeButton);
         } else if (type == Type.YES_OR_NO) {
@@ -105,7 +105,7 @@ public class MessageBox extends Widget implements Button.Event {
                     136, 60);
             yesButton = new Button.Builder(this, yesButtonRegion)
                     .message("예").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
                     .build();
             addWidget(yesButton);
 
@@ -114,7 +114,7 @@ public class MessageBox extends Widget implements Button.Event {
                     136, 60);
             noButton = new Button.Builder(this, noButtonRegion)
                     .message("아니오").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
                     .build();
             addWidget(noButton);
         } else if (type == Type.OK_OR_CANCEL) {
@@ -125,7 +125,7 @@ public class MessageBox extends Widget implements Button.Event {
                     136, 60);
             okButton = new Button.Builder(this, okButtonRegion)
                     .message("확인").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
                     .build();
             addWidget(okButton);
 
@@ -134,7 +134,7 @@ public class MessageBox extends Widget implements Button.Event {
                     136, 60);
             cancelButton = new Button.Builder(this, cancelButtonRegion)
                     .message("취소").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).textColor(Color.rgb(230, 230, 230))
+                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
                     .build();
             addWidget(cancelButton);
         }

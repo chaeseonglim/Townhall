@@ -44,7 +44,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
+                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(closeButton);
 
@@ -73,7 +73,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
+                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(closeButton);
 
@@ -82,7 +82,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         toTownButton = new Button.Builder(this, toTownButtonRegion)
                 .message("마을로").imageSpriteAsset("")
-                .fontSize(25).layer(layer + 1).textColor(Color.rgb(230, 230, 230))
+                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(toTownButton);
 
@@ -99,7 +99,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text", text, 25)
+        addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)
@@ -279,11 +279,11 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Color.rgb(230, 230, 230));
 
         textPosition.offset(150, -30);
-        addText("소유", new SizeF(150, 40), textPosition.clone(),
+        addText("소속", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(town.getFaction().toGameString() + " 소유", new SizeF(150, 40),
+        addText(town.getFaction().toGameString(), new SizeF(150, 40),
                 textPosition.clone(), Color.rgb(230, 230, 230));
 
         // Status
@@ -368,7 +368,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 farmDevelopmentButton =
                         new Button.Builder(this,  developmentButtonRegion.clone())
                                 .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 farmDevelopmentButton.setImageSpriteSet(
                         town.getDevelopmentPolicy(Town.Facility.FARM).ordinal());
@@ -382,7 +382,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 marketDevelopmentButton =
                         new Button.Builder(this, developmentButtonRegion.clone())
                                 .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 marketDevelopmentButton.setImageSpriteSet(
                         town.getDevelopmentPolicy(Town.Facility.MARKET).ordinal() + 3);
@@ -396,7 +396,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 downtownDevelopmentButton =
                         new Button.Builder(this, developmentButtonRegion.clone())
                                 .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 downtownDevelopmentButton.setImageSpriteSet(
                         town.getDevelopmentPolicy(Town.Facility.DOWNTOWN).ordinal() + 6);
@@ -410,7 +410,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 fortressDevelopmentButton =
                         new Button.Builder(this, developmentButtonRegion.clone())
                                 .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).textColor(Color.rgb(255, 255, 0))
+                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 fortressDevelopmentButton.setImageSpriteSet(
                         town.getDevelopmentPolicy(Town.Facility.FORTRESS).ordinal() + 9);
@@ -605,29 +605,35 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         }
 
         // Stats
-        textPosition.setTo(100, -155);
-        addText("인구 소모", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
+        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
+            textPosition.setTo(100, -155);
+            addText("인구", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
-        addText((squad.getPopulation() == 0)? "-" : squad.getPopulation() + "",
-                new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+            textPosition.offset(0, 30);
+            addText((squad.getPopulation() == 0) ? "-" : squad.getPopulation() + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
 
-        textPosition.offset(150, -30);
-        addText("유지비", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
+            textPosition.offset(150, -30);
+            addText("유지비", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
-        addText((squad.getUpkeep() == 0)? "-" : squad.getUpkeep() + "",
-                new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+            textPosition.offset(0, 30);
+            addText((squad.getUpkeep() == 0) ? "-" : squad.getUpkeep() + "",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+        }
 
         if (squad.getUnits().size() > 0) {
-            int offensiveBonus = squad.collectOffensiveBonus();
-            int defensiveBonus = squad.collectDefensiveBonus();
+            int offensiveBonus = squad.getOffensiveBonusFromTown();
+            int defensiveBonus = squad.getDefensiveBonusFromTown();
 
-            textPosition.offset(-150, 30);
+            if (squad.getFaction() == Tribe.Faction.VILLAGER) {
+                textPosition.offset(-150, 30);
+            } else {
+                textPosition.setTo(100, -155);
+            }
             addText("보너스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 

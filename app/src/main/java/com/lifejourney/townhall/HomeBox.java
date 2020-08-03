@@ -42,18 +42,18 @@ public class HomeBox extends Widget implements Button.Event {
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
+                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(closeButton);
 
-        // Research button
+        // Upgradable button
         Rect toResearchButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
                 150, 60);
-        toResearchButton = new Button.Builder(this, toResearchButtonRegion)
-                .message("연구 화면").imageSpriteAsset("")
-                .fontSize(25).layer(layer + 1).textColor(Color.rgb(230, 230, 230))
+        toPolicyButton = new Button.Builder(this, toResearchButtonRegion)
+                .message("강화하기").imageSpriteAsset("")
+                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
                 .build();
-        addWidget(toResearchButton);
+        addWidget(toPolicyButton);
 
         updateVillageInfo();
 
@@ -68,7 +68,7 @@ public class HomeBox extends Widget implements Button.Event {
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text", text, 25)
+        addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)
@@ -101,7 +101,7 @@ public class HomeBox extends Widget implements Button.Event {
             // Close button
             setVisible(false);
             eventHandler.onHomeBoxClosed(this);
-        } else if (button == toResearchButton) {
+        } else if (button == toPolicyButton) {
             // To town button
             setVisible(false);
             eventHandler.onHomeBoxSwitchToResearchBox(this);
@@ -117,7 +117,7 @@ public class HomeBox extends Widget implements Button.Event {
 
         // The number of towns
         PointF textPosition = new PointF(-250, -155);
-        addText("마을 수", new SizeF(150, 40), textPosition.clone(),
+        addText("전체 마을 수", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
@@ -126,7 +126,7 @@ public class HomeBox extends Widget implements Button.Event {
 
         // The number of squads
         textPosition.offset(150, -30);
-        addText("부대 수", new SizeF(150, 40), textPosition.clone(),
+        addText("전체 부대 수", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
@@ -143,11 +143,11 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(230, 230, 230));
 
         textPosition.offset(150, -30);
-        addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
+        addText("인구 소모", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(villager.getUsingPopulation()+"", new SizeF(150, 40), textPosition.clone(),
+        addText("-" + villager.getWorkingPopulation(), new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Income
@@ -165,7 +165,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(villager.getSpend() + "", new SizeF(150, 40), textPosition.clone(),
+        addText("-" + villager.getSpend(), new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Happiness
@@ -182,5 +182,5 @@ public class HomeBox extends Widget implements Button.Event {
     private Event eventHandler;
     private Villager villager;
     private Button closeButton;
-    private Button toResearchButton;
+    private Button toPolicyButton;
 }

@@ -75,7 +75,7 @@ public class EconomyBar extends Widget {
         goldTextSprite.setText(NumberFormat.getNumberInstance(Locale.US).format(villager.getGold()));
 
         // Set population text
-        int population = villager.getUsablePopulation();
+        int population = villager.getIdlePopulation();
         if (population >= 0) {
             popTextSprite.setFontColor(Color.rgb(255, 255, 0));
         } else {

@@ -134,8 +134,8 @@ public class Town {
                 10,
                 0,
                 3,
-                Tribe.GlobalBonusFactor.UNIT_ATTACK_SPEED,
-                0.5f
+                Tribe.ShrineBonus.UNIT_ATTACK_SPEED,
+                -0.1f
         ),
         SHRINE_HEAL(
                 "치유의 제단",
@@ -147,8 +147,8 @@ public class Town {
                 10,
                 0,
                 3,
-                Tribe.GlobalBonusFactor.UNIT_HEAL_POWER,
-                0.5f
+                Tribe.ShrineBonus.UNIT_HEAL_POWER,
+                0.1f
         ),
         SHRINE_LOVE(
                 "사랑의 제단",
@@ -160,8 +160,8 @@ public class Town {
                 10,
                 0,
                 3,
-                Tribe.GlobalBonusFactor.TOWN_POPULATION_BOOST,
-                0.5f
+                Tribe.ShrineBonus.TOWN_POPULATION_BOOST,
+                0.1f
         ),
         SHRINE_PROSPER(
                 "풍요의 제단",
@@ -173,8 +173,8 @@ public class Town {
                 10,
                 0,
                 3,
-                Tribe.GlobalBonusFactor.TOWN_GOLD_BOOST,
-                0.5f
+                Tribe.ShrineBonus.TOWN_GOLD_BOOST,
+                0.1f
         ),
         UNKNOWN(
                 "모름",
@@ -200,12 +200,12 @@ public class Town {
         private int happinessDelta;
         private int offenseDelta;
         private int defenseDelta;
-        private Tribe.GlobalBonusFactor bonusFactor;
+        private Tribe.ShrineBonus bonusFactor;
         private float bonusValue;
 
         Terrain(String word, int facilitySlots, boolean[] movable, int[] developmentDeltas,
                 int goldDelta, int populationDelta, int happinessDelta, int offenseDelta,
-                int defenseDelta, Tribe.GlobalBonusFactor bonusFactor, float bonusValue) {
+                int defenseDelta, Tribe.ShrineBonus bonusFactor, float bonusValue) {
             this.word = word;
             this.facilitySlots = facilitySlots;
             this.movable = movable;
@@ -250,7 +250,7 @@ public class Town {
         public int defenseDelta() {
             return defenseDelta;
         }
-        public Tribe.GlobalBonusFactor bonusFactor() {
+        public Tribe.ShrineBonus bonusFactor() {
             return bonusFactor;
         }
         public float bonusValue() {
@@ -459,6 +459,9 @@ public class Town {
                     deltas[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()] +=
                             developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()];
                     deltas[DeltaAttribute.GOLD.ordinal()] += squad.collectGoldBonus();
+                    deltas[DeltaAttribute.HAPPINESS.ordinal()] += squad.collectHappinessBonus();
+                    deltas[DeltaAttribute.DEFENSIVE.ordinal()] += squad.collectDefensiveBonus();
+                    break;
                 }
             }
         } else {

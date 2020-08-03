@@ -41,7 +41,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 136, 60);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("취소").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
+                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(cancelButton);
 
@@ -50,7 +50,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 136, 60);
         selectButton = new Button.Builder(this, selectButtonRegion)
                 .message("선택").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).textColor(Color.rgb(230, 230, 230))
+                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         addWidget(selectButton);
 
@@ -105,7 +105,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text"+textIndex, text, 25)
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)

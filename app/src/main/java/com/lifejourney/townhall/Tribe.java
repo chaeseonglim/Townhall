@@ -34,7 +34,7 @@ public abstract class Tribe implements Squad.Event {
         }
     }
 
-    enum GlobalBonusFactor {
+    enum ShrineBonus {
         UNIT_ATTACK_SPEED,
         UNIT_HEAL_POWER,
         TOWN_GOLD_BOOST,
@@ -68,10 +68,10 @@ public abstract class Tribe implements Squad.Event {
 
         // Set squad bonus
         for (Squad squad : squads) {
-            squad.setGlobalFactor(GlobalBonusFactor.UNIT_ATTACK_SPEED,
-                    getGlobalFactor(GlobalBonusFactor.UNIT_ATTACK_SPEED));
-            squad.setGlobalFactor(GlobalBonusFactor.UNIT_HEAL_POWER,
-                    getGlobalFactor(GlobalBonusFactor.UNIT_HEAL_POWER));
+            squad.setShrineBonus(ShrineBonus.UNIT_ATTACK_SPEED,
+                    getShrineBonus(ShrineBonus.UNIT_ATTACK_SPEED));
+            squad.setShrineBonus(ShrineBonus.UNIT_HEAL_POWER,
+                    getShrineBonus(ShrineBonus.UNIT_HEAL_POWER));
         }
     }
 
@@ -214,7 +214,7 @@ public abstract class Tribe implements Squad.Event {
      * @param factor
      * @return
      */
-    public float getGlobalFactor(GlobalBonusFactor factor) {
+    public float getShrineBonus(ShrineBonus factor) {
 
         return globalFactors[factor.ordinal()];
     }
@@ -224,7 +224,7 @@ public abstract class Tribe implements Squad.Event {
      * @param factor
      * @param value
      */
-    public void setGlobalFactor(GlobalBonusFactor factor, float value) {
+    public void setGlobalFactor(ShrineBonus factor, float value) {
 
         globalFactors[factor.ordinal()] = value;
     }
@@ -234,7 +234,7 @@ public abstract class Tribe implements Squad.Event {
      * @param factor
      * @param value
      */
-    public void addGlobalFactor(GlobalBonusFactor factor, float value) {
+    public void addGlobalFactor(ShrineBonus factor, float value) {
 
         globalFactors[factor.ordinal()] += value;
     }
@@ -245,5 +245,5 @@ public abstract class Tribe implements Squad.Event {
     private OffsetCoord headquarterPosition;
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Town> towns;
-    private float[] globalFactors = new float[GlobalBonusFactor.values().length];
+    private float[] globalFactors = new float[ShrineBonus.values().length];
 }

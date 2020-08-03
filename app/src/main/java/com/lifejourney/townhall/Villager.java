@@ -9,7 +9,7 @@ public class Villager extends Tribe {
         super(eventHandler, Faction.VILLAGER, map);
 
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                Unit.UnitClass.HORSE_MAN, Unit.UnitClass.CANNON, Unit.UnitClass.PALADIN);
+                Unit.UnitClass.HEALER, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN);
     }
 
     @Override
@@ -35,21 +35,22 @@ public class Villager extends Tribe {
         happiness = 0;
         for (Town town : getTowns()) {
             income += (float)town.getTax() *
-                    (1.0f + getGlobalFactor(GlobalBonusFactor.TOWN_GOLD_BOOST));
+                    (1.0f + getShrineBonus(ShrineBonus.TOWN_GOLD_BOOST));
             totalPopulation += town.getPopulation() *
-                    (1.0f + getGlobalFactor(GlobalBonusFactor.TOWN_POPULATION_BOOST));
+                    (1.0f + getShrineBonus(ShrineBonus.TOWN_POPULATION_BOOST));
             happiness += town.getHappiness();
         }
         happiness /= getTowns().size();
 
         // Pay upkeep
         spend = 0;
-        usingPopulation = 0;
+        workingPopulation = 0;
         for (Squad squad : getSquads()) {
             spend += squad.getUpkeep();
-            usingPopulation += squad.getPopulation();
+            workingPopulation += squad.getPopulation();
         }
-        usablePopulation = totalPopulation - usingPopulation;
+        spend += Upgradable.getTotalUpkeep(getFaction());
+        idlePopulation = totalPopulation - workingPopulation;
         gold += (income - spend);
 
         /*
@@ -79,7 +80,7 @@ public class Villager extends Tribe {
     public void pay(int gold, int population) {
 
         this.gold -= gold;
-        this.usablePopulation -= population;
+        this.idlePopulation -= population;
     }
 
     /**
@@ -94,7 +95,17 @@ public class Villager extends Tribe {
             replacementPopulation = replacementClass.population();
         }
         return (getGold() >= unitClass.costToPurchase() &&
-                getUsablePopulation() + replacementPopulation >= unitClass.population());
+                getIdlePopulation() + replacementPopulation >= unitClass.population());
+    }
+
+    /**
+     *
+     * @param upgradable
+     * @return
+     */
+    public boolean isAffordable(Upgradable upgradable) {
+
+        return (getGold() >= upgradable.getPurchaseCost());
     }
 
     /**
@@ -110,18 +121,18 @@ public class Villager extends Tribe {
      *
      * @return
      */
-    public int getUsingPopulation() {
+    public int getWorkingPopulation() {
 
-        return usingPopulation;
+        return workingPopulation;
     }
 
     /**
      *
      * @return
      */
-    public int getUsablePopulation() {
+    public int getIdlePopulation() {
 
-        return usablePopulation;
+        return idlePopulation;
     }
 
     /**
@@ -162,12 +173,12 @@ public class Villager extends Tribe {
 
 
     private final static int COLLECT_UPDATE_TIME = 60;
-    private final static int STARTING_GOLD = 250;
+    private final static int STARTING_GOLD = 25000;
 
     private int collectTimeLeft = 1;
     private int totalPopulation = 0;
-    private int usingPopulation = 0;
-    private int usablePopulation = 0;
+    private int workingPopulation = 0;
+    private int idlePopulation = 0;
     private int gold = STARTING_GOLD;
     private int income = 0;
     private int spend = 0;

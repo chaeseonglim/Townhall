@@ -10,7 +10,7 @@ import java.util.ListIterator;
 
 public class GameWorld extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event,
-                SpeedControl.Event, InfoBox.Event, HomeBox.Event, ResearchBox.Event, Tribe.Event {
+                SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -20,6 +20,9 @@ public class GameWorld extends World
 
         // Set FPS
         setDesiredFPS(20.0f);
+
+        // Init singleton
+        Upgradable.reset();
 
         // Build map
         map = new GameMap(this, mapFileName);
@@ -208,7 +211,7 @@ public class GameWorld extends World
             town.getTerrain() == Town.Terrain.SHRINE_HEAL ||
             town.getTerrain() == Town.Terrain.SHRINE_LOVE ||
             town.getTerrain() == Town.Terrain.SHRINE_PROSPER) {
-            Tribe.GlobalBonusFactor factor = town.getTerrain().bonusFactor();
+            Tribe.ShrineBonus factor = town.getTerrain().bonusFactor();
             float value = town.getTerrain().bonusValue();
             if (prevFaction != Tribe.Faction.NEUTRAL) {
                 getTribe(prevFaction).addGlobalFactor(factor, -value);
@@ -394,11 +397,11 @@ public class GameWorld extends World
             paused = false;
         } else if (speedControl.getPlaySpeed() == 2) {
             // 2x
-            setDesiredFPS(30.0f);
+            setDesiredFPS(40.0f);
             paused = false;
         } else if (speedControl.getPlaySpeed() == 3) {
             // 3x
-            setDesiredFPS(40.0f);
+            setDesiredFPS(60.0f);
             paused = false;
         }
     }
@@ -411,7 +414,7 @@ public class GameWorld extends World
     @Override
     public void onHomeBoxSwitchToResearchBox(HomeBox homeBox) {
 
-        popupResearchBox();
+        popupUpgradeBox();
 
         homeBox.close();
         removeWidget(homeBox);
@@ -432,26 +435,37 @@ public class GameWorld extends World
 
     /**
      *
-     * @param researchBox
+     * @param upgradeBox
      */
     @Override
-    public void onResearchBoxSwitchToHomeBox(ResearchBox researchBox) {
+    public void onUpgradeBoxSwitchToHomeBox(UpgradeBox upgradeBox) {
 
         popupHomeBox();
 
-        researchBox.close();
-        removeWidget(researchBox);
+        upgradeBox.close();
+        removeWidget(upgradeBox);
     }
 
     /**
      *
-     * @param researchBox
+     * @param upgradeBox
+     * @param upgradable
      */
     @Override
-    public void onResearchBoxClosed(ResearchBox researchBox) {
+    public void onUpgradeBoxUpgraded(UpgradeBox upgradeBox, Upgradable upgradable) {
 
-        researchBox.close();
-        removeWidget(researchBox);
+        economyBar.refresh();
+    }
+
+    /**
+     *
+     * @param upgradeBox
+     */
+    @Override
+    public void onUpgradeBoxClosed(UpgradeBox upgradeBox) {
+
+        upgradeBox.close();
+        removeWidget(upgradeBox);
 
         speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
     }
@@ -509,15 +523,16 @@ public class GameWorld extends World
     /**
      *
      */
-    private void popupResearchBox() {
+    private void popupUpgradeBox() {
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 500) / 2,
-                800, 500);
+        Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 450) / 2,
+                800, 450);
 
-        ResearchBox researchBox = new ResearchBox(this, boxRegion, 30, 0.0f);
-        researchBox.show();
-        addWidget(researchBox);
+        UpgradeBox upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0),
+                boxRegion, 30, 0.0f);
+        upgradeBox.show();
+        addWidget(upgradeBox);
     }
 
     /**
