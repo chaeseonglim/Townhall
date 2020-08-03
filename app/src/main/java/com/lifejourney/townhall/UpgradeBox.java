@@ -77,12 +77,12 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
         // Upgradable buttons
         Rect[] upgradableButtonRegions = {
-                new Rect(region.left() + 50, region.top() + 90,150, 65),
-                new Rect(region.left() + 50, region.top() + 180,150, 65),
-                new Rect(region.left() + 50, region.top() + 270,150, 65),
-                new Rect(region.left() + 210, region.top() + 90,150, 65),
-                new Rect(region.left() + 210, region.top() + 180,150, 65),
-                new Rect(region.left() + 210, region.top() + 270,150, 65),
+                new Rect(region.left() + 45, region.top() + 90,150, 65),
+                new Rect(region.left() + 45, region.top() + 180,150, 65),
+                new Rect(region.left() + 45, region.top() + 270,150, 65),
+                new Rect(region.left() + 205, region.top() + 90,150, 65),
+                new Rect(region.left() + 205, region.top() + 180,150, 65),
+                new Rect(region.left() + 205, region.top() + 270,150, 65),
         };
         for (int i = 0; i < 6; ++ i) {
             upgradableButtons[i] =
