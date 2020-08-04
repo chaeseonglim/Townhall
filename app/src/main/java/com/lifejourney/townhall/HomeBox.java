@@ -115,26 +115,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         removeSprites("text");
 
-        // The number of towns
-        PointF textPosition = new PointF(-250, -155);
-        addText("전체 마을 수", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
-
-        textPosition.offset(0, 30);
-        addText(villager.getTowns().size() + "", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
-
-        // The number of squads
-        textPosition.offset(150, -30);
-        addText("전체 부대 수", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(255, 255, 0));
-
-        textPosition.offset(0, 30);
-        addText(villager.getSquads().size() + "", new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
-
         // Population
-        textPosition.offset(-150, 30);
+        PointF textPosition = new PointF(-250, -155);
         addText("전체 인구", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
@@ -176,6 +158,24 @@ public class HomeBox extends Widget implements Button.Event {
         textPosition.offset(0, 30);
         addText(villager.getHappiness() + "", new SizeF(150, 40),
                 textPosition.clone(), Color.rgb(230, 230, 230));
+
+        // The number of towns
+        textPosition.setTo(100, -155);
+        addText("마을 수", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        textPosition.offset(0, 30);
+        addText(villager.getTowns().size() + "", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(230, 230, 230));
+
+        // The number of squads
+        textPosition.offset(150, -30);
+        addText("부대 수", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        textPosition.offset(0, 30);
+        addText(villager.getSquads().size() + "", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(230, 230, 230));
 
     }
 

@@ -12,8 +12,8 @@ public abstract class Tribe implements Squad.Event {
     enum Faction {
         NEUTRAL,
         VILLAGER,
-        BANDIT,
-        PIRATE,
+        RAIDER,
+        VIKING,
         REBEL;
 
         String toGameString() {
@@ -22,10 +22,10 @@ public abstract class Tribe implements Squad.Event {
                     return "중립";
                 case VILLAGER:
                     return "주민";
-                case BANDIT:
-                    return "산적";
-                case PIRATE:
-                    return "해적";
+                case RAIDER:
+                    return "침략군";
+                case VIKING:
+                    return "바이킹";
                 case REBEL:
                     return "반란군";
                 default:
