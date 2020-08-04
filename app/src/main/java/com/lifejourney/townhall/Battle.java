@@ -142,6 +142,9 @@ public class Battle {
             } else if (defender.isWillingToRetreat()) {
                 winner = attacker;
                 loser = defender;
+            } else if (battleTimeLeft-- == 0) {
+                winner = defender;
+                loser = attacker;
             }
         }
 
@@ -223,6 +226,7 @@ public class Battle {
     private int WINNER_EXP = 50;
     private int FIGHTING_EXP = 1;
     private int SUPPORTING_EXP = 1;
+    private int BATTLE_TIME_LIMIT = 1000;
 
     private OffsetCoord mapCoord;
     private GameMap map;
@@ -230,4 +234,5 @@ public class Battle {
     private Squad defender;
     private ArrayList<Squad> supporters = new ArrayList<>();
     private boolean finished = false;
+    private int battleTimeLeft = BATTLE_TIME_LIMIT;
 }
