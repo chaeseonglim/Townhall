@@ -9,7 +9,7 @@ public class Villager extends Tribe {
         super(eventHandler, Faction.VILLAGER, map);
 
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                Unit.UnitClass.HEALER, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN);
+                Unit.UnitClass.PALADIN, Unit.UnitClass.WORKER, Unit.UnitClass.WORKER);
     }
 
     @Override

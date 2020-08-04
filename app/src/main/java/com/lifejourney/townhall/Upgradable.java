@@ -219,8 +219,8 @@ enum Upgradable {
     ARCHER_POISON_ARROW(
             "독 화살",
             "독 피해 추가",
-            "독 피해량 +5%",
             "독 피해량 +10%",
+            "독 피해량 +20%",
             ARCHER_RANGED_DAMAGE,
             3000,
             300
@@ -246,9 +246,9 @@ enum Upgradable {
     ),
     HORSE_MAN_MOVE_SPEED(
             "쾌속 질주",
-            "이동 속도 +5%",
             "이동 속도 +10%",
-            "이동 속도 +15%",
+            "이동 속도 +20%",
+            "이동 속도 +30%",
             HORSE_MAN_ARMOR,
             3000,
             300
@@ -302,8 +302,8 @@ enum Upgradable {
     HEALER_DOT_HEAL(
             "기적의 치유",
             "전체 점진적인 치유 추가",
-            "전체 점진적인 치유력 +5%",
             "전체 점진적인 치유력 +10%",
+            "전체 점진적인 치유력 +20%",
             HEALER_HEAL_POWER,
             3000,
             300
@@ -329,8 +329,8 @@ enum Upgradable {
     HEALER_SPLASH_DAMAGE(
             "치유의 가시",
             "치유시 범위 피해 추가",
-            "치유시 범위 피해량 +5%",
             "치유시 범위 피해량 +10%",
+            "치유시 범위 피해량 +20%",
             HEALER_RANGED_EVASION,
             3000,
             300
@@ -356,9 +356,9 @@ enum Upgradable {
     ),
     CANNON_SPLASH_RANGE(
             "피해 범위",
-            "피해 범위 +5%",
             "피해 범위 +10%",
-            "피해 범위 +15%",
+            "피해 범위 +20%",
+            "피해 범위 +30%",
             CANNON_RANGED_DAMAGE,
             3000,
             300
@@ -374,9 +374,9 @@ enum Upgradable {
     ),
     CANNON_MOVE_SPEED(
             "이동 속도",
-            "이동 속도 +5%",
             "이동 속도 +10%",
-            "이동 속도 +15%",
+            "이동 속도 +20%",
+            "이동 속도 +30%",
             CANNON_ARMOR,
             2000,
             200
@@ -412,8 +412,8 @@ enum Upgradable {
     PALADIN_INVINCIBLE(
             "무적",
             "체력 저하시 무적",
-            "기술 쿨타임 -5%",
-            "기술 쿨타임 -10%",
+            "무적 지속시간 +5%",
+            "무적 지속시간 +10%",
             PALADIN_RANGED_EVASION,
             3000,
             300
@@ -438,9 +438,9 @@ enum Upgradable {
     ),
     PALADIN_GUARDIAN(
             "아군 보호",
-            "아군 일반 피해 전환 +5%",
             "아군 일반 피해 전환 +10%",
-            "아군 일반 피해 전환 +15%",
+            "아군 일반 피해 전환 +20%",
+            "아군 일반 피해 전환 +30%",
             PALADIN_MELEE_DAMAGE,
             3000,
             300

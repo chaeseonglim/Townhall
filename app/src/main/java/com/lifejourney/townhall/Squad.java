@@ -208,7 +208,7 @@ public class Squad extends Object implements Controllable {
 
                     // Heal units
                     if (!isSupporting) {
-                        healUnits();
+                        restUnits();
                     }
                 }
             }
@@ -706,7 +706,7 @@ public class Squad extends Object implements Controllable {
 
         this.fighting = false;
         for (Unit unit: units) {
-            unit.setOpponents(null);
+            unit.endFight();
         }
 
         setPosition(getMapPosition().toGameCoord());
@@ -1227,10 +1227,10 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    private void healUnits() {
+    private void restUnits() {
 
         for (Unit unit: units) {
-            unit.rest(HEAL_PERCENTAGE *
+            unit.rest(REST_PERCENTAGE *
                     (1 + map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.DEFENSIVE)));
         }
     }
@@ -1249,7 +1249,7 @@ public class Squad extends Object implements Controllable {
     private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
     private final static float UNIT_BONUS_DELTA = 0.05f;
-    private final static float HEAL_PERCENTAGE = 0.01f;
+    private final static float REST_PERCENTAGE = 0.01f;
 
     private Event eventHandler;
     private GameMap map;

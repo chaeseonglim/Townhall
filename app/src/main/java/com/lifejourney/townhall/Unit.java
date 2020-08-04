@@ -531,7 +531,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     .gridSize(9,1).size(unitClass.spriteSize()).smooth(true).opaque(0.0f)
                     .build();
             Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png")
-                    .gridSize(23,1).size(unitClass.spriteSize().clone().multiply(2.0f))
+                    .gridSize(27,1).size(unitClass.spriteSize().clone().multiply(2.0f))
                     .smooth(false).opaque(0.0f).build();
             return (Unit) new PrivateBuilder<>(position, unitClass)
                     .sprite(unitClassSprite)
@@ -592,44 +592,43 @@ public class Unit extends CollidableObject implements Projectile.Event {
     @Override
     public void update() {
 
+        // Adjust moving speed
         if (Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction) > 0 &&
                 getUnitClass() == UnitClass.HORSE_MAN) {
-
             setMaxVelocity(getUnitClass().maxVelocity() * (1.0f + MOVE_SPEED_DELTA *
                     Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction)));
             setMaxForce(getUnitClass().maxForce() * (1.0f + MOVE_SPEED_DELTA *
                     Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction)));
+        } else if (Upgradable.CANNON_MOVE_SPEED.getLevel(faction) > 0 &&
+                getUnitClass() == UnitClass.CANNON) {
+            setMaxVelocity(getUnitClass().maxVelocity() * (1.0f + MOVE_SPEED_DELTA *
+                    Upgradable.CANNON_MOVE_SPEED.getLevel(faction)));
+            setMaxForce(getUnitClass().maxForce() * (1.0f + MOVE_SPEED_DELTA *
+                    Upgradable.CANNON_MOVE_SPEED.getLevel(faction)));
+        } else {
+            setMaxVelocity(getUnitClass().maxVelocity());
+            setMaxForce(getUnitClass().maxForce());
         }
 
-        if (stunTimeLeft > 0) {
-            // If it's stunned
-            setVelocity(new Vector2D());
-            setForce(new Vector2D());
+        if (isInvincible()) {
+            invincibled();
+        } else if (invincibleCooldownLeft > 0) {
+            invincibleCooldownLeft--;
+        }
 
-            Sprite effectSprite = getSprite("effect");
-            if (--stunTimeLeft > 0) {
-                // stun effect should be remained
-                Point gridIndex = effectSprite.getGridIndex();
-                if (gridIndex.x != 19 && gridIndex.x != 20 && gridIndex.x != 21 &&
-                        gridIndex.x != 22) {
-                    effectSprite.setAnimationWrap(true);
-                    effectSprite.clearAnimation();
-                    effectSprite.addAnimationFrame(19, 0, 10);
-                    effectSprite.addAnimationFrame(20, 0, 10);
-                    effectSprite.addAnimationFrame(21, 0, 10);
-                    effectSprite.addAnimationFrame(22, 0, 10);
-                }
-            } else {
-                effectSprite.clearAnimation();
-                effectSprite.setAnimationWrap(false);
-            }
+        if (isSlowed()) {
+            slowed();
+        }
+
+        if (isStunned()) {
+            stunned();
         } else if (!isRecruiting() && isFighting()) {
             // If it's on battle,  seek or flee enemies
             float highestFavor = -Float.MAX_VALUE, lowestFavor = Float.MAX_VALUE;
             Unit highestFavorUnit = null, lowestFavorUnit = null;
             float highestFavorDistance = Float.MAX_VALUE, lowestFavorDistance = Float.MAX_VALUE;
             for (Unit opponent : opponents) {
-                if (opponent.isRecruiting()) {
+                if (opponent.isRecruiting() || opponent.isInvincible()) {
                     continue;
                 }
 
@@ -709,22 +708,30 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         // Update dot damage
-        if (isFighting()) {
-            ArrayList<Pair<Float, Integer>> dotsCopy = new ArrayList<>(dots);
-            for (Pair<Float, Integer> dot : dotsCopy) {
-                health -= dot.first;
-                if (health < 0.0f) {
-                    health = 0.0f;
-                } else if (health > getMaxHealth()) {
-                    health = getMaxHealth();
-                }
-                if (dot.second > 1) {
-                    dots.add(new Pair<>(dot.first, dot.second - 1));
-                }
-                dots.remove(dot);
+        ArrayList<Pair<Float, Integer>> dotsCopy = new ArrayList<>(dotDamages);
+        for (Pair<Float, Integer> dot : dotsCopy) {
+            health -= dot.first;
+            if (health < 0.0f) {
+                health = 0.0f;
+            } else if (health > getMaxHealth()) {
+                health = getMaxHealth();
             }
-        } else {
-            dots.clear();
+            if (dot.second > 1) {
+                dotDamages.add(new Pair<>(dot.first, dot.second - 1));
+            }
+            dotDamages.remove(dot);
+        }
+
+        // Check invincible mode
+        if (getUnitClass() == UnitClass.PALADIN &&
+                Upgradable.PALADIN_INVINCIBLE.getLevel(faction) > 0 &&
+                getHealth()/getMaxHealth() < INVINCIBLE_HEALTH_THRESHOLD) {
+            if (!isInvincible() && invincibleCooldownLeft == 0) {
+                health = Math.max(health, getMaxHealth() * INVINCIBLE_HEALTH_THRESHOLD);
+                invincibleCooldownLeft = INVINCIBLE_COOLDOWN;
+                invincibleTimeLeft = (int) (INVINCIBLE_DURATION * (1.0f + (INVINCIBLE_DURATION_DELTA *
+                        Upgradable.PALADIN_INVINCIBLE.getLevel(faction) - 1)));
+            }
         }
 
         // Adjust health sprite
@@ -764,7 +771,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         projectile.close();
 
         Unit target = projectile.getTarget();
-        if (target.isClosed()) {
+        if (target.isClosed() || !target.isFighting()) {
             return;
         }
 
@@ -797,7 +804,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
             // Deal damage
             float damage = Math.max(damageBase * (1.0f - target.getArmor()), 1.0f);
             target.gotDamage(damage);
+
         } else if (projectile.getType() == Projectile.ProjectileType.HEAL) {
+            // Heal magic
+
             if (Upgradable.HEALER_DOT_HEAL.getLevel(faction) > 0 &&
                 getUnitClass() == UnitClass.HEALER) {
                 float dotHeal =
@@ -807,8 +817,21 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 }
             }
 
+            // Splash damage
+            if (Upgradable.HEALER_SPLASH_DAMAGE.getLevel(faction) > 0 &&
+                    getUnitClass() == UnitClass.HEALER) {
+                float splashDamage = getHealPower() *
+                        (SPLASH_DAMAGE_DELTA * Upgradable.HEALER_SPLASH_DAMAGE.getLevel(faction));
+                for (Unit opponent : target.getOpponents()) {
+                    if (opponent.getPosition().distance(target.getPosition()) < SPLASH_DAMAGE_RANGE) {
+                        opponent.gotSplashDamage(splashDamage);
+                    }
+                }
+            }
+
             // Heal
             target.gotHeal(getHealPower());
+
         } else if (projectile.getType() == Projectile.ProjectileType.CANNON) {
             // Cannon
 
@@ -822,12 +845,17 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     getUnitClass().strengthMetric(target.getUnitClass()) * (1.0f - target.getArmor()), 1.0f);
             target.gotDamage(damage);
 
+            float splashDamage = damage * SPLASH_DAMAGE_DELTA;
+            float splashDamageRange =
+                    SPLASH_DAMAGE_RANGE * (1.0f + SPLASH_DAMAGE_RANGE_DELTA *
+                            Upgradable.CANNON_SPLASH_RANGE.getLevel(faction));
+
             for (Unit opponent : target.getCompanions()) {
-                float splashDamage = Math.max(getRangedDamage() *
-                        getUnitClass().strengthMetric(target.getUnitClass()) * (1.0f - target.getArmor()) *
-                        SPLASH_DAMAGE_PROPORTION, 1.0f);
-                if (opponent.getPosition().distance(target.getPosition()) < SPLASH_DAMAGE_RANGE) {
+                if (opponent.getPosition().distance(target.getPosition()) < splashDamageRange) {
                     opponent.gotSplashDamage(splashDamage);
+                    if (Upgradable.CANNON_SLOWNESS.getLevel(faction) > 0) {
+                        opponent.gotSlow(SLOW_DELTA * Upgradable.CANNON_SLOWNESS.getLevel(faction));
+                    }
                 }
             }
         }
@@ -838,7 +866,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     public void fight() {
 
-        if (isRecruiting() || stunTimeLeft > 0) {
+        if (isRecruiting() || isStunned()) {
             return;
         }
 
@@ -920,7 +948,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         float highestFavor = -Float.MAX_VALUE;
         float highestHealth = Float.MAX_VALUE;
         for (Unit opponent : opponents) {
-            if (opponent.isRecruiting()) {
+            if (opponent.isRecruiting() || opponent.isInvincible()) {
                 continue;
             }
             if (opponent.getPosition().distance(getPosition()) <= getMeleeAttackRange()) {
@@ -951,9 +979,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
         float highestFavor = -Float.MAX_VALUE;
         float highestHealth = Float.MAX_VALUE;
 
-        // Select highest favored enemy for ranged attack
+        // Select the highest favored enemy for ranged attack
         for (Unit opponent : opponents) {
-            if (opponent.isRecruiting()) {
+            if (opponent.isRecruiting() || opponent.isInvincible()) {
                 continue;
             }
             if (opponent.getPosition().distance(getPosition()) <=
@@ -1000,6 +1028,21 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         return targetCandidate;
+    }
+
+    /**
+     *
+     */
+    public void endFight() {
+
+        for (Projectile projectile: projectiles) {
+            projectile.close();
+        }
+        projectiles.clear();
+        dotDamages.clear();
+        slowTimeLeft = 0;
+        stunTimeLeft = 0;
+        opponents = null;
     }
 
     /**
@@ -1069,6 +1112,105 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     /**
      *
+     */
+    private  void invincibled() {
+
+        ArrayList<Pair<Float, Integer>> dotDamagesCopy = new ArrayList<>(dotDamages);
+        for (Pair<Float, Integer> dotDamage : dotDamagesCopy) {
+            if (dotDamage.first > 0.0f) {
+                dotDamages.remove(dotDamage);
+            }
+        }
+        slowTimeLeft = 0;
+        stunTimeLeft = 0;
+
+        Sprite effectSprite = getSprite("effect");
+        if (invincibleTimeLeft-- > 0) {
+            effectSprite.setAnimationWrap(false);
+            effectSprite.setGridIndex(25, 0);
+        } else {
+            effectSprite.clearAnimation();
+            effectSprite.setAnimationWrap(false);
+        }
+    }
+
+    /**
+     *
+     *
+     */
+    private void stunned() {
+
+        // If it's stunned
+        setVelocity(new Vector2D());
+        setForce(new Vector2D());
+
+        Sprite effectSprite = getSprite("effect");
+        if (--stunTimeLeft > 0) {
+            // stun effect should be remained
+            Point gridIndex = effectSprite.getGridIndex();
+            if (gridIndex.x != 19 && gridIndex.x != 20 && gridIndex.x != 21 &&
+                    gridIndex.x != 22) {
+                effectSprite.setAnimationWrap(true);
+                effectSprite.clearAnimation();
+                effectSprite.addAnimationFrame(19, 0, 10);
+                effectSprite.addAnimationFrame(20, 0, 10);
+                effectSprite.addAnimationFrame(21, 0, 10);
+                effectSprite.addAnimationFrame(22, 0, 10);
+            }
+        } else {
+            effectSprite.clearAnimation();
+            effectSprite.setAnimationWrap(false);
+        }
+    }
+
+    /**
+     *
+     */
+    private void slowed() {
+
+        setMaxVelocity(getMaxVelocity() * (1.0f - MOVE_SPEED_DELTA * slowness));
+        setMaxForce(getMaxForce() * (1.0f - MOVE_SPEED_DELTA * slowness));
+
+        Sprite effectSprite = getSprite("effect");
+        if (--slowTimeLeft > 0) {
+            if (!isStunned()) {
+                // slow effect should be remained
+                Point gridIndex = effectSprite.getGridIndex();
+                if (gridIndex.x != 23 && gridIndex.x != 24) {
+                    effectSprite.setAnimationWrap(true);
+                    effectSprite.clearAnimation();
+                    effectSprite.addAnimationFrame(23, 0, 10);
+                    effectSprite.addAnimationFrame(24, 0, 10);
+                }
+            }
+        } else {
+            if (!isStunned()) {
+                effectSprite.clearAnimation();
+                effectSprite.setAnimationWrap(false);
+            }
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isStunned() {
+
+        return (stunTimeLeft > 0);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isSlowed() {
+
+        return (slowTimeLeft > 0);
+    }
+
+    /**
+     *
      * @param target
      */
     private void rest(Unit target) {
@@ -1080,9 +1222,28 @@ public class Unit extends CollidableObject implements Projectile.Event {
         projectiles.add(projectile);
     }
 
+    /**
+     *
+     */
     private void gotStun() {
 
+        if (isInvincible()) {
+            return;
+        }
         stunTimeLeft += STUN_DURATION;
+    }
+
+    /**
+     *
+     * @param slowness
+     */
+    private void gotSlow(float slowness) {
+
+        if (isInvincible()) {
+            return;
+        }
+        this.slowTimeLeft += SLOW_DURATION;
+        this.slowness = slowness;
     }
 
     /**
@@ -1090,6 +1251,21 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param damage
      */
     private void gotDamage(float damage) {
+
+        if (isInvincible()) {
+            return;
+        }
+
+        if (Upgradable.PALADIN_GUARDIAN.getLevel(faction) > 0) {
+            float guardianDelta =
+                    damage * DAMAGE_UPGRADE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
+            for (Unit companion: companions) {
+                if (companion != this && companion.getUnitClass() == UnitClass.PALADIN) {
+                    damage -= guardianDelta;
+                    companion.gotGuardianDamage(guardianDelta);
+                }
+            }
+        }
 
         health -= damage;
         if (health < 0) {
@@ -1112,7 +1288,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void gotDotDamage(float damage, int duration) {
 
-        dots.add(new Pair<>(damage, duration));
+        if (isInvincible()) {
+            return;
+        }
+
+        dotDamages.add(new Pair<>(damage, duration));
 
         // Poison effect
         Sprite effectSprite = getSprite("effect");
@@ -1130,9 +1310,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void gotGuardianDamage(float damage) {
 
-        health -= damage;
-        if (health < 0) {
-            health = 0;
+        if (!isInvincible()) {
+            health -= damage;
+            if (health < 0) {
+                health = 0;
+            }
         }
 
         // Blinking
@@ -1143,6 +1325,12 @@ public class Unit extends CollidableObject implements Projectile.Event {
         classSprite.addAnimationFrame(unitGridIndex.x, unitGridIndex.y,5);
         classSprite.addAnimationFrame(0, 0, 5);
         classSprite.addAnimationFrame(unitGridIndex.x, unitGridIndex.y,5);
+
+        // Guardian effect
+        Sprite effectSprite = getSprite("effect");
+        effectSprite.clearAnimation();
+        effectSprite.addAnimationFrame(26, 0, 10);
+        effectSprite.addAnimationFrame(0, 0, 5);
     }
 
     /**
@@ -1150,6 +1338,21 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param damage
      */
     private void gotCriticalDamage(float damage) {
+
+        if (isInvincible()) {
+            return;
+        }
+
+        if (Upgradable.PALADIN_GUARDIAN.getLevel(faction) > 0) {
+            float guardianDelta =
+                    damage * DAMAGE_UPGRADE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
+            for (Unit companion: companions) {
+                if (companion != this && companion.getUnitClass() == UnitClass.PALADIN) {
+                    damage -= guardianDelta;
+                    companion.gotGuardianDamage(guardianDelta);
+                }
+            }
+        }
 
         health -= damage;
         if (health < 0) {
@@ -1179,6 +1382,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param damage
      */
     private void gotSplashDamage(float damage) {
+
+        if (isInvincible()) {
+            return;
+        }
 
         health = Math.max(health - damage, 0);
 
@@ -1220,7 +1427,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void gotDotHeal(float healPower, int duration) {
 
-        dots.add(new Pair<>(-healPower, duration));
+        dotDamages.add(new Pair<>(-healPower, duration));
 
         // Healing effect
         Sprite effectSprite = getSprite("effect");
@@ -1655,12 +1862,21 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isInvincible() {
+        return invincibleTimeLeft > 0;
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
     private final static int RESTING_TIME = 30;
     private final static float SPLASH_DAMAGE_RANGE = 30.0f;
-    private final static float SPLASH_DAMAGE_PROPORTION = 0.5f;
+    private final static float SPLASH_DAMAGE_DELTA = 0.1f;
+    private final static float SPLASH_DAMAGE_RANGE_DELTA = 0.1f;
     private final static float DAMAGE_UPGRADE_DELTA = 0.05f;
     private final static float ATTACK_SPEED_UPGRADE_DELTA = 0.05f;
     private final static float HEAL_POWER_UPGRADE_DELTA = 0.05f;
@@ -1668,11 +1884,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private final static float ARMOR_UPGRADE_DELTA = 0.05f;
     private final static float CRITICAL_ATTACK_RATE_DELTA = 0.05f;
     private final static float BUFF_DELTA = 0.05f;
-    private final static float DOT_DELTA = 0.05f;
-    private final static float MOVE_SPEED_DELTA = 0.05f;
+    private final static float DOT_DELTA = 0.1f;
+    private final static float MOVE_SPEED_DELTA = 0.1f;
     private final static float STUN_DELTA = 0.05f;
+    private final static float SLOW_DELTA = 0.05f;
     private final static int DOT_DURATION = 60;
     private final static int STUN_DURATION = 60;
+    private final static int SLOW_DURATION = 60;
+    private final static float INVINCIBLE_DURATION_DELTA = 0.05f;
+    private final static float INVINCIBLE_HEALTH_THRESHOLD = 0.2f;
+    private final static int INVINCIBLE_DURATION = 120;
+    private final static int INVINCIBLE_COOLDOWN = 500;
+    private final static float GUARDIAN_DAMAGE_DELTA = 0.1f;
 
     private UnitClass unitClass;
     private int level;
@@ -1693,6 +1916,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private int healTimeLeft = 0;
     private int restingTimeLeft = RESTING_TIME;
     private ArrayList<Projectile> projectiles = new ArrayList<>();
-    private ArrayList<Pair<Float, Integer>> dots = new ArrayList<>();
+    private ArrayList<Pair<Float, Integer>> dotDamages = new ArrayList<>();
+    private int slowTimeLeft = 0;
+    private float slowness = 0.0f;
     private int stunTimeLeft = 0;
+    private int invincibleTimeLeft = 0;
+    private int invincibleCooldownLeft = 0;
 }
