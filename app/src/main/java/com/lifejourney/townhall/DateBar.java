@@ -14,7 +14,7 @@ public class DateBar extends Widget {
 
     private final String LOG_TAG = "DateBar";
 
-    public DateBar(Rect region, int layer, float depth) {
+    public DateBar(SpeedControl speedControl, Rect region, int layer, float depth) {
 
         super(region, layer, depth);
 
@@ -42,10 +42,11 @@ public class DateBar extends Widget {
      */
     @Override
     public void update() {
+
         super.update();
 
         // Update date
-        if (--updateTimeLeft == 0) {
+        if (!paused && --updateTimeLeft == 0) {
             day++;
             dateTextSprite.setText(day + " days");
             updateTimeLeft = DAY_UPDATE_PERIOD;
@@ -60,8 +61,23 @@ public class DateBar extends Widget {
         return day;
     }
 
+    /**
+     *
+     */
+    public void pause() {
+        paused = true;
+    }
+
+    /**
+     *
+     */
+    public void resume() {
+        paused = false;
+    }
+
     private static final int DAY_UPDATE_PERIOD = 90;
 
+    private boolean paused = false;
     private int day = 0;
     private int updateTimeLeft = DAY_UPDATE_PERIOD;
     private TextSprite dateTextSprite;

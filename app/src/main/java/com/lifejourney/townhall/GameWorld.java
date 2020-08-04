@@ -40,14 +40,14 @@ public class GameWorld extends World
         economyBar.show();
         addWidget(economyBar);
 
-        dateBar = new DateBar(new Rect(480, 10, 230, 64), 20, 0.0f);
-        dateBar.show();
-        addWidget(dateBar);
-
         speedControl = new SpeedControl(this, new Rect(1080, 10, 174, 64),
                 20, 0.0f);
         speedControl.show();
         addWidget(speedControl);
+
+        dateBar = new DateBar(speedControl, new Rect(480, 10, 230, 64), 20, 0.0f);
+        dateBar.show();
+        addWidget(dateBar);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
 
@@ -390,18 +390,22 @@ public class GameWorld extends World
         if (speedControl.getPlaySpeed() == 0) {
             // Pause
             setDesiredFPS(20.0f);
+            dateBar.pause();
             paused = true;
         } else if (speedControl.getPlaySpeed() == 1) {
             // 1x
             setDesiredFPS(20.0f);
+            dateBar.resume();
             paused = false;
         } else if (speedControl.getPlaySpeed() == 2) {
             // 2x
             setDesiredFPS(40.0f);
+            dateBar.resume();
             paused = false;
         } else if (speedControl.getPlaySpeed() == 3) {
             // 3x
             setDesiredFPS(60.0f);
+            dateBar.resume();
             paused = false;
         }
     }
