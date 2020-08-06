@@ -49,7 +49,7 @@ public class SquadPathFinder extends PathFinder {
 
         ArrayList<Waypoint> neighbors = new ArrayList<>();
         ArrayList<OffsetCoord> neighborMapCoord =
-                new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y).getNeighbors();
+                new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y).getNeighbors(1);
         for (OffsetCoord mapCoord: neighborMapCoord) {
             neighbors.add(new Waypoint(new Point(mapCoord.getX(), mapCoord.getY()), waypoint,
                     waypoint.getCostFromStart() + 1));

@@ -21,9 +21,9 @@ public abstract class Tribe implements Squad.Event {
                 case NEUTRAL:
                     return "중립";
                 case VILLAGER:
-                    return "주민";
+                    return "원주민";
                 case RAIDER:
-                    return "침략군";
+                    return "정복자";
                 case VIKING:
                     return "바이킹";
                 case REBEL:
@@ -52,10 +52,10 @@ public abstract class Tribe implements Squad.Event {
         this.eventHandler = eventHandler;
         this.faction = faction;
         this.map = map;
-        this.towns = map.getTownsBySide(faction);
-        for (Town town: towns) {
-            if (town.getTerrain() == Town.Terrain.HEADQUARTER_VILLAGER) {
-                this.headquarterPosition = town.getMapCoord();
+        this.territories = map.getTownsBySide(faction);
+        for (Territory territory : territories) {
+            if (territory.getTerrain() == Territory.Terrain.HEADQUARTER_VILLAGER) {
+                this.headquarterPosition = territory.getMapCoord();
             }
         }
         Arrays.fill(this.globalFactors, 0.0f);
@@ -186,9 +186,9 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public ArrayList<Town> getTowns() {
+    public ArrayList<Territory> getTerritories() {
 
-        return towns;
+        return territories;
     }
 
     /**
@@ -244,6 +244,6 @@ public abstract class Tribe implements Squad.Event {
     private GameMap map;
     private OffsetCoord headquarterPosition;
     private ArrayList<Squad> squads = new ArrayList<>();
-    private ArrayList<Town> towns;
+    private ArrayList<Territory> territories;
     private float[] globalFactors = new float[ShrineBonus.values().length];
 }

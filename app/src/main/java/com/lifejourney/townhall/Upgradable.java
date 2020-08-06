@@ -3,7 +3,7 @@ package com.lifejourney.townhall;
 /*
 - Worker
 1.1 Farm Development speed
-2.1 Town Development speed
+2.1 Territory Development speed
 3.1 Happiness up
 1.2 Market Development speed
 2.2 Fortress development speed

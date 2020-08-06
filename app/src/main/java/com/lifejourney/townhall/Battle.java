@@ -177,9 +177,9 @@ public class Battle {
                 ArrayList<OffsetCoord> retreatableSameFactionCoords = new ArrayList<>();
                 ArrayList<OffsetCoord> retretableNeutralFactionCoords = new ArrayList<>();
                 for (OffsetCoord retreatableCoord: retreatableCoords) {
-                    if (map.getTown(retreatableCoord).getFaction() == loser.getFaction()) {
+                    if (map.getTerritory(retreatableCoord).getFaction() == loser.getFaction()) {
                         retreatableSameFactionCoords.add(retreatableCoord);
-                    } else if (map.getTown(retreatableCoord).getFaction() == Tribe.Faction.NEUTRAL) {
+                    } else if (map.getTerritory(retreatableCoord).getFaction() == Tribe.Faction.NEUTRAL) {
                         retretableNeutralFactionCoords.add(retreatableCoord);
                     }
                 }

@@ -8,15 +8,15 @@ import com.lifejourney.engine2d.Sprite;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Town {
+public class Territory {
 
-    private final static String LOG_TAG = "Town";
+    private final static String LOG_TAG = "Territory";
 
     public interface Event {
 
-        void onTownUpdated(Town town);
+        void onTownUpdated(Territory territory);
 
-        void onTownOccupied(Town town, Tribe.Faction oldFaction);
+        void onTownOccupied(Territory territory, Tribe.Faction oldFaction);
     }
 
     enum Terrain {
@@ -293,6 +293,11 @@ public class Town {
         OFFENSIVE
     }
 
+    enum FogState {
+        CLEAR,
+        MIST,
+        CLOUDY
+    }
 
     private static SizeF TileSize;
 
@@ -305,7 +310,7 @@ public class Town {
         TileSize = tileSize;
     }
 
-    public Town(Event eventHandler, OffsetCoord mapCoord, Terrain terrain, Tribe.Faction faction) {
+    public Territory(Event eventHandler, OffsetCoord mapCoord, Terrain terrain, Tribe.Faction faction) {
 
         this.eventHandler = eventHandler;
         this.mapCoord = mapCoord;
@@ -322,6 +327,7 @@ public class Town {
             Arrays.fill(this.developmentPolicy, DevelopmentPolicy.DETERIORATE);
         }
         this.happiness = 50;
+        this.fogState = (this.faction == Tribe.Faction.VILLAGER)? FogState.CLEAR : FogState.CLOUDY;
     }
 
     /**
@@ -329,7 +335,7 @@ public class Town {
      */
     public void update() {
 
-        // Update town only when it's at peace
+        // Update territory only when it's at peace
         if (getBattle() != null) {
             return;
         }
@@ -420,7 +426,7 @@ public class Town {
             // Calculate delta from neighbors
             int maxDowntownLvl = 0;
             int maxFortressLvl = 0;
-            for (Town neighbor : neighbors) {
+            for (Territory neighbor : neighbors) {
                 if (neighbor != null) {
                     if (neighbor.getFaction() == getFaction()) {
                         int downtownLvl = neighbor.getFacilityLevel(Facility.DOWNTOWN);
@@ -622,6 +628,15 @@ public class Town {
                             .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
             selectionSprite.setGridIndex(0, 0);
         }
+
+        if (fogSprite == null) {
+            fogSprite =
+                    new Sprite.Builder("Fog", "tiles_fog.png")
+                            .position(new PointF(mapCoord.toGameCoord()))
+                            .size(TileSize).gridSize(2, 1).smooth(false)
+                            .layer(SPRITE_LAYER).depth(0.7f).visible(true).build();
+            fogSprite.setGridIndex(0, 0);
+        }
     }
 
     /**
@@ -652,7 +667,7 @@ public class Town {
         sprites.add(baseSprite);
 
         // Set facility sprite
-        if (facilitySlots.size() == 0) {
+        if (facilitySlots.size() == 0 || fogState != FogState.CLEAR) {
             for (Sprite sprite : facilitySprites) {
                 sprite.setVisible(false);
                 sprite.commit();
@@ -708,7 +723,7 @@ public class Town {
             }
         }
 
-        if (showTerritories) {
+        if (showTerritories && fogState == FogState.CLEAR) {
             // Set faction sprite
             factionSprite.setGridIndex(6, faction.ordinal());
             factionSprite.setVisible(true);
@@ -716,7 +731,7 @@ public class Town {
 
             // Set border sprite
             int index = 0;
-            for (Town neighbor : neighbors) {
+            for (Territory neighbor : neighbors) {
                 Sprite border = borderSprites.get(index);
                 if (neighbor == null || neighbor.getFaction() != faction) {
                     border.setGridIndex(index, faction.ordinal());
@@ -738,7 +753,7 @@ public class Town {
         }
 
         // If occupation is ongoing, show progress
-        if (occupationStep > 0) {
+        if (occupationStep > 0 && fogState == FogState.CLEAR) {
             occupationSprite.setVisible(true);
             occupationSprite.setGridIndex(occupationStep - 1, occupyingFaction.ordinal());
             sprites.add(occupationSprite);
@@ -747,8 +762,8 @@ public class Town {
             occupationSprite.commit();
         }
 
-        // Show glowing sprites
-        if (glowing) {
+        // Show glowing sprite
+        if (glowing && fogState != FogState.CLOUDY) {
             glowingSprite.setVisible(true);
             sprites.add(glowingSprite);
         } else {
@@ -756,13 +771,27 @@ public class Town {
             glowingSprite.commit();
         }
 
-        // Show selection sprites
-        if (focused) {
+        // Show selection sprite
+        if (focused && fogState != FogState.CLOUDY) {
             selectionSprite.setVisible(true);
             sprites.add(selectionSprite);
         } else {
             selectionSprite.setVisible(false);
             selectionSprite.commit();
+        }
+
+        // Show fog sprite
+        if (fogState == FogState.CLEAR) {
+            fogSprite.setVisible(false);
+            fogSprite.commit();
+        } else if (fogState == FogState.MIST) {
+            fogSprite.setGridIndex(1, 0);
+            fogSprite.setVisible(true);
+            sprites.add(fogSprite);
+        } else if (fogState == FogState.CLOUDY) {
+            fogSprite.setVisible(true);
+            fogSprite.setGridIndex(0, 0);
+            sprites.add(fogSprite);
         }
 
         return sprites;
@@ -1006,7 +1035,7 @@ public class Town {
      *
      * @param neighbors
      */
-    public void setNeighbors(ArrayList<Town> neighbors) {
+    public void setNeighbors(ArrayList<Territory> neighbors) {
 
         this.neighbors = neighbors;
     }
@@ -1019,6 +1048,24 @@ public class Town {
     public int getDelta(DeltaAttribute attribute) {
 
         return deltas[attribute.ordinal()];
+    }
+
+    /**
+     *
+     * @param fogState
+     */
+    public void setFogState(FogState fogState) {
+
+        this.fogState = fogState;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public FogState getFogState() {
+
+        return fogState;
     }
 
     private final static int SPRITE_LAYER = 0;
@@ -1039,7 +1086,7 @@ public class Town {
     private Terrain terrain;
     private Tribe.Faction faction;
     private boolean focused = false;
-    private ArrayList<Town> neighbors = null;
+    private ArrayList<Territory> neighbors = null;
     private boolean firstUpdate = true;
 
     // Occupation
@@ -1057,6 +1104,7 @@ public class Town {
     private ArrayList<Facility> facilitySlots = new ArrayList<>();
     private int townUpdateLeft = (int)(Math.random()* TOWN_UPDATE_COUNT);
     private int happiness;
+    private FogState fogState;
 
     // Squad
     private ArrayList<Squad> squads = new ArrayList<>();
@@ -1070,6 +1118,7 @@ public class Town {
     private Sprite occupationSprite = null;
     private Sprite glowingSprite = null;
     private Sprite selectionSprite = null;
+    private Sprite fogSprite = null;
     private int baseSpriteSelection = (int)(Math.random()*4);
     private int facilitySpriteSelection = (int)(Math.random()*3);
 }

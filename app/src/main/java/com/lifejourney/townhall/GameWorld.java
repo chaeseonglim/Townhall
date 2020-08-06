@@ -78,6 +78,12 @@ public class GameWorld extends World
         squadBuilderButton.setImageSpriteSet(0);
         squadBuilderButton.hide();
         addWidget(squadBuilderButton);
+
+        newsBar = new NewsBar(new Rect(380, viewport.height - 74, 760, 64),
+                20, 0.0f);
+        newsBar.setFollowParentVisibility(false);
+        newsBar.show();
+        addWidget(newsBar);
     }
 
     /**
@@ -117,10 +123,10 @@ public class GameWorld extends World
             tribe.update();
         }
 
-        // Update towns
-        ArrayList<Town> towns = map.getTowns();
-        for (Town town: towns) {
-            town.update();
+        // Update territories
+        ArrayList<Territory> territories = map.getTerritories();
+        for (Territory territory : territories) {
+            territory.update();
         }
     }
 
@@ -136,13 +142,13 @@ public class GameWorld extends World
 
         // Check if new battle is arisen
         for (Squad squad: squads) {
-            Town thisTown = map.getTown(squad.getMapPosition());
-            ArrayList<Squad> squadsInSameMap = thisTown.getSquads();
+            Territory thisTerritory = map.getTerritory(squad.getMapPosition());
+            ArrayList<Squad> squadsInSameMap = thisTerritory.getSquads();
             assert squadsInSameMap.size() <= 2;
-            if (squadsInSameMap.size() == 2 && thisTown.getBattle() == null) {
+            if (squadsInSameMap.size() == 2 && thisTerritory.getBattle() == null) {
                 Battle battle = new Battle(map, squadsInSameMap.get(1), squadsInSameMap.get(0));
                 battles.add(battle);
-                thisTown.setBattle(battle);
+                thisTerritory.setBattle(battle);
             }
         }
 
@@ -156,41 +162,57 @@ public class GameWorld extends World
             // Remove if battle is finished
             if (battle.isFinished()) {
                 iterBattle.remove();
-                map.getTown(battle.getMapCoord()).setBattle(null);
+                map.getTerritory(battle.getMapCoord()).setBattle(null);
             }
+        }
+
+        // Update fog state
+        for (Territory territory : map.getTerritories()) {
+            if (territory.getFaction() == Tribe.Faction.VILLAGER) {
+                if (territory.getFogState() != Territory.FogState.CLEAR) {
+                    territory.setFogState(Territory.FogState.CLEAR);
+                    map.redraw(territory.getMapCoord());
+                }
+            } else if (territory.getFogState() == Territory.FogState.CLEAR) {
+                territory.setFogState(Territory.FogState.MIST);
+                map.redraw(territory.getMapCoord());
+            }
+        }
+        for (Squad squad : tribes.get(0).getSquads()) {
+            setMapFogState(squad.getMapPosition(), squad.getVision(), Territory.FogState.CLEAR);
         }
     }
 
     /**
      *
-     * @param town
+     * @param territory
      */
     @Override
-    public void onMapTownFocused(Town town) {
+    public void onMapTownFocused(Territory territory) {
 
-        if (focusedTown == town) {
-            town.setFocus(false);
-            focusedTown = null;
+        if (focusedTerritory == territory) {
+            territory.setFocus(false);
+            focusedTerritory = null;
         } else {
             if (focusedSquad != null) {
                 focusedSquad.setFocus(false);
                 focusedSquad = null;
             }
-            if (focusedTown != null) {
-                focusedTown.setFocus(false);
-                focusedTown = null;
+            if (focusedTerritory != null) {
+                focusedTerritory.setFocus(false);
+                focusedTerritory = null;
             }
-            focusedTown = town;
+            focusedTerritory = territory;
         }
 
         // Care for info button
-        if (focusedTown == null && focusedSquad == null) {
+        if (focusedTerritory == null && focusedSquad == null) {
             infoButton.hide();
             squadBuilderButton.hide();
         } else {
             infoButton.show();
-            if (focusedTown != null && focusedTown.getFaction() == Tribe.Faction.VILLAGER &&
-                    focusedTown.getSquads().isEmpty()) {
+            if (focusedTerritory != null && focusedTerritory.getFaction() == Tribe.Faction.VILLAGER &&
+                    focusedTerritory.getSquads().isEmpty()) {
                 squadBuilderButton.show();
             } else {
                 squadBuilderButton.hide();
@@ -200,31 +222,36 @@ public class GameWorld extends World
 
     /**
      *
-     * @param town
+     * @param territory
      * @param prevFaction
      */
     @Override
-    public void onMapTownOccupied(Town town, Tribe.Faction prevFaction) {
+    public void onMapTownOccupied(Territory territory, Tribe.Faction prevFaction) {
 
         // Check if it's shrine
-        if (town.getTerrain() == Town.Terrain.SHRINE_WIND ||
-            town.getTerrain() == Town.Terrain.SHRINE_HEAL ||
-            town.getTerrain() == Town.Terrain.SHRINE_LOVE ||
-            town.getTerrain() == Town.Terrain.SHRINE_PROSPER) {
-            Tribe.ShrineBonus factor = town.getTerrain().bonusFactor();
-            float value = town.getTerrain().bonusValue();
+        if (territory.getTerrain() == Territory.Terrain.SHRINE_WIND ||
+            territory.getTerrain() == Territory.Terrain.SHRINE_HEAL ||
+            territory.getTerrain() == Territory.Terrain.SHRINE_LOVE ||
+            territory.getTerrain() == Territory.Terrain.SHRINE_PROSPER) {
+            Tribe.ShrineBonus factor = territory.getTerrain().bonusFactor();
+            float value = territory.getTerrain().bonusValue();
             if (prevFaction != Tribe.Faction.NEUTRAL) {
                 getTribe(prevFaction).addGlobalFactor(factor, -value);
             }
-            getTribe(town.getFaction()).addGlobalFactor(factor, value);
+            getTribe(territory.getFaction()).addGlobalFactor(factor, value);
         }
 
         // Check UI
-        if (focusedTown == town && focusedTown.getFaction() == Tribe.Faction.VILLAGER &&
-                focusedTown.getSquads().isEmpty()) {
+        if (focusedTerritory == territory && focusedTerritory.getFaction() == Tribe.Faction.VILLAGER &&
+                focusedTerritory.getSquads().isEmpty()) {
             squadBuilderButton.show();
         } else {
             squadBuilderButton.hide();
+        }
+
+        if (prevFaction != Tribe.Faction.NEUTRAL) {
+            newsBar.addNews(territory.getFaction().toGameString() + "이 " +
+                    prevFaction.toGameString() + "의 영토를 차지했습니다.");
         }
     }
 
@@ -245,8 +272,15 @@ public class GameWorld extends World
     @Override
     public void onSquadCreated(Squad squad) {
 
-        map.getTown(squad.getMapPosition()).addSquad(squad);
+        OffsetCoord squadMapPosition = squad.getMapPosition();
+
+        Territory squadTerritory = map.getTerritory(squadMapPosition);
+        squadTerritory.addSquad(squad);
         addSquad(squad);
+
+        if (newsBar != null) {
+            newsBar.addNews(squad.getFaction().toGameString() + "(이)가 새로운 부대를 만들었습니다.");
+        }
     }
 
     /**
@@ -256,17 +290,23 @@ public class GameWorld extends World
     @Override
     public void onSquadDestroyed(Squad squad) {
 
-        map.getTown(squad.getMapPosition()).removeSquad(squad);
+        OffsetCoord squadMapPosition = squad.getMapPosition();
+
+        map.getTerritory(squadMapPosition).removeSquad(squad);
         removeSquad(squad);
 
         // Check if destroyed squad is focused
         if (focusedSquad == squad) {
             focusedSquad = null;
         }
-        if (focusedTown == null && focusedSquad == null) {
+        if (focusedTerritory == null && focusedSquad == null) {
             infoButton.hide();
         } else {
             infoButton.show();
+        }
+
+        if (newsBar != null) {
+            newsBar.addNews(squad.getFaction().toGameString() + "의 부대가 제거되었습니다.");
         }
     }
 
@@ -284,9 +324,9 @@ public class GameWorld extends World
             focusedSquad.setFocus(false);
             focusedSquad = null;
         }
-        if (focusedTown != null) {
-            focusedTown.setFocus(false);
-            focusedTown = null;
+        if (focusedTerritory != null) {
+            focusedTerritory.setFocus(false);
+            focusedTerritory = null;
         }
         focusedSquad = squad;
 
@@ -304,8 +344,8 @@ public class GameWorld extends World
     @Override
     public void onSquadMoved(Squad squad, OffsetCoord prevMapPosition, OffsetCoord newMapPosition) {
 
-        map.getTown(prevMapPosition).removeSquad(squad);
-        map.getTown(newMapPosition).addSquad(squad);
+        map.getTerritory(prevMapPosition).removeSquad(squad);
+        map.getTerritory(newMapPosition).addSquad(squad);
     }
 
     /**
@@ -317,6 +357,8 @@ public class GameWorld extends World
     public void onSquadUnitAdded(Squad squad, Unit unit) {
 
         addUnit(unit);
+
+        // Refresh UI state
         if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
         }
@@ -331,6 +373,7 @@ public class GameWorld extends World
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
 
         removeUnit(unit);
+
         if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
         }
@@ -363,8 +406,8 @@ public class GameWorld extends World
             // Pop up info box
             if (focusedSquad != null) {
                 popupInfoBox(focusedSquad);
-            } else if (focusedTown != null) {
-                popupInfoBox(focusedTown);
+            } else if (focusedTerritory != null) {
+                popupInfoBox(focusedTerritory);
             }
         } else if (button == squadBuilderButton) {
             // Pause game temporarily
@@ -372,10 +415,10 @@ public class GameWorld extends World
             speedControl.setPlaySpeed(0);
 
             // Spawn a squad
-            Squad squad = tribes.get(0).spawnSquad(focusedTown.getMapCoord().toGameCoord(),
+            Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapCoord().toGameCoord(),
                     Tribe.Faction.VILLAGER);
-            focusedTown.setFocus(false);
-            focusedTown = null;
+            focusedTerritory.setFocus(false);
+            focusedTerritory = null;
             squad.setFocus(true);
             focusedSquad = squad;
 
@@ -481,7 +524,7 @@ public class GameWorld extends World
     @Override
     public void onInfoBoxSwitchToTown(InfoBox infoBox) {
 
-        popupInfoBox(map.getTown(focusedSquad.getMapPosition()));
+        popupInfoBox(map.getTerritory(focusedSquad.getMapPosition()));
 
         infoBox.close();
         removeWidget(infoBox);
@@ -501,11 +544,29 @@ public class GameWorld extends World
 
         // In case of building new squad
         if (focusedSquad != null && focusedSquad.getUnits().isEmpty()) {
-            Town town = map.getTown(focusedSquad.getMapPosition());
+            Territory territory = map.getTerritory(focusedSquad.getMapPosition());
             Squad squad = focusedSquad;
             squad.close();
-            town.setFocus(true);
-            onMapTownFocused(town);
+            territory.setFocus(true);
+            onMapTownFocused(territory);
+        }
+    }
+
+    /**
+     *
+     * @param mapCoord
+     * @param radius
+     * @param fogState
+     */
+    private void setMapFogState(OffsetCoord mapCoord, int radius, Territory.FogState fogState) {
+
+        ArrayList<Territory> visibleTerritories = map.getNeighborTowns(mapCoord, radius, false);
+        visibleTerritories.add(map.getTerritory(mapCoord));
+        for (Territory territory : visibleTerritories) {
+            if (territory.getFogState() != fogState) {
+                territory.setFogState(fogState);
+                map.redraw(territory.getMapCoord());
+            }
         }
     }
 
@@ -541,15 +602,15 @@ public class GameWorld extends World
 
     /**
      *
-     * @param town
+     * @param territory
      */
-    private void popupInfoBox(Town town) {
+    private void popupInfoBox(Territory territory) {
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
                 700, 400);
 
-        InfoBox infoBox = new InfoBox(this, infoBoxRegion, 30, 0.0f, town);
+        InfoBox infoBox = new InfoBox(this, infoBoxRegion, 30, 0.0f, territory);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -637,9 +698,10 @@ public class GameWorld extends World
     private EconomyBar economyBar;
     private DateBar dateBar;
     private SpeedControl speedControl;
+    private NewsBar newsBar;
 
     private Squad focusedSquad = null;
-    private Town focusedTown = null;
+    private Territory focusedTerritory = null;
 
     private ArrayList<Battle> battles = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();

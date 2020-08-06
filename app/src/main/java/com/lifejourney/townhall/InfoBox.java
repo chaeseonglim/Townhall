@@ -24,12 +24,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         void onInfoBoxClosed(InfoBox infoBox);
     }
 
-    public InfoBox(Event eventHandler, Rect region, int layer, float depth, Town town) {
+    public InfoBox(Event eventHandler, Rect region, int layer, float depth, Territory territory) {
 
         super(region, layer, depth);
 
         this.eventHandler = eventHandler;
-        this.town = town;
+        this.territory = territory;
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
@@ -77,7 +77,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 .build();
         addWidget(closeButton);
 
-        // Town button
+        // Territory button
         Rect toTownButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
                 150, 60);
         toTownButton = new Button.Builder(this, toTownButtonRegion)
@@ -133,40 +133,40 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             setVisible(false);
             eventHandler.onInfoBoxClosed(this);
         } else if (button == toTownButton) {
-            // To town button
+            // To territory button
             setVisible(false);
             eventHandler.onInfoBoxSwitchToTown(this);
         } else if (button == farmDevelopmentButton) {
             // Farm development button
-            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.FARM);
-            Town.DevelopmentPolicy newDevelopment =
-                    Town.DevelopmentPolicy.values()[
-                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
-            town.setDevelopmentPolicy(Town.Facility.FARM, newDevelopment);
+            Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.FARM);
+            Territory.DevelopmentPolicy newDevelopment =
+                    Territory.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
+            territory.setDevelopmentPolicy(Territory.Facility.FARM, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal());
         } else if (button == marketDevelopmentButton) {
             // Market development button
-            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.MARKET);
-            Town.DevelopmentPolicy newDevelopment =
-                    Town.DevelopmentPolicy.values()[
-                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
-            town.setDevelopmentPolicy(Town.Facility.MARKET, newDevelopment);
+            Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.MARKET);
+            Territory.DevelopmentPolicy newDevelopment =
+                    Territory.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
+            territory.setDevelopmentPolicy(Territory.Facility.MARKET, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 3);
         } else if (button == downtownDevelopmentButton) {
             // Downtown development button
-            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.DOWNTOWN);
-            Town.DevelopmentPolicy newDevelopment =
-                    Town.DevelopmentPolicy.values()[
-                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
-            town.setDevelopmentPolicy(Town.Facility.DOWNTOWN, newDevelopment);
+            Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.DOWNTOWN);
+            Territory.DevelopmentPolicy newDevelopment =
+                    Territory.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
+            territory.setDevelopmentPolicy(Territory.Facility.DOWNTOWN, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 6);
         } else if (button == fortressDevelopmentButton) {
             // Fortress development button
-            Town.DevelopmentPolicy development = town.getDevelopmentPolicy(Town.Facility.FORTRESS);
-            Town.DevelopmentPolicy newDevelopment =
-                    Town.DevelopmentPolicy.values()[
-                            (development.ordinal()+1)% Town.DevelopmentPolicy.values().length];
-            town.setDevelopmentPolicy(Town.Facility.FORTRESS, newDevelopment);
+            Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.FORTRESS);
+            Territory.DevelopmentPolicy newDevelopment =
+                    Territory.DevelopmentPolicy.values()[
+                            (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
+            territory.setDevelopmentPolicy(Territory.Facility.FORTRESS, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 9);
         } else if (button == recruitingButtons[0] ||
                 button == recruitingButtons[1] ||
@@ -275,7 +275,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(town.getTerrain().word(), new SizeF(150, 40), textPosition.clone(),
+        addText(territory.getTerrain().word(), new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         textPosition.offset(150, -30);
@@ -283,7 +283,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(town.getFaction().toGameString(), new SizeF(150, 40),
+        addText(territory.getFaction().toGameString(), new SizeF(150, 40),
                 textPosition.clone(), Color.rgb(230, 230, 230));
 
         // Status
@@ -292,13 +292,13 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Color.rgb(255, 255, 0));
 
         String status = "-";
-        if (town.getBattle() != null) {
+        if (territory.getBattle() != null) {
             status = "전투중";
-        } else if (town.isOccupying()) {
+        } else if (territory.isOccupying()) {
             status = "점령중";
-        } else if (town.getFaction() == Tribe.Faction.VILLAGER &&
-            town.getTotalFacilityLevel() < 5 &&
-            town.getTerrain().facilitySlots() > 0) {
+        } else if (territory.getFaction() == Tribe.Faction.VILLAGER &&
+            territory.getTotalFacilityLevel() < 5 &&
+            territory.getTerrain().facilitySlots() > 0) {
             status = "개발중";
         }
         textPosition.offset(0, 30);
@@ -310,37 +310,37 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addText("시설", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        if (town.getTerrain().facilitySlots() == 0) {
+        if (territory.getTerrain().facilitySlots() == 0) {
             textPosition.offset(0, 30);
             addText("개발 불가", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         } else {
             int facilityCount = 0;
-            if (town.getFacilityLevel(Town.Facility.FARM) > 0) {
+            if (territory.getFacilityLevel(Territory.Facility.FARM) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
-                addText("농장 Lv." + town.getFacilityLevel(Town.Facility.FARM),
+                addText("농장 Lv." + territory.getFacilityLevel(Territory.Facility.FARM),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
-            if (town.getFacilityLevel(Town.Facility.MARKET) > 0) {
+            if (territory.getFacilityLevel(Territory.Facility.MARKET) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
-                addText("시장 Lv." + town.getFacilityLevel(Town.Facility.MARKET),
+                addText("시장 Lv." + territory.getFacilityLevel(Territory.Facility.MARKET),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
-            if (town.getFacilityLevel(Town.Facility.DOWNTOWN) > 0) {
+            if (territory.getFacilityLevel(Territory.Facility.DOWNTOWN) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
-                addText("마을 Lv." + town.getFacilityLevel(Town.Facility.DOWNTOWN),
+                addText("마을 Lv." + territory.getFacilityLevel(Territory.Facility.DOWNTOWN),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
-            if (town.getFacilityLevel(Town.Facility.FORTRESS) > 0) {
+            if (territory.getFacilityLevel(Territory.Facility.FORTRESS) > 0) {
                 facilityCount++;
                 textPosition.offset(0, 30);
-                addText("요새 Lv." + town.getFacilityLevel(Town.Facility.FORTRESS),
+                addText("요새 Lv." + territory.getFacilityLevel(Territory.Facility.FORTRESS),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
@@ -352,7 +352,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             }
 
             // Development buttons
-            if (town.getFaction() == Tribe.Faction.VILLAGER) {
+            if (territory.getFaction() == Tribe.Faction.VILLAGER) {
                 textPosition.offset(0, 30);
                 addText("개발 방향",
                         new SizeF(150, 40), textPosition.clone(),
@@ -371,7 +371,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                                 .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 farmDevelopmentButton.setImageSpriteSet(
-                        town.getDevelopmentPolicy(Town.Facility.FARM).ordinal());
+                        territory.getDevelopmentPolicy(Territory.Facility.FARM).ordinal());
                 addWidget(farmDevelopmentButton);
 
                 if (marketDevelopmentButton != null) {
@@ -385,7 +385,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                                 .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 marketDevelopmentButton.setImageSpriteSet(
-                        town.getDevelopmentPolicy(Town.Facility.MARKET).ordinal() + 3);
+                        territory.getDevelopmentPolicy(Territory.Facility.MARKET).ordinal() + 3);
                 addWidget(marketDevelopmentButton);
 
                 if (downtownDevelopmentButton != null) {
@@ -399,7 +399,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                                 .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 downtownDevelopmentButton.setImageSpriteSet(
-                        town.getDevelopmentPolicy(Town.Facility.DOWNTOWN).ordinal() + 6);
+                        territory.getDevelopmentPolicy(Territory.Facility.DOWNTOWN).ordinal() + 6);
                 addWidget(downtownDevelopmentButton);
 
                 if (fortressDevelopmentButton != null) {
@@ -413,19 +413,19 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                                 .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
                                 .build();
                 fortressDevelopmentButton.setImageSpriteSet(
-                        town.getDevelopmentPolicy(Town.Facility.FORTRESS).ordinal() + 9);
+                        territory.getDevelopmentPolicy(Territory.Facility.FORTRESS).ordinal() + 9);
                 addWidget(fortressDevelopmentButton);
             }
         }
 
-        if (town.getFaction() == Tribe.Faction.VILLAGER) {
+        if (territory.getFaction() == Tribe.Faction.VILLAGER) {
             // Population
             textPosition.setTo(100, -155);
             addText("인구",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((town.getPopulation()==0)?"-":town.getPopulation() + "",
+            addText((territory.getPopulation()==0)?"-": territory.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -435,7 +435,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((town.getTax()==0)?"-":town.getTax() + "",
+            addText((territory.getTax()==0)?"-": territory.getTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -445,7 +445,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText(town.getHappiness() + "",
+            addText(territory.getHappiness() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -455,8 +455,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((town.getDelta(Town.DeltaAttribute.DEFENSIVE)==0)?
-                            "-" : town.getDelta(Town.DeltaAttribute.DEFENSIVE) + "",
+            addText((territory.getDelta(Territory.DeltaAttribute.DEFENSIVE)==0)?
+                            "-" : territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -467,7 +467,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
             boolean isSquadWorking = false;
-            for (Squad squad: town.getSquads()) {
+            for (Squad squad: territory.getSquads()) {
                 if (squad.isWorking()) {
                     isSquadWorking = true;
                     break;
@@ -489,8 +489,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((town.getDelta(Town.DeltaAttribute.DEFENSIVE)==0)?
-                            "-" : town.getDelta(Town.DeltaAttribute.DEFENSIVE) + "",
+            addText((territory.getDelta(Territory.DeltaAttribute.DEFENSIVE)==0)?
+                            "-" : territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -657,7 +657,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
     private Event eventHandler;
     private Villager villager;
-    private Town town;
+    private Territory territory;
     private Squad squad;
     private Button closeButton;
     private Button toTownButton;

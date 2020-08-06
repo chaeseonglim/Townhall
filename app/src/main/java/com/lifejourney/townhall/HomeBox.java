@@ -165,7 +165,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(villager.getTowns().size() + "", new SizeF(150, 40), textPosition.clone(),
+        addText(villager.getTerritories().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // The number of squads

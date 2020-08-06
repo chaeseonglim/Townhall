@@ -70,6 +70,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0,
                 0,
                 50,
+                1,
                 5,
                 null,
                 1.5f,
@@ -109,6 +110,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 20,
                 300,
+                1,
                 10,
                 null,
                 2.0f,
@@ -148,6 +150,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 5,
                 100,
+                1,
                 10,
                 Projectile.ProjectileType.ARROW,
                 2.0f,
@@ -187,6 +190,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0,
                 10,
                 200,
+                1,
                 30,
                 null,
                 3.5f,
@@ -226,6 +230,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 0,
                 100,
+                1,
                 30,
                 Projectile.ProjectileType.HEAL,
                 1.5f,
@@ -265,6 +270,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0,
                 0,
                 150,
+                1,
                 40,
                  Projectile.ProjectileType.CANNON,
                 1.5f,
@@ -304,6 +310,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 10,
                 30,
                 500,
+                1,
                 40,
                 Projectile.ProjectileType.HEAL,
                 2f,
@@ -340,6 +347,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         private float armor;
         private float bountyExp;
         private float health;
+        private int vision;
         private Projectile.ProjectileType projectileType;
         private float maxVelocity;
         private float maxForce;
@@ -354,7 +362,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                   float meleeAttackRange, float rangedAttackRange, float healRange,
                   int meleeAttackSpeed, int rangedAttackSpeed, int healSpeed,
                   float meleeAttackDamage, float rangedAttackDamage, float healPower,
-                  float meleeEvasion, float rangedEvasion, float armor, float health,
+                  float meleeEvasion, float rangedEvasion, float armor, float health, int vision,
                   float bountyExp, Projectile.ProjectileType projectileType, float maxVelocity,
                   float maxForce, float mass, boolean supportable, boolean aggressive) {
             this.word = word;
@@ -383,6 +391,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             this.rangedEvasion = rangedEvasion;
             this.armor = armor;
             this.health = health;
+            this.vision = vision;
             this.bountyExp = bountyExp;
             this.projectileType = projectileType;
             this.maxVelocity = maxVelocity;
@@ -472,6 +481,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public float health() {
             return health;
+        }
+        public int vision() {
+            return vision;
         }
         public int earnedExp(int level) {
             return (int) (bountyExp * (1.0 + level * 0.2));
@@ -700,6 +712,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         if (isRecruiting()) {
             if (!isFighting()) {
                 recruitingTimeLeft--;
+            }
+        } else if (isInvisible()) {
+            for (Sprite sprite : getSprites()) {
+                sprite.setOpaque(0.0f);
             }
         } else {
             for (Sprite sprite : getSprites()) {
@@ -1870,6 +1886,22 @@ public class Unit extends CollidableObject implements Projectile.Event {
         return invincibleTimeLeft > 0;
     }
 
+    /**
+     *
+     * @param invisible
+     */
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isInvisible() {
+        return invisible;
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
@@ -1922,4 +1954,5 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private int stunTimeLeft = 0;
     private int invincibleTimeLeft = 0;
     private int invincibleCooldownLeft = 0;
+    private boolean invisible = false;
 }

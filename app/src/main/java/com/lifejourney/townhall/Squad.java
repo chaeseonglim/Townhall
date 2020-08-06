@@ -177,18 +177,19 @@ public class Squad extends Object implements Controllable {
 
             // If it's not fighting
             if (!isFighting()) {
-                // First checking that if it's occupying town
-                Town town = map.getTown(getMapPosition());
-                if (town.isOccupying()) {
+                // First checking that if it's occupying territory
+                Territory territory = map.getTerritory(getMapPosition());
+                if (territory.isOccupying()) {
                     occupy();
                 } else {
                     // And check if it's supporting other squad
                     boolean isSupporting = false;
                     if (isSupportable()) {
-                        ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapPosition(), false);
-                        for (Town neighborTown : neighborTowns) {
-                            if (neighborTown.getBattle() != null) {
-                                neighborTown.getBattle().addSupporter(this);
+                        ArrayList<Territory> neighborTerritories =
+                                map.getNeighborTowns(getMapPosition(), 1, false);
+                        for (Territory neighborTerritory : neighborTerritories) {
+                            if (neighborTerritory.getBattle() != null) {
+                                neighborTerritory.getBattle().addSupporter(this);
                                 isSupporting = true;
                                 setSpritesToSupport();
                                 break;
@@ -197,7 +198,7 @@ public class Squad extends Object implements Controllable {
                     }
 
                     // Check if it's working
-                    if (isWorking() && town.getTerrain().facilitySlots() > 0) {
+                    if (isWorking() && territory.getTerrain().facilitySlots() > 0) {
                         setSpritesToWork();
                     }
 
@@ -280,6 +281,20 @@ public class Squad extends Object implements Controllable {
                 unit.setCollisionChecked(false);
             }
         }
+
+        // Hide if it's in fog
+        if (map.getTerritory(getMapPosition()).getFogState() != Territory.FogState.CLEAR) {
+            for (Unit unit: units) {
+                unit.setInvisible(true);
+            }
+            for (Sprite sprite: getSprites()) {
+                sprite.setOpaque(0.0f);
+            }
+        } else {
+            for (Unit unit: units) {
+                unit.setInvisible(false);
+            }
+        }
     }
 
     /**
@@ -288,9 +303,9 @@ public class Squad extends Object implements Controllable {
      */
     public int getOffensiveBonusFromTown() {
 
-        Town town = map.getTown(getMapPosition());
-        if (town.getFaction() == faction) {
-            return map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.OFFENSIVE);
+        Territory territory = map.getTerritory(getMapPosition());
+        if (territory.getFaction() == faction) {
+            return map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.OFFENSIVE);
         } else {
             return 0;
         }
@@ -302,9 +317,9 @@ public class Squad extends Object implements Controllable {
      */
     public int getDefensiveBonusFromTown() {
 
-        Town town = map.getTown(getMapPosition());
-        if (town.getFaction() == faction) {
-            return map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.DEFENSIVE);
+        Territory territory = map.getTerritory(getMapPosition());
+        if (territory.getFaction() == faction) {
+            return map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.DEFENSIVE);
         } else {
             return 0;
         }
@@ -326,17 +341,17 @@ public class Squad extends Object implements Controllable {
             }
         }
 
-        int[] deltas = new int[Town.Facility.values().length];
+        int[] deltas = new int[Territory.Facility.values().length];
         Arrays.fill(deltas, workerCount);
 
         if (workerCount > 0) {
-            deltas[Town.Facility.FARM.ordinal()] +=
+            deltas[Territory.Facility.FARM.ordinal()] +=
                     Upgradable.WORKER_FARM_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
-            deltas[Town.Facility.MARKET.ordinal()] +=
+            deltas[Territory.Facility.MARKET.ordinal()] +=
                     Upgradable.WORKER_MARKET_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
-            deltas[Town.Facility.DOWNTOWN.ordinal()] +=
+            deltas[Territory.Facility.DOWNTOWN.ordinal()] +=
                     Upgradable.WORKER_DOWNTOWN_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
-            deltas[Town.Facility.FORTRESS.ordinal()] +=
+            deltas[Territory.Facility.FORTRESS.ordinal()] +=
                     Upgradable.WORKER_FORTRESS_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
         }
         return deltas;
@@ -1080,7 +1095,7 @@ public class Squad extends Object implements Controllable {
      */
     public boolean isOccupying() {
 
-        return !isFighting() && map.getTown(getMapPosition()).isOccupying();
+        return !isFighting() && map.getTerritory(getMapPosition()).isOccupying();
     }
 
     /**
@@ -1107,9 +1122,10 @@ public class Squad extends Object implements Controllable {
             return false;
         }
 
-        ArrayList<Town> neighborTowns = map.getNeighborTowns(getMapPosition(), false);
-        for (Town neighborTown: neighborTowns) {
-            if (neighborTown.getBattle() != null) {
+        ArrayList<Territory> neighborTerritories =
+                map.getNeighborTowns(getMapPosition(), 1, false);
+        for (Territory neighborTerritory : neighborTerritories) {
+            if (neighborTerritory.getBattle() != null) {
                 return true;
             }
         }
@@ -1156,6 +1172,21 @@ public class Squad extends Object implements Controllable {
             populationUpkeep += unit.getPopulationUpkeep();
         }
         return populationUpkeep;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getVision() {
+        int vision = 0;
+        for (Unit unit: units) {
+            if (!unit.isRecruiting()) {
+                vision = Math.max(vision, unit.getUnitClass().vision());
+            }
+        }
+
+        return vision;
     }
 
     /**
@@ -1231,7 +1262,7 @@ public class Squad extends Object implements Controllable {
 
         for (Unit unit: units) {
             unit.rest(REST_PERCENTAGE *
-                    (1 + map.getTown(getMapPosition()).getDelta(Town.DeltaAttribute.DEFENSIVE)));
+                    (1 + map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.DEFENSIVE)));
         }
     }
 
