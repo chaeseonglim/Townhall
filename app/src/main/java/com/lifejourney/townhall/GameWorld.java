@@ -32,7 +32,7 @@ public class GameWorld extends World
         // Build tribe
         Villager villager = new Villager(this, map);
         tribes.add(villager);
-        tribes.add(new Bandit(this, map));
+        tribes.add(new Raider(this, map));
 
         // Build UIs
         economyBar = new EconomyBar(villager, new Rect(20, 10, 440, 64),
@@ -171,11 +171,11 @@ public class GameWorld extends World
             if (territory.getFaction() == Tribe.Faction.VILLAGER) {
                 if (territory.getFogState() != Territory.FogState.CLEAR) {
                     territory.setFogState(Territory.FogState.CLEAR);
-                    map.redraw(territory.getMapCoord());
+                    map.redraw(territory.getMapPosition());
                 }
             } else if (territory.getFogState() == Territory.FogState.CLEAR) {
                 territory.setFogState(Territory.FogState.MIST);
-                map.redraw(territory.getMapCoord());
+                map.redraw(territory.getMapPosition());
             }
         }
         for (Squad squad : tribes.get(0).getSquads()) {
@@ -415,7 +415,7 @@ public class GameWorld extends World
             speedControl.setPlaySpeed(0);
 
             // Spawn a squad
-            Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapCoord().toGameCoord(),
+            Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapPosition().toGameCoord(),
                     Tribe.Faction.VILLAGER);
             focusedTerritory.setFocus(false);
             focusedTerritory = null;
@@ -560,12 +560,12 @@ public class GameWorld extends World
      */
     private void setMapFogState(OffsetCoord mapCoord, int radius, Territory.FogState fogState) {
 
-        ArrayList<Territory> visibleTerritories = map.getNeighborTowns(mapCoord, radius, false);
+        ArrayList<Territory> visibleTerritories = map.getNeighborTerritories(mapCoord, radius, false);
         visibleTerritories.add(map.getTerritory(mapCoord));
         for (Territory territory : visibleTerritories) {
             if (territory.getFogState() != fogState) {
                 territory.setFogState(fogState);
-                map.redraw(territory.getMapCoord());
+                map.redraw(territory.getMapPosition());
             }
         }
     }

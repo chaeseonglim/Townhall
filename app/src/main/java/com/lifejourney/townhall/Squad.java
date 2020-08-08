@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -164,10 +165,10 @@ public class Squad extends Object implements Controllable {
                 // If all units are arrived,  move to next
                 if (allUnitArrived) {
                     moveTo(nextMapPositionToMove);
-                    seekTo(targetMapPositionToMove);
+                    seekTo(targetMapPositionToMove, false);
                 }
             } else {
-                seekTo(targetMapPositionToMove);
+                seekTo(targetMapPositionToMove, false);
             }
         } else {
             // If it's not moving, send unit to current offset
@@ -186,7 +187,7 @@ public class Squad extends Object implements Controllable {
                     boolean isSupporting = false;
                     if (isSupportable()) {
                         ArrayList<Territory> neighborTerritories =
-                                map.getNeighborTowns(getMapPosition(), 1, false);
+                                map.getNeighborTerritories(getMapPosition(), 1, false);
                         for (Territory neighborTerritory : neighborTerritories) {
                             if (neighborTerritory.getBattle() != null) {
                                 neighborTerritory.getBattle().addSupporter(this);
@@ -460,7 +461,7 @@ public class Squad extends Object implements Controllable {
                         // If the battle begins during dragging, cancel dragging
                         setDragging(false, touchedGamePosition);
                     }
-                } else if (isFocused()) {
+                } else if (isFocused() && getFaction() == Tribe.Faction.VILLAGER) {
                     // Keep dragging
                     setDragging(true, touchedGamePosition);
                 }
@@ -492,7 +493,7 @@ public class Squad extends Object implements Controllable {
                     } else {
                         // Stop dragging and seek to target
                         setDragging(false, touchedGamePosition);
-                        seekTo(targetMapPosition);
+                        seekTo(targetMapPosition, false);
                     }
                 }
                 setTouching(false);
@@ -519,7 +520,7 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    private void stopMoving() {
+    public void stopMoving() {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
@@ -538,6 +539,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isMoving() {
+
         return targetMapPositionToMove != null;
     }
 
@@ -546,7 +548,7 @@ public class Squad extends Object implements Controllable {
      * @param targetMapPosition
      * @return
      */
-    private void seekTo(OffsetCoord targetMapPosition) {
+    public boolean seekTo(OffsetCoord targetMapPosition, boolean alternativeTarget) {
 
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
@@ -570,35 +572,61 @@ public class Squad extends Object implements Controllable {
         if (currentMapPosition.equals(targetMapPosition)) {
             // If it reached to target offset, done moving
             stopMoving();
-            return;
+            return true;
         }
 
         // Path finding
-        SquadPathFinder pathFinder = new SquadPathFinder(this, targetMapPosition, false);
+        GamePathFinder pathFinder =
+                new GamePathFinder(this, targetMapPosition, false);
         ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
 
         if (optimalPath == null) {
-            // If there's no path to target, cancel moving
-            stopMoving();
-        } else {
-            // Set next tile
-            nextMapPositionToMove = new OffsetCoord(
-                    optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
+            if (alternativeTarget) {
+                // Try alternative path
+                GamePathFinder alternativePathFinder =
+                        new GamePathFinder(getMapPosition(), targetMapPosition, getMap(),
+                                getFaction());
+                ArrayList<Waypoint> alternativePath = alternativePathFinder.findOptimalPath();
+                if (alternativePath != null && alternativePath.size() > 1) {
+                    OffsetCoord nextCandidate = new OffsetCoord(
+                            alternativePath.get(1).getPosition().x, alternativePath.get(1).getPosition().y);
+                    if (getMap().isMovable(nextCandidate, this)) {
+                        targetMapPositionToMove = nextCandidate;
+                        optimalPath = alternativePath;
+                    } else {
+                        // If there's no path to target, cancel moving
+                        stopMoving();
+                        return false;
+                    }
+                }
+            } else {
+                // If there's no path to target, cancel moving
+                stopMoving();
+                return false;
+            }
+        }
 
-            // Set moving arrow
-            PointF currentGamePosition = getMapPosition().toGameCoord();
-            PointF nextGamePositionToMove = nextMapPositionToMove.toGameCoord();
-            currentGamePosition.add(nextGamePositionToMove).divide(2);
-            movingArrow.setPosition(currentGamePosition);
+        // Set next tile
+        nextMapPositionToMove = new OffsetCoord(
+                optimalPath.get(1).getPosition().x, optimalPath.get(1).getPosition().y);
+
+        // Set moving arrow
+        PointF currentGamePosition = getMapPosition().toGameCoord();
+        PointF nextGamePositionToMove = nextMapPositionToMove.toGameCoord();
+        currentGamePosition.add(nextGamePositionToMove).divide(2);
+        CubeCoord.Direction tileDirection = getMapPosition().getDirection(nextMapPositionToMove);
+        movingArrow.setPosition(currentGamePosition);
+        if (!movingArrow.isVisible() || movingArrow.getGridIndex().y != tileDirection.ordinal()) {
             movingArrow.setAnimationWrap(true);
             movingArrow.clearAnimation();
-            CubeCoord.Direction tileDirection = getMapPosition().getDirection(nextMapPositionToMove);
             movingArrow.addAnimationFrame(0, tileDirection.ordinal(), 15);
             movingArrow.addAnimationFrame(1, tileDirection.ordinal(), 15);
             movingArrow.addAnimationFrame(2, tileDirection.ordinal(), 15);
             movingArrow.addAnimationFrame(3, tileDirection.ordinal(), 15);
             movingArrow.setVisible(true);
         }
+
+        return true;
     }
 
 
@@ -913,7 +941,7 @@ public class Squad extends Object implements Controllable {
         else {
             currentStick.setGridIndex(0, faction.ordinal());
             targetStick.setVisible(false);
-            map.setGlowingTiles(null);
+            map.setGlowingTilePositions(null);
         }
     }
 
@@ -979,12 +1007,12 @@ public class Squad extends Object implements Controllable {
         Sprite targetStick = getSprite("SquadTarget");
 
         if (targetMapPosition == null) {
-            map.setGlowingTiles(null);
+            map.setGlowingTilePositions(null);
         }
         else if (!targetMapPosition.equals(getMapPosition()) &&
                 map.isMovable(targetMapPosition, this)) {
-            SquadPathFinder pathFinder =
-                    new SquadPathFinder(this, targetMapPosition, useNextPosition);
+            GamePathFinder pathFinder =
+                    new GamePathFinder(this, targetMapPosition, useNextPosition);
             ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
 
             if (optimalPath == null) {
@@ -994,11 +1022,11 @@ public class Squad extends Object implements Controllable {
                 for (Waypoint waypoint : optimalPath) {
                     glowingLine.add(new OffsetCoord(waypoint.getPosition().x, waypoint.getPosition().y));
                 }
-                map.setGlowingTiles(glowingLine);
+                map.setGlowingTilePositions(glowingLine);
                 targetStick.setGridIndex(0, faction.ordinal());
             }
         } else {
-            map.setGlowingTiles(null);
+            map.setGlowingTilePositions(null);
             targetStick.setGridIndex(1, faction.ordinal());
         }
     }
@@ -1123,7 +1151,7 @@ public class Squad extends Object implements Controllable {
         }
 
         ArrayList<Territory> neighborTerritories =
-                map.getNeighborTowns(getMapPosition(), 1, false);
+                map.getNeighborTerritories(getMapPosition(), 1, false);
         for (Territory neighborTerritory : neighborTerritories) {
             if (neighborTerritory.getBattle() != null) {
                 return true;
@@ -1263,6 +1291,42 @@ public class Squad extends Object implements Controllable {
         for (Unit unit: units) {
             unit.rest(REST_PERCENTAGE *
                     (1 + map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.DEFENSIVE)));
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isRecruiting() {
+
+        for (Unit unit: units) {
+            if (unit.isRecruiting()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public float getHealthPercentage() {
+
+        float maxHealth = 0.0f, currentHealth = 0.0f;
+        for (Unit unit: units) {
+            if (!unit.isRecruiting()) {
+                maxHealth += unit.getMaxHealth();
+                currentHealth += unit.getHealth();
+            }
+        }
+
+        if (maxHealth == 0.0f) {
+            return 0.0f;
+        } else {
+            return currentHealth / maxHealth;
         }
     }
 

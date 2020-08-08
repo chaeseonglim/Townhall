@@ -69,23 +69,22 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                 Tribe.Faction faction = Tribe.Faction.values()[ordinal];
 
                 Territory territory = new Territory(this, mapCoord, terrain, faction);
-                towns.put(mapCoord, territory);
+                territories.put(mapCoord, territory);
                 townsBySide.get(faction.ordinal()).add(territory);
 
-                if ((terrain == Territory.Terrain.HEADQUARTER_BANDIT ||
-                        terrain == Territory.Terrain.HEADQUARTER_VILLAGER) &&
-                        faction == Tribe.Faction.VILLAGER) {
+                if (terrain == Territory.Terrain.HEADQUARTER && faction == Tribe.Faction.VILLAGER) {
                     villagerHq = territory;
                 }
             }
         }
-        for (Territory territory : towns.values()) {
-            territory.setNeighbors(getNeighborTowns(territory.getMapCoord(), 1, true));
+        for (Territory territory : territories.values()) {
+            territory.setNeighbors(getNeighborTerritories(territory.getMapPosition(), 1, true));
         }
 
         // Calculate viewport clipping area
         OffsetCoord bottomRightMapCoord = new OffsetCoord(mapSize.width-1, mapSize.height-1);
         PointF bottomRightGameCoord = bottomRightMapCoord.toGameCoord();
+        int leftMargin = 0, rightMargin = 0, topMargin = 32, bottomMargin = 32;
         clippedViewport = new RectF(-getTileSize().width - leftMargin,
                 -getTileSize().height - topMargin,
                 bottomRightGameCoord.x + getTileSize().width * 2 + leftMargin + rightMargin,
@@ -93,7 +92,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
         // Scroll to headquarter
         if (villagerHq != null) {
-            Point offset = new Point(villagerHq.getMapCoord().toGameCoord())
+            Point offset = new Point(villagerHq.getMapPosition().toGameCoord())
                     .subtract(Engine2D.GetInstance().getViewport().center());
             scroll(offset);
         }
@@ -105,7 +104,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
     @Override
     public void close() {
 
-        for (Territory territory : towns.values()) {
+        for (Territory territory : territories.values()) {
             territory.removeTileSprites();
         }
         super.close();
@@ -118,7 +117,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
     @Override
     public void onTownUpdated(Territory territory) {
 
-        redraw(territory.getMapCoord());
+        redraw(territory.getMapPosition());
     }
 
     /**
@@ -196,7 +195,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
     @Override
     protected ArrayList<Sprite> getTileSprites(OffsetCoord mapCoord) {
 
-        boolean glowing = (glowingTiles != null && glowingTiles.contains(mapCoord));
+        boolean glowing = (glowingTilePositions != null && glowingTilePositions.contains(mapCoord));
         return getTerritory(mapCoord).getTileSprites(glowing, showTerritories);
     }
 
@@ -216,27 +215,39 @@ class GameMap extends HexTileMap implements View, Territory.Event {
     public void redrawTileSprites(Tribe.Faction faction) {
 
         for (Territory territory : townsBySide.get(faction.ordinal())) {
-            redraw(territory.getMapCoord());
+            redraw(territory.getMapPosition());
         }
     }
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
+     * @param faction
      * @return
      */
-    public boolean isMovable(OffsetCoord mapCoord, Squad squad) {
+    public boolean isMovable(OffsetCoord mapPosition, Tribe.Faction faction) {
 
-        Territory territory = towns.get(mapCoord);
+        Territory territory = territories.get(mapPosition);
         if (territory == null) {
             return false;
         }
 
-        if (!territory.getTerrain().isMovable(squad)) {
+        return territory.getTerrain().isMovable(faction);
+    }
+
+    /**
+     *
+     * @param mapPosition
+     * @param squad
+     * @return
+     */
+    public boolean isMovable(OffsetCoord mapPosition, Squad squad) {
+
+        if (!isMovable(mapPosition, squad.getFaction())) {
             return false;
         }
 
-        ArrayList<Squad> squads = Objects.requireNonNull(towns.get(mapCoord)).getSquads();
+        ArrayList<Squad> squads = Objects.requireNonNull(territories.get(mapPosition)).getSquads();
         for (Squad localSquad : squads) {
             if (squad != localSquad && squad.getFaction() == localSquad.getFaction()) {
                 return false;
@@ -248,24 +259,24 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      * @return
      */
-    public Battle getBattle(OffsetCoord mapCoord) {
+    public Battle getBattle(OffsetCoord mapPosition) {
 
-        Territory territory = towns.get(mapCoord);
+        Territory territory = territories.get(mapPosition);
         assert territory != null;
         return territory.getBattle();
     }
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      * @return
      */
-    public Territory getTerritory(OffsetCoord mapCoord) {
+    public Territory getTerritory(OffsetCoord mapPosition) {
 
-        return towns.get(mapCoord);
+        return territories.get(mapPosition);
     }
 
     /**
@@ -274,21 +285,21 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      */
     public ArrayList<Territory> getTerritories() {
 
-        return new ArrayList<>(this.towns.values());
+        return new ArrayList<>(this.territories.values());
     }
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      * @return
      */
-    protected ArrayList<Territory> getNeighborTowns(OffsetCoord mapCoord, int radius, boolean addNull) {
+    protected ArrayList<Territory> getNeighborTerritories(OffsetCoord mapPosition, int radius, boolean addNull) {
 
         ArrayList<Territory> neighborTerritories = new ArrayList<>();
-        ArrayList<OffsetCoord> neighborCoords =
-                (radius == 1)?mapCoord.getNeighborsByCcw():mapCoord.getNeighbors(radius);
-        for (OffsetCoord coord: neighborCoords) {
-            Territory neighborTerritory = towns.get(coord);
+        ArrayList<OffsetCoord> neighborPositions =
+                (radius == 1)?mapPosition.getNeighborsByCcw():mapPosition.getNeighbors(radius);
+        for (OffsetCoord neighborPosition: neighborPositions) {
+            Territory neighborTerritory = territories.get(neighborPosition);
             if (addNull || neighborTerritory != null) {
                 neighborTerritories.add(neighborTerritory);
             }
@@ -300,20 +311,20 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      *
      * @return
      */
-    public ArrayList<OffsetCoord> findRetreatableMapCoords(Squad squad) {
+    public ArrayList<OffsetCoord> findMapPositionToRetreat(Squad squad) {
 
-        OffsetCoord mapCoord = squad.getMapPosition();
-        ArrayList<OffsetCoord> retreatableMapCoords = new ArrayList<>();
+        OffsetCoord currentSquadPosition = squad.getMapPosition();
+        ArrayList<OffsetCoord> mapPositionsToRetreat = new ArrayList<>();
 
         ArrayList<Territory> neighborTerritories =
-                getNeighborTowns(mapCoord, 1,false);
+                getNeighborTerritories(currentSquadPosition, 1,false);
         for (Territory territory : neighborTerritories) {
-            if (isMovable(territory.getMapCoord(), squad) && territory.getSquads().size() == 0) {
-                retreatableMapCoords.add(territory.getMapCoord());
+            if (isMovable(territory.getMapPosition(), squad) && territory.getSquads().size() == 0) {
+                mapPositionsToRetreat.add(territory.getMapPosition());
             }
         }
 
-        return retreatableMapCoords;
+        return mapPositionsToRetreat;
     }
 
     /**
@@ -341,25 +352,25 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
     /**
      *
-     * @param glowingTiles
+     * @param glowingTilePositions
      */
-    public void setGlowingTiles(ArrayList<OffsetCoord> glowingTiles) {
+    public void setGlowingTilePositions(ArrayList<OffsetCoord> glowingTilePositions) {
 
-        if (this.glowingTiles != null) {
-            for (OffsetCoord mapCoord: this.glowingTiles) {
-                if (glowingTiles == null || !glowingTiles.contains(mapCoord)) {
+        if (this.glowingTilePositions != null) {
+            for (OffsetCoord mapPosition: this.glowingTilePositions) {
+                if (glowingTilePositions == null || !glowingTilePositions.contains(mapPosition)) {
+                    redraw(mapPosition);
+                }
+            }
+        }
+        if (glowingTilePositions != null) {
+            for (OffsetCoord mapCoord: glowingTilePositions) {
+                if (this.glowingTilePositions == null || !this.glowingTilePositions.contains(mapCoord)) {
                     redraw(mapCoord);
                 }
             }
         }
-        if (glowingTiles != null) {
-            for (OffsetCoord mapCoord: glowingTiles) {
-                if (this.glowingTiles == null || !this.glowingTiles.contains(mapCoord)) {
-                    redraw(mapCoord);
-                }
-            }
-        }
-        this.glowingTiles = glowingTiles;
+        this.glowingTilePositions = glowingTilePositions;
     }
 
     /**
@@ -391,14 +402,10 @@ class GameMap extends HexTileMap implements View, Territory.Event {
     private final static int HEX_SIZE = 64;
 
     private Event listener;
-    private int leftMargin = 0;
-    private int rightMargin = 0;
-    private int topMargin = 32;
-    private int bottomMargin = 32;
     private boolean dragging = false;
-    private HashMap<OffsetCoord, Territory> towns = new HashMap<>();
+    private HashMap<OffsetCoord, Territory> territories = new HashMap<>();
     private ArrayList<ArrayList<Territory>> townsBySide = new ArrayList<>(Tribe.Faction.values().length);
-    private ArrayList<OffsetCoord> glowingTiles = null;
+    private ArrayList<OffsetCoord> glowingTilePositions = null;
     private PointF lastTouchedScreenCoord;
     private PointF lastDraggingScreenCoord;
     private RectF clippedViewport;

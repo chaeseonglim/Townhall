@@ -33,14 +33,16 @@ public class Villager extends Tribe {
         income = 0;
         totalPopulation = 0;
         happiness = 0;
-        for (Territory territory : getTerritories()) {
-            income += (float) territory.getTax() *
-                    (1.0f + getShrineBonus(ShrineBonus.TOWN_GOLD_BOOST));
-            totalPopulation += territory.getPopulation() *
-                    (1.0f + getShrineBonus(ShrineBonus.TOWN_POPULATION_BOOST));
-            happiness += territory.getHappiness();
+        if (getTerritories().size() > 0) {
+            for (Territory territory : getTerritories()) {
+                income += (float) territory.getTax() *
+                        (1.0f + getShrineBonus(ShrineBonus.TOWN_GOLD_BOOST));
+                totalPopulation += territory.getPopulation() *
+                        (1.0f + getShrineBonus(ShrineBonus.TOWN_POPULATION_BOOST));
+                happiness += territory.getHappiness();
+            }
+            happiness /= getTerritories().size();
         }
-        happiness /= getTerritories().size();
 
         // Pay upkeep
         spend = 0;

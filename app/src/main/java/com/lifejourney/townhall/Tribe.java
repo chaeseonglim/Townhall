@@ -54,8 +54,13 @@ public abstract class Tribe implements Squad.Event {
         this.map = map;
         this.territories = map.getTownsBySide(faction);
         for (Territory territory : territories) {
-            if (territory.getTerrain() == Territory.Terrain.HEADQUARTER_VILLAGER) {
-                this.headquarterPosition = territory.getMapCoord();
+            if (territory.getTerrain() == Territory.Terrain.HEADQUARTER) {
+                this.headquarterPosition = territory.getMapPosition();
+            } else if (territory.getTerrain() == Territory.Terrain.SHRINE_HEAL ||
+                    territory.getTerrain() == Territory.Terrain.SHRINE_LOVE ||
+                    territory.getTerrain() == Territory.Terrain.SHRINE_PROSPER ||
+                    territory.getTerrain() == Territory.Terrain.SHRINE_WIND) {
+                this.shrinePositions.add(territory.getMapPosition());
             }
         }
         Arrays.fill(this.globalFactors, 0.0f);
@@ -239,10 +244,29 @@ public abstract class Tribe implements Squad.Event {
         globalFactors[factor.ordinal()] += value;
     }
 
+    /**
+     *
+     * @return
+     */
+    public GameMap getMap() {
+
+        return map;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ArrayList<OffsetCoord> getShrinePositions() {
+
+        return shrinePositions;
+    }
+
     private Event eventHandler;
     private Faction faction;
     private GameMap map;
     private OffsetCoord headquarterPosition;
+    private ArrayList<OffsetCoord> shrinePositions = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Territory> territories;
     private float[] globalFactors = new float[ShrineBonus.values().length];

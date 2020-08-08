@@ -162,7 +162,7 @@ public class Battle {
                 }
             } else {
                 // Try retreating loser
-                ArrayList<OffsetCoord> retreatableCoords = map.findRetreatableMapCoords(loser);
+                ArrayList<OffsetCoord> retreatableCoords = map.findMapPositionToRetreat(loser);
                 if (retreatableCoords == null || retreatableCoords.size() == 0) {
                     // Failed to retreat
                     return;

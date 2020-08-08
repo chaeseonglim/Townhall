@@ -98,21 +98,8 @@ public class Territory {
                 null,
                 0.0f
         ),
-        HEADQUARTER_VILLAGER(
-                "타운홀",
-                0,
-                new boolean[] { true, true, true, true, true },
-                new int[] {0, 0, 0, 0},
-                5,
-                5,
-                5,
-                5,
-                5,
-                null,
-                0.0f
-        ),
-        HEADQUARTER_BANDIT(
-                "도적 소굴",
+        HEADQUARTER(
+                "지휘 본부",
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -226,8 +213,8 @@ public class Territory {
         int facilitySlots() {
             return facilitySlots;
         }
-        boolean isMovable(Squad squad) {
-            return movable[squad.getFaction().ordinal()];
+        boolean isMovable(Tribe.Faction faction) {
+            return movable[faction.ordinal()];
         }
         public boolean canDevelop() {
             return canDevelop;
@@ -327,7 +314,7 @@ public class Territory {
             Arrays.fill(this.developmentPolicy, DevelopmentPolicy.DETERIORATE);
         }
         this.happiness = 50;
-        this.fogState = (this.faction == Tribe.Faction.VILLAGER)? FogState.CLEAR : FogState.CLOUDY;
+        this.fogState = FogState.CLEAR; //(this.faction == Tribe.Faction.VILLAGER)? FogState.CLEAR : FogState.CLOUDY;
     }
 
     /**
@@ -612,8 +599,7 @@ public class Territory {
         }
 
         if (glowingSprite == null) {
-            glowingSprite =
-                    new Sprite.Builder("Glowing", "tiles_glowing.png")
+            glowingSprite = new Sprite.Builder("Glowing", "tiles_glowing.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(1, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.5f).visible(true).build();
@@ -621,8 +607,7 @@ public class Territory {
         }
 
         if (selectionSprite == null) {
-            selectionSprite =
-                    new Sprite.Builder("Selection", "tiles_selection.png")
+            selectionSprite = new Sprite.Builder("Selection", "tiles_selection.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(1, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
@@ -630,8 +615,7 @@ public class Territory {
         }
 
         if (fogSprite == null) {
-            fogSprite =
-                    new Sprite.Builder("Fog", "tiles_fog.png")
+            fogSprite = new Sprite.Builder("Fog", "tiles_fog.png")
                             .position(new PointF(mapCoord.toGameCoord()))
                             .size(TileSize).gridSize(2, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.7f).visible(true).build();
@@ -896,7 +880,7 @@ public class Territory {
      *
      * @return
      */
-    public OffsetCoord getMapCoord() {
+    public OffsetCoord getMapPosition() {
 
         return mapCoord;
     }
@@ -1056,7 +1040,7 @@ public class Territory {
      */
     public void setFogState(FogState fogState) {
 
-        this.fogState = fogState;
+        this.fogState = FogState.CLEAR;//fogState;
     }
 
     /**
@@ -1066,6 +1050,21 @@ public class Territory {
     public FogState getFogState() {
 
         return fogState;
+    }
+
+    /**
+     *
+     * @param faction
+     * @return
+     */
+    public boolean isFactionSquadExist(Tribe.Faction faction) {
+
+        for (Squad squad: squads) {
+            if (squad.getFaction() == faction) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private final static int SPRITE_LAYER = 0;
