@@ -474,7 +474,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 }
             }
             if (isSquadWorking) {
-                addText("일꾼 개발",
+                addText("개발 속도(일꾼)",
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             } else {
@@ -626,9 +626,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         }
 
         if (squad.getUnits().size() > 0) {
-            int offensiveBonus = squad.getOffensiveBonusFromTown();
-            int defensiveBonus = squad.getDefensiveBonusFromTown();
-
             if (squad.getFaction() == Tribe.Faction.VILLAGER) {
                 textPosition.offset(-150, 30);
             } else {
@@ -637,18 +634,36 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("보너스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
+            textPosition.offset(0, 30);
+            int offensiveBonus = squad.getOffensiveBonusFromTerritory();
+            int defensiveBonus = squad.getDefensiveBonusFromTerritory();
             if (offensiveBonus != 0 || defensiveBonus != 0) {
-                textPosition.offset(0, 30);
-                addText("공격 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
+                addText("공격력 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
                 textPosition.offset(150, 0);
-                addText("방어 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
+                addText("방어도 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             } else {
-                textPosition.offset(0, 30);
+                addText("-", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+            }
+
+            textPosition.offset(0, 30);
+            int shrineBonusAttackSpeed = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED);
+            int shrineBonusHealPower = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER);
+            if (shrineBonusAttackSpeed != 0 || shrineBonusHealPower != 0) {
+                addText("공격 속도 " + ((offensiveBonus > 0) ? "+" : "") + shrineBonusAttackSpeed,
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+
+                textPosition.offset(150, 0);
+                addText("치유량 " + ((defensiveBonus > 0) ? "+" : "") + shrineBonusHealPower,
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+            } else {
                 addText("-", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }

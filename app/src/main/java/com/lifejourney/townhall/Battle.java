@@ -18,7 +18,7 @@ public class Battle {
         this.defender = defender;
         this.attacker.beginFight(defender);
         this.defender.beginFight(attacker);
-        this.mapCoord = defender.getMapPosition();
+        this.mapPosition = defender.getMapPosition();
     }
 
     /**
@@ -211,8 +211,8 @@ public class Battle {
      *
      * @return
      */
-    public OffsetCoord getMapCoord() {
-        return mapCoord;
+    public OffsetCoord getMapPosition() {
+        return mapPosition;
     }
 
     /**
@@ -224,12 +224,12 @@ public class Battle {
     }
 
     private int WINNER_EXP = 50;
-    private int FIGHTING_EXP = 1;
+    private int FIGHTING_EXP = 2;
     private int SUPPORTING_EXP = 1;
     private int BATTLE_TIME_LIMIT = 1000;
 
-    private OffsetCoord mapCoord;
     private GameMap map;
+    private OffsetCoord mapPosition;
     private Squad attacker;
     private Squad defender;
     private ArrayList<Squad> supporters = new ArrayList<>();

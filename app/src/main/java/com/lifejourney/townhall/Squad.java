@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -116,7 +115,7 @@ public class Squad extends Object implements Controllable {
         eventHandler = builder.eventHandler;
         faction = builder.faction;
         map = builder.map;
-        Arrays.fill(shrineBonus, 1.0f);
+        Arrays.fill(shrineBonus, 0);
 
         eventHandler.onSquadCreated(this);
     }
@@ -189,7 +188,8 @@ public class Squad extends Object implements Controllable {
                         ArrayList<Territory> neighborTerritories =
                                 map.getNeighborTerritories(getMapPosition(), 1, false);
                         for (Territory neighborTerritory : neighborTerritories) {
-                            if (neighborTerritory.getBattle() != null) {
+                            if (neighborTerritory.getBattle() != null &&
+                                    neighborTerritory.isFactionSquadExist(getFaction())) {
                                 neighborTerritory.getBattle().addSupporter(this);
                                 isSupporting = true;
                                 setSpritesToSupport();
@@ -254,10 +254,10 @@ public class Squad extends Object implements Controllable {
 
         // Set unit to bonus
         for (Unit unit: units) {
-            unit.setAttackDamageBonus(UNIT_BONUS_DELTA * getOffensiveBonusFromTown());
-            unit.setArmorBonus(UNIT_BONUS_DELTA * getDefensiveBonusFromTown());
-            unit.setAttackSpeedBonus(shrineBonus[Tribe.ShrineBonus.UNIT_ATTACK_SPEED.ordinal()]);
-            unit.setHealPowerBonus(shrineBonus[Tribe.ShrineBonus.UNIT_HEAL_POWER.ordinal()]);
+            unit.setAttackDamageBonus(UNIT_BONUS_DELTA * getOffensiveBonusFromTerritory());
+            unit.setArmorBonus(UNIT_BONUS_DELTA * getDefensiveBonusFromTerritory());
+            unit.setAttackSpeedBonus(UNIT_BONUS_DELTA * shrineBonus[Tribe.ShrineBonus.UNIT_ATTACK_SPEED.ordinal()]);
+            unit.setHealPowerBonus(UNIT_BONUS_DELTA * shrineBonus[Tribe.ShrineBonus.UNIT_HEAL_POWER.ordinal()]);
         }
 
         if (!isFighting()) {
@@ -302,7 +302,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int getOffensiveBonusFromTown() {
+    public int getOffensiveBonusFromTerritory() {
 
         Territory territory = map.getTerritory(getMapPosition());
         if (territory.getFaction() == faction) {
@@ -316,7 +316,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int getDefensiveBonusFromTown() {
+    public int getDefensiveBonusFromTerritory() {
 
         Territory territory = map.getTerritory(getMapPosition());
         if (territory.getFaction() == faction) {
@@ -831,7 +831,7 @@ public class Squad extends Object implements Controllable {
         while (iter.hasNext()) {
             Unit unit = iter.next();
             if (unit.isKilled()) {
-                expEarned += unit.getUnitClass().earnedExp(unit.getLevel());
+                expEarned += unit.getUnitClass().bountyExp(unit.getLevel());
                 iter.remove();
                 eventHandler.onSquadUnitRemoved(this, unit);
                 unit.close();
@@ -1222,7 +1222,7 @@ public class Squad extends Object implements Controllable {
      * @param factor
      * @return
      */
-    public float getShrineBonus(Tribe.ShrineBonus factor) {
+    public int getShrineBonus(Tribe.ShrineBonus factor) {
 
         return shrineBonus[factor.ordinal()];
     }
@@ -1232,19 +1232,9 @@ public class Squad extends Object implements Controllable {
      * @param factor
      * @param value
      */
-    public void setShrineBonus(Tribe.ShrineBonus factor, float value) {
+    public void setShrineBonus(Tribe.ShrineBonus factor, int value) {
 
         shrineBonus[factor.ordinal()] = value;
-    }
-
-    /**
-     *
-     * @param factor
-     * @param value
-     */
-    public void addGlobalFactor(Tribe.ShrineBonus factor, float value) {
-
-        shrineBonus[factor.ordinal()] += value;
     }
 
     /**
@@ -1330,6 +1320,56 @@ public class Squad extends Object implements Controllable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public float getBattleMetric() {
+
+        float battleMetric = 0.0f;
+        for (Unit unit: units) {
+            if (!unit.isRecruiting()) {
+                battleMetric += unit.getUnitClass().battleMetric();
+            }
+        }
+        return battleMetric;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public float getSupportMetric() {
+
+        float supportMetric = 0.0f;
+        for (Unit unit: units) {
+            if (!unit.isRecruiting()) {
+                supportMetric += unit.getUnitClass().supportMetric();
+            }
+        }
+        return supportMetric;
+    }
+
+    /**
+     *
+     */
+    public void berserk() {
+
+       for (Unit unit: units) {
+           unit.setLevel(10);
+       }
+    }
+
+    /**
+     *
+     */
+    public void eliminate() {
+
+        for (Unit unit: units) {
+            unit.setHealth(0);
+        }
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static float MIN_DISTANCE_START_DRAGGING = 30;
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
@@ -1361,5 +1401,5 @@ public class Squad extends Object implements Controllable {
     private int totalHealthAtBeginningOfFight;
     private PointF lastTouchedScreenPosition = null;
     private PointF firstDraggingGamePosition = null;
-    private float[] shrineBonus = new float[Tribe.ShrineBonus.values().length];
+    private int[] shrineBonus = new int[Tribe.ShrineBonus.values().length];
 }

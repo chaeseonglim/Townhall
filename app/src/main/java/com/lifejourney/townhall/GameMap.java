@@ -189,23 +189,24 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      * @return
      */
     @Override
-    protected ArrayList<Sprite> getTileSprites(OffsetCoord mapCoord) {
+    protected ArrayList<Sprite> getTileSprites(OffsetCoord mapPosition) {
 
-        boolean glowing = (glowingTilePositions != null && glowingTilePositions.contains(mapCoord));
-        return getTerritory(mapCoord).getTileSprites(glowing, showTerritories);
+        boolean glowing = (glowingTilePositions != null && glowingTilePositions.contains(mapPosition));
+        return getTerritory(mapPosition).getTileSprites(glowing, showTerritories);
     }
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      */
     @Override
-    public void removeTileSprites(OffsetCoord mapCoord) {
-        getTerritory(mapCoord).removeTileSprites();
+    public void removeTileSprites(OffsetCoord mapPosition) {
+
+        getTerritory(mapPosition).removeTileSprites();
     }
 
     /**
@@ -249,7 +250,9 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
         ArrayList<Squad> squads = Objects.requireNonNull(territories.get(mapPosition)).getSquads();
         for (Squad localSquad : squads) {
-            if (squad != localSquad && squad.getFaction() == localSquad.getFaction()) {
+            if (squad != localSquad && squad.getFaction() == localSquad.getFaction() ||
+                    (squad.getFaction() != Tribe.Faction.VILLAGER &&
+                            localSquad.getFaction() != Tribe.Faction.VILLAGER)) {
                 return false;
             }
         }

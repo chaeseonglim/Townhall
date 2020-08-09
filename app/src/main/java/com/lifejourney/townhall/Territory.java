@@ -31,7 +31,7 @@ public class Territory {
                 0,
                 0,
                 null,
-                0.0f
+                0
         ),
         BADLANDS(
                 "황무지",
@@ -44,7 +44,7 @@ public class Territory {
                 0,
                 0,
                 null,
-                0.0f
+                0
         ),
         FOREST(
                 "숲",
@@ -57,7 +57,7 @@ public class Territory {
                 0,
                 1,
                 null,
-                0.0f
+                0
         ),
         HILL(
                 "언덕",
@@ -70,12 +70,12 @@ public class Territory {
                 0,
                 2,
                 null,
-                0.0f
+                0
         ),
         MOUNTAIN(
                 "산",
                 0,
-                new boolean[] { false, false, true, false, false },
+                new boolean[] { false, false, false, false, false },
                 new int[] {0, 0, 0, 0},
                 0,
                 0,
@@ -83,7 +83,7 @@ public class Territory {
                 0,
                 3,
                 null,
-                0.0f
+                0
         ),
         RIVER(
                 "강",
@@ -96,7 +96,7 @@ public class Territory {
                 0,
                 3,
                 null,
-                0.0f
+                0
         ),
         HEADQUARTER(
                 "지휘 본부",
@@ -109,7 +109,7 @@ public class Territory {
                 5,
                 5,
                 null,
-                0.0f
+                0
         ),
         SHRINE_WIND(
                 "바람의 제단",
@@ -122,7 +122,7 @@ public class Territory {
                 0,
                 3,
                 Tribe.ShrineBonus.UNIT_ATTACK_SPEED,
-                -0.1f
+                -2
         ),
         SHRINE_HEAL(
                 "치유의 제단",
@@ -135,7 +135,7 @@ public class Territory {
                 0,
                 3,
                 Tribe.ShrineBonus.UNIT_HEAL_POWER,
-                0.1f
+                2
         ),
         SHRINE_LOVE(
                 "사랑의 제단",
@@ -148,7 +148,7 @@ public class Territory {
                 0,
                 3,
                 Tribe.ShrineBonus.TOWN_POPULATION_BOOST,
-                0.1f
+                2
         ),
         SHRINE_PROSPER(
                 "풍요의 제단",
@@ -161,7 +161,7 @@ public class Territory {
                 0,
                 3,
                 Tribe.ShrineBonus.TOWN_GOLD_BOOST,
-                0.1f
+                2
         ),
         UNKNOWN(
                 "모름",
@@ -174,7 +174,7 @@ public class Territory {
                 0,
                 0,
                 null,
-                0.0f
+                0
         );
 
         private String word;
@@ -187,12 +187,12 @@ public class Territory {
         private int happinessDelta;
         private int offenseDelta;
         private int defenseDelta;
-        private Tribe.ShrineBonus bonusFactor;
-        private float bonusValue;
+        private Tribe.ShrineBonus shrineFactor;
+        private int shrineBonus;
 
         Terrain(String word, int facilitySlots, boolean[] movable, int[] developmentDeltas,
                 int goldDelta, int populationDelta, int happinessDelta, int offenseDelta,
-                int defenseDelta, Tribe.ShrineBonus bonusFactor, float bonusValue) {
+                int defenseDelta, Tribe.ShrineBonus shrineFactor, int shrineBonus) {
             this.word = word;
             this.facilitySlots = facilitySlots;
             this.movable = movable;
@@ -203,8 +203,8 @@ public class Territory {
             this.happinessDelta = happinessDelta;
             this.offenseDelta = offenseDelta;
             this.defenseDelta = defenseDelta;
-            this.bonusFactor = bonusFactor;
-            this.bonusValue = bonusValue;
+            this.shrineFactor = shrineFactor;
+            this.shrineBonus = shrineBonus;
         }
 
         String word() {
@@ -238,10 +238,10 @@ public class Territory {
             return defenseDelta;
         }
         public Tribe.ShrineBonus bonusFactor() {
-            return bonusFactor;
+            return shrineFactor;
         }
-        public float bonusValue() {
-            return bonusValue;
+        public int bonusValue() {
+            return shrineBonus;
         }
     }
 
@@ -307,6 +307,10 @@ public class Territory {
         Arrays.fill(this.facilityLevels, 0);
         this.facilityExps = new int[Facility.values().length];
         Arrays.fill(this.facilityExps, 0);
+        this.enemyFacilityIndex = new int[3];
+        for (int i = 0; i < 3; ++i) {
+            this.enemyFacilityIndex[i] = (int) (Math.random() * 4);
+        }
         this.developmentPolicy = new DevelopmentPolicy[Facility.values().length];
         if (this.terrain.canDevelop()) {
             Arrays.fill(this.developmentPolicy, DevelopmentPolicy.PROSPER);
@@ -592,7 +596,7 @@ public class Territory {
                 Sprite facilitySprite =
                         new Sprite.Builder("Facility", "tiles_facility_objects.png")
                                 .position(new PointF(mapCoord.toGameCoord()))
-                                .size(TileSize.clone().multiply(0.5f)).gridSize(6, 5).smooth(false)
+                                .size(TileSize.clone().multiply(0.5f)).gridSize(6, 8).smooth(false)
                                 .layer(SPRITE_LAYER).depth(0.4f).visible(false).build();
                 facilitySprites.add(facilitySprite);
             }
@@ -652,16 +656,61 @@ public class Territory {
 
         // Set facility sprite
         if (facilitySlots.size() == 0 || fogState != FogState.CLEAR) {
-            for (Sprite sprite : facilitySprites) {
-                sprite.setVisible(false);
-                sprite.commit();
+            // Draw enemy facility
+            if (facilitySlots.size() == 0 && fogState == FogState.CLEAR &&
+                    getFaction() != Tribe.Faction.VILLAGER &&
+                    getFaction() != Tribe.Faction.NEUTRAL &&
+                    getTerrain().canDevelop()) {
+                if (terrain == Terrain.FOREST) {
+                    baseSprite.setGridIndex(0, Terrain.GRASS.ordinal());
+                } else if (terrain == Terrain.HILL) {
+                    baseSprite.setGridIndex(0, Terrain.BADLANDS.ordinal());
+                } else {
+                    baseSprite.setGridIndex(0, terrain.ordinal());
+                }
+                for (int facilityIndex = 0; facilityIndex < 3; ++facilityIndex) {
+                    Sprite sprite = facilitySprites.get(facilityIndex);
+
+                    int placement = (facilityIndex + facilitySpriteSelection) % 3;
+                    if (placement == 0) {
+                        sprite.setPositionOffset(new PointF(0.0f, TileSize.height / 4));
+                    } else if (placement == 1) {
+                        sprite.setPositionOffset(new PointF(-TileSize.width / 4, -TileSize.height / 8));
+                    } else if (placement == 2) {
+                        sprite.setPositionOffset(new PointF(TileSize.width / 4, -TileSize.height / 8));
+                    }
+                    if (enemyFacilityIndex[facilityIndex] > 0) {
+                        sprite.setGridIndex(enemyFacilityIndex[facilityIndex] - 1,
+                                getFaction().ordinal() + Facility.values().length - 1);
+                        sprite.setVisible(true);
+                        sprites.add(sprite);
+                    } else {
+                        if (terrain == Terrain.FOREST) {
+                            sprite.setGridIndex(0, Facility.values().length);
+                            sprite.setVisible(true);
+                            sprites.add(sprite);
+                        } else if (terrain == Terrain.HILL) {
+                            sprite.setGridIndex(1, Facility.values().length);
+                            sprite.setVisible(true);
+                            sprites.add(sprite);
+                        } else {
+                            sprite.setVisible(false);
+                            sprite.commit();
+                        }
+                    }
+                }
+            } else {
+                for (Sprite sprite : facilitySprites) {
+                    sprite.setVisible(false);
+                    sprite.commit();
+                }
             }
         } else {
-            int i = 0, highLevelIndex = 0;
-            for (; i < facilitySlots.size(); ++i) {
-                Sprite sprite = facilitySprites.get(i);
+            int facilityIndex = 0;
+            for (int highLevelIndex = 0; facilityIndex < facilitySlots.size(); ++facilityIndex) {
+                Sprite sprite = facilitySprites.get(facilityIndex);
 
-                Facility facility = facilitySlots.get(i);
+                Facility facility = facilitySlots.get(facilityIndex);
                 int level = getFacilityLevel(facility);
                 if (level <= 3) {
                     sprite.setGridIndex(level - 1, facility.ordinal());
@@ -669,7 +718,7 @@ public class Territory {
                     sprite.setGridIndex(3 + highLevelIndex++, facility.ordinal());
                 }
 
-                int placement = (i + facilitySpriteSelection) % 3;
+                int placement = (facilityIndex + facilitySpriteSelection) % 3;
                 if (placement == 0) {
                     sprite.setPositionOffset(new PointF(0.0f, TileSize.height/4));
                 } else if (placement == 1) {
@@ -681,10 +730,10 @@ public class Territory {
                 sprite.setVisible(true);
                 sprites.add(sprite);
             }
-            for (; i < 3; ++i) {
-                Sprite sprite = facilitySprites.get(i);
+            for (; facilityIndex < 3; ++facilityIndex) {
+                Sprite sprite = facilitySprites.get(facilityIndex);
 
-                int placement = (i + facilitySpriteSelection) % 3;
+                int placement = (facilityIndex + facilitySpriteSelection) % 3;
                 if (placement == 0) {
                     sprite.setPositionOffset(new PointF(0.0f, TileSize.height/4));
                 } else if (placement == 1) {
@@ -719,6 +768,7 @@ public class Territory {
                 Sprite border = borderSprites.get(index);
                 if (neighbor == null || neighbor.getFaction() != faction) {
                     border.setGridIndex(index, faction.ordinal());
+                    border.setDepth(2.0f + 0.01f * (9 - faction.ordinal()));
                     border.setVisible(true);
                     sprites.add(border);
                 } else {
@@ -1099,6 +1149,7 @@ public class Territory {
     // Facility
     private int[] facilityLevels;
     private int[] facilityExps;
+    private int[] enemyFacilityIndex;
     private DevelopmentPolicy[] developmentPolicy;
     private ArrayList<Facility> facilitySlots = new ArrayList<>();
     private int townUpdateLeft = (int)(Math.random()* TOWN_UPDATE_COUNT);

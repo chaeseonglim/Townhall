@@ -29,7 +29,7 @@ public class NewsBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(background);
 
-        textSprite = new TextSprite.Builder("dateText", "안녕하세요. 오늘도 평화로운 하루가 시작됩니다!", 26)
+        textSprite = new TextSprite.Builder("dateText", "안녕하세요. 마을 주민들이 당신에게 인사합니다!", 26)
                 .fontColor(Color.rgb(230, 230, 230))
                 .bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(Paint.Align.LEFT)

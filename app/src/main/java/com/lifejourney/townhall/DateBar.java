@@ -14,9 +14,15 @@ public class DateBar extends Widget {
 
     private final String LOG_TAG = "DateBar";
 
-    public DateBar(SpeedControl speedControl, Rect region, int layer, float depth) {
+    interface Event {
+        void onDatePassed(int days);
+    }
+
+    public DateBar(Event eventHandler, Rect region, int layer, float depth) {
 
         super(region, layer, depth);
+
+        this.eventHandler = eventHandler;
 
         Sprite background = new Sprite.Builder("date_bar.png")
                 .size(new SizeF(getRegion().size()))
@@ -47,9 +53,10 @@ public class DateBar extends Widget {
 
         // Update date
         if (!paused && --updateTimeLeft == 0) {
-            day++;
-            dateTextSprite.setText(day + " days");
-            updateTimeLeft = DAY_UPDATE_PERIOD;
+            date++;
+            dateTextSprite.setText(date + " days");
+            eventHandler.onDatePassed(date);
+            updateTimeLeft = DATE_UPDATE_PERIOD;
         }
     }
 
@@ -57,8 +64,8 @@ public class DateBar extends Widget {
      *
      * @return
      */
-    public int getDay() {
-        return day;
+    public int getDate() {
+        return date;
     }
 
     /**
@@ -75,10 +82,11 @@ public class DateBar extends Widget {
         paused = false;
     }
 
-    private static final int DAY_UPDATE_PERIOD = 90;
+    private static final int DATE_UPDATE_PERIOD = 100;
 
+    private Event eventHandler;
     private boolean paused = false;
-    private int day = 0;
-    private int updateTimeLeft = DAY_UPDATE_PERIOD;
+    private int date = 0;
+    private int updateTimeLeft = DATE_UPDATE_PERIOD;
     private TextSprite dateTextSprite;
 }

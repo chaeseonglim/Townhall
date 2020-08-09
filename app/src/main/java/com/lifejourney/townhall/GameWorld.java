@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class GameWorld extends World
-        implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event,
+        implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event, DateBar.Event,
                 SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event {
 
     static final String LOG_TAG = "GameWorld";
@@ -32,7 +32,8 @@ public class GameWorld extends World
         // Build tribe
         Villager villager = new Villager(this, map);
         tribes.add(villager);
-        tribes.add(new Raider(this, map));
+        tribes.add(new Raider(this, map, villager));
+        tribes.add(new Viking(this, map, villager));
 
         // Build UIs
         economyBar = new EconomyBar(villager, new Rect(20, 10, 440, 64),
@@ -45,7 +46,7 @@ public class GameWorld extends World
         speedControl.show();
         addWidget(speedControl);
 
-        dateBar = new DateBar(speedControl, new Rect(480, 10, 230, 64), 20, 0.0f);
+        dateBar = new DateBar(this, new Rect(480, 10, 230, 64), 20, 0.0f);
         dateBar.show();
         addWidget(dateBar);
 
@@ -162,7 +163,7 @@ public class GameWorld extends World
             // Remove if battle is finished
             if (battle.isFinished()) {
                 iterBattle.remove();
-                map.getTerritory(battle.getMapCoord()).setBattle(null);
+                map.getTerritory(battle.getMapPosition()).setBattle(null);
             }
         }
 
@@ -234,11 +235,11 @@ public class GameWorld extends World
             territory.getTerrain() == Territory.Terrain.SHRINE_LOVE ||
             territory.getTerrain() == Territory.Terrain.SHRINE_PROSPER) {
             Tribe.ShrineBonus factor = territory.getTerrain().bonusFactor();
-            float value = territory.getTerrain().bonusValue();
+            int value = territory.getTerrain().bonusValue();
             if (prevFaction != Tribe.Faction.NEUTRAL) {
-                getTribe(prevFaction).addGlobalFactor(factor, -value);
+                getTribe(prevFaction).addShrineBonus(factor, -value);
             }
-            getTribe(territory.getFaction()).addGlobalFactor(factor, value);
+            getTribe(territory.getFaction()).addShrineBonus(factor, value);
         }
 
         // Check UI
@@ -249,10 +250,33 @@ public class GameWorld extends World
             squadBuilderButton.hide();
         }
 
+        if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {
+            newsBar.addNews("우리 본부가 점령되었습니다. 이제 희망이 없습니다!");
+            // TODO: Game over
+        } else {
+            for (int i = 0; i < tribes.size(); ++i) {
+                // Check if some faction's headquarter is occupied
+                if (territory.getMapPosition().equals(tribes.get(i).getHeadquarterPosition()) &&
+                    territory.getFaction() == Tribe.Faction.VILLAGER &&
+                        prevFaction == tribes.get(i).getFaction()) {
+                    newsBar.addNews("우리가 " + tribes.get(i).getFaction().toGameString() + "의 본부를 점령했습니다.");
+                    if (prevFaction == Tribe.Faction.RAIDER) {
+                        if (tribes.get(i).getSquads().size() > 0) {
+                            for (Squad squad : tribes.get(i).getSquads()) {
+                                squad.berserk();
+                            }
+                            newsBar.addNews("조심하세요! 남은 " + tribes.get(i).getFaction().toGameString() +
+                                    "의 병력들이 강해집니다.");
+                        }
+                    }
+                }
+            }
+        }
         if (prevFaction != Tribe.Faction.NEUTRAL) {
             newsBar.addNews(territory.getFaction().toGameString() + "이 " +
                     prevFaction.toGameString() + "의 영토를 차지했습니다.");
         }
+
     }
 
     /**
@@ -263,6 +287,27 @@ public class GameWorld extends World
     public void onTribeCollected(Tribe tribe) {
 
         economyBar.refresh();
+    }
+
+    /**
+     *
+     * @param tribe
+     * @param upgradable
+     */
+    @Override
+    public void onTribeUpgraded(Tribe tribe, Upgradable upgradable) {
+
+        newsBar.addNews(tribe.getFaction().toGameString() + "(이)가 새로운 기술을 습득했습니다.");
+    }
+
+    /**
+     *
+     * @param tribe
+     */
+    @Override
+    public void onTribeDestroyed(Tribe tribe) {
+
+        newsBar.addNews(tribe.getFaction().toGameString() + "(이)가 패배했습니다.");
     }
 
     /**
@@ -550,6 +595,15 @@ public class GameWorld extends World
             territory.setFocus(true);
             onMapTownFocused(territory);
         }
+    }
+
+    /**
+     *
+     * @param days
+     */
+    @Override
+    public void onDatePassed(int days) {
+
     }
 
     /**

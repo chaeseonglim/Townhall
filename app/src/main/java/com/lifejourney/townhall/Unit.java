@@ -77,7 +77,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1.5f,
                 3.0f,
                 false,
-                false
+                false,
+                0,
+                0
         ),
         FIGHTER(
                 "검병",
@@ -117,7 +119,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 3.0f,
                 5.0f,
                 false,
-                true
+                true,
+                100,
+                0
         ),
         ARCHER(
                 "궁수",
@@ -157,7 +161,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 2.0f,
                 4.0f,
                 true,
-                true
+                true,
+                100,
+                200
         ),
         HORSE_MAN(
                 "기마병",
@@ -197,7 +203,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 6.0f,
                 7.0f,
                 false,
-                true
+                true,
+                200,
+                0
         ),
         HEALER(
                 "치유사",
@@ -237,7 +245,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1.5f,
                 3.0f,
                 true,
-                false
+                false,
+                100,
+                300
                 ),
         CANNON(
                 "대포",
@@ -277,7 +287,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 2.0f,
                 4.0f,
                 true,
-                true
+                true,
+                0,
+                300
                 ),
         PALADIN(
                 "성기사",
@@ -317,7 +329,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 3.0f,
                 5.0f,
                 true,
-                true
+                true,
+                300,
+                100
                 );
 
         private UnitClassType unitClassType;
@@ -354,6 +368,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
         private float mass;
         private boolean supportable;
         private boolean aggressive;
+        private float battleMetric;
+        private float supportMetric;
 
         UnitClass(String word, UnitClassType unitClassType, String description,
                   Point spriteGridIndex, SizeF spriteSize, Shape shape,
@@ -364,7 +380,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                   float meleeAttackDamage, float rangedAttackDamage, float healPower,
                   float meleeEvasion, float rangedEvasion, float armor, float health, int vision,
                   float bountyExp, Projectile.ProjectileType projectileType, float maxVelocity,
-                  float maxForce, float mass, boolean supportable, boolean aggressive) {
+                  float maxForce, float mass, boolean supportable, boolean aggressive,
+                  float battleMetric, float supportMetric) {
             this.word = word;
             this.unitClassType = unitClassType;
             this.description = description;
@@ -399,6 +416,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
             this.mass = mass;
             this.supportable = supportable;
             this.aggressive = aggressive;
+            this.battleMetric = battleMetric;
+            this.supportMetric = supportMetric;
         }
 
         public String word() {
@@ -485,13 +504,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public int vision() {
             return vision;
         }
-        public int earnedExp(int level) {
+        public int bountyExp(int level) {
             return (int) (bountyExp * (1.0 + level * 0.2));
         }
-        public int requiredExp(int level) {
-            return 100*level;
+        public int requiredExpToLevelUp(int level) {
+            return 1000*level;
         }
-        public Projectile.ProjectileType projectileClass() {
+        public Projectile.ProjectileType projectileType() {
             return projectileType;
         }
         public float friction() {
@@ -511,6 +530,12 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
         public boolean isAggressive() {
             return aggressive;
+        }
+        public float battleMetric() {
+            return battleMetric;
+        }
+        public float supportMetric() {
+            return supportMetric;
         }
     }
 
@@ -1121,7 +1146,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         // Create a projectile
         Projectile projectile =
-                new Projectile.Builder(this, unitClass.projectileClass(), target,
+                new Projectile.Builder(this, unitClass.projectileType(), target,
                         this.getPosition().clone()).build();
         projectiles.add(projectile);
     }
@@ -1233,7 +1258,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         // Create a projectile
         Projectile projectile =
-                new Projectile.Builder(this, unitClass.projectileClass(), target,
+                new Projectile.Builder(this, unitClass.projectileType(), target,
                         this.getPosition().clone()).build();
         projectiles.add(projectile);
     }
@@ -1274,7 +1299,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         if (Upgradable.PALADIN_GUARDIAN.getLevel(faction) > 0) {
             float guardianDelta =
-                    damage * DAMAGE_UPGRADE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
+                    damage * GUARDIAN_DAMAGE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
             for (Unit companion: companions) {
                 if (companion != this && companion.getUnitClass() == UnitClass.PALADIN) {
                     damage -= guardianDelta;
@@ -1496,6 +1521,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
     public float getHealth() {
 
         return health;
+    }
+
+    /**
+     *
+     * @param health
+     */
+    public void setHealth(float health) {
+
+        this.health = health;
     }
 
     /**
@@ -1752,6 +1786,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     /**
      *
+     * @param level
+     */
+    public void setLevel(int level) {
+
+        this.level = level;
+    }
+
+    /**
+     *
      */
     public void addExp(int expEarned) {
 
@@ -1760,7 +1803,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         exp += expEarned;
-        if (level < MAX_LEVEL && exp > getUnitClass().requiredExp(level)) {
+        if (level < MAX_LEVEL && exp > getUnitClass().requiredExpToLevelUp(level)) {
             exp = 0;
             level++;
 

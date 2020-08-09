@@ -44,6 +44,10 @@ public abstract class Tribe implements Squad.Event {
     public interface Event extends Squad.Event {
 
         void onTribeCollected(Tribe tribe);
+
+        void onTribeUpgraded(Tribe tribe, Upgradable upgradable);
+
+        void onTribeDestroyed(Tribe tribe);
     }
 
 
@@ -63,13 +67,17 @@ public abstract class Tribe implements Squad.Event {
                 this.shrinePositions.add(territory.getMapPosition());
             }
         }
-        Arrays.fill(this.globalFactors, 0.0f);
+        Arrays.fill(this.shrineBonuses, 0);
     }
 
     /**
      *
      */
     public void update() {
+
+        // Check win/defeat condition
+        if (checkDefeated())
+            return;
 
         // Set squad bonus
         for (Squad squad : squads) {
@@ -78,6 +86,22 @@ public abstract class Tribe implements Squad.Event {
             squad.setShrineBonus(ShrineBonus.UNIT_HEAL_POWER,
                     getShrineBonus(ShrineBonus.UNIT_HEAL_POWER));
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean checkDefeated() {
+        if (!destroyed &&
+                (getHeadquarterPosition() != null &&
+                getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()) &&
+                getSquads().size() == 0) {
+            destroyed = true;
+            getEventHandler().onTribeDestroyed(this);
+        }
+
+        return destroyed;
     }
 
     /**
@@ -219,9 +243,9 @@ public abstract class Tribe implements Squad.Event {
      * @param factor
      * @return
      */
-    public float getShrineBonus(ShrineBonus factor) {
+    public int getShrineBonus(ShrineBonus factor) {
 
-        return globalFactors[factor.ordinal()];
+        return shrineBonuses[factor.ordinal()];
     }
 
     /**
@@ -229,9 +253,9 @@ public abstract class Tribe implements Squad.Event {
      * @param factor
      * @param value
      */
-    public void setGlobalFactor(ShrineBonus factor, float value) {
+    public void setShrineBonus(ShrineBonus factor, int value) {
 
-        globalFactors[factor.ordinal()] = value;
+        shrineBonuses[factor.ordinal()] = value;
     }
 
     /**
@@ -239,9 +263,9 @@ public abstract class Tribe implements Squad.Event {
      * @param factor
      * @param value
      */
-    public void addGlobalFactor(ShrineBonus factor, float value) {
+    public void addShrineBonus(ShrineBonus factor, int value) {
 
-        globalFactors[factor.ordinal()] += value;
+        shrineBonuses[factor.ordinal()] += value;
     }
 
     /**
@@ -262,6 +286,28 @@ public abstract class Tribe implements Squad.Event {
         return shrinePositions;
     }
 
+    /**
+     *
+     * @return
+     */
+    public float getTotalBattleMetric() {
+
+        float totalBattleMetric = 0.0f;
+        for (Squad squad: getSquads()) {
+            totalBattleMetric += squad.getBattleMetric();
+        }
+        return totalBattleMetric;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDestroyed() {
+
+        return destroyed;
+    }
+
     private Event eventHandler;
     private Faction faction;
     private GameMap map;
@@ -269,5 +315,6 @@ public abstract class Tribe implements Squad.Event {
     private ArrayList<OffsetCoord> shrinePositions = new ArrayList<>();
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Territory> territories;
-    private float[] globalFactors = new float[ShrineBonus.values().length];
+    private int[] shrineBonuses = new int[ShrineBonus.values().length];
+    protected boolean destroyed = false;
 }
