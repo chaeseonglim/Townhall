@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -157,6 +158,7 @@ public class Button extends Widget {
                     if (messageSprite != null) {
                         messageSprite.setPositionOffset(new PointF(3, 3));
                     }
+                    Engine2D.GetInstance().playSoundEffect("click3", 1.0f);
                     pressed = true;
                     handledResult = true;
                 } else {

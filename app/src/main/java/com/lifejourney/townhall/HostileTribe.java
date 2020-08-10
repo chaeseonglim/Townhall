@@ -109,7 +109,6 @@ public abstract class HostileTribe extends Tribe {
                     selectedUnitClass.unitClassType() != Unit.UnitClassType.MELEE_SUPPORTER) {
                 selectedUnitClass =
                         Unit.UnitClass.values()[(int) (Math.random() * (maxRand - minRand) + minRand)];
-                Log.e(LOG_TAG, "maxRand: " + maxRand + " minRand: " + minRand + " rand: " + selectedUnitClass.ordinal());
             }
         } else if (spawnType == UnitSpawnType.RANGED) {
             while (selectedUnitClass == null ||
@@ -118,11 +117,9 @@ public abstract class HostileTribe extends Tribe {
                     selectedUnitClass.unitClassType() != Unit.UnitClassType.RANGED_SUPPORTER) {
                 selectedUnitClass =
                         Unit.UnitClass.values()[(int) (Math.random() * (maxRand - minRand) + minRand)];
-                Log.e(LOG_TAG, "maxRand: " + maxRand + " minRand: " + minRand + " rand: " + selectedUnitClass.ordinal());
             }
         } else {
             selectedUnitClass = Unit.UnitClass.values()[(int)(Math.random()*(maxRand-minRand)+minRand)];
-            Log.e(LOG_TAG, "maxRand: " + maxRand + " minRand: " + minRand + " rand: " + selectedUnitClass.ordinal());
         }
 
         return selectedUnitClass;
@@ -307,8 +304,13 @@ public abstract class HostileTribe extends Tribe {
                 candidatesToAttack.add(neighborTerritory);
             }
 
-            // Check if there's a other tiles to occupy when the expansion policy is on
-            if (policy == Policy.EXPANSION) {
+            // Check if strategic target is movable
+            if (neighborTerritory.getMapPosition().equals(strategicTarget) &&
+                neighborTerritory.isFactionSquadExist(getFaction()) &&
+                neighborTerritory.isMovable(squad)) {
+                candidatesToExpansion.add(neighborTerritory);
+            } else if (policy == Policy.EXPANSION) {
+                // Check if there's a other tiles to occupy when the expansion policy is on
                 if (neighborTerritory.getFaction() == Faction.NEUTRAL ||
                     neighborTerritory.getFaction() == Faction.VILLAGER) {
                     candidatesToExpansion.add(neighborTerritory);

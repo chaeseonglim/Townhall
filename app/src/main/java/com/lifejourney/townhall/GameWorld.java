@@ -85,6 +85,32 @@ public class GameWorld extends World
         newsBar.setFollowParentVisibility(false);
         newsBar.show();
         addWidget(newsBar);
+
+        // Play BGM
+        Engine2D.GetInstance().getResourceManager().addMusic(R.raw.town_theme);
+        Engine2D.GetInstance().playMusic(0.3f);
+
+        // Load sound effect
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("click3", R.raw.click3);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("click5", R.raw.click5);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("levelup", R.raw.rise01);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("arrow", R.raw.metal_small2);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("coin1", R.raw.coin1);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("heal", R.raw.flame);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("sword1", R.raw.sword_unsheathe1);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("sword2", R.raw.sword_unsheathe2);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("sword3", R.raw.sword_unsheathe3);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit1", R.raw.hit1);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit2", R.raw.hit2);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit3", R.raw.hit3);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit4", R.raw.hit4);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit5", R.raw.hit5);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("die1", R.raw.die1);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("trot", R.raw.trot);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("villager", R.raw.ready);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("raiders", R.raw.growl_0);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("viking", R.raw.laugh_evil_1);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("rebel", R.raw.shade3);
     }
 
     /**
@@ -95,8 +121,13 @@ public class GameWorld extends World
 
         super.close();
 
+        // Close map
         map.close();
         map = null;
+
+        // Unload sound
+        Engine2D.GetInstance().stopMusic();
+        Engine2D.GetInstance().getResourceManager().unloadSoundEffects();
     }
 
     /**
@@ -189,7 +220,9 @@ public class GameWorld extends World
      * @param territory
      */
     @Override
-    public void onMapTownFocused(Territory territory) {
+    public void onMapTerritoryFocused(Territory territory) {
+
+        Engine2D.GetInstance().playSoundEffect("click5", 1.0f);
 
         if (focusedTerritory == territory) {
             territory.setFocus(false);
@@ -227,7 +260,7 @@ public class GameWorld extends World
      * @param prevFaction
      */
     @Override
-    public void onMapTownOccupied(Territory territory, Tribe.Faction prevFaction) {
+    public void onMapTerritoryOccupied(Territory territory, Tribe.Faction prevFaction) {
 
         // Check if it's shrine
         if (territory.getTerrain() == Territory.Terrain.SHRINE_WIND ||
@@ -362,6 +395,16 @@ public class GameWorld extends World
     @Override
     public void onSquadFocused(Squad squad) {
 
+        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
+            Engine2D.GetInstance().playSoundEffect("villager", 1.0f);
+        } else if (squad.getFaction() == Tribe.Faction.RAIDER) {
+            Engine2D.GetInstance().playSoundEffect("raiders", 1.0f);
+        } else if (squad.getFaction() == Tribe.Faction.VIKING) {
+            Engine2D.GetInstance().playSoundEffect("viking", 1.0f);
+        } else if (squad.getFaction() == Tribe.Faction.REBEL) {
+            Engine2D.GetInstance().playSoundEffect("rebel", 1.0f);
+        }
+
         if (focusedSquad == squad) {
             return;
         }
@@ -406,6 +449,7 @@ public class GameWorld extends World
         // Refresh UI state
         if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
+            Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
         }
     }
 
@@ -547,6 +591,7 @@ public class GameWorld extends World
     public void onUpgradeBoxUpgraded(UpgradeBox upgradeBox, Upgradable upgradable) {
 
         economyBar.refresh();
+        Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
     }
 
     /**
@@ -593,7 +638,7 @@ public class GameWorld extends World
             Squad squad = focusedSquad;
             squad.close();
             territory.setFocus(true);
-            onMapTownFocused(territory);
+            onMapTerritoryFocused(territory);
         }
     }
 

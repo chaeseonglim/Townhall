@@ -17,7 +17,6 @@ import com.lifejourney.engine2d.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 class GameMap extends HexTileMap implements View, Territory.Event {
 
@@ -25,9 +24,9 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
     public interface Event {
 
-        void onMapTownFocused(Territory territory);
+        void onMapTerritoryFocused(Territory territory);
 
-        void onMapTownOccupied(Territory territory, Tribe.Faction prevFaction);
+        void onMapTerritoryOccupied(Territory territory, Tribe.Faction prevFaction);
     }
 
     /**
@@ -136,7 +135,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
         }
         redrawTileSprites(territory.getFaction());
 
-        listener.onMapTownOccupied(territory, prevFaction);
+        listener.onMapTerritoryOccupied(territory, prevFaction);
     }
 
     /**
@@ -175,7 +174,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                     Territory territoryToFocus = getTerritory(touchedMapCoord);
                     if (territoryToFocus != null) {
                         territoryToFocus.setFocus(true);
-                        listener.onMapTownFocused(territoryToFocus);
+                        listener.onMapTerritoryFocused(territoryToFocus);
                     }
                 }
             } else if (eventAction == MotionEvent.ACTION_CANCEL) {
@@ -226,13 +225,12 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param faction
      * @return
      */
-    public boolean isMovable(OffsetCoord mapPosition, Tribe.Faction faction) {
+    public boolean isTerrainMovable(OffsetCoord mapPosition, Tribe.Faction faction) {
 
         Territory territory = territories.get(mapPosition);
         if (territory == null) {
             return false;
         }
-
         return territory.getTerrain().isMovable(faction);
     }
 
@@ -242,22 +240,13 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param squad
      * @return
      */
-    public boolean isMovable(OffsetCoord mapPosition, Squad squad) {
+    public boolean isTerritoryMovable(OffsetCoord mapPosition, Squad squad) {
 
-        if (!isMovable(mapPosition, squad.getFaction())) {
+        Territory territory = territories.get(mapPosition);
+        if (territory == null) {
             return false;
         }
-
-        ArrayList<Squad> squads = Objects.requireNonNull(territories.get(mapPosition)).getSquads();
-        for (Squad localSquad : squads) {
-            if (squad != localSquad && squad.getFaction() == localSquad.getFaction() ||
-                    (squad.getFaction() != Tribe.Faction.VILLAGER &&
-                            localSquad.getFaction() != Tribe.Faction.VILLAGER)) {
-                return false;
-            }
-        }
-
-        return true;
+        return territory.isMovable(squad);
     }
 
     /**
@@ -322,7 +311,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
         ArrayList<Territory> neighborTerritories =
                 getNeighborTerritories(currentSquadPosition, 1,false);
         for (Territory territory : neighborTerritories) {
-            if (isMovable(territory.getMapPosition(), squad) && territory.getSquads().size() == 0) {
+            if (isTerritoryMovable(territory.getMapPosition(), squad) && territory.getSquads().size() == 0) {
                 mapPositionsToRetreat.add(territory.getMapPosition());
             }
         }

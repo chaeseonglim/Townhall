@@ -7,6 +7,7 @@ import com.lifejourney.engine2d.Sprite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Territory {
 
@@ -309,7 +310,7 @@ public class Territory {
         Arrays.fill(this.facilityExps, 0);
         this.enemyFacilityIndex = new int[3];
         for (int i = 0; i < 3; ++i) {
-            this.enemyFacilityIndex[i] = (int) (Math.random() * 4);
+            this.enemyFacilityIndex[i] = (int) (Math.random() * 6);
         }
         this.developmentPolicy = new DevelopmentPolicy[Facility.values().length];
         if (this.terrain.canDevelop()) {
@@ -661,41 +662,52 @@ public class Territory {
                     getFaction() != Tribe.Faction.VILLAGER &&
                     getFaction() != Tribe.Faction.NEUTRAL &&
                     getTerrain().canDevelop()) {
-                if (terrain == Terrain.FOREST) {
-                    baseSprite.setGridIndex(0, Terrain.GRASS.ordinal());
-                } else if (terrain == Terrain.HILL) {
-                    baseSprite.setGridIndex(0, Terrain.BADLANDS.ordinal());
-                } else {
-                    baseSprite.setGridIndex(0, terrain.ordinal());
-                }
-                for (int facilityIndex = 0; facilityIndex < 3; ++facilityIndex) {
-                    Sprite sprite = facilitySprites.get(facilityIndex);
-
-                    int placement = (facilityIndex + facilitySpriteSelection) % 3;
-                    if (placement == 0) {
-                        sprite.setPositionOffset(new PointF(0.0f, TileSize.height / 4));
-                    } else if (placement == 1) {
-                        sprite.setPositionOffset(new PointF(-TileSize.width / 4, -TileSize.height / 8));
-                    } else if (placement == 2) {
-                        sprite.setPositionOffset(new PointF(TileSize.width / 4, -TileSize.height / 8));
+                boolean enemyFacilityExist = false;
+                for (int enemyFacility: enemyFacilityIndex) {
+                    if (enemyFacility > 3) {
+                        enemyFacilityExist = true;
+                        break;
                     }
-                    if (enemyFacilityIndex[facilityIndex] > 0) {
-                        sprite.setGridIndex(enemyFacilityIndex[facilityIndex] - 1,
-                                getFaction().ordinal() + Facility.values().length - 1);
-                        sprite.setVisible(true);
-                        sprites.add(sprite);
+                }
+                if (enemyFacilityExist) {
+                    // Switch terrain to basic
+                    if (terrain == Terrain.FOREST) {
+                        baseSprite.setGridIndex(0, Terrain.GRASS.ordinal());
+                    } else if (terrain == Terrain.HILL) {
+                        baseSprite.setGridIndex(0, Terrain.BADLANDS.ordinal());
                     } else {
-                        if (terrain == Terrain.FOREST) {
-                            sprite.setGridIndex(0, Facility.values().length);
-                            sprite.setVisible(true);
-                            sprites.add(sprite);
-                        } else if (terrain == Terrain.HILL) {
-                            sprite.setGridIndex(1, Facility.values().length);
+                        baseSprite.setGridIndex(0, terrain.ordinal());
+                    }
+                    // Position enemy facilities
+                    for (int facilityIndex = 0; facilityIndex < 3; ++facilityIndex) {
+                        Sprite sprite = facilitySprites.get(facilityIndex);
+
+                        int placement = (facilityIndex + facilitySpriteSelection) % 3;
+                        if (placement == 0) {
+                            sprite.setPositionOffset(new PointF(0.0f, TileSize.height / 4));
+                        } else if (placement == 1) {
+                            sprite.setPositionOffset(new PointF(-TileSize.width / 4, -TileSize.height / 8));
+                        } else if (placement == 2) {
+                            sprite.setPositionOffset(new PointF(TileSize.width / 4, -TileSize.height / 8));
+                        }
+                        if (enemyFacilityIndex[facilityIndex] >= 3) {
+                            sprite.setGridIndex(enemyFacilityIndex[facilityIndex] - 3,
+                                    getFaction().ordinal() + Facility.values().length - 1);
                             sprite.setVisible(true);
                             sprites.add(sprite);
                         } else {
-                            sprite.setVisible(false);
-                            sprite.commit();
+                            if (terrain == Terrain.FOREST) {
+                                sprite.setGridIndex(0, Facility.values().length);
+                                sprite.setVisible(true);
+                                sprites.add(sprite);
+                            } else if (terrain == Terrain.HILL) {
+                                sprite.setGridIndex(1, Facility.values().length);
+                                sprite.setVisible(true);
+                                sprites.add(sprite);
+                            } else {
+                                sprite.setVisible(false);
+                                sprite.commit();
+                            }
                         }
                     }
                 }
@@ -1115,6 +1127,28 @@ public class Territory {
             }
         }
         return false;
+    }
+
+    /**
+     *
+     * @param squad
+     * @return
+     */
+    public boolean isMovable(Squad squad) {
+
+        if (!getTerrain().isMovable(squad.getFaction())) {
+            return false;
+        }
+
+        for (Squad localSquad : getSquads()) {
+            if (squad != localSquad && squad.getFaction() == localSquad.getFaction() ||
+                    (squad.getFaction() != Tribe.Faction.VILLAGER &&
+                            localSquad.getFaction() != Tribe.Faction.VILLAGER)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private final static int SPRITE_LAYER = 0;

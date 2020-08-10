@@ -146,7 +146,7 @@ public class Squad extends Object implements Controllable {
         // Movement on tiled view
         OffsetCoord currentMapOffset = getMapPosition();
         if (targetMapPositionToMove != null && !targetMapPositionToMove.equals(currentMapOffset)) {
-            if (map.isMovable(nextMapPositionToMove, this)) {
+            if (map.isTerritoryMovable(nextMapPositionToMove, this)) {
                 // If it's moving, send unit to next offset
                 for (Unit unit : units) {
                     unit.setTargetMapOffset(nextMapPositionToMove);
@@ -475,7 +475,7 @@ public class Squad extends Object implements Controllable {
                     // If it's dragged to the same tile or it's not movable tile
                     if (eventAction == MotionEvent.ACTION_CANCEL ||
                             targetMapPosition.equals(getMapPosition()) ||
-                            !map.isMovable(targetMapPosition, this)) {
+                            !map.isTerritoryMovable(targetMapPosition, this)) {
                         if (targetMapPosition.equals(getMapPosition()) && firstDraggingGamePosition == null) {
                             // cancel dragging and moving
                             setDragging(false, touchedGamePosition);
@@ -590,7 +590,7 @@ public class Squad extends Object implements Controllable {
                 if (alternativePath != null && alternativePath.size() > 1) {
                     OffsetCoord nextCandidate = new OffsetCoord(
                             alternativePath.get(1).getPosition().x, alternativePath.get(1).getPosition().y);
-                    if (getMap().isMovable(nextCandidate, this)) {
+                    if (getMap().isTerritoryMovable(nextCandidate, this)) {
                         targetMapPositionToMove = nextCandidate;
                         optimalPath = alternativePath;
                     } else {
@@ -650,6 +650,7 @@ public class Squad extends Object implements Controllable {
         Unit unit = new Unit.Builder(unitClass, faction).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setCompanions(units);
+        unit.setFocused(focused);
         addUnit(unit);
     }
 
@@ -936,9 +937,15 @@ public class Squad extends Object implements Controllable {
             if (isMoving()) {
                 targetStick.setVisible(true);
             }
+            for (Unit unit: units) {
+                unit.setFocused(true);
+            }
             eventHandler.onSquadFocused(this);
         }
         else {
+            for (Unit unit: units) {
+                unit.setFocused(false);
+            }
             currentStick.setGridIndex(0, faction.ordinal());
             targetStick.setVisible(false);
             map.setGlowingTilePositions(null);
@@ -1010,7 +1017,7 @@ public class Squad extends Object implements Controllable {
             map.setGlowingTilePositions(null);
         }
         else if (!targetMapPosition.equals(getMapPosition()) &&
-                map.isMovable(targetMapPosition, this)) {
+                map.isTerritoryMovable(targetMapPosition, this)) {
             GamePathFinder pathFinder =
                     new GamePathFinder(this, targetMapPosition, useNextPosition);
             ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();

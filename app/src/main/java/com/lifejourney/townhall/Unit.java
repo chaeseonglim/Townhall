@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.core.util.Pair;
 
 import com.lifejourney.engine2d.CollidableObject;
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Point;
 import com.lifejourney.engine2d.PointF;
@@ -177,7 +178,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
-                new float[] {0.2f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f, 0.4f},
+                new float[] {0.2f, 0.3f, 0.5f, 0.1f, 0.5f, 0.6f, 0.4f},
                 // target favor
                 new float[] {0.1f, 0.4f, 0.3f, 0.1f, 0.5f, 0.6f, 0.4f},
                 // damage attribute
@@ -824,6 +825,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 return;
             }
 
+            if (focused || (getOpponents() != null && getOpponents().size() > 0
+                    && getOpponents().get(0).isFocused())) {
+                Engine2D.GetInstance().playSoundEffect("arrow", 1.0f);
+            }
+
             // Point blank
             float buff = 1.0f;
             if (Upgradable.ARCHER_POINT_BLANK.getLevel(faction) > 1 &&
@@ -831,7 +837,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 buff += BUFF_DELTA * (Upgradable.ARCHER_POINT_BLANK.getLevel(faction) - 1);
             }
 
-            float damageBase = getRangedDamage() * buff * getUnitClass().strengthMetric(target.getUnitClass());
+            float damageBase =
+                    getRangedDamage() * buff * getUnitClass().strengthMetric(target.getUnitClass());
 
             // Poison arrow
             if (Upgradable.ARCHER_POISON_ARROW.getLevel(faction) > 0 &&
@@ -848,6 +855,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         } else if (projectile.getType() == Projectile.ProjectileType.HEAL) {
             // Heal magic
+
+            if (focused || (getOpponents() != null && getOpponents().size() > 0
+                    && getOpponents().get(0).isFocused())) {
+                Engine2D.GetInstance().playSoundEffect("heal", 1.0f);
+            }
 
             if (Upgradable.HEALER_DOT_HEAL.getLevel(faction) > 0 &&
                 getUnitClass() == UnitClass.HEALER) {
@@ -1092,6 +1104,16 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void attackMelee(Unit opponent) {
 
+        if (focused || (getOpponents() != null && getOpponents().size() > 0
+                && getOpponents().get(0).isFocused())) {
+            if (getUnitClass() == UnitClass.HORSE_MAN) {
+                Engine2D.GetInstance().playSoundEffect("trot", 1.0f);
+            } else {
+                Engine2D.GetInstance().playSoundEffect("sword" + (int)(Math.random() * 2 + 1),
+                        1.0f);
+            }
+        }
+
         // Check evading
         if (Math.random() < opponent.getMeleeEvasion()) {
             return;
@@ -1297,6 +1319,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return;
         }
 
+        if (focused || (getOpponents().size() > 0 && getOpponents().get(0).isFocused())) {
+            Engine2D.GetInstance().playSoundEffect("hit" + (int)(Math.random()*5 + 1), 1.0f);
+        }
+
         if (Upgradable.PALADIN_GUARDIAN.getLevel(faction) > 0) {
             float guardianDelta =
                     damage * GUARDIAN_DAMAGE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
@@ -1382,6 +1408,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         if (isInvincible()) {
             return;
+        }
+
+        if (focused || (getOpponents().size() > 0 && getOpponents().get(0).isFocused())) {
+            Engine2D.GetInstance().playSoundEffect("hit" + (int)(Math.random()*5 + 1), 1.0f);
         }
 
         if (Upgradable.PALADIN_GUARDIAN.getLevel(faction) > 0) {
@@ -1807,6 +1837,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
             exp = 0;
             level++;
 
+            if (focused) {
+                Engine2D.GetInstance().playSoundEffect("levelup", 1.0f);
+            }
+
             // Level up effect
             Sprite effectSprite = getSprite("effect");
             effectSprite.clearAnimation();
@@ -1945,6 +1979,21 @@ public class Unit extends CollidableObject implements Projectile.Event {
         return invisible;
     }
 
+    /**
+     *
+     * @param focused
+     */
+    public void setFocused(boolean focused) {
+        this.focused = focused;
+    }
+    /**
+     *
+     * @return
+     */
+    public boolean isFocused() {
+        return focused;
+    }
+
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
     private final static int RECRUITING_TIME = 300;
@@ -1998,4 +2047,5 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private int invincibleTimeLeft = 0;
     private int invincibleCooldownLeft = 0;
     private boolean invisible = false;
+    private boolean focused = false;
 }

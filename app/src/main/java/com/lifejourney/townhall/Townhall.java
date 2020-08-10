@@ -1,6 +1,8 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Point;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Trace;
 import android.util.Log;
@@ -75,6 +77,7 @@ public class Townhall extends FragmentActivity
 
         super.onCreate(savedInstanceState);
 
+        // Initialize view
         setContentView(R.layout.activity_main);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);

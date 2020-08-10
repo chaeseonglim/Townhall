@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import com.lifejourney.engine2d.OffsetCoord;
+
 public class Raider extends HostileTribe {
 
     private static final String LOG_TAG = "Raider";

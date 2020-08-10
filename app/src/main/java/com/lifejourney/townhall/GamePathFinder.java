@@ -80,9 +80,9 @@ public class GamePathFinder extends PathFinder {
 
         OffsetCoord targetMapPosition = new OffsetCoord(target.x, target.y);
         if (squad == null) {
-            return map.isMovable(targetMapPosition, faction);
+            return map.isTerrainMovable(targetMapPosition, faction);
         } else {
-            return map.isMovable(targetMapPosition, squad);
+            return map.isTerritoryMovable(targetMapPosition, squad);
         }
     }
 
