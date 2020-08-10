@@ -494,6 +494,8 @@ public class Squad extends Object implements Controllable {
                         // Stop dragging and seek to target
                         setDragging(false, touchedGamePosition);
                         seekTo(targetMapPosition, false);
+
+                        Engine2D.GetInstance().playSoundEffect("move", 1.0f);
                     }
                 }
                 setTouching(false);

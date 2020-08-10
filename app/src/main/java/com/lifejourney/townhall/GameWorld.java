@@ -111,6 +111,7 @@ public class GameWorld extends World
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("raiders", R.raw.growl_0);
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("viking", R.raw.laugh_evil_1);
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("rebel", R.raw.shade3);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("move", R.raw.war_go_go_go);
     }
 
     /**
