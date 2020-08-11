@@ -80,7 +80,7 @@ public abstract class HostileTribe extends Tribe {
             gold += INCOME_PER_TERRITORY;
         }
 
-        Log.w(LOG_TAG, getFaction().toGameString() + " gold: " + gold);
+        Log.i(LOG_TAG, getFaction().toGameString() + " gold: " + gold);
     }
 
     /**
@@ -136,7 +136,7 @@ public abstract class HostileTribe extends Tribe {
         recruitingUpdateTimeLeft = SQUAD_RECRUITING_UPDATE_TIME;
 
         recruitingProgressive += RECRUITING_PROGRESSIVE_DELTA;
-        Log.w(LOG_TAG, getFaction().toGameString() + " progressive: " + recruitingProgressive);
+        Log.i(LOG_TAG, getFaction().toGameString() + " progressive: " + recruitingProgressive);
 
         // Create squad if conditions are met
         if (getSquads().size() < SQUAD_COUNT_LIMIT &&

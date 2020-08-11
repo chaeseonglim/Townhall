@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -22,9 +23,14 @@ public class HomeBox extends Widget implements Button.Event {
         void onHomeBoxClosed(HomeBox homeBox);
     }
 
-    public HomeBox(Event eventHandler, Rect region, int layer, float depth, Villager villager) {
+    public HomeBox(Event eventHandler, Villager villager, int layer, float depth) {
 
-        super(region, layer, depth);
+        super(null, layer, depth);
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+                700, 400);
+        setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
         this.villager = villager;
@@ -38,7 +44,7 @@ public class HomeBox extends Widget implements Button.Event {
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
@@ -47,13 +53,13 @@ public class HomeBox extends Widget implements Button.Event {
         addWidget(closeButton);
 
         // Upgradable button
-        Rect toResearchButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
+        Rect toUpgradeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
                 150, 60);
-        toPolicyButton = new Button.Builder(this, toResearchButtonRegion)
+        toUpgradeButton = new Button.Builder(this, toUpgradeButtonRegion)
                 .message("강화하기").imageSpriteAsset("")
                 .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
                 .build();
-        addWidget(toPolicyButton);
+        addWidget(toUpgradeButton);
 
         updateVillageInfo();
 
@@ -101,8 +107,8 @@ public class HomeBox extends Widget implements Button.Event {
             // Close button
             setVisible(false);
             eventHandler.onHomeBoxClosed(this);
-        } else if (button == toPolicyButton) {
-            // To town button
+        } else if (button == toUpgradeButton) {
+            // To upgrade button
             setVisible(false);
             eventHandler.onHomeBoxSwitchToResearchBox(this);
         }
@@ -177,10 +183,43 @@ public class HomeBox extends Widget implements Button.Event {
         addText(villager.getSquads().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
+        // Occupying shrine
+        textPosition.offset(-150, 30);
+        addText("소유한 제단", new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(255, 255, 0));
+
+        if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) != 0) {
+            textPosition.offset(0, 30);
+            addText("치유의 제단", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+        }
+        if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) != 0) {
+            textPosition.offset(0, 30);
+            addText("바람의 제단", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+        }
+        if (villager.getShrineBonus(Tribe.ShrineBonus.TOWN_GOLD_BOOST) != 0) {
+            textPosition.offset(0, 30);
+            addText("풍요의 제단", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+        }
+        if (villager.getShrineBonus(Tribe.ShrineBonus.TOWN_POPULATION_BOOST) != 0) {
+            textPosition.offset(0, 30);
+            addText("사랑의 제단", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+        }
+        if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) == 0 &&
+                villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0 &&
+                villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0 &&
+                villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0) {
+            textPosition.offset(0, 30);
+            addText("-", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+        }
     }
 
     private Event eventHandler;
     private Villager villager;
     private Button closeButton;
-    private Button toPolicyButton;
+    private Button toUpgradeButton;
 }

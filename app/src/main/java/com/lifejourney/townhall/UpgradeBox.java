@@ -25,9 +25,14 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         void onUpgradeBoxClosed(UpgradeBox upgradeBox);
     }
 
-    public UpgradeBox(Event eventHandler, Villager villager, Rect region, int layer, float depth) {
+    public UpgradeBox(Event eventHandler, Villager villager, int layer, float depth) {
 
-        super(region, layer, depth);
+        super(null, layer, depth);
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 450) / 2,
+                800, 450);
+        setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
         this.villager = villager;
@@ -41,7 +46,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
@@ -50,7 +55,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(closeButton);
 
         // Home button
-        Rect toHomeButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
+        Rect toHomeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
                 150, 60);
         toHomeButton = new Button.Builder(this, toHomeButtonRegion)
                 .message("홈 화면").imageSpriteAsset("")
@@ -60,7 +65,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
         // Unit buttons
         Rect unitButtonRegion =
-                new Rect(region.left() + 22, region.bottom() - 65,
+                new Rect(getRegion().left() + 22, getRegion().bottom() - 65,
                         56, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
@@ -77,12 +82,12 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
         // Upgradable buttons
         Rect[] upgradableButtonRegions = {
-                new Rect(region.left() + 45, region.top() + 90,150, 65),
-                new Rect(region.left() + 45, region.top() + 180,150, 65),
-                new Rect(region.left() + 45, region.top() + 270,150, 65),
-                new Rect(region.left() + 205, region.top() + 90,150, 65),
-                new Rect(region.left() + 205, region.top() + 180,150, 65),
-                new Rect(region.left() + 205, region.top() + 270,150, 65),
+                new Rect(getRegion().left() + 45, getRegion().top() + 90,150, 65),
+                new Rect(getRegion().left() + 45, getRegion().top() + 180,150, 65),
+                new Rect(getRegion().left() + 45, getRegion().top() + 270,150, 65),
+                new Rect(getRegion().left() + 205, getRegion().top() + 90,150, 65),
+                new Rect(getRegion().left() + 205, getRegion().top() + 180,150, 65),
+                new Rect(getRegion().left() + 205, getRegion().top() + 270,150, 65),
         };
         for (int i = 0; i < 6; ++ i) {
             upgradableButtons[i] =

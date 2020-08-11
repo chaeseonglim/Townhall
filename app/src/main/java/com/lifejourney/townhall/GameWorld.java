@@ -10,7 +10,8 @@ import java.util.ListIterator;
 
 public class GameWorld extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event, DateBar.Event,
-                SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event {
+                SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event,
+                SettingBox.Event {
 
     static final String LOG_TAG = "GameWorld";
 
@@ -88,7 +89,7 @@ public class GameWorld extends World
 
         // Play BGM
         Engine2D.GetInstance().getResourceManager().addMusic(R.raw.town_theme);
-        Engine2D.GetInstance().playMusic(0.3f);
+        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
 
         // Load sound effect
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("click3", R.raw.click3);
@@ -108,8 +109,8 @@ public class GameWorld extends World
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("die1", R.raw.die1);
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("trot", R.raw.trot);
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("villager", R.raw.ready);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("raiders", R.raw.growl_0);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("viking", R.raw.laugh_evil_1);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("raiders", R.raw.ogre3);
+        Engine2D.GetInstance().getResourceManager().loadSoundEffect("viking", R.raw.ogre1);
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("rebel", R.raw.shade3);
         Engine2D.GetInstance().getResourceManager().loadSoundEffect("move", R.raw.war_go_go_go);
     }
@@ -161,6 +162,30 @@ public class GameWorld extends World
         for (Territory territory : territories) {
             territory.update();
         }
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void pause() {
+        super.pause();
+
+        // Pause game temporarily
+        playSpeedReturnedFromBackground = speedControl.getPlaySpeed();
+        speedControl.setPlaySpeed(0);
+        Engine2D.GetInstance().stopMusic();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void resume() {
+        super.resume();
+
+        speedControl.setPlaySpeed(playSpeedReturnedFromBackground);
+        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
     }
 
     /**
@@ -514,6 +539,13 @@ public class GameWorld extends World
 
             // Pop up info box
             popupInfoBox(squad);
+        } else if (button == settingButton) {
+            // Pause game temporarily
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+
+            // Pop up setting box
+            popupSettingBox();
         }
     }
 
@@ -542,7 +574,6 @@ public class GameWorld extends World
             paused = false;
         }
     }
-
 
     /**
      *
@@ -645,6 +676,19 @@ public class GameWorld extends World
 
     /**
      *
+     * @param settingBox
+     */
+    @Override
+    public void onSettingBoxClosed(SettingBox settingBox) {
+
+        settingBox.close();
+        removeWidget(settingBox);
+
+        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+    }
+
+    /**
+     *
      * @param days
      */
     @Override
@@ -675,12 +719,8 @@ public class GameWorld extends World
      */
     private void popupHomeBox() {
 
-        Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
-                700, 400);
-
-        HomeBox homeBox = new HomeBox(this, boxRegion, 30, 0.0f,
-                (Villager)tribes.get(0));
+        HomeBox homeBox = new HomeBox(this, (Villager) tribes.get(0),
+                30, 0.0f);
         homeBox.show();
         addWidget(homeBox);
     }
@@ -688,14 +728,20 @@ public class GameWorld extends World
     /**
      *
      */
+    private void popupSettingBox() {
+
+        SettingBox settingBox = new SettingBox(this,30, 0.0f);
+        settingBox.show();
+        addWidget(settingBox);
+    }
+
+    /**
+     *
+     */
     private void popupUpgradeBox() {
 
-        Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 450) / 2,
-                800, 450);
-
         UpgradeBox upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0),
-                boxRegion, 30, 0.0f);
+                30, 0.0f);
         upgradeBox.show();
         addWidget(upgradeBox);
     }
@@ -706,11 +752,7 @@ public class GameWorld extends World
      */
     private void popupInfoBox(Territory territory) {
 
-        Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect infoBoxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
-                700, 400);
-
-        InfoBox infoBox = new InfoBox(this, infoBoxRegion, 30, 0.0f, territory);
+        InfoBox infoBox = new InfoBox(this, territory,30, 0.0f);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -721,12 +763,8 @@ public class GameWorld extends World
      */
     private void popupInfoBox(Squad squad) {
 
-        Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
-                700, 400);
-
-        InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), boxRegion,
-                30, 0.0f, squad);
+        InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), squad,
+                30, 0.0f);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -786,8 +824,11 @@ public class GameWorld extends World
         return null;
     }
 
+    private final static float MUSIC_VOLUME = 0.3f;
+
     private boolean paused = false;
     private int playSpeedReturnedFromWidget = 0;
+    private int playSpeedReturnedFromBackground = 0;
 
     private GameMap map;
     private MessageBox messageBox;

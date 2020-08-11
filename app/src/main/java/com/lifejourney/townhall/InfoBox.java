@@ -24,9 +24,14 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         void onInfoBoxClosed(InfoBox infoBox);
     }
 
-    public InfoBox(Event eventHandler, Rect region, int layer, float depth, Territory territory) {
+    public InfoBox(Event eventHandler, Territory territory, int layer, float depth) {
 
-        super(region, layer, depth);
+        super(null, layer, depth);
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+                700, 400);
+        setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
         this.territory = territory;
@@ -40,7 +45,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
@@ -52,9 +57,14 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
     }
 
-    public InfoBox(Event eventHandler, Villager villager, Rect region, int layer, float depth, Squad squad) {
+    public InfoBox(Event eventHandler, Villager villager, Squad squad, int layer, float depth) {
 
-        super(region, layer, depth);
+        super(null, layer, depth);
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
+                700, 400);
+        setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
         this.villager = villager;
@@ -69,7 +79,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(region.right() - 155, region.bottom() - 65,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
@@ -78,7 +88,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addWidget(closeButton);
 
         // Territory button
-        Rect toTownButtonRegion = new Rect(region.right() - 310, region.bottom() - 65,
+        Rect toTownButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
                 150, 60);
         toTownButton = new Button.Builder(this, toTownButtonRegion)
                 .message("마을로").imageSpriteAsset("")
@@ -646,16 +656,13 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 addText("방어도 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
-            } else {
-                addText("-", new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
             }
 
             textPosition.offset(0, 30);
             int shrineBonusAttackSpeed = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED);
             int shrineBonusHealPower = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER);
             if (shrineBonusAttackSpeed != 0 || shrineBonusHealPower != 0) {
-                addText("공격 속도 " + ((offensiveBonus > 0) ? "+" : "") + shrineBonusAttackSpeed,
+                addText("공격 속도 " + ((offensiveBonus < 0) ? "+" : "") + (-shrineBonusAttackSpeed),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
@@ -663,7 +670,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 addText("치유량 " + ((defensiveBonus > 0) ? "+" : "") + shrineBonusHealPower,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
-            } else {
+            }
+
+            if (offensiveBonus == 0 && defensiveBonus == 0 && shrineBonusAttackSpeed == 0 &&
+                    shrineBonusHealPower == 0) {
                 addText("-", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
