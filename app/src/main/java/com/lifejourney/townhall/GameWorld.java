@@ -3,6 +3,7 @@ package com.lifejourney.townhall;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Rect;
+import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class GameWorld extends World
         // Set FPS
         setDesiredFPS(20.0f);
 
-        // Init singleton
+        // Init singleton enum
         Upgradable.reset();
 
         // Build map
@@ -87,32 +88,44 @@ public class GameWorld extends World
         newsBar.show();
         addWidget(newsBar);
 
+        // Set audio configuration
+        Engine2D engine2D = Engine2D.GetInstance();
+        boolean musicEnabled = engine2D.loadPreference(
+                        engine2D.getString(R.string.music_enable), 1) == 1;
+        boolean soundEffectEnabled = engine2D.loadPreference(
+                        engine2D.getString(R.string.sound_effect_enable), 1) == 1;
+        engine2D.enableMusic(musicEnabled);
+        engine2D.enableSoundEffect(soundEffectEnabled);
+
+        ResourceManager resourceManager = engine2D.getResourceManager();
+
         // Play BGM
-        Engine2D.GetInstance().getResourceManager().addMusic(R.raw.town_theme);
-        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
+        resourceManager.addMusic(R.raw.town_theme);
+        engine2D.playMusic(MUSIC_VOLUME);
 
         // Load sound effect
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("click3", R.raw.click3);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("click5", R.raw.click5);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("levelup", R.raw.rise01);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("arrow", R.raw.metal_small2);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("coin1", R.raw.coin1);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("heal", R.raw.flame);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("sword1", R.raw.sword_unsheathe1);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("sword2", R.raw.sword_unsheathe2);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("sword3", R.raw.sword_unsheathe3);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit1", R.raw.hit1);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit2", R.raw.hit2);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit3", R.raw.hit3);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit4", R.raw.hit4);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("hit5", R.raw.hit5);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("die1", R.raw.die1);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("trot", R.raw.trot);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("villager", R.raw.ready);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("raiders", R.raw.ogre3);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("viking", R.raw.ogre1);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("rebel", R.raw.shade3);
-        Engine2D.GetInstance().getResourceManager().loadSoundEffect("move", R.raw.war_go_go_go);
+        resourceManager.loadSoundEffect("click3", R.raw.click3);
+        resourceManager.loadSoundEffect("click5", R.raw.click5);
+        resourceManager.loadSoundEffect("levelup", R.raw.rise01);
+        resourceManager.loadSoundEffect("news", R.raw.rise02);
+        resourceManager.loadSoundEffect("arrow", R.raw.metal_small2);
+        resourceManager.loadSoundEffect("coin1", R.raw.coin1);
+        resourceManager.loadSoundEffect("heal", R.raw.flame);
+        resourceManager.loadSoundEffect("sword1", R.raw.sword_unsheathe1);
+        resourceManager.loadSoundEffect("sword2", R.raw.sword_unsheathe2);
+        resourceManager.loadSoundEffect("sword3", R.raw.sword_unsheathe3);
+        resourceManager.loadSoundEffect("hit1", R.raw.hit1);
+        resourceManager.loadSoundEffect("hit2", R.raw.hit2);
+        resourceManager.loadSoundEffect("hit3", R.raw.hit3);
+        resourceManager.loadSoundEffect("hit4", R.raw.hit4);
+        resourceManager.loadSoundEffect("hit5", R.raw.hit5);
+        resourceManager.loadSoundEffect("die1", R.raw.die1);
+        resourceManager.loadSoundEffect("trot", R.raw.trot);
+        resourceManager.loadSoundEffect("villager", R.raw.ready);
+        resourceManager.loadSoundEffect("raiders", R.raw.ogre3);
+        resourceManager.loadSoundEffect("viking", R.raw.ogre1);
+        resourceManager.loadSoundEffect("rebel", R.raw.shade3);
+        resourceManager.loadSoundEffect("move", R.raw.war_go_go_go);
     }
 
     /**

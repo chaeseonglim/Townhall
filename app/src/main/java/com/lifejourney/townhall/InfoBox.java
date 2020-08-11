@@ -320,112 +320,104 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addText("시설", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        if (territory.getTerrain().facilitySlots() == 0) {
+        if (territory.getTerrain().facilitySlots() == 0 ||
+                territory.getFaction() != Tribe.Faction.VILLAGER) {
             textPosition.offset(0, 30);
             addText("개발 불가", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         } else {
-            int facilityCount = 0;
-            if (territory.getFacilityLevel(Territory.Facility.FARM) > 0) {
-                facilityCount++;
-                textPosition.offset(0, 30);
-                addText("농장 Lv." + territory.getFacilityLevel(Territory.Facility.FARM),
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-            }
-            if (territory.getFacilityLevel(Territory.Facility.MARKET) > 0) {
-                facilityCount++;
-                textPosition.offset(0, 30);
-                addText("시장 Lv." + territory.getFacilityLevel(Territory.Facility.MARKET),
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-            }
-            if (territory.getFacilityLevel(Territory.Facility.DOWNTOWN) > 0) {
-                facilityCount++;
-                textPosition.offset(0, 30);
-                addText("마을 Lv." + territory.getFacilityLevel(Territory.Facility.DOWNTOWN),
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-            }
-            if (territory.getFacilityLevel(Territory.Facility.FORTRESS) > 0) {
-                facilityCount++;
-                textPosition.offset(0, 30);
-                addText("요새 Lv." + territory.getFacilityLevel(Territory.Facility.FORTRESS),
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-            }
-            if (facilityCount == 0) {
-                textPosition.offset(0, 30);
-                addText("없음",
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-            }
-
             // Development buttons
-            if (territory.getFaction() == Tribe.Faction.VILLAGER) {
-                textPosition.offset(0, 30);
-                addText("개발 방향",
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(255, 255, 0));
-
-                if (farmDevelopmentButton != null) {
-                    farmDevelopmentButton.close();
-                    removeWidget(farmDevelopmentButton);
-                }
-                Rect developmentButtonRegion =
-                        new Rect(region.left() + 22, region.top() + (int)textPosition.y + 219,
-                                64, 64);
-                farmDevelopmentButton =
-                        new Button.Builder(this,  developmentButtonRegion.clone())
-                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
-                                .build();
-                farmDevelopmentButton.setImageSpriteSet(
-                        territory.getDevelopmentPolicy(Territory.Facility.FARM).ordinal());
-                addWidget(farmDevelopmentButton);
-
-                if (marketDevelopmentButton != null) {
-                    marketDevelopmentButton.close();
-                    removeWidget(marketDevelopmentButton);
-                }
-                developmentButtonRegion.offset(73, 0);
-                marketDevelopmentButton =
-                        new Button.Builder(this, developmentButtonRegion.clone())
-                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
-                                .build();
-                marketDevelopmentButton.setImageSpriteSet(
-                        territory.getDevelopmentPolicy(Territory.Facility.MARKET).ordinal() + 3);
-                addWidget(marketDevelopmentButton);
-
-                if (downtownDevelopmentButton != null) {
-                    downtownDevelopmentButton.close();
-                    removeWidget(downtownDevelopmentButton);
-                }
-                developmentButtonRegion.offset(73, 0);
-                downtownDevelopmentButton =
-                        new Button.Builder(this, developmentButtonRegion.clone())
-                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
-                                .build();
-                downtownDevelopmentButton.setImageSpriteSet(
-                        territory.getDevelopmentPolicy(Territory.Facility.DOWNTOWN).ordinal() + 6);
-                addWidget(downtownDevelopmentButton);
-
-                if (fortressDevelopmentButton != null) {
-                    fortressDevelopmentButton.close();
-                    removeWidget(fortressDevelopmentButton);
-                }
-                developmentButtonRegion.offset(73, 0);
-                fortressDevelopmentButton =
-                        new Button.Builder(this, developmentButtonRegion.clone())
-                                .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
-                                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
-                                .build();
-                fortressDevelopmentButton.setImageSpriteSet(
-                        territory.getDevelopmentPolicy(Territory.Facility.FORTRESS).ordinal() + 9);
-                addWidget(fortressDevelopmentButton);
+            if (farmDevelopmentButton != null) {
+                farmDevelopmentButton.close();
+                removeWidget(farmDevelopmentButton);
             }
+            Rect developmentButtonRegion =
+                    new Rect(region.left() + 22, region.top() + (int)textPosition.y + 219,
+                            64, 64);
+            farmDevelopmentButton =
+                    new Button.Builder(this,  developmentButtonRegion.clone())
+                            .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                            .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
+                            .build();
+            farmDevelopmentButton.setImageSpriteSet(
+                    territory.getDevelopmentPolicy(Territory.Facility.FARM).ordinal());
+            addWidget(farmDevelopmentButton);
+
+            if (marketDevelopmentButton != null) {
+                marketDevelopmentButton.close();
+                removeWidget(marketDevelopmentButton);
+            }
+            developmentButtonRegion.offset(73, 0);
+            marketDevelopmentButton =
+                    new Button.Builder(this, developmentButtonRegion.clone())
+                            .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                            .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
+                            .build();
+            marketDevelopmentButton.setImageSpriteSet(
+                    territory.getDevelopmentPolicy(Territory.Facility.MARKET).ordinal() + 3);
+            addWidget(marketDevelopmentButton);
+
+            if (downtownDevelopmentButton != null) {
+                downtownDevelopmentButton.close();
+                removeWidget(downtownDevelopmentButton);
+            }
+            developmentButtonRegion.offset(73, 0);
+            downtownDevelopmentButton =
+                    new Button.Builder(this, developmentButtonRegion.clone())
+                            .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                            .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
+                            .build();
+            downtownDevelopmentButton.setImageSpriteSet(
+                    territory.getDevelopmentPolicy(Territory.Facility.DOWNTOWN).ordinal() + 6);
+            addWidget(downtownDevelopmentButton);
+
+            if (fortressDevelopmentButton != null) {
+                fortressDevelopmentButton.close();
+                removeWidget(fortressDevelopmentButton);
+            }
+            developmentButtonRegion.offset(73, 0);
+            fortressDevelopmentButton =
+                    new Button.Builder(this, developmentButtonRegion.clone())
+                            .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
+                            .fontSize(25).layer(layer + 1).fontColor(Color.rgb(255, 255, 0))
+                            .build();
+            fortressDevelopmentButton.setImageSpriteSet(
+                    territory.getDevelopmentPolicy(Territory.Facility.FORTRESS).ordinal() + 9);
+            addWidget(fortressDevelopmentButton);
+
+            textPosition.offset(4, 100);
+            addText("농장",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(73, 0);
+            addText("시장",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(73, 0);
+            addText("마을",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(73, 0);
+            addText("요새",
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+
+            textPosition.offset(-73*3, 30);
+            addText("Lv." + territory.getFacilityLevel(Territory.Facility.FARM),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(73, 0);
+            addText("Lv." + territory.getFacilityLevel(Territory.Facility.MARKET),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(73, 0);
+            addText("Lv." + territory.getFacilityLevel(Territory.Facility.DOWNTOWN),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(73, 0);
+            addText("Lv." + territory.getFacilityLevel(Territory.Facility.FORTRESS),
+                    new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
         }
 
         if (territory.getFaction() == Tribe.Faction.VILLAGER) {
@@ -435,7 +427,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((territory.getPopulation()==0)?"-": territory.getPopulation() + "",
+            addText(territory.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -445,7 +437,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText((territory.getTax()==0)?"-": territory.getTax() + "",
+            addText(territory.getTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -617,7 +609,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         // Stats
         if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             textPosition.setTo(100, -155);
-            addText("인구", new SizeF(150, 40), textPosition.clone(),
+            addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
             textPosition.offset(0, 30);
@@ -644,24 +636,37 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("보너스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
-            textPosition.offset(0, 30);
             int offensiveBonus = squad.getOffensiveBonusFromTerritory();
             int defensiveBonus = squad.getDefensiveBonusFromTerritory();
             if (offensiveBonus != 0 || defensiveBonus != 0) {
-                addText("공격력 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
+                textPosition.offset(0, 30);
+                if (offensiveBonus == 0) {
+                    addText("공격력 -",
+                            new SizeF(150, 40), textPosition.clone(),
+                            Color.rgb(230, 230, 230));
+
+                } else {
+                    addText("공격력 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
+                            new SizeF(150, 40), textPosition.clone(),
+                            Color.rgb(230, 230, 230));
+                }
 
                 textPosition.offset(150, 0);
-                addText("방어도 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
+                if (defensiveBonus == 0) {
+                    addText("방어도 -",
+                            new SizeF(150, 40), textPosition.clone(),
+                            Color.rgb(230, 230, 230));
+                } else {
+                    addText("방어도 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
+                            new SizeF(150, 40), textPosition.clone(),
+                            Color.rgb(230, 230, 230));
+                }
             }
 
-            textPosition.offset(0, 30);
             int shrineBonusAttackSpeed = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED);
             int shrineBonusHealPower = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER);
             if (shrineBonusAttackSpeed != 0 || shrineBonusHealPower != 0) {
+                textPosition.offset(0, 30);
                 addText("공격 속도 " + ((offensiveBonus < 0) ? "+" : "") + (-shrineBonusAttackSpeed),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
@@ -674,6 +679,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             if (offensiveBonus == 0 && defensiveBonus == 0 && shrineBonusAttackSpeed == 0 &&
                     shrineBonusHealPower == 0) {
+                textPosition.offset(0, 30);
                 addText("-", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }

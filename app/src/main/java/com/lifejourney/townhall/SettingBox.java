@@ -50,10 +50,10 @@ public class SettingBox extends Widget implements Button.Event {
         addWidget(closeButton);
 
         // Music button
-        Rect musicButtonRegion = new Rect(getRegion().left() + 240, getRegion().top() + 45,
+        Rect musicButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 52,
                 56, 60);
         musicButton = new Button.Builder(this, musicButtonRegion)
-                .imageSpriteAsset("music_setting_btn.png").numImageSpriteSet(2)
+                .imageSpriteAsset("music_setting_btn.png").numImageSpriteSet(4)
                 .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         if (Engine2D.GetInstance().isMusicEnabled()) {
@@ -63,25 +63,25 @@ public class SettingBox extends Widget implements Button.Event {
         }
         addWidget(musicButton);
 
-        PointF textPosition = new PointF(-40, -75);
+        PointF textPosition = new PointF(15, -70);
         addText("음악 On/Off", new SizeF(160, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Sound Effect button
-        Rect soundEffectButtonRegion = new Rect(getRegion().left() + 240, getRegion().top() + 125,
+        Rect soundEffectButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 125,
                 56, 60);
         soundEffectButton = new Button.Builder(this, soundEffectButtonRegion)
-                .imageSpriteAsset("music_setting_btn.png").numImageSpriteSet(2)
+                .imageSpriteAsset("music_setting_btn.png").numImageSpriteSet(4)
                 .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
                 .build();
         if (Engine2D.GetInstance().isSoundEffectEnabled()) {
-            soundEffectButton.setImageSpriteSet(0);
+            soundEffectButton.setImageSpriteSet(2);
         } else {
-            soundEffectButton.setImageSpriteSet(1);
+            soundEffectButton.setImageSpriteSet(3);
         }
         addWidget(soundEffectButton);
 
-        textPosition = new PointF(-40, 3);
+        textPosition = new PointF(15, 3);
         addText("효과음 On/Off", new SizeF(160, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
     }
@@ -98,7 +98,7 @@ public class SettingBox extends Widget implements Button.Event {
         addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .fontName("NanumBarunGothic.ttf")
-                .textAlign(Paint.Align.RIGHT)
+                .textAlign(Paint.Align.LEFT)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());
@@ -130,22 +130,18 @@ public class SettingBox extends Widget implements Button.Event {
             eventHandler.onSettingBoxClosed(this);
         } else if (button == musicButton) {
             // Music button
-            if (Engine2D.GetInstance().isMusicEnabled()) {
-                Engine2D.GetInstance().enableMusic(false);
-                musicButton.setImageSpriteSet(1);
-            } else {
-                Engine2D.GetInstance().enableMusic(true);
-                musicButton.setImageSpriteSet(0);
-            }
+            Engine2D engine2D = Engine2D.GetInstance();
+            engine2D.enableMusic(!engine2D.isMusicEnabled());
+            engine2D.savePreference(engine2D.getString(R.string.music_enable),
+                    engine2D.isMusicEnabled()?1:0);
+            musicButton.setImageSpriteSet(engine2D.isMusicEnabled()?0:1);
         } else if (button == soundEffectButton) {
             // Sound effect button
-            if (Engine2D.GetInstance().isSoundEffectEnabled()) {
-                Engine2D.GetInstance().enableSoundEffect(false);
-                soundEffectButton.setImageSpriteSet(1);
-            } else {
-                Engine2D.GetInstance().enableSoundEffect(true);
-                soundEffectButton.setImageSpriteSet(0);
-            }
+            Engine2D engine2D = Engine2D.GetInstance();
+            engine2D.enableSoundEffect(!engine2D.isSoundEffectEnabled());
+            engine2D.savePreference(engine2D.getString(R.string.sound_effect_enable),
+                    engine2D.isSoundEffectEnabled()?1:0);
+            soundEffectButton.setImageSpriteSet(engine2D.isSoundEffectEnabled()?2:3);
         }
     }
 

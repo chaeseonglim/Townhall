@@ -161,6 +161,7 @@ public abstract class HostileTribe extends Tribe {
                 if (upgradable.getLevel(getFaction()) < 3 && Math.random() > 0.5f) {
                     upgradable.setLevel(getFaction(), upgradable.getLevel(getFaction()) + 1);
                     getEventHandler().onTribeUpgraded(this, upgradable);
+                    break;
                 }
             }
             upgradingProgressive -= UPGRADING_PROGRESSIVE_THRESHOLD;

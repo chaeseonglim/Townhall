@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -22,12 +23,12 @@ public class NewsBar extends Widget {
 
         super(region, layer, depth);
 
-        Sprite background = new Sprite.Builder("news_bar.png")
+        backgroundSprite = new Sprite.Builder("news_bar.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).depth(0.0f)
-                .gridSize(1, 1)
+                .gridSize(2, 1)
                 .layer(20).visible(false).build();
-        addSprite(background);
+        addSprite(backgroundSprite);
 
         textSprite = new TextSprite.Builder("dateText", "안녕하세요. 마을 주민들이 당신에게 인사합니다!", 26)
                 .fontColor(Color.rgb(230, 230, 230))
@@ -61,6 +62,15 @@ public class NewsBar extends Widget {
                 textSprite.setText(news);
                 emptyHoldCount = 0;
                 show();
+
+                Engine2D.GetInstance().playSoundEffect("news", 1.0f);
+
+                backgroundSprite.setAnimationWrap(false);
+                backgroundSprite.clearAnimation();
+                backgroundSprite.addAnimationFrame(1, 0, 5);
+                backgroundSprite.addAnimationFrame(0, 0, 5);
+                backgroundSprite.addAnimationFrame(1, 0, 5);
+                backgroundSprite.addAnimationFrame(0, 0, 5);
             }
             updateTimeLeft = NEWS_UPDATE_PERIOD;
         }
@@ -83,11 +93,12 @@ public class NewsBar extends Widget {
     }
 
     private static final int NEWS_UPDATE_PERIOD = 60;
-    private static final int EMPTY_HOLD_COUNT = 3;
+    private static final int EMPTY_HOLD_COUNT = 2;
     private static final int NEWS_LIST_MAX_SIZE = 5;
 
     private int updateTimeLeft = NEWS_UPDATE_PERIOD;
     private int emptyHoldCount = 0;
+    private Sprite backgroundSprite;
     private TextSprite textSprite;
     private Queue<String> newsList = new LinkedList<>();
 }
