@@ -462,7 +462,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             }
         } else {
             textPosition.setTo(100, -155);
-            addText("방어도",
+            addText("지역 방어도",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
