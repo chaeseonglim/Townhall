@@ -98,26 +98,12 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
     /**
      *
-     * @param text
-     * @param size
-     * @param position
-     * @param fontColor
      */
-    private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
-                .textAlign(Paint.Align.LEFT)
-                .size(size).positionOffset(position)
-                .smooth(true).depth(0.1f)
-                .layer(getLayer()+1).visible(false).build());
-    }
-
     private void updateUnitInfo() {
 
         // Remove all previous texts
         removeSprites("text"+textIndex++);
+        removeSprites("icon");
 
         if (selectedUnitClass != null) {
             // Unit Class
@@ -130,87 +116,114 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Population
             textPosition.offset(150, -30);
-            addText("인구", new SizeF(150, 40), textPosition.clone(),
+            addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("people.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText(selectedUnitClass.population()+"", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Purchase gold
-            textPosition.offset(-150, 30);
+            textPosition.offset(-180, 30);
             addText("구매 비용", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText(selectedUnitClass.costToPurchase()+"", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Upkeep gold
-            textPosition.offset(150, -30);
+            textPosition.offset(120, -30);
             addText("유지 비용", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText(selectedUnitClass.costUpkeep()+"", new SizeF(150, 40),
                     textPosition.clone(), Color.rgb(230, 230, 230));
 
             // Health
-            textPosition.offset(-150, 30);
+            textPosition.offset(-180, 30);
             addText("체력", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("health.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText((int)selectedUnitClass.health() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Velocity
-            textPosition.offset(150, -30);
+            textPosition.offset(120, -30);
             addText("이동 속도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("speed.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText((int)(selectedUnitClass.maxVelocity() * 10) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
-
             if (selectedUnitClass.unitClassType() == Unit.UnitClassType.MELEE_HEALER ||
                 selectedUnitClass.unitClassType() == Unit.UnitClassType.RANGED_HEALER) {
                 // Heal power
-                textPosition.offset(-150, 30);
+                textPosition.offset(-180, 30);
                 addText("치유력", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(0, 30);
+                textPosition.offset(-65, 30);
+                addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(95, 0);
                 String healPowerString = (selectedUnitClass.healPower() == 0.0f) ?
                         "-" : (int) selectedUnitClass.healPower() + "";
                 addText(healPowerString, new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
                 // Heal speed
-                textPosition.offset(150, -30);
+                textPosition.offset(120, -30);
                 addText("치유 속도", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(0, 30);
+                textPosition.offset(-65, 30);
+                addIcon("heal_speed.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(95, 0);
                 String healSpeedString = (selectedUnitClass.healSpeed() == 0)?
                         "-" : 100 / selectedUnitClass.healSpeed() + "";
                 addText(healSpeedString, new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             } else {
                 // Attack damage
-                textPosition.offset(-150, 30);
+                textPosition.offset(-180, 30);
                 addText("공격력", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(0, 30);
-                String attackDamageString =
+                textPosition.offset(-65, 30);
+                addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(35, 0);
+                addIcon("ranged_attack.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(53, 0);
+                addText("/", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+                textPosition.offset(42, 0);
+                String meleeAttackDamageString =
                         ((selectedUnitClass.meleeAttackDamage() == 0.0f) ?
                                 "-" : (int) selectedUnitClass.meleeAttackDamage()) + "/" +
                                 ((selectedUnitClass.rangedAttackDamage() == 0.0f) ?
                                         "-" : (int) selectedUnitClass.rangedAttackDamage());
-                addText(attackDamageString, new SizeF(150, 40), textPosition.clone(),
+                addText(meleeAttackDamageString, new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
                 // Attack speed
-                textPosition.offset(150, -30);
+                textPosition.offset(85, -30);
                 addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(0, 30);
+                textPosition.offset(-65, 30);
+                addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(35, 0);
+                addIcon("ranged_attack_speed.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(53, 0);
+                addText("/", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+                textPosition.offset(42, 0);
                 String attackSpeedString =
                         ((selectedUnitClass.meleeAttackSpeed() == 0) ?
                                 "-" : 100 / selectedUnitClass.meleeAttackSpeed()) + "/" +
@@ -218,27 +231,37 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                                         "-" : 100 / selectedUnitClass.rangedAttackSpeed());
                 addText(attackSpeedString, new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
+                textPosition.offset(-35, 0);
             }
 
             // Armor
-            textPosition.offset(-150, 30);
+            textPosition.offset(-180, 30);
             addText("방어도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText((selectedUnitClass.armor() == 0.0f)?"-":(int)selectedUnitClass.armor() + "%",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Evasion
-            textPosition.offset(150, -30);
+            textPosition.offset(120, -30);
             addText("회피", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("evade.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(35, 0);
+            addIcon("ranged_evade.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(53, 0);
+            addText("/", new SizeF(150, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230));
+            textPosition.offset(42, 0);
             String evasionString =
                     ((selectedUnitClass.meleeEvasion() == 0) ?
-                    "-":(int)selectedUnitClass.meleeEvasion()+"%") + "/" +
+                    "-":(int)selectedUnitClass.meleeEvasion()) + "/" +
                     ((selectedUnitClass.rangedEvasion() == 0) ?
-                    "-":(int)selectedUnitClass.rangedEvasion()+"%");
+                    "-":(int)selectedUnitClass.rangedEvasion()) + "%";
             addText(evasionString, new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
@@ -338,6 +361,39 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             updateUnitInfo();
         }
+    }
+
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addText(String text, SizeF size, PointF position, int fontColor) {
+
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(Paint.Align.LEFT)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param asset
+     * @param size
+     * @param position
+     */
+    private void addIcon(String asset, SizeF size, PointF position) {
+
+        addSprite(new Sprite.Builder("icon", asset)
+                .size(size).positionOffset(position)
+                .smooth(false).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
     }
 
     private Event eventHandler;

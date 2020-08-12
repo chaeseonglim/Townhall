@@ -102,24 +102,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
     /**
      *
-     * @param text
-     * @param size
-     * @param position
-     * @param fontColor
-     */
-    private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text", text, 24)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
-                .textAlign(Paint.Align.LEFT)
-                .size(size).positionOffset(position)
-                .smooth(true).depth(0.1f)
-                .layer(getLayer()+1).visible(false).build());
-    }
-
-    /**
-     *
      * @param event
      * @return
      */
@@ -178,12 +160,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                             (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
             territory.setDevelopmentPolicy(Territory.Facility.FORTRESS, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 9);
-        } else if (button == recruitingButtons[0] ||
-                button == recruitingButtons[1] ||
-                button == recruitingButtons[2]) {
+        } else if (button == unitButtons[0] ||
+                button == unitButtons[1] ||
+                button == unitButtons[2]) {
 
             for (int i = 0;; ++i) {
-                if (button == recruitingButtons[i]) {
+                if (button == unitButtons[i]) {
                     recruitingSlot = i;
                     break;
                 }
@@ -229,21 +211,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
     /**
      *
-     * @param replacementUnitClass
-     */
-    private void popupUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
-
-        Rect unitSelectBoxRegion = getRegion().clone();
-        unitSelectBoxRegion.y -= 10;
-        unitSelectBoxRegion.height += 20;
-        UnitSelectionBox unitSelectionBox = new UnitSelectionBox(this, villager,
-                replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
-        addWidget(unitSelectionBox);
-        unitSelectionBox.show();
-    }
-
-    /**
-     *
      * @param infoBox
      * @param unitClass
      */
@@ -278,10 +245,11 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         int layer = getLayer();
 
         removeSprites("text");
+        removeSprites("icon");
 
         // Tile type
         PointF textPosition = new PointF(-250, -155);
-        addText("타일", new SizeF(150, 40), textPosition.clone(),
+        addText("지형", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
@@ -301,7 +269,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addText("상태", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        String status = "-";
+        String status = "없음";
         if (territory.getBattle() != null) {
             status = "전투중";
         } else if (territory.isOccupying()) {
@@ -323,7 +291,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         if (territory.getTerrain().facilitySlots() == 0 ||
                 territory.getFaction() != Tribe.Faction.VILLAGER) {
             textPosition.offset(0, 30);
-            addText("개발 불가", new SizeF(150, 40), textPosition.clone(),
+            addText("없음", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         } else {
             // Development buttons
@@ -385,87 +353,95 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     territory.getDevelopmentPolicy(Territory.Facility.FORTRESS).ordinal() + 9);
             addWidget(fortressDevelopmentButton);
 
-            textPosition.offset(4, 100);
-            addText("농장",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+            textPosition.offset(-46, 100);
+            addText("농장", new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
             textPosition.offset(73, 0);
-            addText("시장",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+            addText("시장", new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
             textPosition.offset(73, 0);
-            addText("마을",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+            addText("마을", new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
             textPosition.offset(73, 0);
-            addText("요새",
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+            addText("요새", new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
 
             textPosition.offset(-73*3, 30);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.FARM),
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+                    new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
             textPosition.offset(73, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.MARKET),
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+                    new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
             textPosition.offset(73, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.DOWNTOWN),
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+                    new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
             textPosition.offset(73, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.FORTRESS),
-                    new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+                    new SizeF(100, 40), textPosition.clone(),
+                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
         }
 
         if (territory.getFaction() == Tribe.Faction.VILLAGER) {
             // Population
             textPosition.setTo(100, -155);
-            addText("인구",
-                    new SizeF(150, 40), textPosition.clone(),
+            addText("인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("people.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText(territory.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Income
-            textPosition.offset(150, -30);
-            addText("수입",
-                    new SizeF(150, 40), textPosition.clone(),
+            textPosition.offset(150 - 30, -30);
+            addText("수입", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText(territory.getTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Happiness
-            textPosition.offset(-150, 30);
-            addText("행복도",
-                    new SizeF(150, 40), textPosition.clone(),
+            textPosition.offset(-180, 30);
+            addText("행복도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            if (territory.getHappiness() > 80) {
+                addIcon("very_happy.png", new SizeF(25, 25), textPosition.clone());
+            } else if (territory.getHappiness() > 60) {
+                addIcon("happy.png", new SizeF(25, 25), textPosition.clone());
+            } else if (territory.getHappiness() > 40) {
+                addIcon("soso.png", new SizeF(25, 25), textPosition.clone());
+            } else if (territory.getHappiness() > 20) {
+                addIcon("bad.png", new SizeF(25, 25), textPosition.clone());
+            } else {
+                addIcon("very_bad.png", new SizeF(25, 25), textPosition.clone());
+            }
+            textPosition.offset(95, 0);
             addText(territory.getHappiness() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Defense
-            textPosition.offset(150, -30);
-            addText("방어도",
-                    new SizeF(150, 40), textPosition.clone(),
+            textPosition.offset(120, -30);
+            addText("방어도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
-            addText((territory.getDelta(Territory.DeltaAttribute.DEFENSIVE)==0)?
-                            "-" : territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
+            textPosition.offset(-65, 30);
+            addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
+            addText(territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
             // Bonus
-            textPosition.offset(-150, 30);
-            addText("보너스",
-                    new SizeF(150, 40), textPosition.clone(),
+            textPosition.offset(-180, 30);
+            addText("보너스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
             boolean isSquadWorking = false;
@@ -476,21 +452,22 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 }
             }
             if (isSquadWorking) {
-                addText("개발 속도(일꾼)",
+                addText("일꾼 개발",
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             } else {
-                addText("-",
+                addText("없음",
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
         } else {
-            // Bonus
             textPosition.setTo(100, -155);
             addText("방어도",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText((territory.getDelta(Territory.DeltaAttribute.DEFENSIVE)==0)?
                             "-" : territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
@@ -499,19 +476,23 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         }
     }
 
+    /**
+     *
+     */
     private void updateSquadInfo() {
 
         Rect region = getRegion();
         int layer = getLayer();
 
         removeSprites("text");
+        removeSprites("icon");
 
         PointF textPosition = new PointF(-250, -155);
         addText("소속", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(0, 30);
-        addText(squad.getFaction().toGameString() + " 부대", new SizeF(150, 40),
+        addText(squad.getFaction().toGameString(), new SizeF(150, 40),
                 textPosition.clone(), Color.rgb(230, 230, 230));
 
         // Status
@@ -559,50 +540,48 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         }
 
         if (squad.getFaction() == Tribe.Faction.VILLAGER) {
-            // Recruiting
-            textPosition.offset(-75, 30);
-            addText("모집", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
-
-            if (!squad.isMoving() &&
-                    !squad.isSupporting() &&
-                    !squad.isOccupying() &&
-                    !squad.isFighting()) {
-                Rect recruitingButtonRegion =
-                        new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
-                                60, 64);
-                for (int i = 0; i < 3; ++i) {
-                    if (recruitingButtons[i] != null) {
-                        recruitingButtons[i].close();
-                        removeWidget(recruitingButtons[i]);
-                    }
-                    if (squad.getUnits().size() >= i) {
-                        recruitingButtons[i] =
-                                new Button.Builder(this, recruitingButtonRegion.clone())
-                                        .imageSpriteAsset("unit_recruiting_btn.png")
-                                        .numImageSpriteSet(Unit.UnitClass.values().length + 1)
-                                        .layer(layer + 1).build();
-                        recruitingButtons[i].setImageSpriteSet((squad.getUnits().size() < (i + 1)) ?
-                                0 : squad.getUnits().get(i).getUnitClass().ordinal() + 1);
-                        addWidget(recruitingButtons[i]);
-                    } else {
-                        recruitingButtons[i] =
-                                new Button.Builder(this, recruitingButtonRegion.clone())
-                                        .imageSpriteAsset("unit_recruiting_btn.png")
-                                        .numImageSpriteSet(Unit.UnitClass.values().length + 1)
-                                        .layer(layer + 1).build();
-                        recruitingButtons[i].setImageSpriteSet((squad.getUnits().size() < (i + 1)) ?
-                                0 : squad.getUnits().get(i).getUnitClass().ordinal() + 1);
-                        recruitingButtons[i].disable();
-                        addWidget(recruitingButtons[i]);
-                    }
-
-                    recruitingButtonRegion.offset(69, 0);
+            // Unit buttons
+            Rect unitButtonRegion =
+                    new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
+                            60, 64);
+            for (int i = 0; i < 3; ++i) {
+                if (unitButtons[i] != null) {
+                    unitButtons[i].close();
+                    removeWidget(unitButtons[i]);
                 }
-            } else {
-                textPosition.offset(0, 30);
-                addText("모집 불가", new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
+                if (squad.getUnits().size() > i) {
+                    unitButtons[i] =
+                            new Button.Builder(this, unitButtonRegion.clone())
+                                    .imageSpriteAsset("unit_recruiting_btn.png")
+                                    .numImageSpriteSet(Unit.UnitClass.values().length + 1)
+                                    .layer(layer + 1).build();
+                    unitButtons[i].setImageSpriteSet(squad.getUnits().get(i).getUnitClass().ordinal() + 1);
+                    addWidget(unitButtons[i]);
+                } else if (squad.getUnits().size() == i) {
+                    unitButtons[i] =
+                            new Button.Builder(this, unitButtonRegion.clone())
+                                    .imageSpriteAsset("unit_recruiting_btn.png")
+                                    .numImageSpriteSet(Unit.UnitClass.values().length + 1)
+                                    .layer(layer + 1).build();
+                    unitButtons[i].setImageSpriteSet(0);
+                    if (squad.isMoving() || squad.isSupporting() || squad.isOccupying() ||
+                            squad.isFighting()) {
+                        unitButtons[i].disable();
+                    }
+                    addWidget(unitButtons[i]);
+                } else
+                {
+                    unitButtons[i] =
+                            new Button.Builder(this, unitButtonRegion.clone())
+                                    .imageSpriteAsset("unit_recruiting_btn.png")
+                                    .numImageSpriteSet(Unit.UnitClass.values().length + 1)
+                                    .layer(layer + 1).build();
+                    unitButtons[i].setImageSpriteSet(0);
+                    unitButtons[i].disable();
+                    addWidget(unitButtons[i]);
+                }
+
+                unitButtonRegion.offset(69, 0);
             }
         }
 
@@ -611,17 +590,19 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.setTo(100, -155);
             addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("people.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText((squad.getPopulation() == 0) ? "-" : squad.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
-            textPosition.offset(150, -30);
+            textPosition.offset(120, -30);
             addText("유지비", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText((squad.getUpkeep() == 0) ? "-" : squad.getUpkeep() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
@@ -629,62 +610,128 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         if (squad.getUnits().size() > 0) {
             if (squad.getFaction() == Tribe.Faction.VILLAGER) {
-                textPosition.offset(-150, 30);
+                textPosition.offset(-180, 30);
             } else {
                 textPosition.setTo(100, -155);
             }
             addText("보너스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
-            int offensiveBonus = squad.getOffensiveBonusFromTerritory();
-            int defensiveBonus = squad.getDefensiveBonusFromTerritory();
-            if (offensiveBonus != 0 || defensiveBonus != 0) {
-                textPosition.offset(0, 30);
-                if (offensiveBonus == 0) {
-                    addText("공격력 -",
-                            new SizeF(150, 40), textPosition.clone(),
-                            Color.rgb(230, 230, 230));
+            textPosition.offset(30, 0);
 
-                } else {
-                    addText("공격력 " + ((offensiveBonus > 0) ? "+" : "") + offensiveBonus,
-                            new SizeF(150, 40), textPosition.clone(),
-                            Color.rgb(230, 230, 230));
-                }
-
-                textPosition.offset(150, 0);
-                if (defensiveBonus == 0) {
-                    addText("방어도 -",
-                            new SizeF(150, 40), textPosition.clone(),
-                            Color.rgb(230, 230, 230));
-                } else {
-                    addText("방어도 " + ((defensiveBonus > 0) ? "+" : "") + defensiveBonus,
-                            new SizeF(150, 40), textPosition.clone(),
-                            Color.rgb(230, 230, 230));
-                }
-            }
-
-            int shrineBonusAttackSpeed = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED);
-            int shrineBonusHealPower = squad.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER);
-            if (shrineBonusAttackSpeed != 0 || shrineBonusHealPower != 0) {
-                textPosition.offset(0, 30);
-                addText("공격 속도 " + ((offensiveBonus < 0) ? "+" : "") + (-shrineBonusAttackSpeed),
-                        new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-
-                textPosition.offset(150, 0);
-                addText("치유량 " + ((defensiveBonus > 0) ? "+" : "") + shrineBonusHealPower,
+            int attackDamageBonus = squad.getAttackDamageBonus();
+            if (attackDamageBonus != 0) {
+                textPosition.offset(-95, 30);
+                addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(95, 0);
+                addText("공격력 " + ((attackDamageBonus > 0) ? "+" : "") + attackDamageBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
 
-            if (offensiveBonus == 0 && defensiveBonus == 0 && shrineBonusAttackSpeed == 0 &&
-                    shrineBonusHealPower == 0) {
-                textPosition.offset(0, 30);
-                addText("-", new SizeF(150, 40), textPosition.clone(),
+            int attackSpeedBonus = squad.getAttackSpeedBonus();
+            if (attackSpeedBonus != 0) {
+                textPosition.offset(-95, 30);
+                addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(95, 0);
+                addText("공격 속도 " + ((attackSpeedBonus < 0) ? "+" : "") + (-attackSpeedBonus),
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+            }
+
+            int armorBonus = squad.getArmorBonus();
+            if (armorBonus != 0) {
+                textPosition.offset(-95, 30);
+                addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(95, 0);
+                addText("방어도 " + ((armorBonus>0)?"+":"") + armorBonus,
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+            }
+
+            int healPowerBonus = squad.getHealPowerBonus();
+            if (healPowerBonus != 0) {
+                textPosition.offset(-95, 30);
+                addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
+                textPosition.offset(95, 0);
+                addText("치유량 " + ((healPowerBonus>0)?"+":"") + healPowerBonus,
+                        new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(230, 230, 230));
+            }
+
+            if (attackDamageBonus == 0 && attackSpeedBonus == 0 && armorBonus == 0 && healPowerBonus == 0) {
+                textPosition.offset(-30, 30);
+                addText("없음", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
         }
     }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addText(String text, SizeF size, PointF position, int fontColor) {
+
+        addSprite(new TextSprite.Builder("text", text, 24)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(Paint.Align.LEFT)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addText(String text, SizeF size, PointF position, int fontColor, Paint.Align align) {
+
+        addSprite(new TextSprite.Builder("text", text, 24)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(align)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param asset
+     * @param size
+     * @param position
+     */
+    private void addIcon(String asset, SizeF size, PointF position) {
+
+        addSprite(new Sprite.Builder("icon", asset)
+                .size(size).positionOffset(position)
+                .smooth(false).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param replacementUnitClass
+     */
+    private void popupUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
+
+        Rect unitSelectBoxRegion = getRegion().clone();
+        unitSelectBoxRegion.y -= 10;
+        unitSelectBoxRegion.height += 20;
+        UnitSelectionBox unitSelectionBox = new UnitSelectionBox(this, villager,
+                replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
+        addWidget(unitSelectionBox);
+        unitSelectionBox.show();
+    }
+
 
     private Event eventHandler;
     private Villager villager;
@@ -696,7 +743,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     private Button downtownDevelopmentButton;
     private Button marketDevelopmentButton;
     private Button fortressDevelopmentButton;
-    private Button[] recruitingButtons = new Button[3];
+    private Button[] unitButtons = new Button[3];
     private MessageBox recruitingReplacementConfirmBox;
     private int recruitingSlot = 0;
 }

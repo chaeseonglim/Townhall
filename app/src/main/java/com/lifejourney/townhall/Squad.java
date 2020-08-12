@@ -254,10 +254,10 @@ public class Squad extends Object implements Controllable {
 
         // Set unit to bonus
         for (Unit unit: units) {
-            unit.setAttackDamageBonus(UNIT_BONUS_DELTA * getOffensiveBonusFromTerritory());
-            unit.setArmorBonus(UNIT_BONUS_DELTA * getDefensiveBonusFromTerritory());
-            unit.setAttackSpeedBonus(UNIT_BONUS_DELTA * shrineBonus[Tribe.ShrineBonus.UNIT_ATTACK_SPEED.ordinal()]);
-            unit.setHealPowerBonus(UNIT_BONUS_DELTA * shrineBonus[Tribe.ShrineBonus.UNIT_HEAL_POWER.ordinal()]);
+            unit.setAttackDamageBonus(UNIT_BONUS_DELTA * getAttackDamageBonus());
+            unit.setArmorBonus(UNIT_BONUS_DELTA * getArmorBonus());
+            unit.setAttackSpeedBonus(UNIT_BONUS_DELTA * getAttackSpeedBonus());
+            unit.setHealPowerBonus(UNIT_BONUS_DELTA * getHealPowerBonus());
         }
 
         if (!isFighting()) {
@@ -302,7 +302,39 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int getOffensiveBonusFromTerritory() {
+    public int getAttackDamageBonus() {
+        return getAttackDamageBonusFromTerritory();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getAttackSpeedBonus() {
+        return getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getArmorBonus() {
+        return getArmorBonusFromTerritory();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getHealPowerBonus() {
+        return getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getAttackDamageBonusFromTerritory() {
 
         Territory territory = map.getTerritory(getMapPosition());
         if (territory.getFaction() == faction) {
@@ -316,7 +348,7 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
-    public int getDefensiveBonusFromTerritory() {
+    public int getArmorBonusFromTerritory() {
 
         Territory territory = map.getTerritory(getMapPosition());
         if (territory.getFaction() == faction) {

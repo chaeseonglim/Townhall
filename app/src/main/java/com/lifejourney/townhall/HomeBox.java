@@ -67,24 +67,6 @@ public class HomeBox extends Widget implements Button.Event {
 
     /**
      *
-     * @param text
-     * @param size
-     * @param position
-     * @param fontColor
-     */
-    private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text", text, 24)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
-                .textAlign(Paint.Align.LEFT)
-                .size(size).positionOffset(position)
-                .smooth(true).depth(0.1f)
-                .layer(getLayer()+1).visible(false).build());
-    }
-
-    /**
-     *
      * @param event
      * @return
      */
@@ -120,48 +102,71 @@ public class HomeBox extends Widget implements Button.Event {
     private void updateVillageInfo() {
 
         removeSprites("text");
+        removeSprites("icon");
 
         // Population
         PointF textPosition = new PointF(-250, -155);
         addText("전체 인구", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
+        textPosition.offset(-65, 30);
+        addIcon("people.png", new SizeF(30, 30), textPosition.clone());
+        textPosition.offset(95, 0);
         addText(villager.getTotalPopulation()+"", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
-        textPosition.offset(150, -30);
+        textPosition.offset(120, -30);
         addText("인구 소모", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
-        addText("-" + villager.getWorkingPopulation(), new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+        textPosition.offset(-65, 30);
+        addIcon("people.png", new SizeF(30, 30), textPosition.clone());
+        textPosition.offset(95, 0);
+        addText((villager.getWorkingPopulation() == 0)? "-" : ("-" + villager.getWorkingPopulation()),
+                new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(230, 0, 0));
 
         // Income
-        textPosition.offset(-150, 30);
+        textPosition.offset(-180, 30);
         addText("골드 수입", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
+        textPosition.offset(-65, 30);
+        addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+        textPosition.offset(95, 0);
         addText(villager.getIncome() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Spend
-        textPosition.offset(150, -30);
+        textPosition.offset(120, -30);
         addText("골드 소비", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
-        addText("-" + villager.getSpend(), new SizeF(150, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+        textPosition.offset(-65, 30);
+        addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+        textPosition.offset(95, 0);
+        addText((villager.getSpend() == 0)? "-" : ("-" + villager.getSpend()),
+                new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(230, 0, 0));
 
         // Happiness
-        textPosition.offset(-150, 30);
+        textPosition.offset(-180, 30);
         addText("평균 행복도", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
+        textPosition.offset(-65, 30);
+        if (villager.getHappiness() > 80) {
+            addIcon("very_happy.png", new SizeF(25, 25), textPosition.clone());
+        } else if (villager.getHappiness() > 60) {
+            addIcon("happy.png", new SizeF(25, 25), textPosition.clone());
+        } else if (villager.getHappiness() > 40) {
+            addIcon("soso.png", new SizeF(25, 25), textPosition.clone());
+        } else if (villager.getHappiness() > 20) {
+            addIcon("bad.png", new SizeF(25, 25), textPosition.clone());
+        } else {
+            addIcon("very_bad.png", new SizeF(25, 25), textPosition.clone());
+        }
+        textPosition.offset(95, 0);
         addText(villager.getHappiness() + "", new SizeF(150, 40),
                 textPosition.clone(), Color.rgb(230, 230, 230));
 
@@ -170,52 +175,100 @@ public class HomeBox extends Widget implements Button.Event {
         addText("마을 수", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
+        textPosition.offset(-65, 30);
+        addIcon("territory.png", new SizeF(25, 25), textPosition.clone());
+        textPosition.offset(95, 0);
         addText(villager.getTerritories().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // The number of squads
-        textPosition.offset(150, -30);
+        textPosition.offset(120, -30);
         addText("부대 수", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
+        textPosition.offset(-65, 30);
+        addIcon("troop.png", new SizeF(25, 25), textPosition.clone());
+        textPosition.offset(95, 0);
         addText(villager.getSquads().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Occupying shrine
-        textPosition.offset(-150, 30);
+        textPosition.offset(-180, 30);
         addText("소유한 제단", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) != 0) {
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText("치유의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
+            textPosition.offset(-30, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) != 0) {
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText("바람의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
+            textPosition.offset(-30, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.TOWN_GOLD_BOOST) != 0) {
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+            textPosition.offset(95, 0);
             addText("풍요의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
+            textPosition.offset(-30, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.TOWN_POPULATION_BOOST) != 0) {
-            textPosition.offset(0, 30);
+            textPosition.offset(-65, 30);
+            addIcon("health.png", new SizeF(25, 25), textPosition.clone());
+            textPosition.offset(95, 0);
             addText("사랑의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
+            textPosition.offset(-30, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) == 0 &&
                 villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0 &&
                 villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0 &&
                 villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0) {
             textPosition.offset(0, 30);
-            addText("-", new SizeF(150, 40), textPosition.clone(),
+            addText("없음", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addText(String text, SizeF size, PointF position, int fontColor) {
+
+        addSprite(new TextSprite.Builder("text", text, 24)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(Paint.Align.LEFT)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param asset
+     * @param size
+     * @param position
+     */
+    private void addIcon(String asset, SizeF size, PointF position) {
+
+        addSprite(new Sprite.Builder("icon", asset)
+                .size(size).positionOffset(position)
+                .smooth(false).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
     }
 
     private Event eventHandler;

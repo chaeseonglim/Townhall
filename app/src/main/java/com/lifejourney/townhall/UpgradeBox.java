@@ -108,24 +108,6 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
     /**
      *
-     * @param text
-     * @param size
-     * @param position
-     * @param fontColor
-     */
-    private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text", text, 24)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
-                .textAlign(Paint.Align.LEFT)
-                .size(size).positionOffset(position)
-                .smooth(true).depth(0.1f)
-                .layer(getLayer()+1).visible(false).build());
-    }
-
-    /**
-     *
      * @param event
      * @return
      */
@@ -238,13 +220,14 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
         // Remove all previous texts
         removeSprites("text");
+        removeSprites("icon");
 
         if (selectedUnitClass != null) {
             backgroundSprite.setGridIndex(1, 0);
 
             for (int i = 0; i < 6; ++ i) {
                 Upgradable upgradable = Upgradable.values()[i+selectedUnitClass.ordinal()*6];
-                upgradableButtons[i].setMessage(upgradable.getTitle()+"\nlv."+
+                upgradableButtons[i].setMessage(upgradable.getTitle()+"\nLv."+
                         upgradable.getLevel(Tribe.Faction.VILLAGER));
                 int alpha = (upgradable == selectedUpgradable)? 1 : 0;
                 if (upgradable.getParent() == null ||
@@ -265,21 +248,25 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 textPosition.setTo(200, -190);
                 addText("구입비", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(0, 30);
+                textPosition.offset(-165, 30);
+                addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+                textPosition.offset(195, 0);
                 addText(selectedUpgradable.getPurchaseCost() + "", new SizeF(350, 40),
                         textPosition.clone(), Color.rgb(230, 230, 230));
 
-                textPosition.offset(0, 30);
+                textPosition.offset(-30, 30);
                 addText("유지비", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(0, 30);
+                textPosition.offset(-165, 30);
+                addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
+                textPosition.offset(195, 0);
                 addText((selectedUpgradable.getUpkeepCost() *
                                 selectedUpgradable.getLevel(Tribe.Faction.VILLAGER)) + " (" +
                                 selectedUpgradable.getUpkeepCost() + " x 레벨)",
                         new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
-                textPosition.offset(0, 30);
+                textPosition.offset(-30, 30);
                 addText("레벨 1 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 1) ? "(현재 레벨)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 1)?
@@ -340,6 +327,38 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
             addText("강화할 클래스를 선택하세요.", new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addText(String text, SizeF size, PointF position, int fontColor) {
+
+        addSprite(new TextSprite.Builder("text", text, 24)
+                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("NanumBarunGothic.ttf")
+                .textAlign(Paint.Align.LEFT)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param asset
+     * @param size
+     * @param position
+     */
+    private void addIcon(String asset, SizeF size, PointF position) {
+
+        addSprite(new Sprite.Builder("icon", asset)
+                .size(size).positionOffset(position)
+                .smooth(false).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
     }
 
     private Event eventHandler;

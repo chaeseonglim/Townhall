@@ -83,9 +83,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0
         ),
         FIGHTER(
-                "검병",
+                "전사",
                 UnitClassType.MELEE_FIGHTER,
-                "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.\n기병에 약합니다.",
+                "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.\n다만 기병에 약합니다.",
                 new Point(2, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -148,8 +148,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 50,
                 30,
                 0,
-                3,
-                5,
+                2,
+                7,
                 0,
                 5,
                 5,
@@ -169,7 +169,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         HORSE_MAN(
                 "기마병",
                 UnitClassType.MELEE_FIGHTER,
-                "빠른 속도의 기마 보병입니다.\n근접과 치유사에 강합니다.\n원거리 유닛에 약합니다.",
+                "빠른 속도의 기마병입니다.\n근접 유닛에 강하지만\n원거리 유닛의 공격에\n취약합니다.",
                 new Point(4, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -251,9 +251,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 300
                 ),
         CANNON(
-                "대포",
+                "대포병",
                 UnitClassType.RANGED_SUPPORTER,
-                "강력한 원거리 공격으로 \n주변을 초토화합니다.\n하지만 쉽게 취약해집니다.",
+                "강력한 원거리 공격으로\n주변을 초토화합니다.\n하지만 근접 공격에 쉽게\n취약해집니다.",
                 new Point(6, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
