@@ -1,8 +1,6 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Point;
-import android.media.AudioAttributes;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Trace;
 import android.util.Log;
@@ -19,6 +17,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Rect;
+import com.lifejourney.engine2d.World;
 
 import java.util.Locale;
 
@@ -252,10 +251,10 @@ public class Townhall extends FragmentActivity
      */
     protected void initResources() {
 
-        world = new GameWorld("map.png");
+        world = new MainMenu();
     }
 
-    private GameWorld world = null;
+    private World world = null;
     private boolean isRunning;
     private boolean surfacePrepared = false;
     private int fpsMarkerCount = 0;

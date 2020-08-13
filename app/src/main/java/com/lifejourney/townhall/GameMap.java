@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -33,11 +34,12 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      *
      * @param mapBitmap
      */
-    GameMap(Event listener, String mapBitmap) {
+    GameMap(Event listener, String mapBitmap, boolean demoMode) {
 
         super(HEX_SIZE);
 
         this.listener = listener;
+        this.demoMode = demoMode;
         setCacheMargin(4);
 
         // Load map data from bitmap file
@@ -91,8 +93,14 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
         // Scroll to headquarter
         if (villagerHq != null) {
-            Point offset = new Point(villagerHq.getMapPosition().toGameCoord())
-                    .subtract(Engine2D.GetInstance().getViewport().center());
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            Point offset = new Point(villagerHq.getMapPosition().toGameCoord()).subtract(viewport.center());
+            if (bottomRightGameCoord.x + getTileSize().width < viewport.width) {
+                offset.x = -(int)((viewport.width - bottomRightGameCoord.x - getTileSize().width) / 2);
+            }
+            if (bottomRightGameCoord.y + getTileSize().height < viewport.height) {
+                offset.y = -(int)((viewport.height - bottomRightGameCoord.y - getTileSize().height) / 2);
+            }
             scroll(offset);
         }
     }
@@ -106,7 +114,18 @@ class GameMap extends HexTileMap implements View, Territory.Event {
         for (Territory territory : territories.values()) {
             territory.removeTileSprites();
         }
+        territories.clear();
         super.close();
+    }
+
+    /**
+     *
+     */
+    public void updateTerritories() {
+
+        for (Territory territory : territories.values()) {
+            territory.update();
+        }
     }
 
     /**
@@ -145,6 +164,10 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        if (demoMode) {
+            return false;
+        }
 
         // Dragging map
         int eventAction = event.getAction();
@@ -327,17 +350,21 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         viewport.offset(offset);
-        if (viewport.x < clippedViewport.x) {
-            viewport.x = (int) clippedViewport.x;
+        if (viewport.width < clippedViewport.width) {
+            if (viewport.x < clippedViewport.x) {
+                viewport.x = (int) clippedViewport.x;
+            }
+            if (viewport.bottomRight().x > clippedViewport.bottomRight().x) {
+                viewport.x = (int) (clippedViewport.bottomRight().x - viewport.width);
+            }
         }
-        if (viewport.y < clippedViewport.y) {
-            viewport.y = (int) clippedViewport.y;
-        }
-        if (viewport.bottomRight().x > clippedViewport.bottomRight().x) {
-            viewport.x = (int) (clippedViewport.bottomRight().x - viewport.width);
-        }
-        if (viewport.bottomRight().y > clippedViewport.bottomRight().y) {
-            viewport.y = (int) (clippedViewport.bottomRight().y - viewport.height);
+        if (viewport.height < clippedViewport.height) {
+            if (viewport.y < clippedViewport.y) {
+                viewport.y = (int) clippedViewport.y;
+            }
+            if (viewport.bottomRight().y > clippedViewport.bottomRight().y) {
+                viewport.y = (int) (clippedViewport.bottomRight().y - viewport.height);
+            }
         }
         Engine2D.GetInstance().setViewport(viewport);
     }
@@ -393,6 +420,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
     private final static int HEX_SIZE = 64;
 
+    private boolean demoMode;
     private Event listener;
     private boolean dragging = false;
     private HashMap<OffsetCoord, Territory> territories = new HashMap<>();

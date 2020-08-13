@@ -3,20 +3,19 @@ package com.lifejourney.townhall;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Rect;
-import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.World;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-public class GameWorld extends World
+public class MainGame extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event, DateBar.Event,
                 SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event,
                 SettingBox.Event {
 
-    static final String LOG_TAG = "GameWorld";
+    static final String LOG_TAG = "MainGame";
 
-    GameWorld(String mapFileName) {
+    MainGame(String mapFileName) {
 
         super();
 
@@ -27,9 +26,9 @@ public class GameWorld extends World
         Upgradable.reset();
 
         // Build map
-        map = new GameMap(this, mapFileName);
+        map = new GameMap(this, mapFileName, false);
         map.show();
-        addView(map);
+        setView(map);
 
         // Build tribe
         Villager villager = new Villager(this, map);
@@ -87,45 +86,6 @@ public class GameWorld extends World
         newsBar.setFollowParentVisibility(false);
         newsBar.show();
         addWidget(newsBar);
-
-        // Set audio configuration
-        Engine2D engine2D = Engine2D.GetInstance();
-        boolean musicEnabled = engine2D.loadPreference(
-                        engine2D.getString(R.string.music_enable), 1) == 1;
-        boolean soundEffectEnabled = engine2D.loadPreference(
-                        engine2D.getString(R.string.sound_effect_enable), 1) == 1;
-        engine2D.enableMusic(musicEnabled);
-        engine2D.enableSoundEffect(soundEffectEnabled);
-
-        ResourceManager resourceManager = engine2D.getResourceManager();
-
-        // Play BGM
-        resourceManager.addMusic(R.raw.town_theme);
-        engine2D.playMusic(MUSIC_VOLUME);
-
-        // Load sound effect
-        resourceManager.loadSoundEffect("click3", R.raw.click3);
-        resourceManager.loadSoundEffect("click5", R.raw.click5);
-        resourceManager.loadSoundEffect("levelup", R.raw.rise01);
-        resourceManager.loadSoundEffect("news", R.raw.rise02);
-        resourceManager.loadSoundEffect("arrow", R.raw.metal_small2);
-        resourceManager.loadSoundEffect("coin1", R.raw.coin1);
-        resourceManager.loadSoundEffect("heal", R.raw.flame);
-        resourceManager.loadSoundEffect("sword1", R.raw.sword_unsheathe1);
-        resourceManager.loadSoundEffect("sword2", R.raw.sword_unsheathe2);
-        resourceManager.loadSoundEffect("sword3", R.raw.sword_unsheathe3);
-        resourceManager.loadSoundEffect("hit1", R.raw.hit1);
-        resourceManager.loadSoundEffect("hit2", R.raw.hit2);
-        resourceManager.loadSoundEffect("hit3", R.raw.hit3);
-        resourceManager.loadSoundEffect("hit4", R.raw.hit4);
-        resourceManager.loadSoundEffect("hit5", R.raw.hit5);
-        resourceManager.loadSoundEffect("die1", R.raw.die1);
-        resourceManager.loadSoundEffect("trot", R.raw.trot);
-        resourceManager.loadSoundEffect("villager", R.raw.ready);
-        resourceManager.loadSoundEffect("raiders", R.raw.ogre3);
-        resourceManager.loadSoundEffect("viking", R.raw.ogre1);
-        resourceManager.loadSoundEffect("rebel", R.raw.shade3);
-        resourceManager.loadSoundEffect("move", R.raw.war_go_go_go);
     }
 
     /**
@@ -133,16 +93,12 @@ public class GameWorld extends World
      */
     @Override
     public void close() {
-
         super.close();
 
         // Close map
         map.close();
         map = null;
-
-        // Unload sound
-        Engine2D.GetInstance().stopMusic();
-        Engine2D.GetInstance().getResourceManager().unloadSoundEffects();
+        setView(null);
     }
 
     /**
@@ -150,7 +106,6 @@ public class GameWorld extends World
      */
     @Override
     protected void updateObjects() {
-
         if (paused) {
             return;
         }
@@ -160,7 +115,6 @@ public class GameWorld extends World
 
     @Override
     protected void preUpdate() {
-
         if (paused) {
             return;
         }
@@ -171,10 +125,7 @@ public class GameWorld extends World
         }
 
         // Update territories
-        ArrayList<Territory> territories = map.getTerritories();
-        for (Territory territory : territories) {
-            territory.update();
-        }
+        map.updateTerritories();
     }
 
     /**
@@ -517,7 +468,6 @@ public class GameWorld extends World
      */
     @Override
     public void onButtonPressed(Button button) {
-
         if (button == homeButton) {
             // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
@@ -700,6 +650,11 @@ public class GameWorld extends World
         speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
     }
 
+    @Override
+    public void onSettingBoxExitPressed(SettingBox settingBox) {
+        // TODO: Go to main menu
+    }
+
     /**
      *
      * @param days
@@ -731,7 +686,6 @@ public class GameWorld extends World
      *
      */
     private void popupHomeBox() {
-
         HomeBox homeBox = new HomeBox(this, (Villager) tribes.get(0),
                 30, 0.0f);
         homeBox.show();
@@ -742,7 +696,6 @@ public class GameWorld extends World
      *
      */
     private void popupSettingBox() {
-
         SettingBox settingBox = new SettingBox(this,30, 0.0f);
         settingBox.show();
         addWidget(settingBox);
@@ -752,7 +705,6 @@ public class GameWorld extends World
      *
      */
     private void popupUpgradeBox() {
-
         UpgradeBox upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0),
                 30, 0.0f);
         upgradeBox.show();
@@ -764,7 +716,6 @@ public class GameWorld extends World
      * @param territory
      */
     private void popupInfoBox(Territory territory) {
-
         InfoBox infoBox = new InfoBox(this, territory,30, 0.0f);
         infoBox.show();
         addWidget(infoBox);
@@ -775,7 +726,6 @@ public class GameWorld extends World
      * @param squad
      */
     private void popupInfoBox(Squad squad) {
-
         InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), squad,
                 30, 0.0f);
         infoBox.show();
@@ -787,7 +737,6 @@ public class GameWorld extends World
      * @param squad
      */
     public void addSquad(Squad squad) {
-
         squads.add(squad);
         addObject(squad);
     }

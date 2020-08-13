@@ -310,7 +310,7 @@ public class Territory {
         Arrays.fill(this.facilityExps, 0);
         this.enemyFacilityIndex = new int[3];
         for (int i = 0; i < 3; ++i) {
-            this.enemyFacilityIndex[i] = (int) (Math.random() * 6);
+            this.enemyFacilityIndex[i] = (terrain == Terrain.HEADQUARTER)? 0 : (int) (Math.random() * 6);
         }
         this.developmentPolicy = new DevelopmentPolicy[Facility.values().length];
         if (this.terrain.canDevelop()) {
@@ -651,7 +651,11 @@ public class Territory {
                 baseSprite.setGridIndex(0, terrain.ordinal());
             }
         } else {
-            baseSprite.setGridIndex(baseSpriteSelection, terrain.ordinal());
+            if (terrain == Terrain.HEADQUARTER) {
+                baseSprite.setGridIndex(getFaction().ordinal() - 1, Terrain.HEADQUARTER.ordinal());
+            } else {
+                baseSprite.setGridIndex(baseSpriteSelection, terrain.ordinal());
+            }
         }
         sprites.add(baseSprite);
 
