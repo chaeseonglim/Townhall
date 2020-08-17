@@ -21,9 +21,9 @@ public abstract class Tribe implements Squad.Event {
                 case NEUTRAL:
                     return "중립";
                 case VILLAGER:
-                    return "부락민";
+                    return "마을 주민";
                 case RAIDER:
-                    return "정복자";
+                    return "도적";
                 case VIKING:
                     return "바이킹";
                 case REBEL:
@@ -93,11 +93,15 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public boolean checkDefeated() {
-        if (!destroyed &&
+        if (!isDestroyed() &&
                 (getHeadquarterPosition() != null &&
                 getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()) &&
                 getSquads().size() == 0) {
             destroyed = true;
+            ArrayList<Territory> territoriesCopy = new ArrayList<>(territories);
+            for (Territory territory: territoriesCopy) {
+                territory.setFaction(Faction.NEUTRAL);
+            }
             getEventHandler().onTribeDestroyed(this);
         }
 

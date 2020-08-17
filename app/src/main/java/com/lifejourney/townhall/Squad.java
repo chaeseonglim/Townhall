@@ -669,9 +669,7 @@ public class Squad extends Object implements Controllable {
      * @param unit
      */
     private void addUnit(Unit unit) {
-
         units.add(unit);
-
         eventHandler.onSquadUnitAdded(this, unit);
     }
 
@@ -680,12 +678,13 @@ public class Squad extends Object implements Controllable {
      * @param unitClass
      */
     public void spawnUnit(Unit.UnitClass unitClass) {
-
         Unit unit = new Unit.Builder(unitClass, faction).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setCompanions(units);
         unit.setFocused(focused);
         addUnit(unit);
+
+        deployed = true;
     }
 
     /**
@@ -693,7 +692,6 @@ public class Squad extends Object implements Controllable {
      * @param unit
      */
     public void removeUnit(Unit unit) {
-
         units.remove(unit);
         eventHandler.onSquadUnitRemoved(this, unit);
         unit.close();
@@ -720,7 +718,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     ArrayList<Unit> getUnits() {
-
         return units;
     }
 
@@ -1330,7 +1327,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isRecruiting() {
-
         for (Unit unit: units) {
             if (unit.isRecruiting()) {
                 return true;
@@ -1345,7 +1341,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public float getHealthPercentage() {
-
         float maxHealth = 0.0f, currentHealth = 0.0f;
         for (Unit unit: units) {
             if (!unit.isRecruiting()) {
@@ -1366,7 +1361,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public float getBattleMetric() {
-
         float battleMetric = 0.0f;
         for (Unit unit: units) {
             if (!unit.isRecruiting()) {
@@ -1381,8 +1375,8 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public float getSupportMetric() {
-
         float supportMetric = 0.0f;
+
         for (Unit unit: units) {
             if (!unit.isRecruiting()) {
                 supportMetric += unit.getUnitClass().supportMetric();
@@ -1395,7 +1389,6 @@ public class Squad extends Object implements Controllable {
      *
      */
     public void berserk() {
-
        for (Unit unit: units) {
            unit.setLevel(10);
        }
@@ -1405,10 +1398,17 @@ public class Squad extends Object implements Controllable {
      *
      */
     public void eliminate() {
-
         for (Unit unit: units) {
             unit.setHealth(0);
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDeployed() {
+        return deployed;
     }
 
     private final static int SPRITE_LAYER = 5;
@@ -1421,7 +1421,7 @@ public class Squad extends Object implements Controllable {
     private final static float ICON_SPRITE_OPAQUE_BATTLE = 0.5f;
     private final static float ICON_SPRITE_OPAQUE_DRAGGING = 0.2f;
     private final static float TARGET_SPRITE_OPAQUE_NORMAL = 0.0f;
-    private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.8f;
+    private final static float TARGET_SPRITE_OPAQUE_DRAGGING = 0.6f;
     private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
     private final static float UNIT_BONUS_DELTA = 0.05f;
@@ -1443,4 +1443,5 @@ public class Squad extends Object implements Controllable {
     private PointF lastTouchedScreenPosition = null;
     private PointF firstDraggingGamePosition = null;
     private int[] shrineBonus = new int[Tribe.ShrineBonus.values().length];
+    private boolean deployed = false;
 }

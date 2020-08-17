@@ -39,7 +39,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(layer).depth(depth)
+                .smooth(true).layer(layer).depth(depth)
                 .gridSize(2, 1).visible(false).opaque(0.8f).build();
         backgroundSprite.setGridIndex(0, 0);
         addSprite(backgroundSprite);
@@ -614,12 +614,18 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             } else {
                 textPosition.setTo(100, -155);
             }
-            addText("보너스", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(255, 255, 0));
+            int attackDamageBonus = squad.getAttackDamageBonus();
+            int attackSpeedBonus = squad.getAttackSpeedBonus();
+            int armorBonus = squad.getArmorBonus();
+            int healPowerBonus = squad.getHealPowerBonus();
+
+            if (attackDamageBonus != 0 || attackSpeedBonus != 0 || armorBonus != 0 || healPowerBonus != 0) {
+                addText("추가 효과", new SizeF(150, 40), textPosition.clone(),
+                        Color.rgb(255, 255, 0));
+            }
 
             textPosition.offset(30, 0);
 
-            int attackDamageBonus = squad.getAttackDamageBonus();
             if (attackDamageBonus != 0) {
                 textPosition.offset(-95, 30);
                 addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
@@ -629,7 +635,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                         Color.rgb(230, 230, 230));
             }
 
-            int attackSpeedBonus = squad.getAttackSpeedBonus();
             if (attackSpeedBonus != 0) {
                 textPosition.offset(-95, 30);
                 addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
@@ -639,7 +644,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                         Color.rgb(230, 230, 230));
             }
 
-            int armorBonus = squad.getArmorBonus();
             if (armorBonus != 0) {
                 textPosition.offset(-95, 30);
                 addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
@@ -649,19 +653,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                         Color.rgb(230, 230, 230));
             }
 
-            int healPowerBonus = squad.getHealPowerBonus();
             if (healPowerBonus != 0) {
                 textPosition.offset(-95, 30);
                 addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(95, 0);
                 addText("치유량 " + ((healPowerBonus>0)?"+":"") + healPowerBonus,
                         new SizeF(150, 40), textPosition.clone(),
-                        Color.rgb(230, 230, 230));
-            }
-
-            if (attackDamageBonus == 0 && attackSpeedBonus == 0 && armorBonus == 0 && healPowerBonus == 0) {
-                textPosition.offset(-30, 30);
-                addText("없음", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
         }
@@ -676,9 +673,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text", text, 24)
+        addSprite(new TextSprite.Builder("text", text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
@@ -694,9 +690,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      */
     private void addText(String text, SizeF size, PointF position, int fontColor, Paint.Align align) {
 
-        addSprite(new TextSprite.Builder("text", text, 24)
+        addSprite(new TextSprite.Builder("text", text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
                 .textAlign(align)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)

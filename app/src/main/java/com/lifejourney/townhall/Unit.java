@@ -817,9 +817,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return;
         }
 
-        if (projectile.getType() == Projectile.ProjectileType.ARROW) {
-            // Arrow
-
+        if (projectile.getType() == Projectile.ProjectileType.ARROW) { // Arrow
             if (Math.random() < target.getRangedEvasion()) {
                 // Check evading
                 return;
@@ -853,9 +851,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             float damage = Math.max(damageBase * (1.0f - target.getArmor()), 1.0f);
             target.gotDamage(damage);
 
-        } else if (projectile.getType() == Projectile.ProjectileType.HEAL) {
-            // Heal magic
-
+        } else if (projectile.getType() == Projectile.ProjectileType.HEAL) { // Heal
             if (focused || (getOpponents() != null && getOpponents().size() > 0
                     && getOpponents().get(0).isFocused())) {
                 Engine2D.GetInstance().playSoundEffect("heal", 1.0f);
@@ -876,7 +872,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 float splashDamage = getHealPower() *
                         (SPLASH_DAMAGE_DELTA * Upgradable.HEALER_SPLASH_DAMAGE.getLevel(faction));
                 for (Unit opponent : target.getOpponents()) {
-                    if (opponent.getPosition().distance(target.getPosition()) < SPLASH_DAMAGE_RANGE) {
+                    if (!opponent.isClosed() && opponent.isFighting() &&
+                            opponent.getPosition().distance(target.getPosition()) <= SPLASH_DAMAGE_RANGE) {
                         opponent.gotSplashDamage(splashDamage);
                     }
                 }
@@ -884,10 +881,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
             // Heal
             target.gotHeal(getHealPower());
-
-        } else if (projectile.getType() == Projectile.ProjectileType.CANNON) {
-            // Cannon
-
+        } else if (projectile.getType() == Projectile.ProjectileType.CANNON) { // Cannon
             if (Math.random() < target.getRangedEvasion()) {
                 // Check evading
                 return;
@@ -904,7 +898,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                             Upgradable.CANNON_SPLASH_RANGE.getLevel(faction));
 
             for (Unit opponent : target.getCompanions()) {
-                if (opponent.getPosition().distance(target.getPosition()) < splashDamageRange) {
+                if (!opponent.isClosed() && opponent.isFighting() &&
+                        opponent.getPosition().distance(target.getPosition()) <= splashDamageRange) {
                     opponent.gotSplashDamage(splashDamage);
                     if (Upgradable.CANNON_SLOWNESS.getLevel(faction) > 0) {
                         opponent.gotSlow(SLOW_DELTA * Upgradable.CANNON_SLOWNESS.getLevel(faction));

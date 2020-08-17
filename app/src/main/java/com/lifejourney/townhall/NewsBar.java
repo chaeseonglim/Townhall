@@ -34,7 +34,6 @@ public class NewsBar extends Widget {
                 .fontColor(Color.rgb(230, 230, 230))
                 .bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(Paint.Align.LEFT)
-                .fontName("NanumBarunGothic.ttf")
                 .size(new SizeF(700, 36))
                 .positionOffset(new PointF(40, -3))
                 .smooth(true).depth(0.1f)

@@ -30,7 +30,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         this.replacementUnitClass = replacementClass;
 
         // Background sprite
-        Sprite backgroundSprite = new Sprite.Builder("unit_builder_box.png")
+        Sprite backgroundSprite = new Sprite.Builder("unit_selection_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(layer).depth(depth)
                 .gridSize(1, 1).visible(false).opaque(0.8f).build();
@@ -373,9 +373,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)

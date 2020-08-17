@@ -26,7 +26,7 @@ public class DateBar extends Widget {
 
         Sprite background = new Sprite.Builder("date_bar.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).depth(0.0f)
+                .smooth(true).depth(0.0f)
                 .gridSize(1, 1)
                 .layer(20).visible(false).build();
         addSprite(background);

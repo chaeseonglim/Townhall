@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -34,11 +33,11 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      *
      * @param mapBitmap
      */
-    GameMap(Event listener, String mapBitmap, boolean demoMode) {
+    GameMap(Event eventHandler, String mapBitmap, boolean demoMode) {
 
         super(HEX_SIZE);
 
-        this.listener = listener;
+        this.eventHandler = eventHandler;
         this.demoMode = demoMode;
         setCacheMargin(4);
 
@@ -50,7 +49,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
         // Init town list
         for (int i = 0; i < Tribe.Faction.values().length; ++i) {
-            townsBySide.add(new ArrayList<Territory>());
+            territoriesBySide.add(new ArrayList<Territory>());
         }
 
         // Add town information
@@ -71,7 +70,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
 
                 Territory territory = new Territory(this, mapCoord, terrain, faction);
                 territories.put(mapCoord, territory);
-                townsBySide.get(faction.ordinal()).add(territory);
+                territoriesBySide.get(faction.ordinal()).add(territory);
 
                 if (terrain == Territory.Terrain.HEADQUARTER && faction == Tribe.Faction.VILLAGER) {
                     villagerHq = territory;
@@ -94,6 +93,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
         // Scroll to headquarter
         if (villagerHq != null) {
             Rect viewport = Engine2D.GetInstance().getViewport();
+            viewport.setTo(0, 0, viewport.width, viewport.height);
             Point offset = new Point(villagerHq.getMapPosition().toGameCoord()).subtract(viewport.center());
             if (bottomRightGameCoord.x + getTileSize().width < viewport.width) {
                 offset.x = -(int)((viewport.width - bottomRightGameCoord.x - getTileSize().width) / 2);
@@ -101,6 +101,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
             if (bottomRightGameCoord.y + getTileSize().height < viewport.height) {
                 offset.y = -(int)((viewport.height - bottomRightGameCoord.y - getTileSize().height) / 2);
             }
+
             scroll(offset);
         }
     }
@@ -133,8 +134,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param territory
      */
     @Override
-    public void onTownUpdated(Territory territory) {
-
+    public void onTerritoryUpdated(Territory territory) {
         redraw(territory.getMapPosition());
     }
 
@@ -144,17 +144,16 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param prevFaction
      */
     @Override
-    public void onTownOccupied(Territory territory, Tribe.Faction prevFaction) {
-
-        townsBySide.get(prevFaction.ordinal()).remove(territory);
-        townsBySide.get(territory.getFaction().ordinal()).add(territory);
+    public void onTerritoryOccupied(Territory territory, Tribe.Faction prevFaction) {
+        territoriesBySide.get(prevFaction.ordinal()).remove(territory);
+        territoriesBySide.get(territory.getFaction().ordinal()).add(territory);
 
         if (prevFaction != Tribe.Faction.NEUTRAL) {
             redrawTileSprites(prevFaction);
         }
         redrawTileSprites(territory.getFaction());
 
-        listener.onMapTerritoryOccupied(territory, prevFaction);
+        eventHandler.onMapTerritoryOccupied(territory, prevFaction);
     }
 
     /**
@@ -197,7 +196,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                     Territory territoryToFocus = getTerritory(touchedMapCoord);
                     if (territoryToFocus != null) {
                         territoryToFocus.setFocus(true);
-                        listener.onMapTerritoryFocused(territoryToFocus);
+                        eventHandler.onMapTerritoryFocused(territoryToFocus);
                     }
                 }
             } else if (eventAction == MotionEvent.ACTION_CANCEL) {
@@ -237,7 +236,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      */
     public void redrawTileSprites(Tribe.Faction faction) {
 
-        for (Territory territory : townsBySide.get(faction.ordinal())) {
+        for (Territory territory : territoriesBySide.get(faction.ordinal())) {
             redraw(territory.getMapPosition());
         }
     }
@@ -415,16 +414,16 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      */
     public ArrayList<Territory> getTownsBySide(Tribe.Faction faction) {
 
-        return townsBySide.get(faction.ordinal());
+        return territoriesBySide.get(faction.ordinal());
     }
 
     private final static int HEX_SIZE = 64;
 
     private boolean demoMode;
-    private Event listener;
+    private Event eventHandler;
     private boolean dragging = false;
     private HashMap<OffsetCoord, Territory> territories = new HashMap<>();
-    private ArrayList<ArrayList<Territory>> townsBySide = new ArrayList<>(Tribe.Faction.values().length);
+    private ArrayList<ArrayList<Territory>> territoriesBySide = new ArrayList<>(Tribe.Faction.values().length);
     private ArrayList<OffsetCoord> glowingTilePositions = null;
     private PointF lastTouchedScreenCoord;
     private PointF lastDraggingScreenCoord;

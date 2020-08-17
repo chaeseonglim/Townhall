@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -24,7 +25,7 @@ public class EconomyBar extends Widget {
 
         Sprite bg = new Sprite.Builder("economy_bar.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).depth(0.0f)
+                .smooth(true).depth(0.0f)
                 .gridSize(1, 1)
                 .layer(20).visible(false).build();
         addSprite(bg);
@@ -32,7 +33,7 @@ public class EconomyBar extends Widget {
         happinessSprite = new Sprite.Builder("economy_bar_happiness.png")
                 .size(new SizeF(42, 42))
                 .positionOffset(new PointF(60, 0))
-                .smooth(false).depth(0.1f)
+                .smooth(true).depth(0.1f)
                 .gridSize(5, 1)
                 .layer(20).visible(false).build();
         happinessSprite.setGridIndex(2, 0);
@@ -59,6 +60,14 @@ public class EconomyBar extends Widget {
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(popTextSprite);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        goldTextSprite.close();
+        popTextSprite.close();
     }
 
     /**

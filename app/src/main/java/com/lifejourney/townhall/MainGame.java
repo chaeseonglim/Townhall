@@ -15,9 +15,15 @@ public class MainGame extends World
 
     static final String LOG_TAG = "MainGame";
 
-    MainGame(String mapFileName) {
+    interface Event {
+        void onGameExited(MainGame game);
+    }
+
+    MainGame(Event eventHandler, Mission mission) {
 
         super();
+
+        this.eventHandler = eventHandler;
 
         // Set FPS
         setDesiredFPS(20.0f);
@@ -26,7 +32,7 @@ public class MainGame extends World
         Upgradable.reset();
 
         // Build map
-        map = new GameMap(this, mapFileName, false);
+        map = new GameMap(this, mission.getMapFile(), false);
         map.show();
         setView(map);
 
@@ -283,19 +289,17 @@ public class MainGame extends World
                     territory.getFaction() == Tribe.Faction.VILLAGER &&
                         prevFaction == tribes.get(i).getFaction()) {
                     newsBar.addNews("우리가 " + tribes.get(i).getFaction().toGameString() + "의 본부를 점령했습니다.");
-                    if (prevFaction == Tribe.Faction.RAIDER) {
-                        if (tribes.get(i).getSquads().size() > 0) {
-                            for (Squad squad : tribes.get(i).getSquads()) {
-                                squad.berserk();
-                            }
-                            newsBar.addNews("조심하세요! 남은 " + tribes.get(i).getFaction().toGameString() +
-                                    "의 병력들이 강해집니다.");
+                    if (tribes.get(i).getSquads().size() > 0) {
+                        for (Squad squad : tribes.get(i).getSquads()) {
+                            squad.berserk();
                         }
+                        newsBar.addNews("조심하세요! 남은 " + tribes.get(i).getFaction().toGameString() +
+                                "의 병력들이 강해집니다.");
                     }
                 }
             }
         }
-        if (prevFaction != Tribe.Faction.NEUTRAL) {
+        if (prevFaction != Tribe.Faction.NEUTRAL && territory.getFaction() != Tribe.Faction.NEUTRAL) {
             newsBar.addNews(territory.getFaction().toGameString() + "이 " +
                     prevFaction.toGameString() + "의 영토를 차지했습니다.");
         }
@@ -320,7 +324,7 @@ public class MainGame extends World
     @Override
     public void onTribeUpgraded(Tribe tribe, Upgradable upgradable) {
 
-        newsBar.addNews(tribe.getFaction().toGameString() + "(이)가 새로운 기술을 습득했습니다.");
+        newsBar.addNews(tribe.getFaction().toGameString() + "이 새로운 기술을 습득했습니다.");
     }
 
     /**
@@ -330,7 +334,7 @@ public class MainGame extends World
     @Override
     public void onTribeDestroyed(Tribe tribe) {
 
-        newsBar.addNews(tribe.getFaction().toGameString() + "(이)가 패배했습니다.");
+        newsBar.addNews(tribe.getFaction().toGameString() + "이 패배했습니다.");
     }
 
     /**
@@ -346,8 +350,8 @@ public class MainGame extends World
         squadTerritory.addSquad(squad);
         addSquad(squad);
 
-        if (newsBar != null) {
-            newsBar.addNews(squad.getFaction().toGameString() + "(이)가 새로운 부대를 만들었습니다.");
+        if (newsBar != null && squad.getFaction() != Tribe.Faction.VILLAGER) {
+            newsBar.addNews(squad.getFaction().toGameString() + "이 새로운 부대를 만들었습니다.");
         }
     }
 
@@ -373,7 +377,7 @@ public class MainGame extends World
             infoButton.show();
         }
 
-        if (newsBar != null) {
+        if (newsBar != null && squad.isDeployed()) {
             newsBar.addNews(squad.getFaction().toGameString() + "의 부대가 제거되었습니다.");
         }
     }
@@ -475,8 +479,7 @@ public class MainGame extends World
 
             // Pop up home box
             popupHomeBox();
-        }
-        if (button == infoButton) {
+        } else if (button == infoButton) {
             // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
@@ -643,7 +646,6 @@ public class MainGame extends World
      */
     @Override
     public void onSettingBoxClosed(SettingBox settingBox) {
-
         settingBox.close();
         removeWidget(settingBox);
 
@@ -652,7 +654,7 @@ public class MainGame extends World
 
     @Override
     public void onSettingBoxExitPressed(SettingBox settingBox) {
-        // TODO: Go to main menu
+        eventHandler.onGameExited(this);
     }
 
     /**
@@ -666,14 +668,13 @@ public class MainGame extends World
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      * @param radius
      * @param fogState
      */
-    private void setMapFogState(OffsetCoord mapCoord, int radius, Territory.FogState fogState) {
-
-        ArrayList<Territory> visibleTerritories = map.getNeighborTerritories(mapCoord, radius, false);
-        visibleTerritories.add(map.getTerritory(mapCoord));
+    private void setMapFogState(OffsetCoord mapPosition, int radius, Territory.FogState fogState) {
+        ArrayList<Territory> visibleTerritories = map.getNeighborTerritories(mapPosition, radius, false);
+        visibleTerritories.add(map.getTerritory(mapPosition));
         for (Territory territory : visibleTerritories) {
             if (territory.getFogState() != fogState) {
                 territory.setFogState(fogState);
@@ -788,10 +789,12 @@ public class MainGame extends World
 
     private final static float MUSIC_VOLUME = 0.3f;
 
+    private Event eventHandler;
     private boolean paused = false;
     private int playSpeedReturnedFromWidget = 0;
     private int playSpeedReturnedFromBackground = 0;
 
+    private Mission mission;
     private GameMap map;
     private MessageBox messageBox;
     private Button squadBuilderButton;

@@ -242,7 +242,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
             PointF textPosition = new PointF(-205, -190);
             addText(selectedUnitClass.word() + " 강화",
                     new SizeF(350, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
+                    Color.rgb(255, 255, 0));
 
             if (selectedUpgradable != null) {
                 textPosition.setTo(200, -190);
@@ -338,9 +338,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
 
-        addSprite(new TextSprite.Builder("text", text, 24)
+        addSprite(new TextSprite.Builder("text", text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("NanumBarunGothic.ttf")
                 .textAlign(Paint.Align.LEFT)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)

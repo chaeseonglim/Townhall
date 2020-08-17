@@ -7,7 +7,6 @@ import com.lifejourney.engine2d.Sprite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Territory {
 
@@ -15,9 +14,8 @@ public class Territory {
 
     public interface Event {
 
-        void onTownUpdated(Territory territory);
-
-        void onTownOccupied(Territory territory, Tribe.Faction oldFaction);
+        void onTerritoryUpdated(Territory territory);
+        void onTerritoryOccupied(Territory territory, Tribe.Faction oldFaction);
     }
 
     enum Terrain {
@@ -358,27 +356,34 @@ public class Territory {
      *
      */
     private void updateOccupation(Tribe.Faction occupyingFaction) {
-
         if (this.occupyingFaction != occupyingFaction) {
             // If someone new try to occupy this, update information
             this.occupyingFaction = occupyingFaction;
             this.occupationStep = 0;
             this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
-            eventHandler.onTownUpdated(this);
+            eventHandler.onTerritoryUpdated(this);
         } else if (--this.occupationUpdateForThisStepLeft == 0) {
             if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
                 // If occupation is done, change the owner faction of town
-                Tribe.Faction prevFaction = this.faction;
-                this.faction = occupyingFaction;
                 this.occupationStep = 0;
                 this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
-                eventHandler.onTownOccupied(this, prevFaction);
+                setFaction(occupyingFaction);
             } else {
                 // Or just update the occupation status
                 this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
             }
-            eventHandler.onTownUpdated(this);
+            eventHandler.onTerritoryUpdated(this);
         }
+    }
+
+    /**
+     *
+     * @param faction
+     */
+    public void setFaction(Tribe.Faction faction) {
+        Tribe.Faction prevFaction = this.faction;
+        this.faction = faction;
+        eventHandler.onTerritoryOccupied(this, prevFaction);
     }
 
     /*
@@ -388,7 +393,7 @@ public class Territory {
 
         // Cancel occupation process
         if (this.occupationStep > 0) {
-            eventHandler.onTownUpdated(this);
+            eventHandler.onTerritoryUpdated(this);
         }
         this.occupyingFaction = Tribe.Faction.NEUTRAL;
         this.occupationStep = 0;
@@ -545,7 +550,7 @@ public class Territory {
 
         // If any facility level is changed, redraw the tile
         if (!Arrays.equals(prevLevels, facilityLevels)) {
-            eventHandler.onTownUpdated(this);
+            eventHandler.onTerritoryUpdated(this);
         }
     }
 
@@ -884,6 +889,10 @@ public class Territory {
             selectionSprite.close();
             selectionSprite = null;
         }
+        if (fogSprite != null) {
+            fogSprite.close();
+            fogSprite = null;
+        }
     }
 
     /**
@@ -967,7 +976,7 @@ public class Territory {
     public void setFocus(boolean focused) {
 
         this.focused = focused;
-        eventHandler.onTownUpdated(this);
+        eventHandler.onTerritoryUpdated(this);
     }
 
     /**

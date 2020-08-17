@@ -95,7 +95,7 @@ public class Button extends Widget {
         if (!builder.imageSpriteAsset.equals("")) {
             imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
                     .size(new SizeF(getRegion().size()))
-                    .smooth(false).depth(0.2f)
+                    .smooth(true).depth(0.2f)
                     .gridSize(3, builder.numImageSpriteSet)
                     .layer(builder.layer).visible(false).build();
             imageSprite.setGridIndex(0, imageSpriteSet);
@@ -106,7 +106,7 @@ public class Button extends Widget {
             Sprite shadowSprite = new Sprite.Builder("shadow", builder.imageSpriteAsset)
                     .size(new SizeF(getRegion().size()))
                     .positionOffset(new PointF(3, 3))
-                    .smooth(false).depth(0.1f).opaque(0.2f)
+                    .smooth(true).depth(0.1f).opaque(0.2f)
                     .gridSize(3, 1)
                     .layer(builder.layer).visible(false).build();
             addSprite(shadowSprite);

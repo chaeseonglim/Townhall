@@ -11,50 +11,17 @@ import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.World;
 
+import java.util.ArrayList;
+
 public class MainMenu extends World
-        implements GameMap.Event, Button.Event, SettingBox.Event {
+        implements GameMap.Event, Button.Event, SettingBox.Event, MainGame.Event,
+                   MissionSelectionBox.Event {
 
     static final String LOG_TAG = "MainMenu";
 
     MainMenu() {
 
         super();
-
-        // Set FPS
-        setDesiredFPS(30.0f);
-
-        // Build map
-        sampleMap = new GameMap(this, "sample_map.png", true);
-        sampleMap.show();
-        setView(sampleMap);
-
-        Rect viewport = Engine2D.GetInstance().getViewport();
-
-        // Logo
-        logo = new Sprite.Builder("logo.png")
-                .position(new PointF(viewport.centerX(), viewport.height / 3))
-                .size(new SizeF(600, 200))
-                .smooth(false).depth(0.2f)
-                .layer(20).visible(true).build();
-
-        // Buttons
-        startButton = new Button.Builder(this,
-                new Rect((viewport.width - 300) / 2,  viewport.height - 200, 300, 62))
-                .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("게임 시작").fontSize(25).fontColor(Color.rgb(230, 230, 230))
-                .build();
-        startButton.setImageSpriteSet(0);
-        startButton.show();
-        addWidget(startButton);
-
-        settingButton = new Button.Builder(this,
-                new Rect((viewport.width - 300) / 2,  viewport.height - 120, 300, 62))
-                .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("설정").fontSize(25).fontColor(Color.rgb(230, 230, 230))
-                .build();
-        settingButton.setImageSpriteSet(0);
-        settingButton.show();
-        addWidget(settingButton);
 
         // Set audio configuration
         Engine2D engine2D = Engine2D.GetInstance();
@@ -92,6 +59,49 @@ public class MainMenu extends World
         resourceManager.loadSoundEffect("viking", R.raw.ogre1);
         resourceManager.loadSoundEffect("rebel", R.raw.shade3);
         resourceManager.loadSoundEffect("move", R.raw.war_go_go_go);
+
+        // Init menu
+        startMenu();
+    }
+
+    private void startMenu() {
+        // Set FPS
+        setDesiredFPS(30.0f);
+
+        // Build map
+        sampleMap = new GameMap(this, "sample_map.png", true);
+        sampleMap.show();
+        setView(sampleMap);
+
+        // Show buttons
+        Rect viewport = Engine2D.GetInstance().getViewport();
+
+        // Logo
+        logo = new Sprite.Builder("logo.png")
+                .position(new PointF(viewport.centerX(), viewport.height / 3))
+                .size(new SizeF(600, 200))
+                .smooth(false).depth(0.2f)
+                .layer(20).visible(true).build();
+
+        // Buttons
+        startButton = new Button.Builder(this,
+                new Rect((viewport.width - 300) / 2,  viewport.height - 200, 300, 62))
+                .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
+                .message("게임 시작").fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .build();
+        startButton.setImageSpriteSet(0);
+        startButton.show();
+        addWidget(startButton);
+
+        settingButton = new Button.Builder(this,
+                new Rect((viewport.width - 300) / 2,  viewport.height - 120, 300, 62))
+                .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
+                .message("설정").fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .build();
+        settingButton.setImageSpriteSet(0);
+        settingButton.show();
+        addWidget(settingButton);
+
     }
 
     @Override
@@ -122,7 +132,9 @@ public class MainMenu extends World
     public void commit() {
         super.commit();
 
-        logo.commit();
+        if (logo != null) {
+            logo.commit();
+        }
 
         if (game != null) {
             game.commit();
@@ -169,18 +181,19 @@ public class MainMenu extends World
     public void onButtonPressed(Button button) {
 
         if (button == startButton) {
-            if (sampleMap != null) {
-                sampleMap.close();
-                sampleMap = null;
-                setView(null);
-            }
-
+            logo.hide();
             startButton.hide();
             settingButton.hide();
-            logo.hide();
 
-            game = new MainGame("map.png");
+            MissionSelectionBox missionSelectionBox =
+                    new MissionSelectionBox(this, 30, 0.0f);
+            missionSelectionBox.show();
+            addWidget(missionSelectionBox);
         } else if (button == settingButton) {
+            logo.hide();
+            startButton.hide();
+            settingButton.hide();
+
             // Pop up setting box
             popupSettingBox();
         }
@@ -190,11 +203,74 @@ public class MainMenu extends World
     public void onSettingBoxClosed(SettingBox settingBox) {
         settingBox.close();
         removeWidget(settingBox);
+
+        logo.show();
+        startButton.show();
+        settingButton.show();
     }
 
+    /**
+     *
+     * @param settingBox
+     */
     @Override
     public void onSettingBoxExitPressed(SettingBox settingBox) {
         System.exit(0);
+    }
+
+    /**
+     *
+     * @param missionSelectionBox
+     */
+    @Override
+    public void onMissionSelectionBoxCanceled(MissionSelectionBox missionSelectionBox) {
+        missionSelectionBox.close();
+        removeWidget(missionSelectionBox);
+
+        logo.show();
+        startButton.show();
+        settingButton.show();
+    }
+
+    /**
+     *
+     * @param missionSelectionBox
+     * @param mission
+     */
+    @Override
+    public void onMissionSelectionBoxStart(MissionSelectionBox missionSelectionBox, Mission mission) {
+        missionSelectionBox.close();
+        removeWidget(missionSelectionBox);
+
+        startButton.close();
+        removeWidget(startButton);
+        startButton = null;
+
+        settingButton.close();
+        removeWidget(settingButton);
+        settingButton = null;
+
+        logo.close();
+        logo = null;
+
+        if (sampleMap != null) {
+            sampleMap.close();
+            sampleMap = null;
+            setView(null);
+        }
+
+        game = new MainGame(this, mission);
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onGameExited(MainGame game) {
+        game.close();
+        this.game = null;
+
+        startMenu();
     }
 
     /**
@@ -213,5 +289,4 @@ public class MainMenu extends World
     private Sprite logo;
     private Button startButton;
     private Button settingButton;
-
 }

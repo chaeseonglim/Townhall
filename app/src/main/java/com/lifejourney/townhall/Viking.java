@@ -11,26 +11,4 @@ public class Viking extends HostileTribe {
 
         super(eventHandler, Faction.VIKING, map, villager);
     }
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public boolean checkDefeated() {
-        if (!destroyed &&
-                getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()) {
-            destroyed = true;
-            for (Squad squad: getSquads()) {
-                if (squad.isFighting()) {
-                    squad.eliminate();
-                } else {
-                    squad.close();
-                }
-            }
-            getEventHandler().onTribeDestroyed(this);
-        }
-
-        return destroyed;
-    }
 }
