@@ -48,7 +48,6 @@ public class SpeedControl extends Widget implements Button.Event {
      */
     @Override
     public void onButtonPressed(Button button) {
-
         if (button == pauseButton) {
             setPlaySpeed(0);
         } else {
@@ -65,9 +64,7 @@ public class SpeedControl extends Widget implements Button.Event {
      * @param playSpeed
      */
     public void setPlaySpeed(int playSpeed) {
-
         this.playSpeed = playSpeed;
-
         if (playSpeed == 0) {
             pauseButton.setImageSpriteSet(0);
             playButton.setImageSpriteSet(0);
@@ -83,7 +80,6 @@ public class SpeedControl extends Widget implements Button.Event {
      * @return
      */
     int getPlaySpeed() {
-
         return playSpeed;
     }
 

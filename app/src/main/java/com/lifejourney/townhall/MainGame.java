@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.Rect;
@@ -107,24 +109,8 @@ public class MainGame extends World
         setView(null);
     }
 
-    /**
-     *
-     */
-    @Override
-    protected void updateObjects() {
-        if (paused) {
-            return;
-        }
-
-        super.updateObjects();
-    }
-
     @Override
     protected void preUpdate() {
-        if (paused) {
-            return;
-        }
-
         // Update tribes
         for (Tribe tribe: tribes) {
             tribe.update();
@@ -140,8 +126,24 @@ public class MainGame extends World
     @Override
     public void pause() {
         super.pause();
+        dateBar.pause();
+    }
 
-        // Pause game temporarily
+    /**
+     *
+     */
+    @Override
+    public void resume() {
+        super.resume();
+        dateBar.resume();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
         playSpeedReturnedFromBackground = speedControl.getPlaySpeed();
         speedControl.setPlaySpeed(0);
         Engine2D.GetInstance().stopMusic();
@@ -151,9 +153,8 @@ public class MainGame extends World
      *
      */
     @Override
-    public void resume() {
-        super.resume();
-
+    public void onResume() {
+        super.onResume();
         speedControl.setPlaySpeed(playSpeedReturnedFromBackground);
         Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
     }
@@ -163,11 +164,6 @@ public class MainGame extends World
      */
     @Override
     protected void postUpdate() {
-
-        if (paused) {
-            return;
-        }
-
         // Check if new battle is arisen
         for (Squad squad: squads) {
             Territory thisTerritory = map.getTerritory(squad.getMapPosition());
@@ -517,27 +513,18 @@ public class MainGame extends World
 
     @Override
     public void onSpeedControlUpdate(SpeedControl speedControl) {
-
-        if (speedControl.getPlaySpeed() == 0) {
-            // Pause
+        if (speedControl.getPlaySpeed() == 0) { // Pause
             setDesiredFPS(20.0f);
-            dateBar.pause();
-            paused = true;
-        } else if (speedControl.getPlaySpeed() == 1) {
-            // 1x
+            pause();
+        } else if (speedControl.getPlaySpeed() == 1) { // 1x
             setDesiredFPS(20.0f);
-            dateBar.resume();
-            paused = false;
-        } else if (speedControl.getPlaySpeed() == 2) {
-            // 2x
+            resume();
+        } else if (speedControl.getPlaySpeed() == 2) { // 2x
             setDesiredFPS(40.0f);
-            dateBar.resume();
-            paused = false;
-        } else if (speedControl.getPlaySpeed() == 3) {
-            // 3x
+            resume();
+        } else if (speedControl.getPlaySpeed() == 3) { // 3x
             setDesiredFPS(60.0f);
-            dateBar.resume();
-            paused = false;
+            resume();
         }
     }
 
@@ -547,7 +534,6 @@ public class MainGame extends World
      */
     @Override
     public void onHomeBoxSwitchToResearchBox(HomeBox homeBox) {
-
         popupUpgradeBox();
 
         homeBox.close();
@@ -790,7 +776,6 @@ public class MainGame extends World
     private final static float MUSIC_VOLUME = 0.3f;
 
     private Event eventHandler;
-    private boolean paused = false;
     private int playSpeedReturnedFromWidget = 0;
     private int playSpeedReturnedFromBackground = 0;
 

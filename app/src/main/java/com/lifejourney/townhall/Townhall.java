@@ -141,13 +141,12 @@ public class Townhall extends FragmentActivity
      */
     @Override
     protected void onPause() {
-
         Log.i(LOG_TAG, "onPause");
 
         super.onPause();
 
         if (world != null) {
-            world.pause();
+            world.onPause();
         }
     }
 
@@ -156,13 +155,12 @@ public class Townhall extends FragmentActivity
      */
     @Override
     protected void onResume() {
-
         Log.i(LOG_TAG, "onResume");
 
         super.onResume();
 
         if (world != null) {
-            world.resume();
+            world.onResume();
         }
     }
 

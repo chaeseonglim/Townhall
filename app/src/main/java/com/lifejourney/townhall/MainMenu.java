@@ -80,7 +80,7 @@ public class MainMenu extends World
         logo = new Sprite.Builder("logo.png")
                 .position(new PointF(viewport.centerX(), viewport.height / 3))
                 .size(new SizeF(600, 200))
-                .smooth(false).depth(0.2f)
+                .smooth(true).depth(0.2f)
                 .layer(20).visible(true).build();
 
         // Buttons
@@ -145,25 +145,26 @@ public class MainMenu extends World
     public boolean onTouchEvent(MotionEvent event) {
         if (game != null) {
             return game.onTouchEvent(event);
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public void pause() {
-        super.pause();
-
-        if (game != null) {
-            game.pause();
+        } else {
+            return super.onTouchEvent(event);
         }
     }
 
     @Override
-    public void resume() {
-        super.resume();
+    public void onPause() {
+        super.onPause();
 
         if (game != null) {
-            game.resume();
+            game.onPause();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (game != null) {
+            game.onResume();
         }
     }
 
