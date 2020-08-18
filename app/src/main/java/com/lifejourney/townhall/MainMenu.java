@@ -11,8 +11,6 @@ import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.World;
 
-import java.util.ArrayList;
-
 public class MainMenu extends World
         implements GameMap.Event, Button.Event, SettingBox.Event, MainGame.Event,
                    MissionSelectionBox.Event {
@@ -20,7 +18,6 @@ public class MainMenu extends World
     static final String LOG_TAG = "MainMenu";
 
     MainMenu() {
-
         super();
 
         // Set audio configuration
@@ -66,10 +63,10 @@ public class MainMenu extends World
 
     private void startMenu() {
         // Set FPS
-        setDesiredFPS(30.0f);
+        setUpdateFPS(30.0f);
 
         // Build map
-        sampleMap = new GameMap(this, "sample_map.png", true);
+        sampleMap = new GameMap(this, "map/map_mainmenu.png", true);
         sampleMap.show();
         setView(sampleMap);
 
@@ -104,6 +101,9 @@ public class MainMenu extends World
 
     }
 
+    /**
+     *
+     */
     @Override
     public void close() {
         super.close();
@@ -119,6 +119,9 @@ public class MainMenu extends World
         Engine2D.GetInstance().getResourceManager().unloadSoundEffects();
     }
 
+    /**
+     *
+     */
     @Override
     public void update() {
         super.update();
@@ -128,6 +131,9 @@ public class MainMenu extends World
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void commit() {
         super.commit();
@@ -141,6 +147,11 @@ public class MainMenu extends World
         }
     }
 
+    /**
+     *
+     * @param event
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (game != null) {
@@ -150,6 +161,9 @@ public class MainMenu extends World
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void onPause() {
         super.onPause();
@@ -159,6 +173,9 @@ public class MainMenu extends World
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -168,20 +185,32 @@ public class MainMenu extends World
         }
     }
 
+    /**
+     *
+     * @param territory
+     */
     @Override
     public void onMapTerritoryFocused(Territory territory) {
 
     }
 
+    /**
+     *
+     * @param territory
+     * @param prevFaction
+     */
     @Override
     public void onMapTerritoryOccupied(Territory territory, Tribe.Faction prevFaction) {
 
     }
 
+    /**
+     *
+     * @param button
+     */
     @Override
     public void onButtonPressed(Button button) {
-
-        if (button == startButton) {
+        if (button == startButton) {    // Start button
             logo.hide();
             startButton.hide();
             settingButton.hide();
@@ -190,7 +219,7 @@ public class MainMenu extends World
                     new MissionSelectionBox(this, 30, 0.0f);
             missionSelectionBox.show();
             addWidget(missionSelectionBox);
-        } else if (button == settingButton) {
+        } else if (button == settingButton) {   // Setting button
             logo.hide();
             startButton.hide();
             settingButton.hide();
@@ -200,6 +229,10 @@ public class MainMenu extends World
         }
     }
 
+    /**
+     *
+     * @param settingBox
+     */
     @Override
     public void onSettingBoxClosed(SettingBox settingBox) {
         settingBox.close();
@@ -267,9 +300,13 @@ public class MainMenu extends World
      *
      */
     @Override
-    public void onGameExited(MainGame game) {
+    public void onGameExited(MainGame game, int starRating) {
         game.close();
         this.game = null;
+
+        if (game.getMission().getStarRating() < starRating) {
+            game.getMission().setStarRating(starRating);
+        }
 
         startMenu();
     }

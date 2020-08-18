@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
+
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.SizeF;
@@ -13,7 +15,6 @@ public class Territory {
     private final static String LOG_TAG = "Territory";
 
     public interface Event {
-
         void onTerritoryUpdated(Territory territory);
         void onTerritoryOccupied(Territory territory, Tribe.Faction oldFaction);
     }
@@ -146,7 +147,7 @@ public class Territory {
                 10,
                 0,
                 3,
-                Tribe.ShrineBonus.TOWN_POPULATION_BOOST,
+                Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST,
                 2
         ),
         SHRINE_PROSPER(
@@ -159,7 +160,7 @@ public class Territory {
                 10,
                 0,
                 3,
-                Tribe.ShrineBonus.TOWN_GOLD_BOOST,
+                Tribe.ShrineBonus.TERRITORY_GOLD_BOOST,
                 2
         ),
         UNKNOWN(
@@ -292,14 +293,12 @@ public class Territory {
      * @param tileSize
      */
     public static void SetTileSize(SizeF tileSize) {
-
         TileSize = tileSize;
     }
 
-    public Territory(Event eventHandler, OffsetCoord mapCoord, Terrain terrain, Tribe.Faction faction) {
-
+    public Territory(Event eventHandler, OffsetCoord mapPosition, Terrain terrain, Tribe.Faction faction) {
         this.eventHandler = eventHandler;
-        this.mapCoord = mapCoord;
+        this.mapPosition = mapPosition;
         this.terrain = terrain;
         this.faction = faction;
         this.facilityLevels = new int[Facility.values().length];
@@ -317,14 +316,14 @@ public class Territory {
             Arrays.fill(this.developmentPolicy, DevelopmentPolicy.DETERIORATE);
         }
         this.happiness = 50;
-        this.fogState = FogState.CLEAR; //(this.faction == Tribe.Faction.VILLAGER)? FogState.CLEAR : FogState.CLOUDY;
+        //this.fogState = FogState.CLEAR;
+        this.fogState = (this.faction == Tribe.Faction.VILLAGER)? FogState.CLEAR : FogState.CLOUDY;
     }
 
     /**
      *
      */
     public void update() {
-
         // Update territory only when it's at peace
         if (getBattle() != null) {
             return;
@@ -333,20 +332,18 @@ public class Territory {
         assert squads.size() <= 1;
 
         Squad squad = (squads.isEmpty())? null : squads.get(0);
-        if (squad != null &&
-                squad.getFaction() != getFaction() &&
-                !squad.isMoving() &&
-                !squad.isEliminated()) {
-            // If an enemy squad is exist, occupy town
+        if (squad != null && squad.getFaction() != getFaction() &&
+                !squad.isMoving() && !squad.isEliminated()) {
+            // If an enemy squad is exist, occupy territory
             updateOccupation(squad.getFaction());
         } else {
             cancelOccupation();
 
-            // Or update town
-            if (firstUpdate || townUpdateLeft-- == 0) {
+            // Or update territory
+            if (firstUpdate || territoryUpdateLeft-- == 0) {
                 updateDelta();
                 updateFacility();
-                townUpdateLeft = TOWN_UPDATE_COUNT;
+                territoryUpdateLeft = TERRITORY_UPDATE_COUNT;
                 firstUpdate = false;
             }
         }
@@ -364,7 +361,7 @@ public class Territory {
             eventHandler.onTerritoryUpdated(this);
         } else if (--this.occupationUpdateForThisStepLeft == 0) {
             if (++this.occupationStep > OCCUPATION_TOTAL_STEP) {
-                // If occupation is done, change the owner faction of town
+                // If occupation is done, change the owner faction of territory
                 this.occupationStep = 0;
                 this.occupationUpdateForThisStepLeft = OCCUPATION_UPDATE_TIME_FOR_EACH_STEP;
                 setFaction(occupyingFaction);
@@ -390,7 +387,6 @@ public class Territory {
      *
      */
     private void cancelOccupation() {
-
         // Cancel occupation process
         if (this.occupationStep > 0) {
             eventHandler.onTerritoryUpdated(this);
@@ -404,9 +400,8 @@ public class Territory {
      *
      */
     private void updateDelta() {
-
         if (faction == Tribe.Faction.VILLAGER) {
-            // Calculate delta from this town
+            // Calculate delta from this territory
             for (int i = 0; i < Facility.values().length; ++i) {
                 deltas[i] = developmentPolicy[i].developmentDelta() +
                         terrain.developmentDelta(Facility.values()[i]);
@@ -484,7 +479,6 @@ public class Territory {
      *
      */
     private void updateFacility() {
-
         // Get base exp delta for facilities
         int[] facilityExpDelta = new int[Facility.values().length];
         for (int i = 0; i < Facility.values().length; ++i) {
@@ -505,16 +499,8 @@ public class Territory {
         // Level down if exp is negative
         for (int i = 0; i < Facility.values().length; ++i) {
             if (facilityExps[i] < 0) {
-                if (facilityLevels[i] > 0) {
-                    facilityLevels[i]--;
-                    facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]-1;
-                    if (facilityLevels[i] == 4 || facilityLevels[i] == 3 || facilityLevels[i] == 0) {
-                        // Remove facility from placement if facility level is certain level
-                        facilitySlots.remove(Facility.values()[i]);
-                    }
-                } else {
-                    facilityExps[i] = 0;
-                }
+                setFacilityLevel(Facility.values()[i],
+                        Math.max(getFacilityLevel(Facility.values()[i]) - 1, 0));
             }
         }
 
@@ -523,24 +509,8 @@ public class Territory {
             if (developmentPolicy[i] == DevelopmentPolicy.PROSPER &&
                     facilityLevels[i] < MAX_FACILITY_LEVEL &&
                     facilityExps[i] >= REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]]) {
-                // Check if town have max facility already
-                if (getTotalFacilityLevel() < MAX_FACILITY_LEVEL) {
-                    // Check if facility need additional slots
-                    if (facilityLevels[i] == 0 || facilityLevels[i] == 3 || facilityLevels[i] == 4) {
-                        if (facilitySlots.size() < terrain.facilitySlots()) {
-                            facilitySlots.add(Facility.values()[i]);
-                            facilityLevels[i]++;
-                            facilityExps[i] = 0;
-                        } else {
-                            facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
-                        }
-                    } else {
-                        facilityLevels[i]++;
-                        facilityExps[i] = 0;
-                    }
-                } else {
-                    facilityExps[i] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[facilityLevels[i]];
-                }
+                setFacilityLevel(Facility.values()[i],
+                        Math.min(getFacilityLevel(Facility.values()[i]) + 1, 5));
             }
         }
 
@@ -560,17 +530,15 @@ public class Territory {
     private void createTileSprites() {
 
         if (baseSprite == null) {
-            baseSprite =
-                    new Sprite.Builder("Base", "tiles.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
+            baseSprite = new Sprite.Builder("Base", "tiles.png")
+                            .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(4, Terrain.values().length).smooth(false)
                             .layer(SPRITE_LAYER).visible(true).build();
         }
 
         if (factionSprite == null) {
-            factionSprite =
-                    new Sprite.Builder("TownFaction", "tiles_territory.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
+            factionSprite = new Sprite.Builder("TownFaction", "tiles_territory.png")
+                            .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(7, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.1f).visible(true).build();
         }
@@ -578,9 +546,8 @@ public class Territory {
         if (borderSprites == null) {
             borderSprites = new ArrayList<>();
             for (int i = 0; i < 6; ++i) {
-                Sprite border =
-                        new Sprite.Builder("TownTerritory", "tiles_territory.png")
-                                .position(new PointF(mapCoord.toGameCoord()))
+                Sprite border = new Sprite.Builder("TownTerritory", "tiles_territory.png")
+                                .position(new PointF(mapPosition.toGameCoord()))
                                 .size(TileSize).gridSize(7, 5).smooth(false)
                                 .layer(SPRITE_LAYER).depth(0.2f).visible(true).build();
                 border.setGridIndex(i, faction.ordinal());
@@ -589,9 +556,8 @@ public class Territory {
         }
 
         if (occupationSprite == null) {
-            occupationSprite =
-                    new Sprite.Builder("TerritoryOccupation", "tiles_occupation.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
+            occupationSprite = new Sprite.Builder("TerritoryOccupation", "tiles_occupation.png")
+                            .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(6, 5).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.3f).visible(true).build();
         }
@@ -599,9 +565,8 @@ public class Territory {
         if (facilitySprites == null) {
             facilitySprites = new ArrayList<>();
             for (int i = 0; i < 3; ++i) {
-                Sprite facilitySprite =
-                        new Sprite.Builder("Facility", "tiles_facility_objects.png")
-                                .position(new PointF(mapCoord.toGameCoord()))
+                Sprite facilitySprite = new Sprite.Builder("Facility", "tiles_facility_objects.png")
+                                .position(new PointF(mapPosition.toGameCoord()))
                                 .size(TileSize.clone().multiply(0.5f)).gridSize(6, 8).smooth(false)
                                 .layer(SPRITE_LAYER).depth(0.4f).visible(false).build();
                 facilitySprites.add(facilitySprite);
@@ -610,7 +575,7 @@ public class Territory {
 
         if (glowingSprite == null) {
             glowingSprite = new Sprite.Builder("Glowing", "tiles_glowing.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
+                            .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(1, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.5f).visible(true).build();
             glowingSprite.setGridIndex(0, 0);
@@ -618,7 +583,7 @@ public class Territory {
 
         if (selectionSprite == null) {
             selectionSprite = new Sprite.Builder("Selection", "tiles_selection.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
+                            .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(1, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.6f).visible(true).build();
             selectionSprite.setGridIndex(0, 0);
@@ -626,7 +591,7 @@ public class Territory {
 
         if (fogSprite == null) {
             fogSprite = new Sprite.Builder("Fog", "tiles_fog.png")
-                            .position(new PointF(mapCoord.toGameCoord()))
+                            .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(2, 1).smooth(false)
                             .layer(SPRITE_LAYER).depth(0.7f).visible(true).build();
             fogSprite.setGridIndex(0, 0);
@@ -665,11 +630,14 @@ public class Territory {
         sprites.add(baseSprite);
 
         // Set facility sprite
-        if (facilitySlots.size() == 0 || fogState != FogState.CLEAR) {
+        if (fogState != FogState.CLEAR) {
+            for (Sprite sprite : facilitySprites) {
+                sprite.setVisible(false);
+                sprite.commit();
+            }
+        } else if (facilitySlots.size() == 0) {
             // Draw enemy facility
-            if (facilitySlots.size() == 0 && fogState == FogState.CLEAR &&
-                    getFaction() != Tribe.Faction.VILLAGER &&
-                    getFaction() != Tribe.Faction.NEUTRAL &&
+            if (getFaction() != Tribe.Faction.VILLAGER && getFaction() != Tribe.Faction.NEUTRAL &&
                     getTerrain().canDevelop()) {
                 boolean enemyFacilityExist = false;
                 for (int enemyFacility: enemyFacilityIndex) {
@@ -727,10 +695,10 @@ public class Territory {
                 }
             }
         } else {
+            // Draw facilities for villager
             int facilityIndex = 0;
             for (int highLevelIndex = 0; facilityIndex < facilitySlots.size(); ++facilityIndex) {
                 Sprite sprite = facilitySprites.get(facilityIndex);
-
                 Facility facility = facilitySlots.get(facilityIndex);
                 int level = getFacilityLevel(facility);
                 if (level <= 3) {
@@ -929,7 +897,6 @@ public class Territory {
      * @param squad
      */
     public void removeSquad(Squad squad) {
-
         this.squads.remove(squad);
     }
 
@@ -938,7 +905,6 @@ public class Territory {
      * @return
      */
     public Battle getBattle() {
-
         return battle;
     }
 
@@ -947,7 +913,6 @@ public class Territory {
      * @param battle
      */
     public void setBattle(Battle battle) {
-
         this.battle = battle;
     }
 
@@ -956,17 +921,15 @@ public class Territory {
      * @return
      */
     public OffsetCoord getMapPosition() {
-
-        return mapCoord;
+        return mapPosition;
     }
 
     /**
      *
-     * @param mapCoord
+     * @param mapPosition
      */
-    public void setMapCoord(OffsetCoord mapCoord) {
-
-        this.mapCoord = mapCoord;
+    public void setMapPosition(OffsetCoord mapPosition) {
+        this.mapPosition = mapPosition;
     }
 
     /**
@@ -974,7 +937,6 @@ public class Territory {
      * @param focused
      */
     public void setFocus(boolean focused) {
-
         this.focused = focused;
         eventHandler.onTerritoryUpdated(this);
     }
@@ -984,7 +946,6 @@ public class Territory {
      * @return
      */
     public boolean getFocus() {
-
         return focused;
     }
 
@@ -993,8 +954,67 @@ public class Territory {
      * @return
      */
     public Terrain getTerrain() {
-
         return terrain;
+    }
+
+    /**
+     *
+     * @param facility
+     * @param level
+     */
+    public void setFacilityLevel(Facility facility, int level) {
+        int currentFacilityLevel = facilityLevels[facility.ordinal()];
+        int levelDelta = level - currentFacilityLevel;
+
+        // Check if the territory has already the max facility level
+        if (getTotalFacilityLevel() + levelDelta > MAX_FACILITY_LEVEL) {
+            //Log.w(LOG_TAG, "Facility level can't go over " + MAX_FACILITY_LEVEL + "!!");
+            return;
+        }
+
+        // Count the previous facility slot count
+        int currentNeededSlotCount;
+        if (currentFacilityLevel <= 0) {
+            currentNeededSlotCount = 0;
+        } else if (currentFacilityLevel <= 3) {
+            currentNeededSlotCount = 1;
+        } else if (currentFacilityLevel <= 4) {
+            currentNeededSlotCount = 2;
+        } else {
+            currentNeededSlotCount = 3;
+        }
+
+        // Count the needed facility slot count
+        int newNeededSlotCount;
+        if (level <= 0) {
+            newNeededSlotCount = 0;
+        } else if (level <= 3) {
+            newNeededSlotCount = 1;
+        } else if (level <= 4) {
+            newNeededSlotCount = 2;
+        } else {
+            newNeededSlotCount = 3;
+        }
+
+        // Add/remove facility slot
+        int slotDelta = newNeededSlotCount - currentNeededSlotCount;
+        if (facilitySlots.size() + slotDelta <= terrain.facilitySlots()) {
+            for (int i = 0; i < Math.abs(slotDelta); ++i) {
+                if (slotDelta > 0) {
+                    facilitySlots.add(facility);
+                } else {
+                    facilitySlots.remove(facility);
+                }
+            }
+        }
+
+        // Set facility level
+        facilityLevels[facility.ordinal()] = level;
+        if (levelDelta >= 0) {
+            facilityExps[facility.ordinal()] = 0;
+        } else {
+            facilityExps[facility.ordinal()] = REQUIRED_FACILITY_EXP_FOR_LEVEL_UP[level] - 1;
+        }
     }
 
     /**
@@ -1003,7 +1023,6 @@ public class Territory {
      * @return
      */
     public int getFacilityLevel(Facility facility) {
-
         return facilityLevels[facility.ordinal()];
     }
 
@@ -1012,7 +1031,6 @@ public class Territory {
      * @return
      */
     public int getTotalFacilityLevel() {
-
         return Arrays.stream(facilityLevels).sum();
     }
 
@@ -1021,7 +1039,6 @@ public class Territory {
      * @return
      */
     public Tribe.Faction getFaction() {
-
         return faction;
     }
 
@@ -1031,7 +1048,6 @@ public class Territory {
      * @return
      */
     public DevelopmentPolicy getDevelopmentPolicy(Facility facility) {
-
         return developmentPolicy[facility.ordinal()];
     }
 
@@ -1041,7 +1057,6 @@ public class Territory {
      * @param policy
      */
     public void setDevelopmentPolicy(Facility facility, DevelopmentPolicy policy) {
-
         developmentPolicy[facility.ordinal()] = policy;
     }
 
@@ -1050,7 +1065,6 @@ public class Territory {
      * @return
      */
     public int getTax() {
-
         if (getBattle() != null) {
             return 0;
         } else {
@@ -1165,20 +1179,20 @@ public class Territory {
     }
 
     private final static int SPRITE_LAYER = 0;
-    private final static int TOWN_UPDATE_COUNT = 30;
+    private final static int TERRITORY_UPDATE_COUNT = 30;
     private final static int MAX_FACILITY_LEVEL = 5;
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
-            new int[] { 100, 200, 300, 400, 500};
+            new int[] { 1000, 3000, 6000, 10000, 15000};
     private final static int FACILITY_EXP_STEP = 10;
     private final static int GOLD_STEP = 50;
     private final static int POPULATION_STEP = 10;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;
     private final static int OCCUPATION_TOTAL_STEP = 5;
-    private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 30;
+    private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 60;
 
     private Event eventHandler;
-    private OffsetCoord mapCoord;
+    private OffsetCoord mapPosition;
     private Terrain terrain;
     private Tribe.Faction faction;
     private boolean focused = false;
@@ -1199,7 +1213,7 @@ public class Territory {
     private int[] enemyFacilityIndex;
     private DevelopmentPolicy[] developmentPolicy;
     private ArrayList<Facility> facilitySlots = new ArrayList<>();
-    private int townUpdateLeft = (int)(Math.random()* TOWN_UPDATE_COUNT);
+    private int territoryUpdateLeft = (int)(Math.random()* TERRITORY_UPDATE_COUNT);
     private int happiness;
     private FogState fogState;
 

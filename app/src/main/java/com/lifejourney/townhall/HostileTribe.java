@@ -25,17 +25,8 @@ public abstract class HostileTribe extends Tribe {
     }
 
     public HostileTribe(Event eventHandler, Faction faction, GameMap map, Villager villager) {
-
         super(eventHandler, faction, map);
-
-        // Write down villager's information
         this.villager = villager;
-        for (Territory territory : map.getTerritories()) {
-            if (territory.getTerrain() == Territory.Terrain.HEADQUARTER &&
-                    territory.getFaction() == Faction.VILLAGER) {
-                this.villagerHeadquarterPosition = territory.getMapPosition();
-            }
-        }
     }
 
     /**
@@ -43,7 +34,6 @@ public abstract class HostileTribe extends Tribe {
      */
     @Override
     public void update() {
-
         super.update();
 
         if (!isDestroyed()) {
@@ -129,7 +119,6 @@ public abstract class HostileTribe extends Tribe {
      *
      */
     protected void recruit() {
-
         if (recruitingUpdateTimeLeft-- > 0) {
             return;
         }
@@ -141,6 +130,7 @@ public abstract class HostileTribe extends Tribe {
         // Create squad if conditions are met
         if (getSquads().size() < SQUAD_COUNT_LIMIT &&
                 gold >= SQUAD_CREATION_ALLOW_GOLD * (getSquads().size() + 1) &&
+                getHeadquarterPosition() != null &&
                 getMap().getTerritory(getHeadquarterPosition()).getFaction() == getFaction() &&
                 getMap().getTerritory(getHeadquarterPosition()).getSquads().size() == 0) {
             gold -= SQUAD_CREATION_ALLOW_GOLD;
@@ -155,7 +145,6 @@ public abstract class HostileTribe extends Tribe {
      *
      */
     protected void upgrade() {
-
         if (upgradingProgressive++ > UPGRADING_PROGRESSIVE_THRESHOLD) {
             for (Upgradable upgradable : Upgradable.values()) {
                 if (upgradable.getLevel(getFaction()) < 3 && Math.random() > 0.5f) {
@@ -173,7 +162,6 @@ public abstract class HostileTribe extends Tribe {
      *
      */
     protected void decidePolicy() {
-
         if (policyDecisionUpdateTimeLeft-- > 0) {
             return;
         }
@@ -199,6 +187,7 @@ public abstract class HostileTribe extends Tribe {
         }
 
         if ((policy == Raider.Policy.EXPANSION || policy == Raider.Policy.DEFENSIVE) &&
+                getHeadquarterPosition() != null &&
                 getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()) {
             // If someone took its hq, take it back
             strategicTarget = getHeadquarterPosition();
@@ -206,17 +195,19 @@ public abstract class HostileTribe extends Tribe {
             // First try to take shrines
             int nearestDistanceToShrine = Integer.MAX_VALUE;
             OffsetCoord nearestShrinePosition = null;
-            for (OffsetCoord shrinePosition: getShrinePositions()) {
-                if (getMap().getTerritory(shrinePosition).getFaction() == getFaction()) {
-                    continue;
-                }
-                GamePathFinder pathFinder = new GamePathFinder(getHeadquarterPosition(),
-                        shrinePosition, getMap(), getFaction());
-                ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
+            if (getHeadquarterPosition() != null) {
+                for (OffsetCoord shrinePosition : getShrinePositions()) {
+                    if (getMap().getTerritory(shrinePosition).getFaction() == getFaction()) {
+                        continue;
+                    }
+                    GamePathFinder pathFinder = new GamePathFinder(getHeadquarterPosition(),
+                            shrinePosition, getMap(), getFaction());
+                    ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
 
-                if (optimalPath != null && nearestDistanceToShrine > optimalPath.size()) {
-                    nearestDistanceToShrine = optimalPath.size();
-                    nearestShrinePosition = shrinePosition;
+                    if (optimalPath != null && nearestDistanceToShrine > optimalPath.size()) {
+                        nearestDistanceToShrine = optimalPath.size();
+                        nearestShrinePosition = shrinePosition;
+                    }
                 }
             }
 
@@ -224,7 +215,7 @@ public abstract class HostileTribe extends Tribe {
             if (nearestShrinePosition != null) {
                 strategicTarget = nearestShrinePosition;
             } else {
-                strategicTarget = villagerHeadquarterPosition;
+                strategicTarget = villager.getHeadquarterPosition();
             }
         }
     }
@@ -233,7 +224,6 @@ public abstract class HostileTribe extends Tribe {
      *
      */
     protected void decideTactic() {
-
         if (tacticalDecisionUpdateTime-- > 0) {
             return;
         }
@@ -249,7 +239,6 @@ public abstract class HostileTribe extends Tribe {
      * @param squad
      */
     protected void decideASquadTactic(final Squad squad) {
-
         if (squad.isFighting() || squad.isOccupying() || squad.isSupporting() ||
                 squad.isRecruiting() || squad.getHealthPercentage() <= SQUAD_ACTIVATE_THRESHOLD) {
             return;
@@ -397,7 +386,6 @@ public abstract class HostileTribe extends Tribe {
     protected Villager villager;
     protected Policy policy = Policy.EXPANSION;
     protected OffsetCoord strategicTarget = null;
-    protected OffsetCoord villagerHeadquarterPosition;
 
     protected int recruitingProgressive = 0;
     protected int upgradingProgressive = 0;

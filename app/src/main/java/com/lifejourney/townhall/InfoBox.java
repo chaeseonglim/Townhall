@@ -25,7 +25,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     }
 
     public InfoBox(Event eventHandler, Territory territory, int layer, float depth) {
-
         super(null, layer, depth);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
@@ -53,12 +52,11 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 .build();
         addWidget(closeButton);
 
-        updateTownInfo();
+        updateTerritoryInfo();
 
     }
 
     public InfoBox(Event eventHandler, Villager villager, Squad squad, int layer, float depth) {
-
         super(null, layer, depth);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
@@ -90,11 +88,11 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         // Territory button
         Rect toTownButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
                 150, 60);
-        toTownButton = new Button.Builder(this, toTownButtonRegion)
+        toTerritoryButton = new Button.Builder(this, toTownButtonRegion)
                 .message("마을로").imageSpriteAsset("")
                 .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
                 .build();
-        addWidget(toTownButton);
+        addWidget(toTerritoryButton);
 
 
         updateSquadInfo();
@@ -107,7 +105,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         // It consumes all input
         super.onTouchEvent(event);
         return true;
@@ -119,51 +116,41 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      */
     @Override
     public void onButtonPressed(Button button) {
-
-        if (button == closeButton) {
-            // Close button
+        if (button == closeButton) { // Close button
             setVisible(false);
             eventHandler.onInfoBoxClosed(this);
-        } else if (button == toTownButton) {
-            // To territory button
+        } else if (button == toTerritoryButton) { // To territory button
             setVisible(false);
             eventHandler.onInfoBoxSwitchToTown(this);
-        } else if (button == farmDevelopmentButton) {
-            // Farm development button
+        } else if (button == farmDevelopmentButton) { // Farm development button
             Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.FARM);
             Territory.DevelopmentPolicy newDevelopment =
                     Territory.DevelopmentPolicy.values()[
                             (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
             territory.setDevelopmentPolicy(Territory.Facility.FARM, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal());
-        } else if (button == marketDevelopmentButton) {
-            // Market development button
+        } else if (button == marketDevelopmentButton) { // Market development button
             Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.MARKET);
             Territory.DevelopmentPolicy newDevelopment =
                     Territory.DevelopmentPolicy.values()[
                             (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
             territory.setDevelopmentPolicy(Territory.Facility.MARKET, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 3);
-        } else if (button == downtownDevelopmentButton) {
-            // Downtown development button
+        } else if (button == downtownDevelopmentButton) { // Downtown development button
             Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.DOWNTOWN);
             Territory.DevelopmentPolicy newDevelopment =
                     Territory.DevelopmentPolicy.values()[
                             (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
             territory.setDevelopmentPolicy(Territory.Facility.DOWNTOWN, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 6);
-        } else if (button == fortressDevelopmentButton) {
-            // Fortress development button
+        } else if (button == fortressDevelopmentButton) { // Fortress development button
             Territory.DevelopmentPolicy development = territory.getDevelopmentPolicy(Territory.Facility.FORTRESS);
             Territory.DevelopmentPolicy newDevelopment =
                     Territory.DevelopmentPolicy.values()[
                             (development.ordinal()+1)% Territory.DevelopmentPolicy.values().length];
             territory.setDevelopmentPolicy(Territory.Facility.FORTRESS, newDevelopment);
             button.setImageSpriteSet(newDevelopment.ordinal() + 9);
-        } else if (button == unitButtons[0] ||
-                button == unitButtons[1] ||
-                button == unitButtons[2]) {
-
+        } else if (button == unitButtons[0] || button == unitButtons[1] || button == unitButtons[2]) {  // Unit buttons
             for (int i = 0;; ++i) {
                 if (button == unitButtons[i]) {
                     recruitingSlot = i;
@@ -216,7 +203,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      */
     @Override
     public void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass) {
-
         infoBox.close();
         removeWidget(infoBox);
         show();
@@ -239,8 +225,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     /**
      *
      */
-    private void updateTownInfo() {
-
+    private void updateTerritoryInfo() {
         Rect region = getRegion();
         int layer = getLayer();
 
@@ -293,8 +278,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(0, 30);
             addText("없음", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
-        } else {
-            // Development buttons
+        } else { // Development buttons status
             if (farmDevelopmentButton != null) {
                 farmDevelopmentButton.close();
                 removeWidget(farmDevelopmentButton);
@@ -530,17 +514,16 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         } else {
             for (Unit unit : squad.getUnits()) {
                 textPosition.offset(0, 30);
-                String unitStr = unit.getUnitClass().word() + " Lv." + unit.getLevel();
+                String unitInfoStr = unit.getUnitClass().word() + " Lv." + unit.getLevel();
                 if (unit.isRecruiting()) {
-                    unitStr += " (모집중)";
+                    unitInfoStr += " (모집중)";
                 }
-                addText(unitStr, new SizeF(300, 40), textPosition.clone(),
+                addText(unitInfoStr, new SizeF(300, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
         }
 
-        if (squad.getFaction() == Tribe.Faction.VILLAGER) {
-            // Unit buttons
+        if (squad.getFaction() == Tribe.Faction.VILLAGER) { // Unit buttons
             Rect unitButtonRegion =
                     new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
                             60, 64);
@@ -672,7 +655,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-
         addSprite(new TextSprite.Builder("text", text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(Paint.Align.LEFT)
@@ -689,7 +671,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor, Paint.Align align) {
-
         addSprite(new TextSprite.Builder("text", text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(align)
@@ -705,7 +686,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param position
      */
     private void addIcon(String asset, SizeF size, PointF position) {
-
         addSprite(new Sprite.Builder("icon", asset)
                 .size(size).positionOffset(position)
                 .smooth(false).depth(0.1f)
@@ -717,7 +697,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param replacementUnitClass
      */
     private void popupUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
-
         Rect unitSelectBoxRegion = getRegion().clone();
         unitSelectBoxRegion.y -= 10;
         unitSelectBoxRegion.height += 20;
@@ -727,13 +706,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         unitSelectionBox.show();
     }
 
-
     private Event eventHandler;
     private Villager villager;
     private Territory territory;
     private Squad squad;
     private Button closeButton;
-    private Button toTownButton;
+    private Button toTerritoryButton;
     private Button farmDevelopmentButton;
     private Button downtownDevelopmentButton;
     private Button marketDevelopmentButton;

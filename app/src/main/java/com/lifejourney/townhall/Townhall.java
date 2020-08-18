@@ -170,7 +170,6 @@ public class Townhall extends FragmentActivity
      */
     @Override
     public void doFrame(long frameTimeNanos) {
-
         Trace.beginSection("doFrame");
 
         if (fpsMarkerCount++%120 == 0) {

@@ -53,9 +53,9 @@ public class DateBar extends Widget {
 
         // Update date
         if (!paused && --updateTimeLeft == 0) {
-            date++;
-            dateTextSprite.setText(date + " days");
-            eventHandler.onDatePassed(date);
+            days++;
+            dateTextSprite.setText(days + " days");
+            eventHandler.onDatePassed(days);
             updateTimeLeft = DATE_UPDATE_PERIOD;
         }
     }
@@ -64,8 +64,8 @@ public class DateBar extends Widget {
      *
      * @return
      */
-    public int getDate() {
-        return date;
+    public int getDays() {
+        return days;
     }
 
     /**
@@ -86,7 +86,7 @@ public class DateBar extends Widget {
 
     private Event eventHandler;
     private boolean paused = false;
-    private int date = 0;
+    private int days = 0;
     private int updateTimeLeft = DATE_UPDATE_PERIOD;
     private TextSprite dateTextSprite;
 }

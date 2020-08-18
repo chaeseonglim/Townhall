@@ -7,7 +7,7 @@ public class Rebel extends HostileTribe {
         super(eventHandler, Faction.REBEL, map, villager);
 
         policy = Policy.ASSAULT;
-        strategicTarget = villagerHeadquarterPosition;
+        strategicTarget = villager.getHeadquarterPosition();
     }
 
     @Override

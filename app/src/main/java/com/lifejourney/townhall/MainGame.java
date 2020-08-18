@@ -1,6 +1,6 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
+import android.graphics.Color;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
@@ -18,20 +18,20 @@ public class MainGame extends World
     static final String LOG_TAG = "MainGame";
 
     interface Event {
-        void onGameExited(MainGame game);
+        void onGameExited(MainGame game, int stars);
     }
 
     MainGame(Event eventHandler, Mission mission) {
-
         super();
 
         this.eventHandler = eventHandler;
+        this.mission = mission;
 
-        // Set FPS
-        setDesiredFPS(20.0f);
-
-        // Init singleton enum
+        // Init upgradable status
         Upgradable.reset();
+
+        // Set update FPS
+        setUpdateFPS(20.0f);
 
         // Build map
         map = new GameMap(this, mission.getMapFile(), false);
@@ -124,47 +124,8 @@ public class MainGame extends World
      *
      */
     @Override
-    public void pause() {
-        super.pause();
-        dateBar.pause();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void resume() {
-        super.resume();
-        dateBar.resume();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-        playSpeedReturnedFromBackground = speedControl.getPlaySpeed();
-        speedControl.setPlaySpeed(0);
-        Engine2D.GetInstance().stopMusic();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        speedControl.setPlaySpeed(playSpeedReturnedFromBackground);
-        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
-    }
-
-    /**
-     *
-     */
-    @Override
     protected void postUpdate() {
-        // Check if new battle is arisen
+        // Check if new battle starts
         for (Squad squad: squads) {
             Territory thisTerritory = map.getTerritory(squad.getMapPosition());
             ArrayList<Squad> squadsInSameMap = thisTerritory.getSquads();
@@ -205,6 +166,48 @@ public class MainGame extends World
         for (Squad squad : tribes.get(0).getSquads()) {
             setMapFogState(squad.getMapPosition(), squad.getVision(), Territory.FogState.CLEAR);
         }
+
+        // Update mission
+        mission.update(this);
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void pause() {
+        super.pause();
+        dateBar.pause();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void resume() {
+        super.resume();
+        dateBar.resume();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        playSpeedReturnedFromBackground = speedControl.getPlaySpeed();
+        speedControl.setPlaySpeed(0);
+        Engine2D.GetInstance().stopMusic();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        speedControl.setPlaySpeed(playSpeedReturnedFromBackground);
+        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
     }
 
     /**
@@ -213,7 +216,6 @@ public class MainGame extends World
      */
     @Override
     public void onMapTerritoryFocused(Territory territory) {
-
         Engine2D.GetInstance().playSoundEffect("click5", 1.0f);
 
         if (focusedTerritory == territory) {
@@ -253,7 +255,6 @@ public class MainGame extends World
      */
     @Override
     public void onMapTerritoryOccupied(Territory territory, Tribe.Faction prevFaction) {
-
         // Check if it's shrine
         if (territory.getTerrain() == Territory.Terrain.SHRINE_WIND ||
             territory.getTerrain() == Territory.Terrain.SHRINE_HEAL ||
@@ -276,8 +277,16 @@ public class MainGame extends World
         }
 
         if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {
-            newsBar.addNews("우리 본부가 점령되었습니다. 이제 희망이 없습니다!");
-            // TODO: Game over
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            pause();
+            newsBar.addNews("우리 본부가 점령되었습니다. 이제 더이상 희망이 없습니다!");
+            gameoverBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                    new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                            353, 275), "본부가 점령되었습니다.\n\n게임 오버!")
+                    .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
+                    .build();
+            gameoverBox.show();
+            addWidget(gameoverBox);
         } else {
             for (int i = 0; i < tribes.size(); ++i) {
                 // Check if some faction's headquarter is occupied
@@ -308,7 +317,6 @@ public class MainGame extends World
      */
     @Override
     public void onTribeCollected(Tribe tribe) {
-
         economyBar.refresh();
     }
 
@@ -319,7 +327,6 @@ public class MainGame extends World
      */
     @Override
     public void onTribeUpgraded(Tribe tribe, Upgradable upgradable) {
-
         newsBar.addNews(tribe.getFaction().toGameString() + "이 새로운 기술을 습득했습니다.");
     }
 
@@ -329,7 +336,6 @@ public class MainGame extends World
      */
     @Override
     public void onTribeDestroyed(Tribe tribe) {
-
         newsBar.addNews(tribe.getFaction().toGameString() + "이 패배했습니다.");
     }
 
@@ -339,7 +345,6 @@ public class MainGame extends World
      */
     @Override
     public void onSquadCreated(Squad squad) {
-
         OffsetCoord squadMapPosition = squad.getMapPosition();
 
         Territory squadTerritory = map.getTerritory(squadMapPosition);
@@ -357,7 +362,6 @@ public class MainGame extends World
      */
     @Override
     public void onSquadDestroyed(Squad squad) {
-
         OffsetCoord squadMapPosition = squad.getMapPosition();
 
         map.getTerritory(squadMapPosition).removeSquad(squad);
@@ -384,7 +388,6 @@ public class MainGame extends World
      */
     @Override
     public void onSquadFocused(Squad squad) {
-
         if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             Engine2D.GetInstance().playSoundEffect("villager", 1.0f);
         } else if (squad.getFaction() == Tribe.Faction.RAIDER) {
@@ -421,7 +424,6 @@ public class MainGame extends World
      */
     @Override
     public void onSquadMoved(Squad squad, OffsetCoord prevMapPosition, OffsetCoord newMapPosition) {
-
         map.getTerritory(prevMapPosition).removeSquad(squad);
         map.getTerritory(newMapPosition).addSquad(squad);
     }
@@ -433,7 +435,6 @@ public class MainGame extends World
      */
     @Override
     public void onSquadUnitAdded(Squad squad, Unit unit) {
-
         addUnit(unit);
 
         // Refresh UI state
@@ -450,7 +451,6 @@ public class MainGame extends World
      */
     @Override
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
-
         removeUnit(unit);
 
         if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
@@ -460,6 +460,9 @@ public class MainGame extends World
 
     @Override
     public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
+        if (messageBox == gameoverBox) {
+            eventHandler.onGameExited(this, 0);
+        }
     }
 
     /**
@@ -468,14 +471,14 @@ public class MainGame extends World
      */
     @Override
     public void onButtonPressed(Button button) {
-        if (button == homeButton) {
+        if (button == homeButton) { // Home button pressed
             // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
 
             // Pop up home box
             popupHomeBox();
-        } else if (button == infoButton) {
+        } else if (button == infoButton) { // Info button pressed
             // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
@@ -486,7 +489,7 @@ public class MainGame extends World
             } else if (focusedTerritory != null) {
                 popupInfoBox(focusedTerritory);
             }
-        } else if (button == squadBuilderButton) {
+        } else if (button == squadBuilderButton) { // Squad Builder Button
             // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
@@ -501,7 +504,7 @@ public class MainGame extends World
 
             // Pop up info box
             popupInfoBox(squad);
-        } else if (button == settingButton) {
+        } else if (button == settingButton) { // Settings Button
             // Pause game temporarily
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
@@ -514,16 +517,16 @@ public class MainGame extends World
     @Override
     public void onSpeedControlUpdate(SpeedControl speedControl) {
         if (speedControl.getPlaySpeed() == 0) { // Pause
-            setDesiredFPS(20.0f);
+            setUpdateFPS(20.0f);
             pause();
         } else if (speedControl.getPlaySpeed() == 1) { // 1x
-            setDesiredFPS(20.0f);
+            setUpdateFPS(20.0f);
             resume();
         } else if (speedControl.getPlaySpeed() == 2) { // 2x
-            setDesiredFPS(40.0f);
+            setUpdateFPS(40.0f);
             resume();
         } else if (speedControl.getPlaySpeed() == 3) { // 3x
-            setDesiredFPS(60.0f);
+            setUpdateFPS(60.0f);
             resume();
         }
     }
@@ -546,7 +549,6 @@ public class MainGame extends World
      */
     @Override
     public void onHomeBoxClosed(HomeBox homeBox) {
-
         homeBox.close();
         removeWidget(homeBox);
 
@@ -559,7 +561,6 @@ public class MainGame extends World
      */
     @Override
     public void onUpgradeBoxSwitchToHomeBox(UpgradeBox upgradeBox) {
-
         popupHomeBox();
 
         upgradeBox.close();
@@ -573,7 +574,6 @@ public class MainGame extends World
      */
     @Override
     public void onUpgradeBoxUpgraded(UpgradeBox upgradeBox, Upgradable upgradable) {
-
         economyBar.refresh();
         Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
     }
@@ -584,7 +584,6 @@ public class MainGame extends World
      */
     @Override
     public void onUpgradeBoxClosed(UpgradeBox upgradeBox) {
-
         upgradeBox.close();
         removeWidget(upgradeBox);
 
@@ -597,7 +596,6 @@ public class MainGame extends World
      */
     @Override
     public void onInfoBoxSwitchToTown(InfoBox infoBox) {
-
         popupInfoBox(map.getTerritory(focusedSquad.getMapPosition()));
 
         infoBox.close();
@@ -610,7 +608,6 @@ public class MainGame extends World
      */
     @Override
     public void onInfoBoxClosed(InfoBox infoBox) {
-
         infoBox.close();
         removeWidget(infoBox);
 
@@ -634,13 +631,12 @@ public class MainGame extends World
     public void onSettingBoxClosed(SettingBox settingBox) {
         settingBox.close();
         removeWidget(settingBox);
-
         speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
     }
 
     @Override
     public void onSettingBoxExitPressed(SettingBox settingBox) {
-        eventHandler.onGameExited(this);
+        eventHandler.onGameExited(this, 0);
     }
 
     /**
@@ -773,6 +769,22 @@ public class MainGame extends World
         return null;
     }
 
+    /**
+     *
+     * @return
+     */
+    public int getDays() {
+        return dateBar.getDays();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Mission getMission() {
+        return mission;
+    }
+
     private final static float MUSIC_VOLUME = 0.3f;
 
     private Event eventHandler;
@@ -781,7 +793,7 @@ public class MainGame extends World
 
     private Mission mission;
     private GameMap map;
-    private MessageBox messageBox;
+    private MessageBox gameoverBox;
     private Button squadBuilderButton;
     private Button infoButton;
     private Button homeButton;

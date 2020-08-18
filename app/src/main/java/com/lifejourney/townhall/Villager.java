@@ -8,8 +8,10 @@ public class Villager extends Tribe {
 
         super(eventHandler, Faction.VILLAGER, map);
 
+        /*
         spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
                 Unit.UnitClass.PALADIN, Unit.UnitClass.HEALER, Unit.UnitClass.HORSE_MAN);
+         */
     }
 
     @Override
@@ -36,9 +38,9 @@ public class Villager extends Tribe {
         if (getTerritories().size() > 0) {
             for (Territory territory : getTerritories()) {
                 income += (float) territory.getTax() *
-                        (1.0f + getShrineBonus(ShrineBonus.TOWN_GOLD_BOOST));
+                        (1.0f + getShrineBonus(ShrineBonus.TERRITORY_GOLD_BOOST));
                 totalPopulation += territory.getPopulation() *
-                        (1.0f + getShrineBonus(ShrineBonus.TOWN_POPULATION_BOOST));
+                        (1.0f + getShrineBonus(ShrineBonus.TERRITORY_POPULATION_BOOST));
                 happiness += territory.getHappiness();
             }
             happiness /= getTerritories().size();
@@ -175,7 +177,7 @@ public class Villager extends Tribe {
 
 
     private final static int COLLECT_UPDATE_TIME = 60;
-    private final static int STARTING_GOLD = 25000;
+    private final static int STARTING_GOLD = 250;
 
     private int collectTimeLeft = 1;
     private int totalPopulation = 0;

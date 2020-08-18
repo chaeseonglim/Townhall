@@ -213,7 +213,7 @@ public class HomeBox extends Widget implements Button.Event {
                     Color.rgb(230, 230, 230));
             textPosition.offset(-30, 0);
         }
-        if (villager.getShrineBonus(Tribe.ShrineBonus.TOWN_GOLD_BOOST) != 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_GOLD_BOOST) != 0) {
             textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(95, 0);
@@ -221,7 +221,7 @@ public class HomeBox extends Widget implements Button.Event {
                     Color.rgb(230, 230, 230));
             textPosition.offset(-30, 0);
         }
-        if (villager.getShrineBonus(Tribe.ShrineBonus.TOWN_POPULATION_BOOST) != 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST) != 0) {
             textPosition.offset(-65, 30);
             addIcon("health.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(95, 0);

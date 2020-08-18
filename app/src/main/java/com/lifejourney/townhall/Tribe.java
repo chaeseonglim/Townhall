@@ -37,8 +37,8 @@ public abstract class Tribe implements Squad.Event {
     enum ShrineBonus {
         UNIT_ATTACK_SPEED,
         UNIT_HEAL_POWER,
-        TOWN_GOLD_BOOST,
-        TOWN_POPULATION_BOOST;
+        TERRITORY_GOLD_BOOST,
+        TERRITORY_POPULATION_BOOST;
     }
 
     public interface Event extends Squad.Event {
@@ -74,7 +74,6 @@ public abstract class Tribe implements Squad.Event {
      *
      */
     public void update() {
-
         // Check win/defeat condition
         if (checkDefeated())
             return;
@@ -93,15 +92,17 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public boolean checkDefeated() {
-        if (!isDestroyed() &&
+        if (!isDestroyed() && getSquads().size() == 0 &&
                 (getHeadquarterPosition() != null &&
-                getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()) &&
-                getSquads().size() == 0) {
+                getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction())) {
             destroyed = true;
+
+            // Remove territories
             ArrayList<Territory> territoriesCopy = new ArrayList<>(territories);
             for (Territory territory: territoriesCopy) {
                 territory.setFaction(Faction.NEUTRAL);
             }
+
             getEventHandler().onTribeDestroyed(this);
         }
 
@@ -180,7 +181,6 @@ public abstract class Tribe implements Squad.Event {
      * @param unitClass
      */
     public Squad spawnSquad(PointF position, Faction faction, Unit.UnitClass... unitClass) {
-
         Squad squad = new Squad.Builder(this, position, map, faction).build();
         if (unitClass.length >= 1) {
             squad.spawnUnit(unitClass[0]);

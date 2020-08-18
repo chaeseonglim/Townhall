@@ -22,7 +22,6 @@ public class MissionSelectionBox extends Widget implements Button.Event{
     }
 
     public MissionSelectionBox(Event eventHandler, int layer, float depth) {
-
         super(null, layer, depth);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
@@ -84,9 +83,8 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      *
      */
     private void updateMissionInfo() {
-
         // Remove all previous texts
-        removeSprites("text"+textIndex++);
+        removeSprites("text");
         removeSprites("icon");
 
         // Set left button
@@ -137,6 +135,19 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         addText(selectedMission.getTimeLimit() + "일", new SizeF(460, 40),
                 textPosition.clone(),
                 25, Color.rgb(235, 235, 235), Paint.Align.LEFT);
+
+        // Star rating
+        textPosition.offset(-248, 60);
+        for (int i = 0; i < selectedMission.getStarRating(); ++i) {
+            textPosition.offset(35, 0);
+            addIcon("star.png", new SizeF(30, 30), textPosition.clone(),
+                    3, 2, 0, 0);
+        }
+        for (int i = selectedMission.getStarRating(); i < 3; ++i) {
+            textPosition.offset(35, 0);
+            addIcon("star.png", new SizeF(30, 30), textPosition.clone(),
+                    3, 2, 2, 0);
+        }
     }
 
     /**
@@ -146,7 +157,6 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         if (!isVisible()) {
             return false;
         }
@@ -163,7 +173,6 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      */
     @Override
     public void onButtonPressed(Button button) {
-
         if (button == cancelButton) { // Cancel button
             eventHandler.onMissionSelectionBoxCanceled(this);
         } else if (button == startButton) { // Start button
@@ -186,8 +195,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontSize, int fontColor, Paint.Align align) {
-
-        addSprite(new TextSprite.Builder("text" + textIndex, text, fontSize)
+        addSprite(new TextSprite.Builder("text", text, fontSize)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .textAlign(align)
                 .size(size).positionOffset(position)
@@ -201,12 +209,13 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      * @param size
      * @param position
      */
-    private void addIcon(String asset, SizeF size, PointF position) {
-
-        addSprite(new Sprite.Builder("icon", asset)
+    private void addIcon(String asset, SizeF size, PointF position, int gridCols, int gridRows, int col, int row) {
+        Sprite sprite = new Sprite.Builder("icon", asset)
                 .size(size).positionOffset(position)
-                .smooth(false).depth(0.1f)
-                .layer(getLayer()+1).visible(false).build());
+                .smooth(false).depth(0.1f).gridSize(gridCols, gridRows)
+                .layer(getLayer()+1).visible(false).build();
+        sprite.setGridIndex(col, row);
+        addSprite(sprite);
     }
 
     private Event eventHandler;
@@ -214,6 +223,5 @@ public class MissionSelectionBox extends Widget implements Button.Event{
     private Button startButton;
     private Button leftButton;
     private Button rightButton;
-    private int textIndex = 0;
     private Mission selectedMission;
 }

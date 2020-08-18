@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -34,7 +35,6 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param mapBitmap
      */
     GameMap(Event eventHandler, String mapBitmap, boolean demoMode) {
-
         super(HEX_SIZE);
 
         this.eventHandler = eventHandler;
@@ -58,19 +58,35 @@ class GameMap extends HexTileMap implements View, Territory.Event {
         Size mapSize = getMapSize();
         for (int y = 0; y < mapSize.height; ++y) {
             for (int x = 0; x < mapSize.width; ++x) {
-                OffsetCoord mapCoord = new OffsetCoord(x, y);
+                OffsetCoord mapPosition = new OffsetCoord(x, y);
 
                 // base terrain
-                int ordinal = (getMapData(mapCoord) & 0x00F00000) >> 20;
+                int ordinal = (getMapData(mapPosition) & 0x00F00000) >> 20;
                 Territory.Terrain terrain = Territory.Terrain.values()[ordinal];
 
                 // faction
-                ordinal = (getMapData(mapCoord) & 0x000F0000) >> 16;
+                ordinal = (getMapData(mapPosition) & 0x000F0000) >> 16;
                 Tribe.Faction faction = Tribe.Faction.values()[ordinal];
 
-                Territory territory = new Territory(this, mapCoord, terrain, faction);
-                territories.put(mapCoord, territory);
+                Territory territory = new Territory(this, mapPosition, terrain, faction);
+
+                // facility
+                int level = (getMapData(mapPosition) & 0x0000F000) >> 12;
+                territory.setFacilityLevel(Territory.Facility.DOWNTOWN, level);
+                level = (getMapData(mapPosition) & 0x00000F00) >> 8;
+                territory.setFacilityLevel(Territory.Facility.FARM, level);
+                level = (getMapData(mapPosition) & 0x000000F0) >> 4;
+                territory.setFacilityLevel(Territory.Facility.MARKET, level);
+                level = (getMapData(mapPosition) & 0x0000000F) >> 0;
+                territory.setFacilityLevel(Territory.Facility.FORTRESS, level);
+
+                if (demoMode) {
+                    territory.setFogState(Territory.FogState.CLEAR);
+                }
+
+                territories.put(mapPosition, territory);
                 territoriesBySide.get(faction.ordinal()).add(territory);
+                redraw(mapPosition);
 
                 if (terrain == Territory.Terrain.HEADQUARTER && faction == Tribe.Faction.VILLAGER) {
                     villagerHq = territory;
@@ -101,7 +117,6 @@ class GameMap extends HexTileMap implements View, Territory.Event {
             if (bottomRightGameCoord.y + getTileSize().height < viewport.height) {
                 offset.y = -(int)((viewport.height - bottomRightGameCoord.y - getTileSize().height) / 2);
             }
-
             scroll(offset);
         }
     }
@@ -111,7 +126,6 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      */
     @Override
     public void close() {
-
         for (Territory territory : territories.values()) {
             territory.removeTileSprites();
         }
@@ -123,7 +137,6 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      *
      */
     public void updateTerritories() {
-
         for (Territory territory : territories.values()) {
             territory.update();
         }
@@ -163,37 +176,36 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         if (demoMode) {
             return false;
         }
 
         // Dragging map
         int eventAction = event.getAction();
-        PointF touchedScreenCoord = new PointF(event.getX(), event.getY());
-        PointF touchedGameCoord =
-                Engine2D.GetInstance().translateScreenToGamePosition(touchedScreenCoord);
+        PointF touchedScreenPosition = new PointF(event.getX(), event.getY());
+        PointF touchedGamePosition =
+                Engine2D.GetInstance().translateScreenToGamePosition(touchedScreenPosition);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             setDragging(true);
-            lastTouchedScreenCoord = lastDraggingScreenCoord = touchedScreenCoord;
+            lastTouchedScreenPosition = lastDraggingScreenPosition = touchedScreenPosition;
             return true;
         } else if (isDragging()) {
             if (eventAction == MotionEvent.ACTION_MOVE) {
-                PointF delta = new PointF(touchedScreenCoord);
-                delta.subtract(lastDraggingScreenCoord).multiply(-1.0f);
+                PointF delta = new PointF(touchedScreenPosition);
+                delta.subtract(lastDraggingScreenPosition).multiply(-1.0f);
                 scroll(new Point(delta));
-                lastDraggingScreenCoord = touchedScreenCoord;
+                lastDraggingScreenPosition = touchedScreenPosition;
             } else if (eventAction == MotionEvent.ACTION_UP) {
                 setDragging(false);
 
-                PointF lastTouchedWidgetCoord =
-                        Engine2D.GetInstance().translateScreenToWidgetPosition(lastTouchedScreenCoord);
-                PointF touchedWidgetCoord =
-                        Engine2D.GetInstance().translateScreenToWidgetPosition(touchedScreenCoord);
-                if (lastTouchedWidgetCoord.distance(touchedWidgetCoord) < 60.0f) {
-                    OffsetCoord touchedMapCoord = new OffsetCoord(touchedGameCoord);
-                    Territory territoryToFocus = getTerritory(touchedMapCoord);
+                PointF lastTouchedWidgetPosition =
+                        Engine2D.GetInstance().translateScreenToWidgetPosition(lastTouchedScreenPosition);
+                PointF touchedWidgetPosition =
+                        Engine2D.GetInstance().translateScreenToWidgetPosition(touchedScreenPosition);
+                if (lastTouchedWidgetPosition.distance(touchedWidgetPosition) < 60.0f) {
+                    OffsetCoord touchedMapPosition = new OffsetCoord(touchedGamePosition);
+                    Territory territoryToFocus = getTerritory(touchedMapPosition);
                     if (territoryToFocus != null) {
                         territoryToFocus.setFocus(true);
                         eventHandler.onMapTerritoryFocused(territoryToFocus);
@@ -346,7 +358,6 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param offset
      */
     public void scroll(Point offset) {
-
         Rect viewport = Engine2D.GetInstance().getViewport();
         viewport.offset(offset);
         if (viewport.width < clippedViewport.width) {
@@ -356,12 +367,27 @@ class GameMap extends HexTileMap implements View, Territory.Event {
             if (viewport.bottomRight().x > clippedViewport.bottomRight().x) {
                 viewport.x = (int) (clippedViewport.bottomRight().x - viewport.width);
             }
+        } else {
+            if (viewport.x > clippedViewport.x) {
+                viewport.x = (int) clippedViewport.x;
+            }
+            if (viewport.bottomRight().x < clippedViewport.bottomRight().x) {
+                viewport.x = (int) (clippedViewport.bottomRight().x - viewport.width);
+            }
         }
+
         if (viewport.height < clippedViewport.height) {
             if (viewport.y < clippedViewport.y) {
                 viewport.y = (int) clippedViewport.y;
             }
             if (viewport.bottomRight().y > clippedViewport.bottomRight().y) {
+                viewport.y = (int) (clippedViewport.bottomRight().y - viewport.height);
+            }
+        } else {
+            if (viewport.y > clippedViewport.y) {
+                viewport.y = (int) clippedViewport.y;
+            }
+            if (viewport.bottomRight().y < clippedViewport.bottomRight().y) {
                 viewport.y = (int) (clippedViewport.bottomRight().y - viewport.height);
             }
         }
@@ -425,8 +451,8 @@ class GameMap extends HexTileMap implements View, Territory.Event {
     private HashMap<OffsetCoord, Territory> territories = new HashMap<>();
     private ArrayList<ArrayList<Territory>> territoriesBySide = new ArrayList<>(Tribe.Faction.values().length);
     private ArrayList<OffsetCoord> glowingTilePositions = null;
-    private PointF lastTouchedScreenCoord;
-    private PointF lastDraggingScreenCoord;
+    private PointF lastTouchedScreenPosition;
+    private PointF lastDraggingScreenPosition;
     private RectF clippedViewport;
     private boolean showTerritories = true;
 }
