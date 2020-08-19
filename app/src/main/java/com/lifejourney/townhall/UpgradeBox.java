@@ -126,16 +126,13 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
     @Override
     public void onButtonPressed(Button button) {
 
-        if (button == closeButton) {
-        // Close button
+        if (button == closeButton) { // Close button
             setVisible(false);
             eventHandler.onUpgradeBoxClosed(this);
-        } else if (button == toHomeButton) {
-        // To home button
+        } else if (button == toHomeButton) { // To home button
             setVisible(false);
             eventHandler.onUpgradeBoxSwitchToHomeBox(this);
-        } else if (button.getName().startsWith("UnitBtn")) {
-        // Unit class selection buttons
+        } else if (button.getName().startsWith("UnitBtn")) { // Unit class selection buttons
             Unit.UnitClass pressedUnitClass =
                     Unit.UnitClass.values()[Integer.parseInt(button.getName().substring(7))];
 
@@ -157,8 +154,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
             selectedUpgradable = null;
 
             updateInfo();
-        } else if (button.getName().startsWith("UpgradeBtn")) {
-        // Upgradable buttons
+        } else if (button.getName().startsWith("UpgradeBtn")) { // Upgradable buttons
             Upgradable pressedUpgradable =
                     Upgradable.values()[selectedUnitClass.ordinal()*6 +
                             Integer.parseInt(button.getName().substring(10))];
@@ -176,7 +172,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                     } else {
                         upgradeConfirmBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                                        353, 275), "골드가 부족합니다.\n\n다음에 시도해주세요.")
+                                        353, 275), "골드가 부족합니다.\n다음에 시도해주세요.")
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                                 .build();
                     }

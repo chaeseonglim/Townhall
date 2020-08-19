@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Trace;
@@ -33,7 +34,6 @@ public class Townhall extends FragmentActivity
      *
      */
     protected void initEngine() {
-
         // Get display metrics
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
@@ -54,13 +54,15 @@ public class Townhall extends FragmentActivity
         display.getSize(size);
         float ratio = 1280.0f / size.x;
         Engine2D.GetInstance().setViewport(new Rect(0, 0, 1280, (int)(size.y*ratio)));
+
+        // Set background color
+        Engine2D.GetInstance().setBackgroundColor(Color.rgb(50, 50, 50));
     }
 
     /**
      *
      */
     protected void finalizeEngine() {
-
         // Finalize Engine
         Engine2D.GetInstance().finalizeEngine();
         Log.i(LOG_TAG, "Engine finalized: " + Engine2D.GetInstance().isInitialized());
