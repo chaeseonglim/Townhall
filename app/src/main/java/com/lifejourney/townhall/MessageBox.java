@@ -30,17 +30,14 @@ public class MessageBox extends Widget implements Button.Event {
     }
 
     public interface Event {
-
         void onMessageBoxButtonPressed(MessageBox messageBox, ButtonType buttonType);
     }
 
     public static class Builder {
-
         private Event listener;
         private Rect region;
         private Type type;
         private String message;
-
         private String imageSpriteAsset = "messagebox_bg.png";
         private float fontSize = 35.0f;
         private int textColor = Color.rgb(255, 255, 255);
@@ -75,7 +72,6 @@ public class MessageBox extends Widget implements Button.Event {
     }
 
     private MessageBox(Builder builder) {
-
         super(builder.region, builder.layer, builder.depth);
         eventHandler = builder.listener;
         type = builder.type;
@@ -90,7 +86,7 @@ public class MessageBox extends Widget implements Button.Event {
             bgSprite.setGridIndex(0, 0);
 
             // Close button
-            Rect closeButtonRegion = new Rect(getRegion().right() - 143, getRegion().bottom() - 65,
+            Rect closeButtonRegion = new Rect(getRegion().left() + 107, getRegion().bottom() - 67,
                     136, 60);
             closeButton = new Button.Builder(this, closeButtonRegion)
                     .message("닫기").imageSpriteAsset("")
@@ -101,7 +97,7 @@ public class MessageBox extends Widget implements Button.Event {
             bgSprite.setGridIndex(1, 0);
 
             // Yes button
-            Rect yesButtonRegion = new Rect(getRegion().right() - 283, getRegion().bottom() - 65,
+            Rect yesButtonRegion = new Rect(getRegion().left() + 37, getRegion().bottom() - 67,
                     136, 60);
             yesButton = new Button.Builder(this, yesButtonRegion)
                     .message("예").imageSpriteAsset("")
@@ -110,7 +106,7 @@ public class MessageBox extends Widget implements Button.Event {
             addWidget(yesButton);
 
             // No button
-            Rect noButtonRegion = new Rect(getRegion().right() - 143, getRegion().bottom() - 65,
+            Rect noButtonRegion = new Rect(getRegion().left() + 177, getRegion().bottom() - 67,
                     136, 60);
             noButton = new Button.Builder(this, noButtonRegion)
                     .message("아니오").imageSpriteAsset("")
@@ -121,7 +117,7 @@ public class MessageBox extends Widget implements Button.Event {
             bgSprite.setGridIndex(1, 0);
 
             // OK button
-            Rect okButtonRegion = new Rect(getRegion().right() - 283, getRegion().bottom() - 65,
+            Rect okButtonRegion = new Rect(getRegion().left() + 37, getRegion().bottom() - 67,
                     136, 60);
             okButton = new Button.Builder(this, okButtonRegion)
                     .message("확인").imageSpriteAsset("")
@@ -130,7 +126,7 @@ public class MessageBox extends Widget implements Button.Event {
             addWidget(okButton);
 
             // Cancel button
-            Rect cancelButtonRegion = new Rect(getRegion().right() - 143, getRegion().bottom() - 65,
+            Rect cancelButtonRegion = new Rect(getRegion().right() + 177, getRegion().bottom() - 67,
                     136, 60);
             cancelButton = new Button.Builder(this, cancelButtonRegion)
                     .message("취소").imageSpriteAsset("")
@@ -157,7 +153,6 @@ public class MessageBox extends Widget implements Button.Event {
      */
     @Override
     public void onButtonPressed(Button button) {
-
         if (button == yesButton) {
             eventHandler.onMessageBoxButtonPressed(this, ButtonType.YES);
         } else if (button == noButton) {
@@ -178,7 +173,6 @@ public class MessageBox extends Widget implements Button.Event {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         // It consumes all input
         super.onTouchEvent(event);
         return true;

@@ -55,7 +55,8 @@ public class MainGame extends World
         speedControl.show();
         addWidget(speedControl);
 
-        dateBar = new DateBar(this, new Rect(480, 10, 230, 64), 20, 0.0f);
+        dateBar = new DateBar(this, new Rect(480, 10, 230, 64),
+                20, 0.0f);
         dateBar.show();
         addWidget(dateBar);
 
@@ -89,6 +90,13 @@ public class MainGame extends World
         squadBuilderButton.hide();
         addWidget(squadBuilderButton);
 
+        missionButton = new Button.Builder(this,
+                new Rect(960, 10, 100, 64))
+                .imageSpriteAsset("mission_btn.png").numImageSpriteSet(1).layer(20).build();
+        missionButton.setImageSpriteSet(0);
+        missionButton.show();
+        addWidget(missionButton);
+
         newsBar = new NewsBar(new Rect(380, viewport.height - 74, 760, 64),
                 20, 0.0f);
         newsBar.setFollowParentVisibility(false);
@@ -103,7 +111,6 @@ public class MainGame extends World
     public void close() {
         super.close();
 
-        // Close map
         map.close();
         map = null;
         setView(null);
@@ -125,7 +132,7 @@ public class MainGame extends World
      */
     @Override
     protected void postUpdate() {
-        // Check if new battle starts
+        // Check if new battle arises
         for (Squad squad: squads) {
             Territory thisTerritory = map.getTerritory(squad.getMapPosition());
             ArrayList<Squad> squadsInSameMap = thisTerritory.getSquads();
@@ -277,16 +284,16 @@ public class MainGame extends World
         }
 
         if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
             pause();
             newsBar.addNews("우리 본부가 점령되었습니다. 이제 더이상 희망이 없습니다!");
-            gameoverBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            gameOverMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                             353, 275), "본부가 점령되었습니다.\n\n게임 오버!")
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
                     .build();
-            gameoverBox.show();
-            addWidget(gameoverBox);
+            gameOverMessageBox.show();
+            addWidget(gameOverMessageBox);
         } else {
             for (int i = 0; i < tribes.size(); ++i) {
                 // Check if some faction's headquarter is occupied
@@ -460,8 +467,13 @@ public class MainGame extends World
 
     @Override
     public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
-        if (messageBox == gameoverBox) {
+        if (messageBox == gameOverMessageBox) {
             eventHandler.onGameExited(this, 0);
+        } else if (messageBox == missionMessageBox) {
+            speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+            missionMessageBox.close();
+            removeWidget(missionMessageBox);
+            missionMessageBox = null;
         }
     }
 
@@ -511,6 +523,20 @@ public class MainGame extends World
 
             // Pop up setting box
             popupSettingBox();
+        } else if (button == missionButton) { // Mission Button
+            // Pause game temporarily
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+
+            // Pop up mission box
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            missionMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                    new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                            353, 275), "승리 조건:\n" + mission.getVictoryCondition())
+                    .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
+                    .build();
+            missionMessageBox.show();
+            addWidget(missionMessageBox);
         }
     }
 
@@ -793,11 +819,13 @@ public class MainGame extends World
 
     private Mission mission;
     private GameMap map;
-    private MessageBox gameoverBox;
+    private MessageBox gameOverMessageBox;
+    private MessageBox missionMessageBox;
     private Button squadBuilderButton;
     private Button infoButton;
     private Button homeButton;
     private Button settingButton;
+    private Button missionButton;
     private EconomyBar economyBar;
     private DateBar dateBar;
     private SpeedControl speedControl;
