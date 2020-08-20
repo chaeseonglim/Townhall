@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -18,7 +19,8 @@ public class MessageBox extends Widget implements Button.Event {
     enum Type {
         CLOSE,
         YES_OR_NO,
-        OK_OR_CANCEL
+        OK_OR_CANCEL,
+        TOUCH
     }
 
     enum ButtonType {
@@ -26,7 +28,8 @@ public class MessageBox extends Widget implements Button.Event {
         YES,
         NO,
         OK,
-        CANCEL
+        CANCEL,
+        TOUCH
     }
 
     public interface Event {
@@ -38,11 +41,13 @@ public class MessageBox extends Widget implements Button.Event {
         private Rect region;
         private Type type;
         private String message;
-        private String imageSpriteAsset = "messagebox_bg.png";
+        private String bgAsset = "messagebox_bg.png";
+        private boolean isCustomAsset = false;
         private float fontSize = 35.0f;
         private int textColor = Color.rgb(255, 255, 255);
         private int layer = 0;
         private float depth = 0.0f;
+        private float bgOpaque = 1.0f;
 
         Builder(Event listener, Type type, Rect region, String message) {
             this.listener = listener;
@@ -66,6 +71,15 @@ public class MessageBox extends Widget implements Button.Event {
             this.depth = depth;
             return this;
         }
+        Builder bgAsset(String bgAsset) {
+            this.bgAsset = bgAsset;
+            this.isCustomAsset = true;
+            return this;
+        }
+        Builder bgOpaque(float opaque) {
+            this.bgOpaque = opaque;
+            return this;
+        }
         MessageBox build() {
             return new MessageBox(this);
         }
@@ -76,14 +90,16 @@ public class MessageBox extends Widget implements Button.Event {
         eventHandler = builder.listener;
         type = builder.type;
 
-        Sprite bgSprite = new Sprite.Builder(builder.imageSpriteAsset)
+        Sprite bgSprite = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(builder.layer).depth(0.2f)
-                .gridSize(2, 1).visible(false).build();
+                .smooth(false).layer(builder.layer).depth(0.2f).opaque(builder.bgOpaque)
+                .gridSize((builder.isCustomAsset)?1:2, 1).visible(false).build();
         addSprite(bgSprite);
 
         if (type == Type.CLOSE) {
-            bgSprite.setGridIndex(0, 0);
+            if (!builder.isCustomAsset) {
+                bgSprite.setGridIndex(0, 0);
+            }
 
             // Close button
             Rect closeButtonRegion = new Rect(getRegion().left() + 107, getRegion().bottom() - 67,
@@ -94,7 +110,9 @@ public class MessageBox extends Widget implements Button.Event {
                     .build();
             addWidget(closeButton);
         } else if (type == Type.YES_OR_NO) {
-            bgSprite.setGridIndex(1, 0);
+            if (!builder.isCustomAsset) {
+                bgSprite.setGridIndex(1, 0);
+            }
 
             // Yes button
             Rect yesButtonRegion = new Rect(getRegion().left() + 37, getRegion().bottom() - 67,
@@ -114,7 +132,9 @@ public class MessageBox extends Widget implements Button.Event {
                     .build();
             addWidget(noButton);
         } else if (type == Type.OK_OR_CANCEL) {
-            bgSprite.setGridIndex(1, 0);
+            if (!builder.isCustomAsset) {
+                bgSprite.setGridIndex(1, 0);
+            }
 
             // OK button
             Rect okButtonRegion = new Rect(getRegion().left() + 37, getRegion().bottom() - 67,
@@ -173,8 +193,23 @@ public class MessageBox extends Widget implements Button.Event {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isVisible()) {
+            return false;
+        }
+
+        if (super.onTouchEvent(event)) {
+            return true;
+        }
+
+        int eventAction = event.getAction();
+        if (type == Type.TOUCH && eventAction == MotionEvent.ACTION_DOWN &&
+                checkIfInputEventInRegion(event)) {
+            Engine2D.GetInstance().playSoundEffect("click3", 1.0f);
+            eventHandler.onMessageBoxButtonPressed(this, ButtonType.TOUCH);
+            return true;
+        }
+
         // It consumes all input
-        super.onTouchEvent(event);
         return true;
     }
 

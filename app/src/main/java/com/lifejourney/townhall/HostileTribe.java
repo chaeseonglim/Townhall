@@ -36,8 +36,7 @@ public abstract class HostileTribe extends Tribe {
     public void update() {
         super.update();
 
-        if (!isDestroyed()) {
-
+        if (!isDefeated()) {
             // Collect resource
             collect();
 

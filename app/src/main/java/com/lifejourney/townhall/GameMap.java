@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -184,7 +183,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
         int eventAction = event.getAction();
         PointF touchedScreenPosition = new PointF(event.getX(), event.getY());
         PointF touchedGamePosition =
-                Engine2D.GetInstance().translateScreenToGamePosition(touchedScreenPosition);
+                Engine2D.GetInstance().fromScreenToGame(touchedScreenPosition);
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             setDragging(true);
@@ -200,13 +199,13 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                 setDragging(false);
 
                 PointF lastTouchedWidgetPosition =
-                        Engine2D.GetInstance().translateScreenToWidgetPosition(lastTouchedScreenPosition);
+                        Engine2D.GetInstance().fromScreenToWidget(lastTouchedScreenPosition);
                 PointF touchedWidgetPosition =
-                        Engine2D.GetInstance().translateScreenToWidgetPosition(touchedScreenPosition);
+                        Engine2D.GetInstance().fromScreenToWidget(touchedScreenPosition);
                 if (lastTouchedWidgetPosition.distance(touchedWidgetPosition) < 60.0f) {
                     OffsetCoord touchedMapPosition = new OffsetCoord(touchedGamePosition);
                     Territory territoryToFocus = getTerritory(touchedMapPosition);
-                    if (territoryToFocus != null) {
+                    if (territoryToFocus != null && territoryToFocus.getFogState() != Territory.FogState.CLOUDY) {
                         territoryToFocus.setFocus(true);
                         eventHandler.onMapTerritoryFocused(territoryToFocus);
                     }

@@ -48,6 +48,7 @@ public class MainGame extends World
         economyBar = new EconomyBar(villager, new Rect(20, 10, 440, 64),
                 20, 0.0f);
         economyBar.show();
+        economyBar.refresh();
         addWidget(economyBar);
 
         speedControl = new SpeedControl(this, new Rect(1080, 10, 174, 64),
@@ -102,6 +103,16 @@ public class MainGame extends World
         newsBar.setFollowParentVisibility(false);
         newsBar.show();
         addWidget(newsBar);
+
+        // Show tutorial when running first mission
+        if (mission == Mission.LV1) {
+            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+            speedControl.setPlaySpeed(0);
+
+            TutorialGuide tutorialGuide = new TutorialGuide(this);
+            tutorialGuide.show();
+            addWidget(tutorialGuide);
+        }
     }
 
     /**
@@ -342,7 +353,7 @@ public class MainGame extends World
      * @param tribe
      */
     @Override
-    public void onTribeDestroyed(Tribe tribe) {
+    public void onTribeDefeated(Tribe tribe) {
         newsBar.addNews(tribe.getFaction().toGameString() + "이 패배했습니다.");
     }
 
@@ -817,8 +828,8 @@ public class MainGame extends World
     private int playSpeedReturnedFromWidget = 0;
     private int playSpeedReturnedFromBackground = 0;
 
-    private Mission mission;
     private GameMap map;
+    private Mission mission;
     private MessageBox gameOverMessageBox;
     private MessageBox missionMessageBox;
     private Button squadBuilderButton;

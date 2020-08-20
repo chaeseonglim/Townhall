@@ -42,17 +42,13 @@ public abstract class Tribe implements Squad.Event {
     }
 
     public interface Event extends Squad.Event {
-
         void onTribeCollected(Tribe tribe);
-
         void onTribeUpgraded(Tribe tribe, Upgradable upgradable);
-
-        void onTribeDestroyed(Tribe tribe);
+        void onTribeDefeated(Tribe tribe);
     }
 
 
     public Tribe(Event eventHandler, Faction faction, GameMap map) {
-
         this.eventHandler = eventHandler;
         this.faction = faction;
         this.map = map;
@@ -67,6 +63,7 @@ public abstract class Tribe implements Squad.Event {
                 this.shrinePositions.add(territory.getMapPosition());
             }
         }
+        this.defeated = (getHeadquarterPosition() == null);
         Arrays.fill(this.shrineBonuses, 0);
     }
 
@@ -92,10 +89,11 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public boolean checkDefeated() {
-        if (!isDestroyed() && getSquads().size() == 0 &&
+        if (!isDefeated() && getSquads().size() == 0 &&
+                (getHeadquarterPosition() == null ||
                 (getHeadquarterPosition() != null &&
-                getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction())) {
-            destroyed = true;
+                getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()))) {
+            defeated = true;
 
             // Remove territories
             ArrayList<Territory> territoriesCopy = new ArrayList<>(territories);
@@ -103,10 +101,10 @@ public abstract class Tribe implements Squad.Event {
                 territory.setFaction(Faction.NEUTRAL);
             }
 
-            getEventHandler().onTribeDestroyed(this);
+            getEventHandler().onTribeDefeated(this);
         }
 
-        return destroyed;
+        return defeated;
     }
 
     /**
@@ -115,7 +113,6 @@ public abstract class Tribe implements Squad.Event {
      */
     @Override
     public void onSquadCreated(Squad squad) {
-
         eventHandler.onSquadCreated(squad);
     }
 
@@ -125,7 +122,6 @@ public abstract class Tribe implements Squad.Event {
      */
     @Override
     public void onSquadDestroyed(Squad squad) {
-
         eventHandler.onSquadDestroyed(squad);
     }
 
@@ -135,7 +131,6 @@ public abstract class Tribe implements Squad.Event {
      */
     @Override
     public void onSquadFocused(Squad squad) {
-
         eventHandler.onSquadFocused(squad);
     }
 
@@ -147,7 +142,6 @@ public abstract class Tribe implements Squad.Event {
      */
     @Override
     public void onSquadMoved(Squad squad, OffsetCoord prevMapPosition, OffsetCoord newMapPosition) {
-
         eventHandler.onSquadMoved(squad, prevMapPosition, newMapPosition);
     }
 
@@ -158,7 +152,6 @@ public abstract class Tribe implements Squad.Event {
      */
     @Override
     public void onSquadUnitAdded(Squad squad, Unit unit) {
-
         eventHandler.onSquadUnitAdded(squad, unit);
 
     }
@@ -170,7 +163,6 @@ public abstract class Tribe implements Squad.Event {
      */
     @Override
     public void onSquadUnitRemoved(Squad squad, Unit unit) {
-
         eventHandler.onSquadUnitRemoved(squad, unit);
     }
 
@@ -202,7 +194,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public OffsetCoord getHeadquarterPosition() {
-
         return headquarterPosition;
     }
 
@@ -211,7 +202,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public Faction getFaction() {
-
         return faction;
     }
 
@@ -220,7 +210,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public ArrayList<Territory> getTerritories() {
-
         return territories;
     }
 
@@ -229,7 +218,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public ArrayList<Squad> getSquads() {
-
         return squads;
     }
 
@@ -238,7 +226,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     protected Event getEventHandler() {
-
         return eventHandler;
     }
 
@@ -248,7 +235,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public int getShrineBonus(ShrineBonus factor) {
-
         return shrineBonuses[factor.ordinal()];
     }
 
@@ -258,7 +244,6 @@ public abstract class Tribe implements Squad.Event {
      * @param value
      */
     public void setShrineBonus(ShrineBonus factor, int value) {
-
         shrineBonuses[factor.ordinal()] = value;
     }
 
@@ -268,7 +253,6 @@ public abstract class Tribe implements Squad.Event {
      * @param value
      */
     public void addShrineBonus(ShrineBonus factor, int value) {
-
         shrineBonuses[factor.ordinal()] += value;
     }
 
@@ -277,7 +261,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public GameMap getMap() {
-
         return map;
     }
 
@@ -286,7 +269,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public ArrayList<OffsetCoord> getShrinePositions() {
-
         return shrinePositions;
     }
 
@@ -295,7 +277,6 @@ public abstract class Tribe implements Squad.Event {
      * @return
      */
     public float getTotalBattleMetric() {
-
         float totalBattleMetric = 0.0f;
         for (Squad squad: getSquads()) {
             totalBattleMetric += squad.getBattleMetric();
@@ -307,9 +288,8 @@ public abstract class Tribe implements Squad.Event {
      *
      * @return
      */
-    public boolean isDestroyed() {
-
-        return destroyed;
+    public boolean isDefeated() {
+        return defeated;
     }
 
     private Event eventHandler;
@@ -320,5 +300,5 @@ public abstract class Tribe implements Squad.Event {
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Territory> territories;
     private int[] shrineBonuses = new int[ShrineBonus.values().length];
-    protected boolean destroyed = false;
+    protected boolean defeated = false;
 }

@@ -220,7 +220,7 @@ public class Squad extends Object implements Controllable {
             // Scroll map if dragging is going on boundary
             Point scrollOffset = new Point();
             PointF touchedWidgetPosition =
-                    Engine2D.GetInstance().translateScreenToWidgetPosition(lastTouchedScreenPosition);
+                    Engine2D.GetInstance().fromScreenToWidget(lastTouchedScreenPosition);
             if (touchedWidgetPosition.x < 70) {
                 scrollOffset.x = -30;
             }
@@ -243,7 +243,7 @@ public class Squad extends Object implements Controllable {
             } else {
                 // Show glowing line while dragging
                 PointF lastTouchedGamePosition =
-                        Engine2D.GetInstance().translateScreenToGamePosition(lastTouchedScreenPosition);
+                        Engine2D.GetInstance().fromScreenToGame(lastTouchedScreenPosition);
                 OffsetCoord lastDraggingMapPosition = new OffsetCoord(lastTouchedGamePosition);
                 showGlowingTilesToTarget(lastDraggingMapPosition, false);
             }
@@ -473,7 +473,7 @@ public class Squad extends Object implements Controllable {
         int eventAction = event.getAction();
         PointF touchedScreenPosition = new PointF(event.getX(), event.getY());
         PointF touchedGamePosition =
-                Engine2D.GetInstance().translateScreenToGamePosition(touchedScreenPosition);
+                Engine2D.GetInstance().fromScreenToGame(touchedScreenPosition);
 
         // If it goes out of region without dragging, ignore touch
         RectF region = new RectF(getPosition(), spriteSize);
