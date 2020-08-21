@@ -2,7 +2,7 @@ package com.lifejourney.townhall;
 
 enum Mission {
     LV1("map/map_lv1.png",
-            "굶주림",
+            "굶주림 [튜토리얼]",
             "당신은 어느 작은 마을의 촌장입니다.\n" +
                     "유난히 혹독했던 지난 겨울 당신은 많은\n" +
                     "친구들을 잃었습니다. 하지만 이제 애도를\n" +

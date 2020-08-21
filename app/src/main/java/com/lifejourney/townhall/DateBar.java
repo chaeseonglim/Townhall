@@ -15,7 +15,7 @@ public class DateBar extends Widget {
     private final String LOG_TAG = "DateBar";
 
     interface Event {
-        void onDatePassed(int days);
+        void onDateBarPassed(int days);
     }
 
     public DateBar(Event eventHandler, Rect region, int layer, float depth) {
@@ -55,7 +55,7 @@ public class DateBar extends Widget {
         if (!paused && --updateTimeLeft == 0) {
             days++;
             dateTextSprite.setText(days + " days");
-            eventHandler.onDatePassed(days);
+            eventHandler.onDateBarPassed(days);
             updateTimeLeft = DATE_UPDATE_PERIOD;
         }
     }

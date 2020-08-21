@@ -696,14 +696,22 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      *
      * @param replacementUnitClass
      */
-    private void popupUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
+    public void popupUnitSelectionBox(Unit.UnitClass replacementUnitClass) {
         Rect unitSelectBoxRegion = getRegion().clone();
         unitSelectBoxRegion.y -= 10;
         unitSelectBoxRegion.height += 20;
-        UnitSelectionBox unitSelectionBox = new UnitSelectionBox(this, villager,
+        unitSelectionBox = new UnitSelectionBox(this, villager,
                 replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
         addWidget(unitSelectionBox);
         unitSelectionBox.show();
+    }
+
+    /**
+     *
+     */
+    public void closeUnitSelectionBox() {
+        unitSelectionBox.close();
+        removeWidget(unitSelectionBox);
     }
 
     private Event eventHandler;
@@ -718,5 +726,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     private Button fortressDevelopmentButton;
     private Button[] unitButtons = new Button[3];
     private MessageBox recruitingReplacementConfirmBox;
+    private UnitSelectionBox unitSelectionBox;
     private int recruitingSlot = 0;
 }

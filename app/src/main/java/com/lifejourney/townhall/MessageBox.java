@@ -20,7 +20,8 @@ public class MessageBox extends Widget implements Button.Event {
         CLOSE,
         YES_OR_NO,
         OK_OR_CANCEL,
-        TOUCH
+        TOUCH,
+        PLATE
     }
 
     enum ButtonType {
@@ -213,10 +214,18 @@ public class MessageBox extends Widget implements Button.Event {
         return true;
     }
 
+    /**
+     *
+     * @param message
+     */
+    public void setMessage(String message) {
+        textSprite.setText(message);
+    }
+
     private final int TEXT_MARGIN = 12;
 
     private Event eventHandler;
-    private Sprite textSprite;
+    private TextSprite textSprite;
     private Type type;
     private Button yesButton;
     private Button noButton;

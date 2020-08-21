@@ -13,7 +13,7 @@ import java.util.ListIterator;
 public class MainGame extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event, DateBar.Event,
                 SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event,
-                SettingBox.Event {
+                SettingBox.Event, TutorialGuideForManagement.Event {
 
     static final String LOG_TAG = "MainGame";
 
@@ -109,9 +109,9 @@ public class MainGame extends World
             playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
             speedControl.setPlaySpeed(0);
 
-            TutorialGuide tutorialGuide = new TutorialGuide(this);
-            tutorialGuide.show();
-            addWidget(tutorialGuide);
+            TutorialGuideForManagement tutorialGuideForManagement = new TutorialGuideForManagement(this, this);
+            tutorialGuideForManagement.show();
+            addWidget(tutorialGuideForManagement);
         }
     }
 
@@ -543,7 +543,8 @@ public class MainGame extends World
             Rect viewport = Engine2D.GetInstance().getViewport();
             missionMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                            353, 275), "승리 조건:\n" + mission.getVictoryCondition())
+                            353, 275), "승리 조건:\n" + mission.getVictoryCondition() +
+                    "\n시간 제한:\n" + mission.getTimeLimit()+" days")
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
                     .build();
             missionMessageBox.show();
@@ -681,8 +682,20 @@ public class MainGame extends World
      * @param days
      */
     @Override
-    public void onDatePassed(int days) {
+    public void onDateBarPassed(int days) {
 
+    }
+
+    /**
+     *
+     * @param tutorial
+     */
+    @Override
+    public void onTutorialGuideForManagementFinished(TutorialGuideForManagement tutorial) {
+        tutorial.close();
+        removeWidget(tutorial);
+
+        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
     }
 
     /**
@@ -705,8 +718,8 @@ public class MainGame extends World
     /**
      *
      */
-    private void popupHomeBox() {
-        HomeBox homeBox = new HomeBox(this, (Villager) tribes.get(0),
+    public void popupHomeBox() {
+        homeBox = new HomeBox(this, (Villager) tribes.get(0),
                 30, 0.0f);
         homeBox.show();
         addWidget(homeBox);
@@ -715,8 +728,25 @@ public class MainGame extends World
     /**
      *
      */
-    private void popupSettingBox() {
-        SettingBox settingBox = new SettingBox(this,30, 0.0f);
+    public void closeHomeBox() {
+        homeBox.close();
+        removeWidget(homeBox);
+        homeBox = null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Rect getHomeBoxRegion() {
+        return homeBox.getRegion();
+    }
+
+    /**
+     *
+     */
+    public void popupSettingBox() {
+        settingBox = new SettingBox(this,30, 0.0f);
         settingBox.show();
         addWidget(settingBox);
     }
@@ -724,8 +754,17 @@ public class MainGame extends World
     /**
      *
      */
-    private void popupUpgradeBox() {
-        UpgradeBox upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0),
+    public void closeSettingBox() {
+        settingBox.close();
+        removeWidget(settingBox);
+        settingBox = null;
+    }
+
+    /**
+     *
+     */
+    public void popupUpgradeBox() {
+        upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0),
                 30, 0.0f);
         upgradeBox.show();
         addWidget(upgradeBox);
@@ -733,10 +772,27 @@ public class MainGame extends World
 
     /**
      *
+     */
+    public void closeUpgradeBox() {
+        upgradeBox.close();
+        removeWidget(upgradeBox);
+        upgradeBox = null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Rect getUpgradeBoxRegion() {
+        return upgradeBox.getRegion();
+    }
+
+    /**
+     *
      * @param territory
      */
-    private void popupInfoBox(Territory territory) {
-        InfoBox infoBox = new InfoBox(this, territory,30, 0.0f);
+    public void popupInfoBox(Territory territory) {
+        infoBox = new InfoBox(this, territory,30, 0.0f);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -745,11 +801,67 @@ public class MainGame extends World
      *
      * @param squad
      */
-    private void popupInfoBox(Squad squad) {
-        InfoBox infoBox = new InfoBox(this, (Villager)tribes.get(0), squad,
+    public void popupInfoBox(Squad squad) {
+        infoBox = new InfoBox(this, (Villager)tribes.get(0), squad,
                 30, 0.0f);
         infoBox.show();
         addWidget(infoBox);
+    }
+
+    /**
+     *
+     */
+    public void closeInfoBox() {
+        infoBox.close();
+        removeWidget(infoBox);
+        infoBox = null;
+
+        // In case of building new squad
+        if (focusedSquad != null && focusedSquad.getUnits().isEmpty()) {
+            Territory territory = map.getTerritory(focusedSquad.getMapPosition());
+            Squad squad = focusedSquad;
+            squad.close();
+            territory.setFocus(true);
+            onMapTerritoryFocused(territory);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Rect getInfoBoxRegion() {
+        return infoBox.getRegion();
+    }
+
+    /**
+     *
+     */
+    public void pressSquadBuilderButton() {
+        // Spawn a squad
+        Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapPosition().toGameCoord(),
+                Tribe.Faction.VILLAGER);
+        focusedTerritory.setFocus(false);
+        focusedTerritory = null;
+        squad.setFocus(true);
+        focusedSquad = squad;
+
+        // Pop up info box
+        popupInfoBox(squad);
+    }
+
+    /**
+     *
+     */
+    public void pressUnitSelectionButton() {
+        infoBox.popupUnitSelectionBox(null);
+    }
+
+    /**
+     *
+     */
+    public void closeUnitSelectionBox() {
+        infoBox.closeUnitSelectionBox();
     }
 
     /**
@@ -822,6 +934,14 @@ public class MainGame extends World
         return mission;
     }
 
+    /**
+     *
+     * @return
+     */
+    public GameMap getMap() {
+        return map;
+    }
+
     private final static float MUSIC_VOLUME = 0.3f;
 
     private Event eventHandler;
@@ -841,6 +961,10 @@ public class MainGame extends World
     private DateBar dateBar;
     private SpeedControl speedControl;
     private NewsBar newsBar;
+    private HomeBox homeBox;
+    private UpgradeBox upgradeBox;
+    private InfoBox infoBox;
+    private SettingBox settingBox;
 
     private Squad focusedSquad = null;
     private Territory focusedTerritory = null;
