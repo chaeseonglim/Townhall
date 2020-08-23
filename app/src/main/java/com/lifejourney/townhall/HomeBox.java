@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -247,10 +248,10 @@ public class HomeBox extends Widget implements Button.Event {
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text", text, 25)
+        addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.LEFT)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());
@@ -263,7 +264,6 @@ public class HomeBox extends Widget implements Button.Event {
      * @param position
      */
     private void addIcon(String asset, SizeF size, PointF position) {
-
         addSprite(new Sprite.Builder("icon", asset)
                 .size(size).positionOffset(position)
                 .smooth(false).depth(0.1f)

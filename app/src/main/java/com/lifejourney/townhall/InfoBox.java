@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -339,33 +340,33 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             textPosition.offset(-46, 100);
             addText("농장", new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(73, 0);
             addText("시장", new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(73, 0);
             addText("마을", new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(73, 0);
             addText("요새", new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
 
             textPosition.offset(-73*3, 30);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.FARM),
                     new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(73, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.MARKET),
                     new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(73, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.DOWNTOWN),
                     new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(73, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.FORTRESS),
                     new SizeF(100, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230), Paint.Align.CENTER);
+                    Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
         }
 
         if (territory.getFaction() == Tribe.Faction.VILLAGER) {
@@ -655,9 +656,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text", text, 25)
+        addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.LEFT)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());
@@ -670,10 +672,11 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param position
      * @param fontColor
      */
-    private void addText(String text, SizeF size, PointF position, int fontColor, Paint.Align align) {
-        addSprite(new TextSprite.Builder("text", text, 25)
+    private void addText(String text, SizeF size, PointF position, int fontColor, Layout.Alignment alignment) {
+        addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(align)
+                .horizontalAlign(alignment)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());

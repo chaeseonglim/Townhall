@@ -24,7 +24,7 @@ public class Territory {
                 "초원",
                 3,
                  new boolean[] { true, true, true, true, true },
-                 new int[] {1, 1, 0, 0},
+                 new int[] {1, 1, 0, -1},
                 0,
                 0,
                 1,
@@ -37,7 +37,7 @@ public class Territory {
                 "황무지",
                 3,
                 new boolean[] { true, true, true, true, true },
-                new int[] {1, 0, 1, 0},
+                new int[] {1, 0, 1, -1},
                 0,
                 0,
                 -1,
@@ -50,7 +50,7 @@ public class Territory {
                 "숲",
                 2,
                 new boolean[] { true, true, true, true, true },
-                new int[] {-1, 1, 0, 1},
+                new int[] {-1, 1, -1, 1},
                 0,
                 0,
                 0,
@@ -63,7 +63,7 @@ public class Territory {
                 "언덕",
                 2,
                 new boolean[] { true, true, true, true, true },
-                new int[] {-1, -1, 0, 2},
+                new int[] {-1, -1, 1, 2},
                 0,
                 0,
                 0,
@@ -1185,7 +1185,7 @@ public class Territory {
             new int[] { 1000, 3000, 6000, 10000, 15000};
     private final static int FACILITY_EXP_STEP = 10;
     private final static int GOLD_STEP = 50;
-    private final static int POPULATION_STEP = 10;
+    private final static int POPULATION_STEP = 5;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;
     private final static int OCCUPATION_TOTAL_STEP = 5;

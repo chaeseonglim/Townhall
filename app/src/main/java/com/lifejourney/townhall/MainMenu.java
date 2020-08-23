@@ -165,11 +165,11 @@ public class MainMenu extends World
      *
      */
     @Override
-    public void onPause() {
-        super.onPause();
+    public void pauseForBackground() {
+        super.pauseForBackground();
 
         if (game != null) {
-            game.onPause();
+            game.pauseForBackground();
         }
     }
 
@@ -177,11 +177,11 @@ public class MainMenu extends World
      *
      */
     @Override
-    public void onResume() {
-        super.onResume();
+    public void resumeFromBackground() {
+        super.resumeFromBackground();
 
         if (game != null) {
-            game.onResume();
+            game.resumeFromBackground();
         }
     }
 

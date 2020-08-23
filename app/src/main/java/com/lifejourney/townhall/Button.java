@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -113,14 +114,7 @@ public class Button extends Widget {
         }
 
         if (builder.message != null) {
-            messageSprite = new TextSprite.Builder("button" + UID++, builder.message, builder.fontSize)
-                    .fontColor(builder.fontColor)
-                    .bgColor(Color.argb(0, 0, 0, 0))
-                    .textAlign(Paint.Align.CENTER)
-                    .size(new SizeF(getRegion().size()))
-                    .smooth(true).depth(0.3f)
-                    .layer(builder.layer).visible(false).build();
-            addSprite(messageSprite);
+            setMessage(builder.message);
         }
     }
 
@@ -254,12 +248,12 @@ public class Button extends Widget {
      * @param message
      */
     public void setMessage(String message) {
-
         if (messageSprite == null) {
             messageSprite = new TextSprite.Builder("button" + UID++, message, fontSize)
                     .fontColor(fontColor)
                     .bgColor(Color.argb(0, 0, 0, 0))
-                    .textAlign(Paint.Align.CENTER)
+                    .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                    .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                     .size(new SizeF(getRegion().size()))
                     .smooth(true).depth(0.3f)
                     .layer(layer).visible(false).build();

@@ -148,7 +148,7 @@ public class Townhall extends FragmentActivity
         super.onPause();
 
         if (world != null) {
-            world.onPause();
+            world.pauseForBackground();
         }
     }
 
@@ -162,7 +162,7 @@ public class Townhall extends FragmentActivity
         super.onResume();
 
         if (world != null) {
-            world.onResume();
+            world.resumeFromBackground();
         }
     }
 

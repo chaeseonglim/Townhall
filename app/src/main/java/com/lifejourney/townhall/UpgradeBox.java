@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -166,13 +167,13 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                     if (villager.isAffordable(selectedUpgradable)) {
                         upgradeConfirmBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                                        353, 275), "유지 비용이 발생하며\n선택시 취소할 수 없습니다.\n\n진행하시겠습니까?")
+                                        353, 275), "유지 비용이 발생하며\n선택시 취소할 수 없습니다.\n진행하시겠습니까?")
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                                 .build();
                     } else {
                         upgradeConfirmBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                                        353, 275), "골드가 부족합니다.\n다음에 시도해주세요.")
+                                        353, 275), "금화가 부족합니다!\n다음에 시도해주세요.")
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                                 .build();
                     }
@@ -333,10 +334,10 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-
-        addSprite(new TextSprite.Builder("text", text, 25)
+        addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.LEFT)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());
@@ -349,7 +350,6 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      * @param position
      */
     private void addIcon(String asset, SizeF size, PointF position) {
-
         addSprite(new Sprite.Builder("icon", asset)
                 .size(size).positionOffset(position)
                 .smooth(false).depth(0.1f)

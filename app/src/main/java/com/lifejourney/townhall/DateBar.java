@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -31,13 +32,13 @@ public class DateBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(background);
 
-        dateTextSprite = new TextSprite.Builder("dateText", "0 days", 26)
+        dateTextSprite = new TextSprite.Builder("dateText", "0 일", 25)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.RIGHT)
-                .fontName("NanumBarunGothic.ttf")
-                .size(new SizeF(130, 36))
-                .positionOffset(new PointF(20, -3))
+                .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(new SizeF(130, 30))
+                .positionOffset(new PointF(20, 0))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(dateTextSprite);
@@ -54,7 +55,7 @@ public class DateBar extends Widget {
         // Update date
         if (!paused && --updateTimeLeft == 0) {
             days++;
-            dateTextSprite.setText(days + " days");
+            dateTextSprite.setText(days + "일");
             eventHandler.onDateBarPassed(days);
             updateTimeLeft = DATE_UPDATE_PERIOD;
         }

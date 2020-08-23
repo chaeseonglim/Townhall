@@ -103,16 +103,6 @@ public class MainGame extends World
         newsBar.setFollowParentVisibility(false);
         newsBar.show();
         addWidget(newsBar);
-
-        // Show tutorial when running first mission
-        if (mission == Mission.LV1) {
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
-
-            TutorialGuideForManagement tutorialGuideForManagement = new TutorialGuideForManagement(this, this);
-            tutorialGuideForManagement.show();
-            addWidget(tutorialGuideForManagement);
-        }
     }
 
     /**
@@ -211,8 +201,8 @@ public class MainGame extends World
      *
      */
     @Override
-    public void onPause() {
-        super.onPause();
+    public void pauseForBackground() {
+        super.pauseForBackground();
         playSpeedReturnedFromBackground = speedControl.getPlaySpeed();
         speedControl.setPlaySpeed(0);
         Engine2D.GetInstance().stopMusic();
@@ -222,10 +212,25 @@ public class MainGame extends World
      *
      */
     @Override
-    public void onResume() {
-        super.onResume();
+    public void resumeFromBackground() {
+        super.resumeFromBackground();
         speedControl.setPlaySpeed(playSpeedReturnedFromBackground);
         Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
+    }
+
+    /**
+     *
+     */
+    public void pauseForWidget() {
+        playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
+        speedControl.setPlaySpeed(0);
+    }
+
+    /**
+     *
+     */
+    public void resumeFromWidget() {
+        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
     }
 
     /**
@@ -481,7 +486,7 @@ public class MainGame extends World
         if (messageBox == gameOverMessageBox) {
             eventHandler.onGameExited(this, 0);
         } else if (messageBox == missionMessageBox) {
-            speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+            resumeFromWidget();
             missionMessageBox.close();
             removeWidget(missionMessageBox);
             missionMessageBox = null;
@@ -495,16 +500,14 @@ public class MainGame extends World
     @Override
     public void onButtonPressed(Button button) {
         if (button == homeButton) { // Home button pressed
-            // Pause game temporarily
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
+            // Pause game
+            pauseForWidget();
 
             // Pop up home box
             popupHomeBox();
         } else if (button == infoButton) { // Info button pressed
-            // Pause game temporarily
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
+            // Pause game
+            pauseForWidget();
 
             // Pop up info box
             if (focusedSquad != null) {
@@ -513,9 +516,8 @@ public class MainGame extends World
                 popupInfoBox(focusedTerritory);
             }
         } else if (button == squadBuilderButton) { // Squad Builder Button
-            // Pause game temporarily
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
+            // Pause game
+            pauseForWidget();
 
             // Spawn a squad
             Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapPosition().toGameCoord(),
@@ -528,23 +530,21 @@ public class MainGame extends World
             // Pop up info box
             popupInfoBox(squad);
         } else if (button == settingButton) { // Settings Button
-            // Pause game temporarily
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
+            // Pause game
+            pauseForWidget();
 
             // Pop up setting box
             popupSettingBox();
         } else if (button == missionButton) { // Mission Button
-            // Pause game temporarily
-            playSpeedReturnedFromWidget = speedControl.getPlaySpeed();
-            speedControl.setPlaySpeed(0);
+            // Pause game
+            pauseForWidget();
 
             // Pop up mission box
             Rect viewport = Engine2D.GetInstance().getViewport();
             missionMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                             353, 275), "승리 조건:\n" + mission.getVictoryCondition() +
-                    "\n시간 제한:\n" + mission.getTimeLimit()+" days")
+                    "\n시간 제한:\n" + mission.getTimeLimit()+"일")
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
                     .build();
             missionMessageBox.show();
@@ -552,6 +552,10 @@ public class MainGame extends World
         }
     }
 
+    /**
+     *
+     * @param speedControl
+     */
     @Override
     public void onSpeedControlUpdate(SpeedControl speedControl) {
         if (speedControl.getPlaySpeed() == 0) { // Pause
@@ -590,7 +594,7 @@ public class MainGame extends World
         homeBox.close();
         removeWidget(homeBox);
 
-        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+        resumeFromWidget();
     }
 
     /**
@@ -625,7 +629,7 @@ public class MainGame extends World
         upgradeBox.close();
         removeWidget(upgradeBox);
 
-        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+        resumeFromWidget();
     }
 
     /**
@@ -649,8 +653,6 @@ public class MainGame extends World
         infoBox.close();
         removeWidget(infoBox);
 
-        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
-
         // In case of building new squad
         if (focusedSquad != null && focusedSquad.getUnits().isEmpty()) {
             Territory territory = map.getTerritory(focusedSquad.getMapPosition());
@@ -659,6 +661,8 @@ public class MainGame extends World
             territory.setFocus(true);
             onMapTerritoryFocused(territory);
         }
+
+        resumeFromWidget();
     }
 
     /**
@@ -669,7 +673,8 @@ public class MainGame extends World
     public void onSettingBoxClosed(SettingBox settingBox) {
         settingBox.close();
         removeWidget(settingBox);
-        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+
+        resumeFromWidget();
     }
 
     @Override
@@ -695,7 +700,7 @@ public class MainGame extends World
         tutorial.close();
         removeWidget(tutorial);
 
-        speedControl.setPlaySpeed(playSpeedReturnedFromWidget);
+        resumeFromWidget();
     }
 
     /**

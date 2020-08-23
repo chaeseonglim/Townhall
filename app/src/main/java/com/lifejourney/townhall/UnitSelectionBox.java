@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.PointF;
@@ -375,7 +376,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
         addSprite(new TextSprite.Builder("text"+textIndex, text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.LEFT)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());

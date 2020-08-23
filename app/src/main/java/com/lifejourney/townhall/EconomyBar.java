@@ -2,7 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
+import android.text.Layout;
 
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
@@ -39,24 +39,24 @@ public class EconomyBar extends Widget {
         happinessSprite.setGridIndex(2, 0);
         addSprite(happinessSprite);
 
-        goldTextSprite = new TextSprite.Builder("goldText", " ", 26)
+        goldTextSprite = new TextSprite.Builder("goldText", " ", 25)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.RIGHT)
-                .fontName("NanumBarunGothic.ttf")
-                .size(new SizeF(130, 36))
-                .positionOffset(new PointF(-80, -3))
+                .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(new SizeF(130, 30))
+                .positionOffset(new PointF(-80, 0))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(goldTextSprite);
 
-        popTextSprite = new TextSprite.Builder("popText", " ", 26)
+        popTextSprite = new TextSprite.Builder("popText", " ", 25)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.RIGHT)
-                .fontName("NanumBarunGothic.ttf")
-                .size(new SizeF(130, 36))
-                .positionOffset(new PointF(130, -3))
+                .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(new SizeF(130, 30))
+                .positionOffset(new PointF(130, 0))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(popTextSprite);
@@ -74,7 +74,6 @@ public class EconomyBar extends Widget {
      *
      */
     public void refresh() {
-
         // Set gold text
         if (villager.getGold() >= 0) {
             goldTextSprite.setFontColor(Color.rgb(255, 255, 0));

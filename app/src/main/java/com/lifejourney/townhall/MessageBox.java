@@ -2,6 +2,8 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -156,13 +158,18 @@ public class MessageBox extends Widget implements Button.Event {
             addWidget(cancelButton);
         }
 
+        SizeF textSize = new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2));
+        if (type != Type.TOUCH && type != Type.PLATE) {
+            textSize.height = 200 - TEXT_MARGIN * 2;
+        }
         textSprite =
             new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
                 .fontColor(builder.textColor)
                 .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.LEFT)
-                .size(new SizeF(getRegion().size().add(-TEXT_MARGIN*2, -TEXT_MARGIN*2)))
-                .positionOffset(new PointF(TEXT_MARGIN, TEXT_MARGIN))
+                .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(textSize)
+                .positionOffset(new PointF(0, (textSize.height - getRegion().height)/2+TEXT_MARGIN))
                 .smooth(true).depth(0.3f)
                 .layer(builder.layer).visible(false).build();
         addSprite(textSprite);
@@ -222,7 +229,7 @@ public class MessageBox extends Widget implements Button.Event {
         textSprite.setText(message);
     }
 
-    private final int TEXT_MARGIN = 12;
+    private final int TEXT_MARGIN = 14;
 
     private Event eventHandler;
     private TextSprite textSprite;

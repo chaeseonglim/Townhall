@@ -2,6 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -107,34 +108,34 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         PointF textPosition = new PointF(0, -210);
         addText("챕터 " + (selectedMission.ordinal() + 1) + " - " + selectedMission.getTitle(),
                 new SizeF(480, 40), textPosition.clone(), 32,
-                Color.rgb(255, 255, 0), Paint.Align.CENTER);
+                Color.rgb(255, 255, 0), Layout.Alignment.ALIGN_CENTER);
 
         // Mission description
         textPosition.setTo(0, -70);
         addText(selectedMission.getDescription(), new SizeF(460, 210), textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Paint.Align.LEFT);
+                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL);
 
         // Mission victory condition
         textPosition.setTo(0, 60);
         addText("승리 조건:", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(255, 255, 0), Paint.Align.LEFT);
+                25, Color.rgb(255, 255, 0), Layout.Alignment.ALIGN_NORMAL);
 
         textPosition.setTo(0, 90);
         addText(selectedMission.getVictoryCondition(), new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Paint.Align.LEFT);
+                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL);
 
         // Mission time limit
         textPosition.setTo(0, 120);
         addText("시간 제한:", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(255, 255, 0), Paint.Align.LEFT);
+                25, Color.rgb(255, 255, 0), Layout.Alignment.ALIGN_NORMAL);
 
         textPosition.setTo(0, 150);
         addText(selectedMission.getTimeLimit() + "일", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Paint.Align.LEFT);
+                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL);
 
         // Star rating
         textPosition.offset(-248, 60);
@@ -194,10 +195,11 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      * @param position
      * @param fontColor
      */
-    private void addText(String text, SizeF size, PointF position, int fontSize, int fontColor, Paint.Align align) {
+    private void addText(String text, SizeF size, PointF position, int fontSize, int fontColor,
+                         Layout.Alignment alignment) {
         addSprite(new TextSprite.Builder("text", text, fontSize)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(align)
+                .horizontalAlign(alignment)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());

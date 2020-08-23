@@ -2,7 +2,7 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
+import android.text.Layout;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
@@ -33,9 +33,10 @@ public class NewsBar extends Widget {
         textSprite = new TextSprite.Builder("dateText", "안녕하세요. 마을 주민들이 당신에게 인사합니다!", 26)
                 .fontColor(Color.rgb(230, 230, 230))
                 .bgColor(Color.argb(0, 0, 0, 0))
-                .textAlign(Paint.Align.LEFT)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(700, 36))
-                .positionOffset(new PointF(40, -3))
+                .positionOffset(new PointF(40, 0))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(textSprite);
