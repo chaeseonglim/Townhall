@@ -7,7 +7,6 @@ public class Raider extends HostileTribe {
     private static final String LOG_TAG = "Raider";
 
     public Raider(Event eventHandler, GameMap map, Villager villager) {
-
         super(eventHandler, Faction.RAIDER, map, villager);
 
         /*

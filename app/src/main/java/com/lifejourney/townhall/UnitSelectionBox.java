@@ -280,7 +280,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             addText("설명",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(75, 70);
+            textPosition.offset(75, 75);
             addText(selectedUnitClass.description(),
                     new SizeF(300, 120), textPosition.clone(),
                     Color.rgb(230, 230, 230));

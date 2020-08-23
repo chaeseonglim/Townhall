@@ -22,8 +22,8 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         void onMissionSelectionBoxStart(MissionSelectionBox missionSelectionBox, Mission mission);
     }
 
-    public MissionSelectionBox(Event eventHandler, int layer, float depth) {
-        super(null, layer, depth);
+    public MissionSelectionBox(Event eventHandler, Mission startingMission) {
+        super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 500) / 2,
@@ -31,12 +31,25 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
-        this.selectedMission = Mission.LV1;
+
+        if (startingMission == null) {
+            for (Mission mission : Mission.values()) {
+                if (mission.getStarRating() == 0) {
+                    this.selectedMission = mission;
+                    break;
+                }
+            }
+            if (this.selectedMission == null) {
+                this.selectedMission = Mission.values()[Mission.values().length - 1];
+            }
+        } else {
+            this.selectedMission = startingMission;
+        }
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("mission_selection_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(true).layer(layer).depth(depth)
+                .smooth(true).layer(getLayer()).depth(getDepth())
                 .gridSize(1, 1).visible(false).opaque(1.0f).build();
         addSprite(backgroundSprite);
 
@@ -45,8 +58,8 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 136, 60);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("뒤로").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(cancelButton);
 
         // Start button
@@ -54,8 +67,8 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 136, 60);
         startButton = new Button.Builder(this, startButtonRegion)
                 .message("시작").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(startButton);
 
         // Left button
@@ -63,7 +76,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 100, 100);
         leftButton = new Button.Builder(this, leftButtonRegion)
                 .imageSpriteAsset("left_right_btns.png").numImageSpriteSet(2)
-                .fontSize(25).layer(layer+1).build();
+                .fontSize(25).layer(getLayer()+1).build();
         leftButton.setFollowParentVisibility(false);
         addWidget(leftButton);
 
@@ -72,7 +85,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 100, 100);
         rightButton = new Button.Builder(this, rightButtonRegion)
                 .imageSpriteAsset("left_right_btns.png").numImageSpriteSet(2)
-                .fontSize(25).layer(layer+1).build();
+                .fontSize(25).layer(getLayer()+1).build();
         rightButton.setFollowParentVisibility(false);
         rightButton.setImageSpriteSet(1);
         addWidget(rightButton);

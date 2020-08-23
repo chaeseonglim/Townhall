@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -140,7 +141,6 @@ public class Squad extends Object implements Controllable {
      */
     @Override
     public void update() {
-
         super.update();
 
         // Movement on tiled view
@@ -180,7 +180,7 @@ public class Squad extends Object implements Controllable {
                 // First checking that if it's occupying territory
                 Territory territory = map.getTerritory(getMapPosition());
                 if (territory.isOccupying()) {
-                    occupy();
+                    setSpritesToOccupy();
                 } else {
                     // And check if it's supporting other squad
                     boolean isSupporting = false;
@@ -286,14 +286,16 @@ public class Squad extends Object implements Controllable {
         // Hide if it's in fog
         if (map.getTerritory(getMapPosition()).getFogState() != Territory.FogState.CLEAR) {
             for (Unit unit: units) {
-                unit.setInvisible(true);
+                unit.hide();
             }
             for (Sprite sprite: getSprites()) {
-                sprite.setOpaque(0.0f);
+                sprite.hide();
             }
         } else {
             for (Unit unit: units) {
-                unit.setInvisible(false);
+                if (!unit.isRecruiting()) {
+                    unit.show();
+                }
             }
         }
     }
@@ -462,7 +464,6 @@ public class Squad extends Object implements Controllable {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         boolean result = false;
 
         if (!isVisible()) {
@@ -507,19 +508,20 @@ public class Squad extends Object implements Controllable {
                     // If it's dragged to the same tile or it's not movable tile
                     if (eventAction == MotionEvent.ACTION_CANCEL ||
                             targetMapPosition.equals(getMapPosition()) ||
-                            !map.isTerritoryMovable(targetMapPosition, this)) {
+                            !map.isTerritoryMovable(targetMapPosition, this) ||
+                            map.getTerritory(targetMapPosition).getFogState() == Territory.FogState.CLOUDY) {
                         if (targetMapPosition.equals(getMapPosition()) && firstDraggingGamePosition == null) {
-                            // cancel dragging and moving
+                            // Cancel dragging and moving
                             setDragging(false, touchedGamePosition);
                             stopMoving();
                         } else {
-                            // cancel dragging
+                            // Cancel dragging
                             setDragging(false, touchedGamePosition);
                             if (isMoving()) {
                                 Sprite targetStick = getSprite("SquadTarget");
                                 targetStick.setPosition(targetMapPositionToMove.toGameCoord());
                                 targetStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
-                                targetStick.setVisible(true);
+                                targetStick.show();
                             }
                         }
                     } else {
@@ -542,28 +544,29 @@ public class Squad extends Object implements Controllable {
 
     /**
      *
-     * @param targetMapCoord
+     * @param targetMapPosition
      */
-    public void moveTo(OffsetCoord targetMapCoord) {
-
+    public void moveTo(OffsetCoord targetMapPosition) {
         prevMapPosition = getMapPosition().clone();
-        setPosition(targetMapCoord.toGameCoord());
-        eventHandler.onSquadMoved(this, prevMapPosition, targetMapCoord);
+        setPosition(targetMapPosition.toGameCoord());
+        eventHandler.onSquadMoved(this, prevMapPosition, targetMapPosition);
     }
 
     /**
      *
      */
     public void stopMoving() {
-
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
         Sprite squadIcon = getSprite("SquadIcon");
         Sprite movingArrow = getSprite("SquadMovingArrow");
+
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetStick.setVisible(false);
+        targetStick.hide();
+        squadIcon.show();
+        squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         squadIcon.setGridIndex(0, 0);
-        movingArrow.setVisible(false);
+        movingArrow.hide();
         targetMapPositionToMove = null;
         nextMapPositionToMove = null;
     }
@@ -573,7 +576,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isMoving() {
-
         return targetMapPositionToMove != null;
     }
 
@@ -583,18 +585,21 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean seekTo(OffsetCoord targetMapPosition, boolean alternativeTarget) {
-
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
         Sprite squadIcon = getSprite("SquadIcon");
         Sprite movingArrow = getSprite("SquadMovingArrow");
 
+        currentStick.show();
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        targetStick.show();
         targetStick.setPosition(targetMapPosition.toGameCoord());
         targetStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
         if (isFocused()) {
-            targetStick.setVisible(true);
+            targetStick.show();
         }
+        squadIcon.show();
+        squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         squadIcon.setAnimationWrap(true);
         squadIcon.clearAnimation();
         squadIcon.addAnimationFrame(1, 0, 40);
@@ -657,7 +662,7 @@ public class Squad extends Object implements Controllable {
             movingArrow.addAnimationFrame(1, tileDirection.ordinal(), 15);
             movingArrow.addAnimationFrame(2, tileDirection.ordinal(), 15);
             movingArrow.addAnimationFrame(3, tileDirection.ordinal(), 15);
-            movingArrow.setVisible(true);
+            movingArrow.show();
         }
 
         return true;
@@ -740,7 +745,6 @@ public class Squad extends Object implements Controllable {
      * @param opponent
      */
     void beginFight(Squad opponent) {
-
         // Finish any moving action
         stopMoving();
 
@@ -748,11 +752,13 @@ public class Squad extends Object implements Controllable {
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_BATTLE);
+        squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         squadIcon.setAnimationWrap(true);
         squadIcon.clearAnimation();
         squadIcon.addAnimationFrame(3, 0, 8);
         squadIcon.addAnimationFrame(0, 0, 8);
         squadIcon.addAnimationFrame(3, 0, 200);
+        Log.e(LOG_TAG, "AAAAAA7");
 
         this.fighting = true;
 
@@ -773,10 +779,10 @@ public class Squad extends Object implements Controllable {
      *
      */
     void endFight() {
-
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
         squadIcon.setGridIndex(0, 0);
 
         this.fighting = false;
@@ -821,34 +827,6 @@ public class Squad extends Object implements Controllable {
             unit.setCompanions(getUnits());
             unit.setOpponents(null);
         }
-    }
-
-    /**
-     *
-     */
-    private void occupy() {
-
-        Sprite currentStick = getSprite("SquadStick");
-        Sprite squadIcon = getSprite("SquadIcon");
-        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
-        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(5, 0))) {
-            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-            squadIcon.setAnimationWrap(true);
-            squadIcon.clearAnimation();
-            squadIcon.addAnimationFrame(5, 0, 40);
-            squadIcon.addAnimationFrame(6, 0, 40);
-        }
-    }
-
-    /**
-     *
-     */
-    private void resetSprites() {
-
-        Sprite currentStick = getSprite("SquadStick");
-        Sprite squadIcon = getSprite("SquadIcon");
-        squadIcon.setGridIndex(0, 0);
-        currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
     }
 
     /**
@@ -966,7 +944,7 @@ public class Squad extends Object implements Controllable {
         if (this.focused) {
             currentStick.setGridIndex(2, faction.ordinal());
             if (isMoving()) {
-                targetStick.setVisible(true);
+                targetStick.show();
             }
             for (Unit unit: units) {
                 unit.setFocused(true);
@@ -978,7 +956,7 @@ public class Squad extends Object implements Controllable {
                 unit.setFocused(false);
             }
             currentStick.setGridIndex(0, faction.ordinal());
-            targetStick.setVisible(false);
+            targetStick.hide();
             map.setGlowingTilePositions(null);
         }
     }
@@ -989,7 +967,6 @@ public class Squad extends Object implements Controllable {
      * @param touchedGamePosition
      */
     public void setDragging(boolean dragging, PointF touchedGamePosition) {
-
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
 
@@ -1004,7 +981,7 @@ public class Squad extends Object implements Controllable {
                     firstDraggingGamePosition.distance(touchedGamePosition) > MIN_DISTANCE_START_DRAGGING) {
                 currentStick.setOpaque(ICON_SPRITE_OPAQUE_DRAGGING);
                 targetStick.setOpaque(TARGET_SPRITE_OPAQUE_DRAGGING);
-                targetStick.setVisible(true);
+                targetStick.show();
                 targetStick.setPosition(touchedGamePosition);
                 targetStick.setPositionOffset(TARGET_SPRITE_HOTSPOT_OFFSET);
                 firstDraggingGamePosition = null;
@@ -1012,7 +989,7 @@ public class Squad extends Object implements Controllable {
         }
         else {
             currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-            targetStick.setVisible(false);
+            targetStick.hide();
             firstDraggingGamePosition = null;
         }
     }
@@ -1048,7 +1025,8 @@ public class Squad extends Object implements Controllable {
             map.setGlowingTilePositions(null);
         }
         else if (!targetMapPosition.equals(getMapPosition()) &&
-                map.isTerritoryMovable(targetMapPosition, this)) {
+                map.isTerritoryMovable(targetMapPosition, this) &&
+                map.getTerritory(targetMapPosition).getFogState() != Territory.FogState.CLOUDY) {
             GamePathFinder pathFinder =
                     new GamePathFinder(this, targetMapPosition, useNextPosition);
             ArrayList<Waypoint> optimalPath = pathFinder.findOptimalPath();
@@ -1203,7 +1181,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isWorking() {
-
         if (isMoving() || isFighting() || isOccupying() || isSupporting()) {
             return false;
         }
@@ -1278,13 +1255,47 @@ public class Squad extends Object implements Controllable {
     /**
      *
      */
-    private void setSpritesToSupport() {
+    private void resetSprites() {
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        currentStick.show();
+        currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        squadIcon.show();
+        squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+        squadIcon.setGridIndex(0, 0);
+    }
 
+    /**
+     *
+     */
+    private void setSpritesToOccupy() {
+        Sprite currentStick = getSprite("SquadStick");
+        Sprite squadIcon = getSprite("SquadIcon");
+        ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
+        if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(5, 0))) {
+            currentStick.show();
+            currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.show();
+            squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.setAnimationWrap(true);
+            squadIcon.clearAnimation();
+            squadIcon.addAnimationFrame(5, 0, 40);
+            squadIcon.addAnimationFrame(6, 0, 40);
+        }
+    }
+
+    /**
+     *
+     */
+    private void setSpritesToSupport() {
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
         ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
         if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(4, 0))) {
+            currentStick.show();
             currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.show();
+            squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
             squadIcon.setAnimationWrap(true);
             squadIcon.clearAnimation();
             squadIcon.addAnimationFrame(4, 0, 8);
@@ -1297,12 +1308,14 @@ public class Squad extends Object implements Controllable {
      *
      */
     private void setSpritesToWork() {
-
         Sprite currentStick = getSprite("SquadStick");
         Sprite squadIcon = getSprite("SquadIcon");
         ArrayList<Pair<Point, Integer>> iconAnimation = squadIcon.getAnimation();
         if (iconAnimation.size() == 0 || !iconAnimation.get(0).first.equals(new Point(7, 0))) {
+            currentStick.show();
             currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
+            squadIcon.show();
+            squadIcon.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
             squadIcon.setAnimationWrap(true);
             squadIcon.clearAnimation();
             squadIcon.addAnimationFrame(7, 0, 8);
@@ -1315,10 +1328,10 @@ public class Squad extends Object implements Controllable {
      *
      */
     private void restUnits() {
-
+        int defensiveDeltaFromTerritory =
+                map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.DEFENSIVE);
         for (Unit unit: units) {
-            unit.rest(REST_PERCENTAGE *
-                    (1 + map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.DEFENSIVE)));
+            unit.rest(REST_PERCENTAGE * (1 + defensiveDeltaFromTerritory));
         }
     }
 
@@ -1332,7 +1345,6 @@ public class Squad extends Object implements Controllable {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -1376,7 +1388,6 @@ public class Squad extends Object implements Controllable {
      */
     public float getSupportMetric() {
         float supportMetric = 0.0f;
-
         for (Unit unit: units) {
             if (!unit.isRecruiting()) {
                 supportMetric += unit.getUnitClass().supportMetric();

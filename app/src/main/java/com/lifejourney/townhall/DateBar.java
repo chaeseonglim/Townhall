@@ -55,7 +55,7 @@ public class DateBar extends Widget {
         // Update date
         if (!paused && --updateTimeLeft == 0) {
             days++;
-            dateTextSprite.setText(days + "일");
+            dateTextSprite.setText(days + " 일");
             eventHandler.onDateBarPassed(days);
             updateTimeLeft = DATE_UPDATE_PERIOD;
         }

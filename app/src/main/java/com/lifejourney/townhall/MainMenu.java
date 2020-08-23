@@ -2,7 +2,6 @@ package com.lifejourney.townhall;
 
 import android.graphics.Color;
 import android.text.Layout;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -232,22 +231,8 @@ public class MainMenu extends World
     @Override
     public void onButtonPressed(Button button) {
         if (button == startButton) {    // Start button
-            logo.hide();
-            logoShadow.hide();
-            startButton.hide();
-            settingButton.hide();
-
-            MissionSelectionBox missionSelectionBox =
-                    new MissionSelectionBox(this, 30, 0.0f);
-            missionSelectionBox.show();
-            addWidget(missionSelectionBox);
+            popupMissionSelectBox();
         } else if (button == settingButton) {   // Setting button
-            logo.hide();
-            logoShadow.hide();
-            startButton.hide();
-            settingButton.hide();
-
-            // Pop up setting box
             popupSettingBox();
         }
     }
@@ -336,21 +321,48 @@ public class MainMenu extends World
             game.getMission().setStarRating(starRating);
         }
 
+        nextMission = game.getMission();
+        if (starRating > 0 && nextMission.ordinal() + 1 < Mission.values().length) {
+            nextMission = Mission.values()[nextMission.ordinal() + 1];
+        }
+
         startMenu();
+        popupMissionSelectBox();
     }
 
     /**
      *
      */
     private void popupSettingBox() {
+        logo.hide();
+        logoShadow.hide();
+        startButton.hide();
+        settingButton.hide();
+
         SettingBox settingBox = new SettingBox(this,30, 0.0f);
         settingBox.show();
         addWidget(settingBox);
     }
 
+    /**
+     *
+     */
+    private void popupMissionSelectBox() {
+        logo.hide();
+        logoShadow.hide();
+        startButton.hide();
+        settingButton.hide();
+
+        MissionSelectionBox missionSelectionBox =
+                new MissionSelectionBox(this, nextMission);
+        missionSelectionBox.show();
+        addWidget(missionSelectionBox);
+    }
+
     private final static float MUSIC_VOLUME = 0.3f;
 
     private MainGame game;
+    private Mission nextMission = null;
     private GameMap sampleMap;
     private Sprite logo;
     private Sprite logoShadow;

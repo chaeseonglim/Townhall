@@ -17,7 +17,6 @@ import com.lifejourney.engine2d.Vector2D;
 import java.util.ArrayList;
 
 public class Unit extends CollidableObject implements Projectile.Event {
-
     private static final String LOG_TAG = "Unit";
 
     enum UnitClassType {

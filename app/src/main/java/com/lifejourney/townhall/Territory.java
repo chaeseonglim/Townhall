@@ -1077,7 +1077,6 @@ public class Territory {
      * @return
      */
     public int getPopulation() {
-
         if (getBattle() != null) {
             return 0;
         } else {
@@ -1090,7 +1089,6 @@ public class Territory {
      * @return
      */
     public int getHappiness() {
-
         return happiness;
     }
 
@@ -1099,7 +1097,6 @@ public class Territory {
      * @return
      */
     public boolean isOccupying() {
-
         return (occupyingFaction != Tribe.Faction.NEUTRAL && getBattle() == null &&
                 !squads.get(0).isEliminated());
     }
@@ -1109,7 +1106,6 @@ public class Territory {
      * @param neighbors
      */
     public void setNeighbors(ArrayList<Territory> neighbors) {
-
         this.neighbors = neighbors;
     }
 
@@ -1119,7 +1115,6 @@ public class Territory {
      * @return
      */
     public int getDelta(DeltaAttribute attribute) {
-
         return deltas[attribute.ordinal()];
     }
 
@@ -1128,8 +1123,7 @@ public class Territory {
      * @param fogState
      */
     public void setFogState(FogState fogState) {
-
-        this.fogState = FogState.CLEAR;//fogState;
+        this.fogState = fogState;
     }
 
     /**
@@ -1137,7 +1131,6 @@ public class Territory {
      * @return
      */
     public FogState getFogState() {
-
         return fogState;
     }
 
@@ -1147,7 +1140,6 @@ public class Territory {
      * @return
      */
     public boolean isFactionSquadExist(Tribe.Faction faction) {
-
         for (Squad squad: squads) {
             if (squad.getFaction() == faction) {
                 return true;

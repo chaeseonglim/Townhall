@@ -467,7 +467,6 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      *
      */
     private void updateSquadInfo() {
-
         Rect region = getRegion();
         int layer = getLayer();
 
