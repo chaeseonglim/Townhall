@@ -3,6 +3,7 @@ package com.lifejourney.townhall;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.Layout;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -26,9 +27,9 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         void onUpgradeBoxClosed(UpgradeBox upgradeBox);
     }
 
-    public UpgradeBox(Event eventHandler, Villager villager, int layer, float depth) {
+    public UpgradeBox(Event eventHandler, Villager villager, Mission mission) {
 
-        super(null, layer, depth);
+        super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 450) / 2,
@@ -37,11 +38,12 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
         this.eventHandler = eventHandler;
         this.villager = villager;
+        this.mission = mission;
 
         // Background sprite
         backgroundSprite = new Sprite.Builder("upgrade_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(layer).depth(depth)
+                .smooth(false).layer(getLayer()).depth(getDepth())
                 .gridSize(2, 1).visible(false).opaque(0.8f).build();
         backgroundSprite.setGridIndex(0, 0);
         addSprite(backgroundSprite);
@@ -51,8 +53,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
         // Home button
@@ -60,8 +62,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 150, 60);
         toHomeButton = new Button.Builder(this, toHomeButtonRegion)
                 .message("홈 화면").imageSpriteAsset("")
-                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(toHomeButton);
 
         // Unit buttons
@@ -74,8 +76,11 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .name("UnitBtn" + i)
                             .imageSpriteAsset("unit_selection_btn.png")
                             .numImageSpriteSet(Unit.UnitClass.values().length * 4)
-                            .layer(layer + 1).build();
+                            .layer(getLayer() + 1).build();
             unitButtons[i].setImageSpriteSet(i * 4);
+            if (!mission.getRecruitAvailable()[i]) {
+                unitButtons[i].disable();
+            }
             addWidget(unitButtons[i]);
 
             unitButtonRegion.offset(62, 0);
@@ -96,9 +101,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .name("UpgradeBtn" + i)
                             .imageSpriteAsset("unit_upgrade_btn.png")
                             .numImageSpriteSet(4)
-                            .message(" ")
-                            .fontSize(19)
-                            .layer(layer + 1).build();
+                            .message(" ").fontSize(19)
+                            .layer(getLayer() + 1).build();
             upgradableButtons[i].hide();
             upgradableButtons[i].setFollowParentVisibility(false);
             addWidget(upgradableButtons[i]);
@@ -114,7 +118,6 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         // It consumes all input
         super.onTouchEvent(event);
         return true;
@@ -126,7 +129,6 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      */
     @Override
     public void onButtonPressed(Button button) {
-
         if (button == closeButton) { // Close button
             setVisible(false);
             eventHandler.onUpgradeBoxClosed(this);
@@ -214,7 +216,6 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      *
      */
     private void updateInfo() {
-
         // Remove all previous texts
         removeSprites("text");
         removeSprites("icon");
@@ -311,9 +312,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 textPosition.setTo(200, -190);
                 addText("강화할 항목을 선택하세요.", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
-
             }
-
         } else {
             backgroundSprite.setGridIndex(0, 0);
             for (int i = 0; i < 6; ++ i) {
@@ -358,6 +357,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
     private Event eventHandler;
     private Villager villager;
+    private Mission mission;
     private Sprite backgroundSprite;
     private Button closeButton;
     private Button toHomeButton;

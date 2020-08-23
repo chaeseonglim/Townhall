@@ -2,7 +2,7 @@ package com.lifejourney.townhall;
 
 enum Mission {
     LV1("map/map_lv1.png",
-            "굶주림 [튜토리얼]",
+            "굶주림",
             "당신은 어느 작은 마을의 촌장입니다.\n" +
                     "유난히 혹독했던 지난 겨울 당신은 많은 " +
                     "친구들을 잃었습니다. 하지만 이제 애도를 " +
@@ -10,21 +10,32 @@ enum Mission {
                     "마을을 정돈하고 인구를 충분히 회복해야 " +
                     "합니다.",
             "전체 인구 100 이상",
-            100) {
+            100,
+            new boolean[] { true, false, false, false, false, false, false }) {
+
+        public void init(MainGame game) {
+            turn = 0;
+        }
 
         public void update(MainGame game) {
             // Start the tutorial for management
-            if (++turn == 30) {
-                game.pauseForWidget();
-
-                TutorialGuideForManagement tutorialGuideForManagement =
-                        new TutorialGuideForManagement(game, game);
-                tutorialGuideForManagement.show();
-                game.addWidget(tutorialGuideForManagement);
+            if (++turn == 5) {
+                game.startTutorialForManagement();
             }
 
+            int day = game.getDays();
             if (((Villager)game.getTribe(Tribe.Faction.VILLAGER)).getTotalPopulation() > 100) {
-                int day = game.getDays();
+                if (day <= 60) {
+                    game.missionCompleted(3);
+                } else if (day <= 80) {
+                    game.missionCompleted(2);
+                } else {
+                    game.missionCompleted(1);
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
             }
         }
 
@@ -37,20 +48,26 @@ enum Mission {
                     "있습니다. 당신의 병사들이 준비되었는지 " +
                     "확인해 볼 수 있는 좋은 기회입니다.",
             "도적 본부 점령",
-            100) {
+            100,
+            new boolean[] { true, true, true, false, false, false, false }) {
 
+        public void init(MainGame game) {
+        }
         public void update(MainGame game) {
         }
     };
 
+    abstract void init(MainGame game);
     abstract void update(MainGame game);
 
-    Mission(String mapFile, String title, String description, String victoryCondition, int timeLimit) {
+    Mission(String mapFile, String title, String description, String victoryCondition, int timeLimit,
+            boolean[] recruitAvailable) {
         this.mapFile = mapFile;
         this.title = title;
         this.description = description;
         this.victoryCondition = victoryCondition;
         this.timeLimit = timeLimit;
+        this.recruitAvailable = recruitAvailable;
     }
 
     public String getMapFile() {
@@ -85,6 +102,10 @@ enum Mission {
         return unlocked;
     }
 
+    public boolean[] getRecruitAvailable() {
+        return recruitAvailable;
+    }
+
     private String mapFile;
     private String title;
     private String description;
@@ -92,4 +113,5 @@ enum Mission {
     private int timeLimit;
     private boolean unlocked = true;
     private int starRating = 0;
+    private boolean[] recruitAvailable = null;
 }

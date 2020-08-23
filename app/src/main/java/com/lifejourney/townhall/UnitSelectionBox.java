@@ -17,23 +17,23 @@ public class UnitSelectionBox extends Widget implements Button.Event{
     private final String LOG_TAG = "UnitSelectionBox";
 
     public interface Event {
-
         void onUnitBuilderBoxSelected(UnitSelectionBox infoBox, Unit.UnitClass unitClass);
     }
 
-    public UnitSelectionBox(Event eventHandler, Villager villager, Unit.UnitClass replacementClass,
-                            Rect region, int layer, float depth) {
+    public UnitSelectionBox(Event eventHandler, Mission mission, Villager villager,
+                            Unit.UnitClass replacementClass, Rect region) {
 
-        super(region, layer, depth);
+        super(region, 40, 0.0f);
 
         this.eventHandler = eventHandler;
+        this.mission = mission;
         this.villager = villager;
         this.replacementUnitClass = replacementClass;
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("unit_selection_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(layer).depth(depth)
+                .smooth(false).layer(getLayer()).depth(getDepth())
                 .gridSize(1, 1).visible(false).opaque(0.8f).build();
         addSprite(backgroundSprite);
 
@@ -42,8 +42,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 136, 60);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("취소").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(cancelButton);
 
         // Select button
@@ -51,8 +51,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 136, 60);
         selectButton = new Button.Builder(this, selectButtonRegion)
                 .message("선택").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(selectButton);
 
         // Unit button
@@ -64,12 +64,15 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     new Button.Builder(this, unitButtonRegion.clone())
                             .imageSpriteAsset("unit_selection_btn.png")
                             .numImageSpriteSet(Unit.UnitClass.values().length * 4)
-                            .layer(layer + 1).build();
+                            .layer(getLayer() + 1).build();
             Unit.UnitClass unitClass = Unit.UnitClass.values()[i];
             if (villager.isAffordable(unitClass, replacementUnitClass)) {
                 unitButtons[i].setImageSpriteSet(i * 4);
             } else {
                 unitButtons[i].setImageSpriteSet(i * 4 + 2);
+            }
+            if (!mission.getRecruitAvailable()[i]) {
+                unitButtons[i].disable();
             }
             addWidget(unitButtons[i]);
 
@@ -84,9 +87,9 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      */
     @Override
     public void update() {
-
         // Do this here for preventing auto show/hide affect to the button status
-        if (selectedUnitClass == null || !villager.isAffordable(selectedUnitClass, replacementUnitClass)) {
+        if (selectedUnitClass == null ||
+                !villager.isAffordable(selectedUnitClass, replacementUnitClass)) {
             selectButton.hide();
             cancelButton.show();
         } else {
@@ -101,7 +104,6 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      *
      */
     private void updateUnitInfo() {
-
         // Remove all previous texts
         removeSprites("text"+textIndex++);
         removeSprites("icon");
@@ -373,10 +375,10 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-
         addSprite(new TextSprite.Builder("text"+textIndex, text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());
@@ -389,7 +391,6 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      * @param position
      */
     private void addIcon(String asset, SizeF size, PointF position) {
-
         addSprite(new Sprite.Builder("icon", asset)
                 .size(size).positionOffset(position)
                 .smooth(false).depth(0.1f)
@@ -398,6 +399,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
     private Event eventHandler;
     private Villager villager;
+    private Mission mission;
     private Button cancelButton;
     private Button selectButton;
     private Button[] unitButtons = new Button[Unit.UnitClass.values().length];

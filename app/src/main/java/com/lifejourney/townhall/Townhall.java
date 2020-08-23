@@ -114,7 +114,6 @@ public class Townhall extends FragmentActivity
      */
     @Override
     protected void onStart() {
-
         Log.i(LOG_TAG, "onStart");
 
         super.onStart();
@@ -129,7 +128,6 @@ public class Townhall extends FragmentActivity
      */
     @Override
     protected void onStop() {
-
         Log.i(LOG_TAG, "onStop");
 
         super.onStop();

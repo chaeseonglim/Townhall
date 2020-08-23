@@ -1,6 +1,8 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
+import android.text.Layout;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -9,6 +11,7 @@ import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.ResourceManager;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
+import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.World;
 
 public class MainMenu extends World
@@ -74,10 +77,25 @@ public class MainMenu extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
 
         // Logo
-        logo = new Sprite.Builder("logo.png")
-                .position(new PointF(viewport.centerX(), viewport.height / 3))
+        String logoText = "마을 대전략";
+        logoShadow = new TextSprite.Builder("logo", logoText, 120)
+                .fontColor(Color.rgb(0, 0, 0))
+                .bgColor(Color.argb(0, 0, 0, 0))
+                .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(600, 200))
-                .smooth(true).depth(0.2f)
+                .position(new PointF(viewport.centerX(), viewport.height / 3))
+                .positionOffset(new PointF(0, 5))
+                .smooth(true).depth(0.0f)
+                .layer(20).visible(true).build();
+        logo = new TextSprite.Builder("logo", logoText, 120)
+                .fontColor(Color.rgb(255, 255, 0))
+                .bgColor(Color.argb(0, 0, 0, 0))
+                .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(new SizeF(600, 200))
+                .position(new PointF(viewport.centerX(), viewport.height / 3))
+                .smooth(true).depth(0.1f)
                 .layer(20).visible(true).build();
 
         // Buttons
@@ -140,6 +158,7 @@ public class MainMenu extends World
 
         if (logo != null) {
             logo.commit();
+            logoShadow.commit();
         }
 
         if (game != null) {
@@ -166,6 +185,7 @@ public class MainMenu extends World
      */
     @Override
     public void pauseForBackground() {
+        Engine2D.GetInstance().stopMusic();
         super.pauseForBackground();
 
         if (game != null) {
@@ -178,6 +198,7 @@ public class MainMenu extends World
      */
     @Override
     public void resumeFromBackground() {
+        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
         super.resumeFromBackground();
 
         if (game != null) {
@@ -212,6 +233,7 @@ public class MainMenu extends World
     public void onButtonPressed(Button button) {
         if (button == startButton) {    // Start button
             logo.hide();
+            logoShadow.hide();
             startButton.hide();
             settingButton.hide();
 
@@ -221,6 +243,7 @@ public class MainMenu extends World
             addWidget(missionSelectionBox);
         } else if (button == settingButton) {   // Setting button
             logo.hide();
+            logoShadow.hide();
             startButton.hide();
             settingButton.hide();
 
@@ -239,6 +262,7 @@ public class MainMenu extends World
         removeWidget(settingBox);
 
         logo.show();
+        logoShadow.show();
         startButton.show();
         settingButton.show();
     }
@@ -262,6 +286,7 @@ public class MainMenu extends World
         removeWidget(missionSelectionBox);
 
         logo.show();
+        logoShadow.show();
         startButton.show();
         settingButton.show();
     }
@@ -287,6 +312,9 @@ public class MainMenu extends World
         logo.close();
         logo = null;
 
+        logoShadow.close();
+        logoShadow = null;
+
         if (sampleMap != null) {
             sampleMap.close();
             sampleMap = null;
@@ -300,7 +328,7 @@ public class MainMenu extends World
      *
      */
     @Override
-    public void onGameExited(MainGame game, int starRating) {
+    public void onGameFinished(MainGame game, int starRating) {
         game.close();
         this.game = null;
 
@@ -325,6 +353,7 @@ public class MainMenu extends World
     private MainGame game;
     private GameMap sampleMap;
     private Sprite logo;
+    private Sprite logoShadow;
     private Button startButton;
     private Button settingButton;
 }

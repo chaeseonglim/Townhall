@@ -1182,9 +1182,9 @@ public class Territory {
     private final static int TERRITORY_UPDATE_COUNT = 30;
     private final static int MAX_FACILITY_LEVEL = 5;
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
-            new int[] { 1000, 3000, 6000, 10000, 15000};
+            new int[] { 500, 1000, 2000, 4000, 8000};
     private final static int FACILITY_EXP_STEP = 10;
-    private final static int GOLD_STEP = 50;
+    private final static int GOLD_STEP = 10;
     private final static int POPULATION_STEP = 5;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;

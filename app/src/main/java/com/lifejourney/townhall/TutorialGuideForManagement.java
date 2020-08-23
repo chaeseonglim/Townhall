@@ -53,13 +53,13 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         tutorialBox = new MessageBox.Builder(this, MessageBox.Type.PLATE,
-                new Rect(viewport.width - 353 - 20, viewport.height - 275 - 100,
-                        353, 275),
+                new Rect(viewport.width - 340 - 20, viewport.height - 275 - 100,
+                        340, 275),
                 "존경하는 촌장님!\n\n" +
                 "저는 당신의 조언가입니다. " +
                 "지금부터 마을을 운영하는 방법을 알려드리고자 합니다.\n\n\n" +
                 "∙ 아무 곳이나 터치하세요.")
-                .fontSize(24.0f).layer(50).textColor(Color.rgb(0, 0, 0))
+                .fontSize(24.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                 .bgAsset("tutorial_box_bg.png").bgOpaque(0.8f)
                 .build();
         tutorialBox.setFollowParentVisibility(false);
@@ -253,7 +253,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
             guideRectangle.commit();
 
             tutorialBox.setMessage(
-                    "∙ 4개 버튼을 통해 각 시설의 개발 방향을 정할 수 있습니다.\n\n" +
+                    "∙ 각 시설별 버튼을 통해 개발 방향을 정할 수 있습니다.\n\n" +
                     "∙ 시설의 전체 레벨 합이 5로 제한되어 있으므로 적절하게 조정하는 것이 중요합니다.");
         } else if (step == Step.INFO_FACILITY2) {
             Rect boxRegion = game.getInfoBoxRegion();
@@ -345,8 +345,8 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
 
             tutorialBox.setMessage(
                     "촌장님!\n" +
-                    "마을 운영에 대한 설명을 이만 마치겠습니다.\n" +
-                    "∙ 팁: 주변 타일의 시설을 농장 개발에 집중하면 쉽게 미션 목표를 달성할 수 있습니다.");
+                    "마을 운영에 대한 설명을 이만 마치겠습니다.\n\n" +
+                    "∙ 팁: 농장 개발에 집중하면 쉽게 미션 목표를 달성할 수 있습니다.");
         }
     }
 

@@ -83,7 +83,7 @@ public class DateBar extends Widget {
         paused = false;
     }
 
-    private static final int DATE_UPDATE_PERIOD = 100;
+    private static final int DATE_UPDATE_PERIOD = 80;
 
     private Event eventHandler;
     private boolean paused = false;

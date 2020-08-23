@@ -25,8 +25,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         void onInfoBoxClosed(InfoBox infoBox);
     }
 
-    public InfoBox(Event eventHandler, Territory territory, int layer, float depth) {
-        super(null, layer, depth);
+    public InfoBox(Event eventHandler, Mission mission, Territory territory) {
+        super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
@@ -35,11 +35,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         this.eventHandler = eventHandler;
         this.territory = territory;
+        this.mission = mission;
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(true).layer(layer).depth(depth)
+                .smooth(true).layer(getLayer()).depth(getDepth())
                 .gridSize(2, 1).visible(false).opaque(0.8f).build();
         backgroundSprite.setGridIndex(0, 0);
         addSprite(backgroundSprite);
@@ -49,16 +50,16 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
         updateTerritoryInfo();
 
     }
 
-    public InfoBox(Event eventHandler, Villager villager, Squad squad, int layer, float depth) {
-        super(null, layer, depth);
+    public InfoBox(Event eventHandler, Mission mission, Villager villager, Squad squad) {
+        super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
         Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
@@ -68,11 +69,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         this.eventHandler = eventHandler;
         this.villager = villager;
         this.squad = squad;
+        this.mission = mission;
 
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(layer).depth(depth)
+                .smooth(false).layer(getLayer()).depth(getDepth())
                 .gridSize(2, 1).visible(false).opaque(0.8f).build();
         backgroundSprite.setGridIndex(1, 0);
         addSprite(backgroundSprite);
@@ -82,8 +84,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
         // Territory button
@@ -91,8 +93,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 150, 60);
         toTerritoryButton = new Button.Builder(this, toTownButtonRegion)
                 .message("마을로").imageSpriteAsset("")
-                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
-                .build();
+                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .layer(getLayer() + 1).build();
         addWidget(toTerritoryButton);
 
 
@@ -703,8 +705,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         Rect unitSelectBoxRegion = getRegion().clone();
         unitSelectBoxRegion.y -= 10;
         unitSelectBoxRegion.height += 20;
-        unitSelectionBox = new UnitSelectionBox(this, villager,
-                replacementUnitClass, unitSelectBoxRegion, getLayer() + 10, 0.0f);
+        unitSelectionBox = new UnitSelectionBox(this, mission, villager,
+                replacementUnitClass, unitSelectBoxRegion);
         addWidget(unitSelectionBox);
         unitSelectionBox.show();
     }
@@ -719,6 +721,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
     private Event eventHandler;
     private Villager villager;
+    private Mission mission;
     private Territory territory;
     private Squad squad;
     private Button closeButton;

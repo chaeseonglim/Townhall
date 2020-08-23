@@ -1,6 +1,7 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
@@ -18,7 +19,7 @@ public class MainGame extends World
     static final String LOG_TAG = "MainGame";
 
     interface Event {
-        void onGameExited(MainGame game, int stars);
+        void onGameFinished(MainGame game, int stars);
     }
 
     MainGame(Event eventHandler, Mission mission) {
@@ -103,6 +104,8 @@ public class MainGame extends World
         newsBar.setFollowParentVisibility(false);
         newsBar.show();
         addWidget(newsBar);
+
+        mission.init(this);
     }
 
     /**
@@ -205,7 +208,6 @@ public class MainGame extends World
         super.pauseForBackground();
         playSpeedReturnedFromBackground = speedControl.getPlaySpeed();
         speedControl.setPlaySpeed(0);
-        Engine2D.GetInstance().stopMusic();
     }
 
     /**
@@ -215,7 +217,6 @@ public class MainGame extends World
     public void resumeFromBackground() {
         super.resumeFromBackground();
         speedControl.setPlaySpeed(playSpeedReturnedFromBackground);
-        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
     }
 
     /**
@@ -300,16 +301,8 @@ public class MainGame extends World
         }
 
         if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {
-            pause();
             newsBar.addNews("우리 본부가 점령되었습니다. 이제 더이상 희망이 없습니다!");
-            Rect viewport = Engine2D.GetInstance().getViewport();
-            gameOverMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
-                    new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                            353, 275), "본부가 점령되었습니다.\n\n게임 오버!")
-                    .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
-                    .build();
-            gameOverMessageBox.show();
-            addWidget(gameOverMessageBox);
+            missionFailed();
         } else {
             for (int i = 0; i < tribes.size(); ++i) {
                 // Check if some faction's headquarter is occupied
@@ -481,15 +474,34 @@ public class MainGame extends World
         }
     }
 
+    /**
+     *
+     * @param messageBox
+     * @param buttonType
+     */
     @Override
     public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
-        if (messageBox == gameOverMessageBox) {
-            eventHandler.onGameExited(this, 0);
+        if (messageBox == gameFinishMessageBox) {
+            eventHandler.onGameFinished(this, gameResultStars);
         } else if (messageBox == missionMessageBox) {
-            resumeFromWidget();
             missionMessageBox.close();
             removeWidget(missionMessageBox);
             missionMessageBox = null;
+
+            resumeFromWidget();
+        } else if (messageBox == tutorialStartMessageBox) {
+            tutorialStartMessageBox.close();
+            removeWidget(tutorialStartMessageBox);
+            tutorialStartMessageBox = null;
+
+            if (buttonType == MessageBox.ButtonType.YES) {
+                TutorialGuideForManagement tutorialGuideForManagement =
+                        new TutorialGuideForManagement(this, this);
+                tutorialGuideForManagement.show();
+                this.addWidget(tutorialGuideForManagement);
+            } else {
+                resumeFromWidget();
+            }
         }
     }
 
@@ -679,7 +691,7 @@ public class MainGame extends World
 
     @Override
     public void onSettingBoxExitPressed(SettingBox settingBox) {
-        eventHandler.onGameExited(this, 0);
+        eventHandler.onGameFinished(this, 0);
     }
 
     /**
@@ -769,8 +781,7 @@ public class MainGame extends World
      *
      */
     public void popupUpgradeBox() {
-        upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0),
-                30, 0.0f);
+        upgradeBox = new UpgradeBox(this, (Villager) tribes.get(0), mission);
         upgradeBox.show();
         addWidget(upgradeBox);
     }
@@ -797,7 +808,7 @@ public class MainGame extends World
      * @param territory
      */
     public void popupInfoBox(Territory territory) {
-        infoBox = new InfoBox(this, territory,30, 0.0f);
+        infoBox = new InfoBox(this, mission, territory);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -807,8 +818,7 @@ public class MainGame extends World
      * @param squad
      */
     public void popupInfoBox(Squad squad) {
-        infoBox = new InfoBox(this, (Villager)tribes.get(0), squad,
-                30, 0.0f);
+        infoBox = new InfoBox(this, mission, (Villager)tribes.get(0), squad);
         infoBox.show();
         addWidget(infoBox);
     }
@@ -947,6 +957,74 @@ public class MainGame extends World
         return map;
     }
 
+    /**
+     *
+     * @param stars
+     */
+    public void missionCompleted(int stars) {
+        pauseForWidget();
+
+        gameResultStars = stars;
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                        353, 275), "미션을 완수했습니다!!!\n별 " + stars + "개 달성")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
+                .build();
+        gameFinishMessageBox.show();
+        addWidget(gameFinishMessageBox);
+    }
+
+    /**
+     *
+     */
+    public void missionTimeout() {
+        pauseForWidget();
+
+        gameResultStars = 0;
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                        353, 275), "게임 오버!!!\n시간 내에 미션을 완수하지 못했습니다.")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 0, 0))
+                .build();
+        gameFinishMessageBox.show();
+        addWidget(gameFinishMessageBox);
+    }
+
+    /**
+     *
+     */
+    public void missionFailed() {
+        pauseForWidget();
+
+        gameResultStars = 0;
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                        353, 275), "게임 오버!!!\n본부가 점령되었습니다.")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 0, 0))
+                .build();
+        gameFinishMessageBox.show();
+        addWidget(gameFinishMessageBox);
+    }
+
+    /**
+     *
+     */
+    public void startTutorialForManagement() {
+        pauseForWidget();
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        tutorialStartMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
+                new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                        353, 275), "튜토리얼을 진행하시겠습니까?")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                .build();
+        tutorialStartMessageBox.show();
+        addWidget(tutorialStartMessageBox);
+    }
+
     private final static float MUSIC_VOLUME = 0.3f;
 
     private Event eventHandler;
@@ -955,7 +1033,8 @@ public class MainGame extends World
 
     private GameMap map;
     private Mission mission;
-    private MessageBox gameOverMessageBox;
+    private MessageBox gameFinishMessageBox;
+    private MessageBox tutorialStartMessageBox;
     private MessageBox missionMessageBox;
     private Button squadBuilderButton;
     private Button infoButton;
@@ -970,6 +1049,7 @@ public class MainGame extends World
     private UpgradeBox upgradeBox;
     private InfoBox infoBox;
     private SettingBox settingBox;
+    private int gameResultStars;
 
     private Squad focusedSquad = null;
     private Territory focusedTerritory = null;
