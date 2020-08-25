@@ -41,8 +41,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         Rect cancelButtonRegion = new Rect(region.right() - 140, region.bottom() - 65,
                 136, 60);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
-                .message("취소").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
                 .layer(getLayer() + 1).build();
         addWidget(cancelButton);
 
@@ -50,8 +50,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         Rect selectButtonRegion = new Rect(region.right() - 140, region.bottom() - 65,
                 136, 60);
         selectButton = new Button.Builder(this, selectButtonRegion)
-                .message("선택").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("선택").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
                 .layer(getLayer() + 1).build();
         addWidget(selectButton);
 

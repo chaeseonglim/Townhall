@@ -40,7 +40,7 @@ public class HomeBox extends Widget implements Button.Event {
         Sprite backgroundSprite = new Sprite.Builder("home_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(true).layer(layer).depth(depth)
-                .gridSize(1, 1).visible(false).opaque(0.8f).build();
+                .gridSize(1, 1).visible(false).opaque(1.0f).build();
         backgroundSprite.setGridIndex(0, 0);
         addSprite(backgroundSprite);
 
@@ -48,17 +48,17 @@ public class HomeBox extends Widget implements Button.Event {
         Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
                 150, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("")
-                .fontSize(25).layer(layer+1).fontColor(Color.rgb(230, 230, 230))
+                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(25).layer(layer+1).fontColor(Color.rgb(61, 61, 61))
                 .build();
         addWidget(closeButton);
 
         // Upgradable button
-        Rect toUpgradeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
+        Rect toUpgradeButtonRegion = new Rect(getRegion().right() - 312, getRegion().bottom() - 65,
                 150, 60);
         toUpgradeButton = new Button.Builder(this, toUpgradeButtonRegion)
-                .message("강화하기").imageSpriteAsset("")
-                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(230, 230, 230))
+                .message("강화하기").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(25).layer(layer + 1).fontColor(Color.rgb(61, 61, 61))
                 .build();
         addWidget(toUpgradeButton);
 

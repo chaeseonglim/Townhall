@@ -56,7 +56,7 @@ public class Townhall extends FragmentActivity
         Engine2D.GetInstance().setViewport(new Rect(0, 0, 1280, (int)(size.y*ratio)));
 
         // Set background color
-        Engine2D.GetInstance().setBackgroundColor(Color.rgb(50, 50, 50));
+        Engine2D.GetInstance().setBackgroundColor(Color.rgb(61, 61, 61));
     }
 
     /**

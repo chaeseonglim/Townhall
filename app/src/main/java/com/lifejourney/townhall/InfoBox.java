@@ -29,8 +29,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
-                700, 400);
+        Rect boxRegion = new Rect((viewport.width - 702) / 2, (viewport.height - 402) / 2,
+                702, 402);
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
@@ -41,16 +41,18 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(true).layer(getLayer()).depth(getDepth())
-                .gridSize(2, 1).visible(false).opaque(0.8f).build();
+                .gridSize(2, 1).visible(false).opaque(1.0f).build();
         backgroundSprite.setGridIndex(0, 0);
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
-                150, 60);
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 70,
+                138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(27).fontColor(Color.rgb(35, 35, 35))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 2.0f)
                 .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
@@ -62,8 +64,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 400) / 2,
-                700, 400);
+        Rect boxRegion = new Rect((viewport.width - 702) / 2, (viewport.height - 402) / 2,
+                702, 402);
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
@@ -75,25 +77,29 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(getLayer()).depth(getDepth())
-                .gridSize(2, 1).visible(false).opaque(0.8f).build();
+                .gridSize(2, 1).visible(false).opaque(1.0f).build();
         backgroundSprite.setGridIndex(1, 0);
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
-                150, 60);
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 70,
+                138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(27).fontColor(Color.rgb(35, 35, 35))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 2.0f)
                 .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
         // Territory button
-        Rect toTownButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
-                150, 60);
+        Rect toTownButtonRegion = new Rect(getRegion().right() - 312, getRegion().bottom() - 70,
+                138, 64);
         toTerritoryButton = new Button.Builder(this, toTownButtonRegion)
-                .message("마을로").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("지역").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(27).fontColor(Color.rgb(35, 35, 35))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 2.0f)
                 .layer(getLayer() + 1).build();
         addWidget(toTerritoryButton);
 
@@ -509,10 +515,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         textPosition.offset(75, 0);
         if (squad.getUnits().isEmpty()) {
-            textPosition.offset(0, 50);
-            addText("유닛이 없습니다.\n하단 모집 버튼을 누르세요.", new SizeF(300, 80), textPosition.clone(),
+            textPosition.offset(0, 55);
+            addText("유닛이 없습니다.\n하단 버튼을 눌러 모집해주세요.", new SizeF(300, 80), textPosition.clone(),
                     Color.rgb(230, 230, 230));
-            textPosition.offset(0, 8);
+            textPosition.offset(0, 25);
         } else {
             for (Unit unit : squad.getUnits()) {
                 textPosition.offset(0, 30);
@@ -527,8 +533,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         if (squad.getFaction() == Tribe.Faction.VILLAGER) { // Unit buttons
             Rect unitButtonRegion =
-                    new Rect(region.left() + 22, region.top() + (int) textPosition.y + 219,
-                            60, 64);
+                    new Rect(region.left() + 22, region.top() + (int) textPosition.y + 220,
+                            70, 74);
             for (int i = 0; i < 3; ++i) {
                 if (unitButtons[i] != null) {
                     unitButtons[i].close();
@@ -554,8 +560,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                         unitButtons[i].disable();
                     }
                     addWidget(unitButtons[i]);
-                } else
-                {
+                } else {
                     unitButtons[i] =
                             new Button.Builder(this, unitButtonRegion.clone())
                                     .imageSpriteAsset("unit_recruiting_btn.png")
@@ -566,7 +571,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     addWidget(unitButtons[i]);
                 }
 
-                unitButtonRegion.offset(69, 0);
+                unitButtonRegion.offset(80, 0);
             }
         }
 
@@ -659,6 +664,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     private void addText(String text, SizeF size, PointF position, int fontColor) {
         addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)
@@ -676,6 +683,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
     private void addText(String text, SizeF size, PointF position, int fontColor, Layout.Alignment alignment) {
         addSprite(new TextSprite.Builder("text", text, 24)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(alignment)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)

@@ -127,30 +127,27 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
     @Override
     public void onButtonPressed(Button button) {
 
-        if (button == closeButton) {
-            // Close button
+        if (button == closeButton) { // Close button
             setVisible(false);
             eventHandler.onSettingBoxClosed(this);
-        } else if (button == musicButton) {
-            // Music button
+        } else if (button == musicButton) { // Music button
             Engine2D engine2D = Engine2D.GetInstance();
             engine2D.enableMusic(!engine2D.isMusicEnabled());
             engine2D.savePreference(engine2D.getString(R.string.music_enable),
                     engine2D.isMusicEnabled()?1:0);
             musicButton.setImageSpriteSet(engine2D.isMusicEnabled()?0:1);
-        } else if (button == soundEffectButton) {
-            // Sound effect button
+        } else if (button == soundEffectButton) { // Sound effect button
             Engine2D engine2D = Engine2D.GetInstance();
             engine2D.enableSoundEffect(!engine2D.isSoundEffectEnabled());
             engine2D.savePreference(engine2D.getString(R.string.sound_effect_enable),
                     engine2D.isSoundEffectEnabled()?1:0);
             soundEffectButton.setImageSpriteSet(engine2D.isSoundEffectEnabled()?2:3);
-        } else if (button == exitButton) {
+        } else if (button == exitButton) { // Exit button
             Rect viewport = Engine2D.GetInstance().getViewport();
             MessageBox messageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
-                    new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                            353, 275), "정말 나가시겠습니까?")
-                    .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                    new Rect((viewport.width - 355) / 2, (viewport.height - 277) / 2,
+                            355, 277), "정말 나가시겠습니까?")
+                    .fontSize(25.0f).layer(50).textColor(Color.rgb(210, 210, 210))
                     .build();
             messageBox.setFollowParentVisibility(false);
             messageBox.show();
@@ -185,7 +182,6 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-
         addSprite(new TextSprite.Builder("text", text, 25)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)

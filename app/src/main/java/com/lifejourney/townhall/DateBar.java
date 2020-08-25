@@ -32,9 +32,11 @@ public class DateBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(background);
 
-        dateTextSprite = new TextSprite.Builder("dateText", "0 일", 25)
+        dateTextSprite = new TextSprite.Builder("dateText", "0 일", 27)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(130, 30))

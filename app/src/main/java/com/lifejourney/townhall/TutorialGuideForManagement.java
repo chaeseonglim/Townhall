@@ -58,9 +58,9 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
                 "존경하는 촌장님!\n\n" +
                 "저는 당신의 조언가입니다. " +
                 "지금부터 마을을 운영하는 방법을 알려드리고자 합니다.\n\n\n" +
-                "∙ 아무 곳이나 터치하세요.")
-                .fontSize(24.0f).layer(50).textColor(Color.rgb(230, 230, 230))
-                .bgAsset("tutorial_box_bg.png").bgOpaque(0.8f)
+                "아무 곳이나 터치하세요.")
+                .fontSize(24.0f).layer(50).textColor(Color.rgb(210, 210, 210))
+                .bgAsset("tutorial_box_bg.png").bgOpaque(1.0f)
                 .build();
         tutorialBox.setFollowParentVisibility(false);
         tutorialBox.show();
@@ -101,7 +101,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         super.onTouchEvent(event);
         int eventAction = event.getAction();
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            Engine2D.GetInstance().playSoundEffect("click3", 1.0f);
+            Engine2D.GetInstance().playSoundEffect("switch33", 1.0f);
             if (Step.values().length > step.ordinal() + 1) {
                 step = Step.values()[step.ordinal() + 1];
                 updateGuide();
@@ -323,7 +323,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(boxRegion.left() + 20, boxRegion.top() + 190)),
-                    new SizeF(200, 64)));
+                    new SizeF(230, 64)));
             guideRectangle.show();
             guideRectangle.commit();
 

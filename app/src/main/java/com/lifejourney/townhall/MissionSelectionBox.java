@@ -26,8 +26,8 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 700) / 2, (viewport.height - 500) / 2,
-                700, 500);
+        Rect boxRegion = new Rect((viewport.width - 702) / 2, (viewport.height - 502) / 2,
+                702, 502);
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
@@ -54,20 +54,24 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         addSprite(backgroundSprite);
 
         // Cancel button
-        Rect cancelButtonRegion = new Rect(getRegion().right() - 384, getRegion().bottom() - 73,
-                136, 60);
+        Rect cancelButtonRegion = new Rect(getRegion().right() - 392, getRegion().bottom() - 77,
+                138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
-                .message("뒤로").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("뒤로").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(cancelButton);
 
         // Start button
-        Rect startButtonRegion = new Rect(getRegion().right() - 244, getRegion().bottom() - 73,
-                136, 60);
+        Rect startButtonRegion = new Rect(getRegion().right() - 246, getRegion().bottom() - 77,
+                138, 64);
         startButton = new Button.Builder(this, startButtonRegion)
-                .message("시작").imageSpriteAsset("")
-                .fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("시작").imageSpriteAsset("messagebox_btn_bg.png")
+                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(startButton);
 
@@ -121,34 +125,40 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         PointF textPosition = new PointF(0, -210);
         addText("챕터 " + (selectedMission.ordinal() + 1) + " - " + selectedMission.getTitle(),
                 new SizeF(480, 40), textPosition.clone(), 32,
-                Color.rgb(255, 255, 0), Layout.Alignment.ALIGN_CENTER);
+                Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_CENTER,
+                Layout.Alignment.ALIGN_CENTER);
 
         // Mission description
-        textPosition.setTo(0, -70);
+        textPosition.setTo(0, -80);
         addText(selectedMission.getDescription(), new SizeF(460, 210), textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL);
+                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_CENTER,
+                Layout.Alignment.ALIGN_CENTER);
 
         // Mission victory condition
         textPosition.setTo(0, 60);
         addText("승리 조건:", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(255, 255, 0), Layout.Alignment.ALIGN_NORMAL);
+                25, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
+                Layout.Alignment.ALIGN_CENTER);
 
         textPosition.setTo(0, 90);
         addText(selectedMission.getVictoryCondition(), new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL);
+                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
+                Layout.Alignment.ALIGN_CENTER);
 
         // Mission time limit
         textPosition.setTo(0, 120);
         addText("시간 제한:", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(255, 255, 0), Layout.Alignment.ALIGN_NORMAL);
+                25, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
+                Layout.Alignment.ALIGN_CENTER);
 
         textPosition.setTo(0, 150);
         addText(selectedMission.getTimeLimit() + "일", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL);
+                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
+                Layout.Alignment.ALIGN_CENTER);
 
         // Star rating
         textPosition.offset(-248, 60);
@@ -209,10 +219,12 @@ public class MissionSelectionBox extends Widget implements Button.Event{
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontSize, int fontColor,
-                         Layout.Alignment alignment) {
+                         Layout.Alignment horizontalAlignment, Layout.Alignment verticalAlignment) {
         addSprite(new TextSprite.Builder("text", text, fontSize)
                 .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
-                .horizontalAlign(alignment)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(0, 0, 0), 2.0f)
+                .horizontalAlign(horizontalAlignment).verticalAlign(verticalAlignment)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());

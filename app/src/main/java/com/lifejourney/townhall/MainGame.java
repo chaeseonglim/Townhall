@@ -556,8 +556,8 @@ public class MainGame extends World
             missionMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                             353, 275), "승리 조건:\n" + mission.getVictoryCondition() +
-                    "\n시간 제한:\n" + mission.getTimeLimit()+"일")
-                    .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
+                    "\n\n시간 제한:\n" + mission.getTimeLimit()+"일")
+                    .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                     .build();
             missionMessageBox.show();
             addWidget(missionMessageBox);

@@ -39,9 +39,11 @@ public class EconomyBar extends Widget {
         happinessSprite.setGridIndex(2, 0);
         addSprite(happinessSprite);
 
-        goldTextSprite = new TextSprite.Builder("goldText", " ", 25)
+        goldTextSprite = new TextSprite.Builder("goldText", " ", 27)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(130, 30))
@@ -50,9 +52,11 @@ public class EconomyBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(goldTextSprite);
 
-        popTextSprite = new TextSprite.Builder("popText", " ", 25)
+        popTextSprite = new TextSprite.Builder("popText", " ", 27)
                 .fontColor(Color.argb(255, 255, 255, 0))
                 .bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(130, 30))

@@ -95,7 +95,7 @@ public class MessageBox extends Widget implements Button.Event {
 
         Sprite bgSprite = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
-                .smooth(false).layer(builder.layer).depth(0.2f).opaque(builder.bgOpaque)
+                .smooth(true).layer(builder.layer).depth(0.2f).opaque(builder.bgOpaque)
                 .gridSize((builder.isCustomAsset)?1:2, 1).visible(false).build();
         addSprite(bgSprite);
 
@@ -105,12 +105,15 @@ public class MessageBox extends Widget implements Button.Event {
             }
 
             // Close button
-            Rect closeButtonRegion = new Rect(getRegion().left() + 107, getRegion().bottom() - 67,
-                    136, 60);
+            Rect closeButtonRegion = new Rect(getRegion().left() + 105, getRegion().bottom() - 71,
+                    138, 64);
             closeButton = new Button.Builder(this, closeButtonRegion)
-                    .message("닫기").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
-                    .build();
+                    .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                    .fontSize(25)
+                    .fontColor(Color.rgb(61, 61, 61))
+                    .fontName("neodgm.ttf")
+                    .shadow(Color.rgb(235, 235, 235), 1.0f)
+                    .layer(getLayer()+1).build();
             addWidget(closeButton);
         } else if (type == Type.YES_OR_NO) {
             if (!builder.isCustomAsset) {
@@ -118,21 +121,27 @@ public class MessageBox extends Widget implements Button.Event {
             }
 
             // Yes button
-            Rect yesButtonRegion = new Rect(getRegion().left() + 37, getRegion().bottom() - 67,
-                    136, 60);
+            Rect yesButtonRegion = new Rect(getRegion().left() + 33, getRegion().bottom() - 71,
+                    138, 64);
             yesButton = new Button.Builder(this, yesButtonRegion)
-                    .message("예").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
-                    .build();
+                    .message("예").imageSpriteAsset("messagebox_btn_bg.png")
+                    .fontSize(25)
+                    .fontColor(Color.rgb(61, 61, 61))
+                    .fontName("neodgm.ttf")
+                    .shadow(Color.rgb(235, 235, 235), 2.0f)
+                    .layer(getLayer()+1).build();
             addWidget(yesButton);
 
             // No button
-            Rect noButtonRegion = new Rect(getRegion().left() + 177, getRegion().bottom() - 67,
-                    136, 60);
+            Rect noButtonRegion = new Rect(getRegion().left() + 177, getRegion().bottom() - 71,
+                    138, 64);
             noButton = new Button.Builder(this, noButtonRegion)
-                    .message("아니오").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
-                    .build();
+                    .message("아니오").imageSpriteAsset("messagebox_btn_bg.png")
+                    .fontSize(25)
+                    .fontColor(Color.rgb(61, 61, 61))
+                    .fontName("neodgm.ttf")
+                    .shadow(Color.rgb(235, 235, 235), 2.0f)
+                    .layer(getLayer()+1).build();
             addWidget(noButton);
         } else if (type == Type.OK_OR_CANCEL) {
             if (!builder.isCustomAsset) {
@@ -140,21 +149,27 @@ public class MessageBox extends Widget implements Button.Event {
             }
 
             // OK button
-            Rect okButtonRegion = new Rect(getRegion().left() + 37, getRegion().bottom() - 67,
-                    136, 60);
+            Rect okButtonRegion = new Rect(getRegion().left() + 35, getRegion().bottom() - 71,
+                    138, 64);
             okButton = new Button.Builder(this, okButtonRegion)
-                    .message("확인").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
-                    .build();
+                    .message("확인").imageSpriteAsset("messagebox_btn_bg.png")
+                    .fontSize(25)
+                    .fontColor(Color.rgb(235, 235, 235))
+                    .fontName("neodgm.ttf")
+                    .shadow(Color.rgb(61, 61, 61), 1.0f)
+                    .layer(getLayer()+1).build();
             addWidget(okButton);
 
             // Cancel button
-            Rect cancelButtonRegion = new Rect(getRegion().right() + 177, getRegion().bottom() - 67,
-                    136, 60);
+            Rect cancelButtonRegion = new Rect(getRegion().left() + 177, getRegion().bottom() - 71,
+                    138, 64);
             cancelButton = new Button.Builder(this, cancelButtonRegion)
-                    .message("취소").imageSpriteAsset("")
-                    .fontSize(25).layer(getLayer()+1).fontColor(Color.rgb(230, 230, 230))
-                    .build();
+                    .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
+                    .fontSize(25)
+                    .fontColor(Color.rgb(235, 235, 235))
+                    .fontName("neodgm.ttf")
+                    .shadow(Color.rgb(61, 61, 61), 1.0f)
+                    .layer(getLayer()+1).build();
             addWidget(cancelButton);
         }
 
@@ -166,6 +181,8 @@ public class MessageBox extends Widget implements Button.Event {
             new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
                 .fontColor(builder.textColor)
                 .bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(0, 0, 0), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(textSize)
@@ -212,7 +229,7 @@ public class MessageBox extends Widget implements Button.Event {
         int eventAction = event.getAction();
         if (type == Type.TOUCH && eventAction == MotionEvent.ACTION_DOWN &&
                 checkIfInputEventInRegion(event)) {
-            Engine2D.GetInstance().playSoundEffect("click3", 1.0f);
+            Engine2D.GetInstance().playSoundEffect("switch33", 1.0f);
             eventHandler.onMessageBoxButtonPressed(this, ButtonType.TOUCH);
             return true;
         }

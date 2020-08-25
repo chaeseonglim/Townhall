@@ -38,6 +38,7 @@ public class MainMenu extends World
         // Load sound effect
         resourceManager.loadSoundEffect("click3", R.raw.click3);
         resourceManager.loadSoundEffect("click5", R.raw.click5);
+        resourceManager.loadSoundEffect("switch33", R.raw.switch33);
         resourceManager.loadSoundEffect("levelup", R.raw.rise01);
         resourceManager.loadSoundEffect("news", R.raw.rise02);
         resourceManager.loadSoundEffect("arrow", R.raw.metal_small2);
@@ -77,40 +78,36 @@ public class MainMenu extends World
 
         // Logo
         String logoText = "마을 대전략";
-        logoShadow = new TextSprite.Builder("logo", logoText, 120)
-                .fontColor(Color.rgb(0, 0, 0))
-                .bgColor(Color.argb(0, 0, 0, 0))
-                .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
-                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
-                .size(new SizeF(600, 200))
-                .position(new PointF(viewport.centerX(), viewport.height / 3))
-                .positionOffset(new PointF(0, 5))
-                .smooth(true).depth(0.0f)
-                .layer(20).visible(true).build();
         logo = new TextSprite.Builder("logo", logoText, 120)
                 .fontColor(Color.rgb(255, 255, 0))
+                .fontName("neodgm.ttf")
                 .bgColor(Color.argb(0, 0, 0, 0))
+                .shadow(Color.rgb(0, 0, 0), 7.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
-                .size(new SizeF(600, 200))
-                .position(new PointF(viewport.centerX(), viewport.height / 3))
+                .size(new SizeF(600, 220))
+                .position(new PointF(viewport.centerX(), viewport.height * 2 / 5))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(true).build();
 
         // Buttons
         startButton = new Button.Builder(this,
-                new Rect((viewport.width - 300) / 2,  viewport.height - 200, 300, 62))
+                new Rect((viewport.width - 300) / 2,  viewport.height - 200, 302, 64))
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("게임 시작").fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("게임 시작").fontSize(29).fontColor(Color.rgb(61, 61, 61))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
         startButton.setImageSpriteSet(0);
         startButton.show();
         addWidget(startButton);
 
         settingButton = new Button.Builder(this,
-                new Rect((viewport.width - 300) / 2,  viewport.height - 120, 300, 62))
+                new Rect((viewport.width - 300) / 2,  viewport.height - 120, 302, 64))
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("설정").fontSize(25).fontColor(Color.rgb(230, 230, 230))
+                .message("설정").fontSize(29).fontColor(Color.rgb(61, 61, 61))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
         settingButton.setImageSpriteSet(0);
         settingButton.show();
@@ -157,7 +154,6 @@ public class MainMenu extends World
 
         if (logo != null) {
             logo.commit();
-            logoShadow.commit();
         }
 
         if (game != null) {
@@ -247,7 +243,6 @@ public class MainMenu extends World
         removeWidget(settingBox);
 
         logo.show();
-        logoShadow.show();
         startButton.show();
         settingButton.show();
     }
@@ -271,7 +266,6 @@ public class MainMenu extends World
         removeWidget(missionSelectionBox);
 
         logo.show();
-        logoShadow.show();
         startButton.show();
         settingButton.show();
     }
@@ -296,9 +290,6 @@ public class MainMenu extends World
 
         logo.close();
         logo = null;
-
-        logoShadow.close();
-        logoShadow = null;
 
         if (sampleMap != null) {
             sampleMap.close();
@@ -335,7 +326,6 @@ public class MainMenu extends World
      */
     private void popupSettingBox() {
         logo.hide();
-        logoShadow.hide();
         startButton.hide();
         settingButton.hide();
 
@@ -349,7 +339,6 @@ public class MainMenu extends World
      */
     private void popupMissionSelectBox() {
         logo.hide();
-        logoShadow.hide();
         startButton.hide();
         settingButton.hide();
 
@@ -365,7 +354,6 @@ public class MainMenu extends World
     private Mission nextMission = null;
     private GameMap sampleMap;
     private Sprite logo;
-    private Sprite logoShadow;
     private Button startButton;
     private Button settingButton;
 }
