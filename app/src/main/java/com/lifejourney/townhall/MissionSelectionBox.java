@@ -58,7 +58,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("뒤로").imageSpriteAsset("messagebox_btn_bg.png")
-                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
@@ -69,7 +69,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 138, 64);
         startButton = new Button.Builder(this, startButtonRegion)
                 .message("시작").imageSpriteAsset("messagebox_btn_bg.png")
-                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();

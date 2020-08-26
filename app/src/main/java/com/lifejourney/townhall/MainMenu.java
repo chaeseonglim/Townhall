@@ -94,7 +94,7 @@ public class MainMenu extends World
         startButton = new Button.Builder(this,
                 new Rect((viewport.width - 300) / 2,  viewport.height - 200, 302, 64))
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("게임 시작").fontSize(29).fontColor(Color.rgb(61, 61, 61))
+                .message("게임 시작").fontSize(29).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
@@ -105,7 +105,7 @@ public class MainMenu extends World
         settingButton = new Button.Builder(this,
                 new Rect((viewport.width - 300) / 2,  viewport.height - 120, 302, 64))
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("설정").fontSize(29).fontColor(Color.rgb(61, 61, 61))
+                .message("설정").fontSize(29).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();

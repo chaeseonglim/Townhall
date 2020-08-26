@@ -34,30 +34,34 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         Sprite backgroundSprite = new Sprite.Builder("unit_selection_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(getLayer()).depth(getDepth())
-                .gridSize(1, 1).visible(false).opaque(0.8f).build();
+                .gridSize(1, 1).visible(false).opaque(1.0f).build();
         addSprite(backgroundSprite);
 
         // Cancel button
-        Rect cancelButtonRegion = new Rect(region.right() - 140, region.bottom() - 65,
-                136, 60);
+        Rect cancelButtonRegion = new Rect(region.right() - 155, region.bottom() - 75,
+                138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(cancelButton);
 
         // Select button
-        Rect selectButtonRegion = new Rect(region.right() - 140, region.bottom() - 65,
-                136, 60);
+        Rect selectButtonRegion = new Rect(region.right() - 155, region.bottom() - 75,
+                138, 64);
         selectButton = new Button.Builder(this, selectButtonRegion)
                 .message("선택").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(selectButton);
 
         // Unit button
         Rect unitButtonRegion =
-                new Rect(region.left() + 22, region.bottom() - 65,
+                new Rect(region.left() + 22, region.bottom() - 73,
                         56, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
@@ -110,7 +114,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
         if (selectedUnitClass != null) {
             // Unit Class
-            PointF textPosition = new PointF(-250, -165);
+            PointF textPosition = new PointF(-240, -165);
             addText("클래스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
@@ -204,7 +208,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 textPosition.offset(35, 0);
                 addIcon("ranged_attack.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(53, 0);
-                addText("/", new SizeF(150, 40), textPosition.clone(),
+                addText("|", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
                 textPosition.offset(42, 0);
                 String meleeAttackDamageString =
@@ -224,7 +228,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 textPosition.offset(35, 0);
                 addIcon("ranged_attack_speed.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(53, 0);
-                addText("/", new SizeF(150, 40), textPosition.clone(),
+                addText("|", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
                 textPosition.offset(42, 0);
                 String attackSpeedString =
@@ -257,7 +261,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             textPosition.offset(35, 0);
             addIcon("ranged_evade.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(53, 0);
-            addText("/", new SizeF(150, 40), textPosition.clone(),
+            addText("|", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
             textPosition.offset(42, 0);
             String evasionString =
@@ -269,7 +273,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Strong/Weakness
-            textPosition.setTo(100, -165);
+            textPosition.setTo(110, -165);
             addText("지원", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
@@ -281,11 +285,11 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(75, 75);
-            addText(selectedUnitClass.description(),
+            addLongText(selectedUnitClass.description(),
                     new SizeF(300, 120), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         } else {
-            PointF textPosition = new PointF(-250 + 75, -165);
+            PointF textPosition = new PointF(-240 + 75, -165);
             addText("클래스를 선택하세요.", new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
@@ -366,7 +370,6 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         }
     }
 
-
     /**
      *
      * @param text
@@ -375,10 +378,31 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text"+textIndex, text, 25)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+                .fontColor(fontColor)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addLongText(String text, SizeF size, PointF position, int fontColor) {
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+                .fontColor(fontColor)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)
                 .layer(getLayer()+1).visible(false).build());

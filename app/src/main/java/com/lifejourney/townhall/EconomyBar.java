@@ -60,7 +60,7 @@ public class EconomyBar extends Widget {
                 .horizontalAlign(Layout.Alignment.ALIGN_OPPOSITE)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(130, 30))
-                .positionOffset(new PointF(130, 0))
+                .positionOffset(new PointF(125, 0))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(false).build();
         addSprite(popTextSprite);

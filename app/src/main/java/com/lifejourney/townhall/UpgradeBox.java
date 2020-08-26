@@ -28,12 +28,11 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
     }
 
     public UpgradeBox(Event eventHandler, Villager villager, Mission mission) {
-
         super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 800) / 2, (viewport.height - 450) / 2,
-                800, 450);
+        Rect boxRegion = new Rect((viewport.width - 802) / 2, (viewport.height - 452) / 2,
+                802,452);
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
@@ -49,26 +48,30 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 65,
-                150, 60);
+        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 75,
+                138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
-                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontSize(25).fontColor(Color.rgb(0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
         // Home button
-        Rect toHomeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 65,
-                150, 60);
+        Rect toHomeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 75,
+                150, 64);
         toHomeButton = new Button.Builder(this, toHomeButtonRegion)
                 .message("홈 화면").imageSpriteAsset("messagebox_btn_bg.png")
-                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontSize(25).fontColor(Color.rgb(0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(toHomeButton);
 
         // Unit buttons
         Rect unitButtonRegion =
-                new Rect(getRegion().left() + 22, getRegion().bottom() - 65,
+                new Rect(getRegion().left() + 22, getRegion().bottom() - 73,
                         56, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
@@ -101,7 +104,9 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .name("UpgradeBtn" + i)
                             .imageSpriteAsset("unit_upgrade_btn.png")
                             .numImageSpriteSet(4)
-                            .message(" ").fontSize(19)
+                            .message(" ").fontSize(22)
+                            .fontName("neodgm.ttf")
+                            .shadow(Color.rgb(61, 61, 61), 1.0f)
                             .layer(getLayer() + 1).build();
             upgradableButtons[i].hide();
             upgradableButtons[i].setFollowParentVisibility(false);
@@ -197,7 +202,6 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      */
     @Override
     public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
-
         if (buttonType == MessageBox.ButtonType.YES) {
             villager.pay(selectedUpgradable.getPurchaseCost());
             selectedUpgradable.setLevel(Tribe.Faction.VILLAGER,
@@ -237,34 +241,34 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 upgradableButtons[i].show();
             }
 
-            PointF textPosition = new PointF(-205, -190);
-            addText(selectedUnitClass.word() + " 강화",
+            PointF textPosition = new PointF(-175, -165);
+            addTitleText(selectedUnitClass.word() + " 강화",
                     new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
             if (selectedUpgradable != null) {
-                textPosition.setTo(200, -190);
+                textPosition.setTo(210, -170);
                 addText("구입비", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(-165, 30);
-                addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
-                textPosition.offset(195, 0);
+                textPosition.offset(-160, 30);
+                addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+                textPosition.offset(200, 0);
                 addText(selectedUpgradable.getPurchaseCost() + "", new SizeF(350, 40),
                         textPosition.clone(), Color.rgb(230, 230, 230));
 
-                textPosition.offset(-30, 30);
+                textPosition.offset(-40, 30);
                 addText("유지비", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
-                textPosition.offset(-165, 30);
-                addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
-                textPosition.offset(195, 0);
+                textPosition.offset(-160, 30);
+                addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+                textPosition.offset(200, 0);
                 addText((selectedUpgradable.getUpkeepCost() *
                                 selectedUpgradable.getLevel(Tribe.Faction.VILLAGER)) + " (" +
                                 selectedUpgradable.getUpkeepCost() + " x 레벨)",
                         new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
-                textPosition.offset(-30, 30);
+                textPosition.offset(-40, 30);
                 addText("레벨 1 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 1) ? "(현재 레벨)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 1)?
@@ -309,7 +313,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                                 Color.rgb(230, 230, 230)
                 );
             } else {
-                textPosition.setTo(200, -190);
+                textPosition.setTo(210, -170);
                 addText("강화할 항목을 선택하세요.", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
@@ -319,7 +323,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 upgradableButtons[i].hide();
             }
 
-            PointF textPosition = new PointF(-205, -190);
+            PointF textPosition = new PointF(-185, -180);
             addText("강화할 클래스를 선택하세요.", new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
@@ -332,9 +336,30 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      * @param position
      * @param fontColor
      */
+    private void addTitleText(String text, SizeF size, PointF position, int fontColor) {
+        addSprite(new TextSprite.Builder("text", text, 28)
+                .fontColor(fontColor)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
         addSprite(new TextSprite.Builder("text", text, 24)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontColor(fontColor)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)

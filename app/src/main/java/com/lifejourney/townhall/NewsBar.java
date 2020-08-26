@@ -33,6 +33,8 @@ public class NewsBar extends Widget {
         textSprite = new TextSprite.Builder("dateText", "안녕하세요. 마을 주민들이 당신에게 인사합니다!", 26)
                 .fontColor(Color.rgb(230, 230, 230))
                 .bgColor(Color.argb(0, 0, 0, 0))
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(700, 36))

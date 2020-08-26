@@ -28,8 +28,8 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         super(null, layer, depth);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 350) / 2, (viewport.height - 302) / 2,
-                350, 302);
+        Rect boxRegion = new Rect((viewport.width - 322) / 2, (viewport.height - 302) / 2,
+                322, 302);
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
@@ -43,7 +43,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         addSprite(backgroundSprite);
 
         // Music button
-        Rect musicButtonRegion = new Rect(getRegion().left() + 45, getRegion().top() + 30,
+        Rect musicButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 26,
                 56, 60);
         musicButton = new Button.Builder(this, musicButtonRegion)
                 .imageSpriteAsset("setting_icon_btns.png").numImageSpriteSet(6)
@@ -56,12 +56,12 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         }
         addWidget(musicButton);
 
-        PointF textPosition = new PointF(20, -91);
-        addText("음악 On/Off", new SizeF(160, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+        PointF textPosition = new PointF(50, -96);
+        addText("음악 On/Off", new SizeF(200, 40), textPosition.clone(),
+                Color.rgb(35, 35, 35));
 
         // Sound Effect button
-        Rect soundEffectButtonRegion = new Rect(getRegion().left() + 45, getRegion().top() + 90,
+        Rect soundEffectButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 89,
                 56, 60);
         soundEffectButton = new Button.Builder(this, soundEffectButtonRegion)
                 .imageSpriteAsset("setting_icon_btns.png").numImageSpriteSet(6)
@@ -74,12 +74,12 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         }
         addWidget(soundEffectButton);
 
-        textPosition = new PointF(20, -31);
-        addText("효과음 On/Off", new SizeF(160, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+        textPosition = new PointF(50, -33);
+        addText("효과음 On/Off", new SizeF(200, 40), textPosition.clone(),
+                Color.rgb(35, 35, 35));
 
         // Exit button
-        Rect exitButtonRegion = new Rect(getRegion().left() + 45, getRegion().top() + 150,
+        Rect exitButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 152,
                 56, 60);
         exitButton = new Button.Builder(this, exitButtonRegion)
                 .imageSpriteAsset("setting_icon_btns.png").numImageSpriteSet(6)
@@ -88,12 +88,12 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         exitButton.setImageSpriteSet(4);
         addWidget(exitButton);
 
-        textPosition = new PointF(20, 29);
-        addText("종료하기", new SizeF(160, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+        textPosition = new PointF(50, 30);
+        addText("종료하기", new SizeF(200, 40), textPosition.clone(),
+                Color.rgb(35, 35, 35));
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().left() + 45, getRegion().top() + 210,
+        Rect closeButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 215,
                 56, 60);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .imageSpriteAsset("setting_icon_btns.png").numImageSpriteSet(6)
@@ -102,9 +102,9 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         closeButton.setImageSpriteSet(5);
         addWidget(closeButton);
 
-        textPosition = new PointF(20, 89);
-        addText("돌아가기", new SizeF(160, 40), textPosition.clone(),
-                Color.rgb(230, 230, 230));
+        textPosition = new PointF(50, 93);
+        addText("돌아가기", new SizeF(200, 40), textPosition.clone(),
+                Color.rgb(35, 35, 35));
     }
 
     /**
@@ -114,7 +114,6 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         // It consumes all input
         super.onTouchEvent(event);
         return true;
@@ -126,7 +125,6 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
      */
     @Override
     public void onButtonPressed(Button button) {
-
         if (button == closeButton) { // Close button
             setVisible(false);
             eventHandler.onSettingBoxClosed(this);
@@ -183,7 +181,9 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
         addSprite(new TextSprite.Builder("text", text, 25)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontColor(fontColor)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(235, 235, 235), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)

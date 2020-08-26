@@ -51,6 +51,9 @@ public class MessageBox extends Widget implements Button.Event {
         private int layer = 0;
         private float depth = 0.0f;
         private float bgOpaque = 1.0f;
+        private boolean shadow = true;
+        private int shadowColor = Color.rgb(0, 0, 0);
+        private float shadowDepth = 2.0f;
 
         Builder(Event listener, Type type, Rect region, String message) {
             this.listener = listener;
@@ -64,6 +67,12 @@ public class MessageBox extends Widget implements Button.Event {
         }
         Builder textColor(int textColor) {
             this.textColor = textColor;
+            return this;
+        }
+        Builder textShadow(int shadowColor, float shadowDepth) {
+            this.shadow = true;
+            this.shadowColor = shadowColor;
+            this.shadowDepth = shadowDepth;
             return this;
         }
         Builder layer(int layer) {
@@ -92,6 +101,9 @@ public class MessageBox extends Widget implements Button.Event {
         super(builder.region, builder.layer, builder.depth);
         eventHandler = builder.listener;
         type = builder.type;
+        shadow = builder.shadow;
+        shadowColor = builder.shadowColor;
+        shadowDepth = builder.shadowDepth;
 
         Sprite bgSprite = new Sprite.Builder(builder.bgAsset)
                 .size(new SizeF(getRegion().size()))
@@ -126,9 +138,9 @@ public class MessageBox extends Widget implements Button.Event {
             yesButton = new Button.Builder(this, yesButtonRegion)
                     .message("예").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
-                    .fontColor(Color.rgb(61, 61, 61))
+                    .fontColor(Color.rgb(0, 0, 0))
                     .fontName("neodgm.ttf")
-                    .shadow(Color.rgb(235, 235, 235), 2.0f)
+                    .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(yesButton);
 
@@ -138,9 +150,9 @@ public class MessageBox extends Widget implements Button.Event {
             noButton = new Button.Builder(this, noButtonRegion)
                     .message("아니오").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
-                    .fontColor(Color.rgb(61, 61, 61))
+                    .fontColor(Color.rgb(0, 0, 0))
                     .fontName("neodgm.ttf")
-                    .shadow(Color.rgb(235, 235, 235), 2.0f)
+                    .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(noButton);
         } else if (type == Type.OK_OR_CANCEL) {
@@ -154,9 +166,9 @@ public class MessageBox extends Widget implements Button.Event {
             okButton = new Button.Builder(this, okButtonRegion)
                     .message("확인").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
-                    .fontColor(Color.rgb(235, 235, 235))
+                    .fontColor(Color.rgb(0, 0, 0))
                     .fontName("neodgm.ttf")
-                    .shadow(Color.rgb(61, 61, 61), 1.0f)
+                    .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(okButton);
 
@@ -166,9 +178,9 @@ public class MessageBox extends Widget implements Button.Event {
             cancelButton = new Button.Builder(this, cancelButtonRegion)
                     .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
-                    .fontColor(Color.rgb(235, 235, 235))
+                    .fontColor(Color.rgb(0, 0, 0))
                     .fontName("neodgm.ttf")
-                    .shadow(Color.rgb(61, 61, 61), 1.0f)
+                    .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(cancelButton);
         }
@@ -177,18 +189,30 @@ public class MessageBox extends Widget implements Button.Event {
         if (type != Type.TOUCH && type != Type.PLATE) {
             textSize.height = 200 - TEXT_MARGIN * 2;
         }
-        textSprite =
-            new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
-                .fontColor(builder.textColor)
-                .bgColor(Color.argb(0, 0, 0, 0))
-                .fontName("neodgm.ttf")
-                .shadow(Color.rgb(0, 0, 0), 2.0f)
-                .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
-                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
-                .size(textSize)
-                .positionOffset(new PointF(0, (textSize.height - getRegion().height)/2+TEXT_MARGIN))
-                .smooth(true).depth(0.3f)
-                .layer(builder.layer).visible(false).build();
+        if (shadow) {
+            textSprite =
+                    new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
+                            .fontColor(builder.textColor)
+                            .fontName("neodgm.ttf")
+                            .shadow(shadowColor, shadowDepth)
+                            .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                            .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                            .size(textSize)
+                            .positionOffset(new PointF(0, (textSize.height - getRegion().height) / 2 + TEXT_MARGIN))
+                            .smooth(true).depth(0.3f)
+                            .layer(builder.layer).visible(false).build();
+        } else {
+            textSprite =
+                    new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
+                            .fontColor(builder.textColor)
+                            .fontName("neodgm.ttf")
+                            .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                            .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                            .size(textSize)
+                            .positionOffset(new PointF(0, (textSize.height - getRegion().height) / 2 + TEXT_MARGIN))
+                            .smooth(true).depth(0.3f)
+                            .layer(builder.layer).visible(false).build();
+        }
         addSprite(textSprite);
     }
 
@@ -256,4 +280,7 @@ public class MessageBox extends Widget implements Button.Event {
     private Button okButton;
     private Button cancelButton;
     private Button closeButton;
+    private boolean shadow;
+    private int shadowColor;
+    private float shadowDepth;
 }

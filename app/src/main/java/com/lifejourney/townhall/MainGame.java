@@ -700,7 +700,6 @@ public class MainGame extends World
      */
     @Override
     public void onDateBarPassed(int days) {
-
     }
 
     /**
@@ -987,6 +986,7 @@ public class MainGame extends World
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                         353, 275), "게임 오버!!!\n시간 내에 미션을 완수하지 못했습니다.")
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 0, 0))
+                .textShadow(Color.rgb(61, 61, 61), 2.0f)
                 .build();
         gameFinishMessageBox.show();
         addWidget(gameFinishMessageBox);
@@ -1004,6 +1004,7 @@ public class MainGame extends World
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                         353, 275), "게임 오버!!!\n본부가 점령되었습니다.")
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 0, 0))
+                .textShadow(Color.rgb(61, 61, 61), 2.0f)
                 .build();
         gameFinishMessageBox.show();
         addWidget(gameFinishMessageBox);
