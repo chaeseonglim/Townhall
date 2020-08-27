@@ -80,7 +80,7 @@ public class EconomyBar extends Widget {
     public void refresh() {
         // Set gold text
         if (villager.getGold() >= 0) {
-            goldTextSprite.setFontColor(Color.rgb(255, 255, 0));
+            goldTextSprite.setFontColor(Color.rgb(235, 235, 235));
         } else {
             goldTextSprite.setFontColor(Color.rgb(255, 0, 0));
         }
@@ -89,13 +89,13 @@ public class EconomyBar extends Widget {
         // Set population text
         int population = villager.getIdlePopulation();
         if (population >= 0) {
-            popTextSprite.setFontColor(Color.rgb(255, 255, 0));
+            popTextSprite.setFontColor(Color.rgb(235, 235,  235));
         } else {
             popTextSprite.setFontColor(Color.rgb(255, 0, 0));
         }
         popTextSprite.setText(((population >= 0)?"+":"")+ population);
 
-        // Set happiness text
+        // Set happiness icon
         if (villager.getHappiness() > 80) {
             happinessSprite.setGridIndex(0, 0);
         } else if (villager.getHappiness() > 60) {
