@@ -48,7 +48,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 155, getRegion().bottom() - 75,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 75,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
@@ -59,10 +59,10 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(closeButton);
 
         // Home button
-        Rect toHomeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 75,
-                150, 64);
+        Rect toHomeButtonRegion = new Rect(getRegion().right() - 300, getRegion().bottom() - 75,
+                138, 64);
         toHomeButton = new Button.Builder(this, toHomeButtonRegion)
-                .message("홈 화면").imageSpriteAsset("messagebox_btn_bg.png")
+                .message("홈").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
@@ -105,8 +105,9 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .imageSpriteAsset("unit_upgrade_btn.png")
                             .numImageSpriteSet(4)
                             .message(" ").fontSize(22)
+                            .fontColor(Color.rgb(35, 35, 35))
                             .fontName("neodgm.ttf")
-                            .shadow(Color.rgb(61, 61, 61), 1.0f)
+                            .shadow(Color.rgb(235, 235, 235), 1.0f)
                             .layer(getLayer() + 1).build();
             upgradableButtons[i].hide();
             upgradableButtons[i].setFollowParentVisibility(false);

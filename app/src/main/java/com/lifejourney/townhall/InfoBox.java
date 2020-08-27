@@ -40,12 +40,12 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         // Background sprite
         Sprite backgroundSprite = new Sprite.Builder("info_box.png")
                 .size(new SizeF(getRegion().size()))
-                .smooth(true).layer(getLayer()).depth(getDepth())
+                .smooth(false).layer(getLayer()).depth(getDepth())
                 .gridSize(1, 1).visible(false).opaque(1.0f).build();
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 78,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 81,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
@@ -80,7 +80,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 78,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 81,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
@@ -91,7 +91,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addWidget(closeButton);
 
         // Territory button
-        Rect toTownButtonRegion = new Rect(getRegion().right() - 305, getRegion().bottom() - 78,
+        Rect toTownButtonRegion = new Rect(getRegion().right() - 300, getRegion().bottom() - 81,
                 138, 64);
         toTerritoryButton = new Button.Builder(this, toTownButtonRegion)
                 .message("지역").imageSpriteAsset("messagebox_btn_bg.png")
@@ -291,8 +291,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 removeWidget(farmDevelopmentButton);
             }
             Rect developmentButtonRegion =
-                    new Rect(region.left() + 35, region.top() + (int)textPosition.y + 219,
-                            64, 64);
+                    new Rect(region.left() + 36, region.top() + (int)textPosition.y + 218,
+                            61, 65);
             farmDevelopmentButton =
                     new Button.Builder(this,  developmentButtonRegion.clone())
                             .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
@@ -306,7 +306,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 marketDevelopmentButton.close();
                 removeWidget(marketDevelopmentButton);
             }
-            developmentButtonRegion.offset(73, 0);
+            developmentButtonRegion.offset(71, 0);
             marketDevelopmentButton =
                     new Button.Builder(this, developmentButtonRegion.clone())
                             .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
@@ -320,7 +320,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 downtownDevelopmentButton.close();
                 removeWidget(downtownDevelopmentButton);
             }
-            developmentButtonRegion.offset(73, 0);
+            developmentButtonRegion.offset(71, 0);
             downtownDevelopmentButton =
                     new Button.Builder(this, developmentButtonRegion.clone())
                             .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
@@ -334,7 +334,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 fortressDevelopmentButton.close();
                 removeWidget(fortressDevelopmentButton);
             }
-            developmentButtonRegion.offset(73, 0);
+            developmentButtonRegion.offset(71, 0);
             fortressDevelopmentButton =
                     new Button.Builder(this, developmentButtonRegion.clone())
                             .imageSpriteAsset("facility_development_btn.png").numImageSpriteSet(12)
@@ -347,29 +347,29 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(-46, 100);
             addText("농장", new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
-            textPosition.offset(73, 0);
+            textPosition.offset(71, 0);
             addText("시장", new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
-            textPosition.offset(73, 0);
+            textPosition.offset(71, 0);
             addText("마을", new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
-            textPosition.offset(73, 0);
+            textPosition.offset(71, 0);
             addText("요새", new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
 
-            textPosition.offset(-73*3, 30);
+            textPosition.offset(-71*3+1, 30);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.FARM),
                     new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
-            textPosition.offset(73, 0);
+            textPosition.offset(71, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.MARKET),
                     new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
-            textPosition.offset(73, 0);
+            textPosition.offset(71, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.DOWNTOWN),
                     new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
-            textPosition.offset(73, 0);
+            textPosition.offset(71, 0);
             addText("Lv." + territory.getFacilityLevel(Territory.Facility.FORTRESS),
                     new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230), Layout.Alignment.ALIGN_CENTER);
@@ -381,7 +381,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
-            addIcon("people.png", new SizeF(35, 35), textPosition.clone());
+            addIcon("people.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText(territory.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
@@ -392,7 +392,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("수입", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
-            addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText(territory.getTax() + "",
                     new SizeF(150, 40), textPosition.clone(),
@@ -404,15 +404,15 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
             if (territory.getHappiness() > 80) {
-                addIcon("very_happy.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("very_happy.png", new SizeF(25, 25), textPosition.clone());
             } else if (territory.getHappiness() > 60) {
-                addIcon("happy.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("happy.png", new SizeF(25, 25), textPosition.clone());
             } else if (territory.getHappiness() > 40) {
-                addIcon("soso.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("soso.png", new SizeF(25, 25), textPosition.clone());
             } else if (territory.getHappiness() > 20) {
-                addIcon("bad.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("bad.png", new SizeF(25, 25), textPosition.clone());
             } else {
-                addIcon("very_bad.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("very_bad.png", new SizeF(25, 25), textPosition.clone());
             }
             textPosition.offset(100, 0);
             addText(territory.getHappiness() + "",
@@ -424,7 +424,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("방어도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
-            addIcon("armor.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText(territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
                     new SizeF(150, 40), textPosition.clone(),
@@ -457,7 +457,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
-            addIcon("armor.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText((territory.getDelta(Territory.DeltaAttribute.DEFENSIVE)==0)?
                             "-" : territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
@@ -568,7 +568,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     addWidget(unitButtons[i]);
                 }
 
-                unitButtonRegion.offset(71, 0);
+                unitButtonRegion.offset(73, 0);
             }
         }
 
@@ -578,7 +578,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
-            addIcon("people.png", new SizeF(35, 35), textPosition.clone());
+            addIcon("people.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText((squad.getPopulation() == 0) ? "-" : squad.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
@@ -588,7 +588,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("유지비", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-60, 30);
-            addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText((squad.getUpkeep() == 0) ? "-" : squad.getUpkeep() + "",
                     new SizeF(150, 40), textPosition.clone(),
@@ -615,7 +615,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             if (attackDamageBonus != 0) {
                 textPosition.offset(-90, 30);
-                addIcon("attack.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("공격력 " + ((attackDamageBonus > 0) ? "+" : "") + attackDamageBonus,
                         new SizeF(150, 40), textPosition.clone(),
@@ -624,7 +624,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             if (attackSpeedBonus != 0) {
                 textPosition.offset(-90, 30);
-                addIcon("wind.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("공격 속도 " + ((attackSpeedBonus < 0) ? "+" : "") + (-attackSpeedBonus),
                         new SizeF(150, 40), textPosition.clone(),
@@ -633,7 +633,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             if (armorBonus != 0) {
                 textPosition.offset(-90, 30);
-                addIcon("armor.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("방어도 " + ((armorBonus>0)?"+":"") + armorBonus,
                         new SizeF(150, 40), textPosition.clone(),
@@ -642,7 +642,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             if (healPowerBonus != 0) {
                 textPosition.offset(-90, 30);
-                addIcon("heal.png", new SizeF(30, 30), textPosition.clone());
+                addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("치유량 " + ((healPowerBonus>0)?"+":"") + healPowerBonus,
                         new SizeF(150, 40), textPosition.clone(),

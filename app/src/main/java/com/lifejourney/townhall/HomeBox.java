@@ -45,7 +45,7 @@ public class HomeBox extends Widget implements Button.Event {
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 78,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 81,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
@@ -56,7 +56,7 @@ public class HomeBox extends Widget implements Button.Event {
         addWidget(closeButton);
 
         // Upgradable button
-        Rect toUpgradeButtonRegion = new Rect(getRegion().right() - 305, getRegion().bottom() - 78,
+        Rect toUpgradeButtonRegion = new Rect(getRegion().right() - 300, getRegion().bottom() - 81,
                 138, 64);
         toUpgradeButton = new Button.Builder(this, toUpgradeButtonRegion)
                 .message("강화").imageSpriteAsset("messagebox_btn_bg.png")
@@ -110,7 +110,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(-60, 30);
-        addIcon("people.png", new SizeF(35, 35), textPosition.clone());
+        addIcon("people.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getTotalPopulation()+"", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
@@ -120,7 +120,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(-60, 30);
-        addIcon("people.png", new SizeF(35, 35), textPosition.clone());
+        addIcon("people.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText((villager.getWorkingPopulation() == 0)? "-" : ("-" + villager.getWorkingPopulation()),
                 new SizeF(150, 40), textPosition.clone(),
@@ -132,7 +132,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(-60, 30);
-        addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+        addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getIncome() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
@@ -143,7 +143,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(-60, 30);
-        addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+        addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText((villager.getSpend() == 0)? "-" : ("-" + villager.getSpend()),
                 new SizeF(150, 40), textPosition.clone(),
@@ -156,15 +156,15 @@ public class HomeBox extends Widget implements Button.Event {
 
         textPosition.offset(-60, 30);
         if (villager.getHappiness() > 80) {
-            addIcon("very_happy.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("very_happy.png", new SizeF(25, 25), textPosition.clone());
         } else if (villager.getHappiness() > 60) {
-            addIcon("happy.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("happy.png", new SizeF(25, 25), textPosition.clone());
         } else if (villager.getHappiness() > 40) {
-            addIcon("soso.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("soso.png", new SizeF(25, 25), textPosition.clone());
         } else if (villager.getHappiness() > 20) {
-            addIcon("bad.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("bad.png", new SizeF(25, 25), textPosition.clone());
         } else {
-            addIcon("very_bad.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("very_bad.png", new SizeF(25, 25), textPosition.clone());
         }
         textPosition.offset(100, 0);
         addText(villager.getHappiness() + "", new SizeF(150, 40),
@@ -176,7 +176,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(-60, 30);
-        addIcon("territory.png", new SizeF(30, 30), textPosition.clone());
+        addIcon("territory.png", new SizeF(25, 25), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getTerritories().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
@@ -187,7 +187,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(255, 255, 0));
 
         textPosition.offset(-60, 30);
-        addIcon("troop.png", new SizeF(30, 30), textPosition.clone());
+        addIcon("troop.png", new SizeF(25, 25), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getSquads().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
@@ -215,7 +215,7 @@ public class HomeBox extends Widget implements Button.Event {
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_GOLD_BOOST) != 0) {
             textPosition.offset(-60, 30);
-            addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+            addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText("풍요의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
@@ -223,7 +223,7 @@ public class HomeBox extends Widget implements Button.Event {
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST) != 0) {
             textPosition.offset(-60, 30);
-            addIcon("health.png", new SizeF(30, 30), textPosition.clone());
+            addIcon("health.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText("사랑의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));

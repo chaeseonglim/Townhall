@@ -195,7 +195,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.UPGRADE_BUTTON) {
             Rect boxRegion = game.getHomeBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.right() - 310, boxRegion.bottom() - 69)),
+                    new PointF(boxRegion.right() - 310, boxRegion.bottom() - 79)),
                     new SizeF(150, 64)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -203,16 +203,26 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
             tutorialBox.setMessage(
                     "∙ 하단 강화하기 버튼을 누르면 병력 강화를 진행할 수 있습니다.");
         } else if (step == Step.UPGRADE_UI) {
+            guideRectangle.hide();
+            guideRectangle.commit();
+
             game.closeHomeBox();
             game.popupUpgradeBox();
 
-            guideRectangle.hide();
+            Rect boxRegion = game.getUpgradeBoxRegion();
+            guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
+                    new PointF(boxRegion.left() + 15, boxRegion.bottom() - 79)),
+                    new SizeF(430, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 병력 강화 화면입니다. 상자 하단 버튼을 눌러 강화할 클래스를 선택할 수 있습니다.\n\n" +
                             "∙ 병력을 강화하면 유지비가 발생하며 취소할 수 없습니다.");
         } else if (step == Step.FOCUS_TILE) {
+            guideRectangle.hide();
+            guideRectangle.commit();
+
             game.closeUpgradeBox();
 
             Territory territory = game.getMap().getTerritory(new OffsetCoord(2, 3));
@@ -247,8 +257,8 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 20, boxRegion.top() + 180)),
-                    new SizeF(290, 70)));
+                    new PointF(boxRegion.left() + 30, boxRegion.top() + 180)),
+                    new SizeF(280, 70)));
             guideRectangle.show();
             guideRectangle.commit();
 
@@ -258,7 +268,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY2) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 20, boxRegion.top() + 180)),
+                    new PointF(boxRegion.left() + 30, boxRegion.top() + 180)),
                     new SizeF(65, 70)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -269,7 +279,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY3) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 95, boxRegion.top() + 180)),
+                    new PointF(boxRegion.left() + 105, boxRegion.top() + 180)),
                     new SizeF(65, 70)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -280,7 +290,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY4) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 170, boxRegion.top() + 180)),
+                    new PointF(boxRegion.left() + 180, boxRegion.top() + 180)),
                     new SizeF(65, 70)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -322,8 +332,8 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.SQUAD_BUILDING2) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 20, boxRegion.top() + 190)),
-                    new SizeF(230, 64)));
+                    new PointF(boxRegion.left() + 30, boxRegion.top() + 210)),
+                    new SizeF(220, 64)));
             guideRectangle.show();
             guideRectangle.commit();
 
@@ -331,15 +341,25 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
                     "∙ 병력 추가 버튼을 눌러서 병력을 추가할 수 있습니다.\n\n" +
                     "∙ 부대 별로 최대 3개의 병력을 추가할 수 있습니다.");
         } else if (step == Step.SQUAD_RECRUITING) {
+            guideRectangle.hide();
+            guideRectangle.commit();
+
             game.pressUnitSelectionButton();
 
-            guideRectangle.hide();
+            Rect boxRegion = game.getInfoBoxRegion();
+            guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
+                    new PointF(boxRegion.left() + 20, boxRegion.bottom() - 62)),
+                    new SizeF(430, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 병력 추가 버튼을 누르면 나오는 화면입니다.\n\n" +
                     "∙ 하단 클래스 버튼을 선택하여 추가할 병력을 선택할 수 있습니다.");
         } else if (step == Step.FINAL) {
+            guideRectangle.hide();
+            guideRectangle.commit();
+
             game.closeUnitSelectionBox();
             game.closeInfoBox();
 
