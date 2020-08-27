@@ -58,7 +58,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
 
         PointF textPosition = new PointF(50, -94);
         addText("음악 On/Off", new SizeF(200, 40), textPosition.clone(),
-                Color.rgb(61, 61, 61));
+                Color.rgb(35, 35, 35));
 
         // Sound Effect button
         Rect soundEffectButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 91,
@@ -76,7 +76,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
 
         textPosition = new PointF(50, -31);
         addText("효과음 On/Off", new SizeF(200, 40), textPosition.clone(),
-                Color.rgb(61, 61, 61));
+                Color.rgb(35, 35, 35));
 
         // Exit button
         Rect exitButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 154,
@@ -90,7 +90,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
 
         textPosition = new PointF(50, 32);
         addText("종료하기", new SizeF(200, 40), textPosition.clone(),
-                Color.rgb(61, 61, 61));
+                Color.rgb(35, 35, 35));
 
         // Close button
         Rect closeButtonRegion = new Rect(getRegion().left() + 40, getRegion().top() + 217,
@@ -104,7 +104,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
 
         textPosition = new PointF(50, 95);
         addText("돌아가기", new SizeF(200, 40), textPosition.clone(),
-                Color.rgb(61, 61, 61));
+                Color.rgb(35, 35, 35));
     }
 
     /**
