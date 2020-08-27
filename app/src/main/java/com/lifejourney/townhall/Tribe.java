@@ -21,7 +21,7 @@ public abstract class Tribe implements Squad.Event {
                 case NEUTRAL:
                     return "중립";
                 case VILLAGER:
-                    return "마을 주민";
+                    return "마을";
                 case RAIDER:
                     return "도적";
                 case VIKING:

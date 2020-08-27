@@ -380,7 +380,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.setTo(111, -148);
             addText("인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("people.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText(territory.getPopulation() + "",
@@ -388,10 +388,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(230, 230, 230));
 
             // Income
-            textPosition.offset(145 - 30, -30);
+            textPosition.offset(150 - 30, -30);
             addText("수입", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText(territory.getTax() + "",
@@ -399,10 +399,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(230, 230, 230));
 
             // Happiness
-            textPosition.offset(-195, 30);
+            textPosition.offset(-190, 30);
             addText("행복도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             if (territory.getHappiness() > 80) {
                 addIcon("very_happy.png", new SizeF(25, 25), textPosition.clone());
             } else if (territory.getHappiness() > 60) {
@@ -420,10 +420,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(230, 230, 230));
 
             // Defense
-            textPosition.offset(115, -30);
+            textPosition.offset(120, -30);
             addText("방어도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText(territory.getDelta(Territory.DeltaAttribute.DEFENSIVE) + "",
@@ -431,7 +431,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(230, 230, 230));
 
             // Bonus
-            textPosition.offset(-195, 30);
+            textPosition.offset(-190, 30);
             addText("보너스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
@@ -456,7 +456,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addText("지역 방어도",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText((territory.getDelta(Territory.DeltaAttribute.DEFENSIVE)==0)?
@@ -577,17 +577,17 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.setTo(111, -148);
             addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("people.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText((squad.getPopulation() == 0) ? "-" : squad.getPopulation() + "",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
 
-            textPosition.offset(115, -30);
+            textPosition.offset(110, -30);
             addText("유지비", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText((squad.getUpkeep() == 0) ? "-" : squad.getUpkeep() + "",
@@ -597,7 +597,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         if (squad.getUnits().size() > 0) {
             if (squad.getFaction() == Tribe.Faction.VILLAGER) {
-                textPosition.offset(-185, 30);
+                textPosition.offset(-180, 30);
             } else {
                 textPosition.setTo(111, -148);
             }
@@ -614,39 +614,43 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(30, 0);
 
             if (attackDamageBonus != 0) {
-                textPosition.offset(-90, 30);
+                textPosition.offset(-95, 30);
                 addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("공격력 " + ((attackDamageBonus > 0) ? "+" : "") + attackDamageBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
+                textPosition.offset(-5, 0);
             }
 
             if (attackSpeedBonus != 0) {
-                textPosition.offset(-90, 30);
+                textPosition.offset(-95, 30);
                 addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("공격 속도 " + ((attackSpeedBonus < 0) ? "+" : "") + (-attackSpeedBonus),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
+                textPosition.offset(-5, 0);
             }
 
             if (armorBonus != 0) {
-                textPosition.offset(-90, 30);
+                textPosition.offset(-95, 30);
                 addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("방어도 " + ((armorBonus>0)?"+":"") + armorBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
+                textPosition.offset(-5, 0);
             }
 
             if (healPowerBonus != 0) {
-                textPosition.offset(-90, 30);
+                textPosition.offset(-95, 30);
                 addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(100, 0);
                 addText("치유량 " + ((healPowerBonus>0)?"+":"") + healPowerBonus,
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
+                textPosition.offset(-5, 0);
             }
         }
     }

@@ -109,17 +109,17 @@ public class HomeBox extends Widget implements Button.Event {
         addText("전체 인구", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         addIcon("people.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getTotalPopulation()+"", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
-        textPosition.offset(120, -30);
+        textPosition.offset(125, -30);
         addText("인구 소모", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         addIcon("people.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText((villager.getWorkingPopulation() == 0)? "-" : ("-" + villager.getWorkingPopulation()),
@@ -127,22 +127,22 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(230, 0, 0));
 
         // Income
-        textPosition.offset(-200, 30);
+        textPosition.offset(-195, 30);
         addText("골드 수입", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getIncome() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Spend
-        textPosition.offset(120, -30);
+        textPosition.offset(125, -30);
         addText("골드 소비", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
         textPosition.offset(100, 0);
         addText((villager.getSpend() == 0)? "-" : ("-" + villager.getSpend()),
@@ -150,11 +150,11 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(230, 0, 0));
 
         // Happiness
-        textPosition.offset(-200, 30);
+        textPosition.offset(-195, 30);
         addText("평균 행복도", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         if (villager.getHappiness() > 80) {
             addIcon("very_happy.png", new SizeF(25, 25), textPosition.clone());
         } else if (villager.getHappiness() > 60) {
@@ -175,59 +175,59 @@ public class HomeBox extends Widget implements Button.Event {
         addText("마을 수", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         addIcon("territory.png", new SizeF(25, 25), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getTerritories().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // The number of squads
-        textPosition.offset(120, -30);
+        textPosition.offset(125, -30);
         addText("부대 수", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(-60, 30);
+        textPosition.offset(-65, 30);
         addIcon("troop.png", new SizeF(25, 25), textPosition.clone());
         textPosition.offset(100, 0);
         addText(villager.getSquads().size() + "", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(230, 230, 230));
 
         // Occupying shrine
-        textPosition.offset(-200, 30);
+        textPosition.offset(-195, 30);
         addText("소유한 제단", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
         if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) != 0) {
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText("치유의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
-            textPosition.offset(-40, 0);
+            textPosition.offset(-35, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) != 0) {
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText("바람의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
-            textPosition.offset(-40, 0);
+            textPosition.offset(-35, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_GOLD_BOOST) != 0) {
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
             addText("풍요의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
-            textPosition.offset(-40, 0);
+            textPosition.offset(-35, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST) != 0) {
-            textPosition.offset(-60, 30);
+            textPosition.offset(-65, 30);
             addIcon("health.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
             addText("사랑의 제단", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
-            textPosition.offset(-40, 0);
+            textPosition.offset(-35, 0);
         }
         if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) == 0 &&
                 villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0 &&
