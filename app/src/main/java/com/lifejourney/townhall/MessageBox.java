@@ -46,6 +46,7 @@ public class MessageBox extends Widget implements Button.Event {
         private String message;
         private String bgAsset = "messagebox_bg.png";
         private boolean isCustomAsset = false;
+        private String fontName = null;
         private float fontSize = 35.0f;
         private int textColor = Color.rgb(255, 255, 255);
         private int layer = 0;
@@ -63,6 +64,10 @@ public class MessageBox extends Widget implements Button.Event {
         }
         Builder fontSize(float fontSize) {
             this.fontSize = fontSize;
+            return this;
+        }
+        Builder fontName(String fontName) {
+            this.fontName = fontName;
             return this;
         }
         Builder textColor(int textColor) {
@@ -123,7 +128,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(61, 61, 61))
-                    .fontName("neodgm.ttf")
+                    .fontName(builder.fontName)
                     .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(closeButton);
@@ -139,7 +144,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .message("예").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
-                    .fontName("neodgm.ttf")
+                    .fontName(builder.fontName)
                     .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(yesButton);
@@ -151,7 +156,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .message("아니오").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
-                    .fontName("neodgm.ttf")
+                    .fontName(builder.fontName)
                     .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(noButton);
@@ -167,7 +172,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .message("확인").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
-                    .fontName("neodgm.ttf")
+                    .fontName(builder.fontName)
                     .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(okButton);
@@ -179,7 +184,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
-                    .fontName("neodgm.ttf")
+                    .fontName(builder.fontName)
                     .shadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(cancelButton);
@@ -193,7 +198,7 @@ public class MessageBox extends Widget implements Button.Event {
             textSprite =
                     new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
                             .fontColor(builder.textColor)
-                            .fontName("neodgm.ttf")
+                            .fontName(builder.fontName)
                             .shadow(shadowColor, shadowDepth)
                             .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                             .verticalAlign(Layout.Alignment.ALIGN_CENTER)
@@ -205,7 +210,7 @@ public class MessageBox extends Widget implements Button.Event {
             textSprite =
                     new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
                             .fontColor(builder.textColor)
-                            .fontName("neodgm.ttf")
+                            .fontName(builder.fontName)
                             .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                             .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                             .size(textSize)

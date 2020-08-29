@@ -36,7 +36,7 @@ public abstract class HostileTribe extends Tribe {
     public void update() {
         super.update();
 
-        if (!isDefeated()) {
+        if (!isDefeated() && isControlledByAI()) {
             // Collect resource
             collect();
 
@@ -133,10 +133,10 @@ public abstract class HostileTribe extends Tribe {
                 getMap().getTerritory(getHeadquarterPosition()).getFaction() == getFaction() &&
                 getMap().getTerritory(getHeadquarterPosition()).getSquads().size() == 0) {
             gold -= SQUAD_CREATION_ALLOW_GOLD;
-            spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                    selectUnitToSpawn(Raider.UnitSpawnType.MELEE),
-                    selectUnitToSpawn(Raider.UnitSpawnType.ANY),
-                    selectUnitToSpawn(Raider.UnitSpawnType.RANGED));
+            spawnSquad(getHeadquarterPosition().toGameCoord(),
+                    selectUnitToSpawn(UnitSpawnType.MELEE),
+                    selectUnitToSpawn(UnitSpawnType.ANY),
+                    selectUnitToSpawn(UnitSpawnType.RANGED));
         }
     }
 
@@ -170,14 +170,14 @@ public abstract class HostileTribe extends Tribe {
             float villagerBattleMetric = villager.getTotalBattleMetric();
             float myBattleMetric = getTotalBattleMetric();
 
-            Raider.Policy prevPolicy = policy;
+            Policy prevPolicy = policy;
 
             if (myBattleMetric > villagerBattleMetric * 2.0f && getSquads().size() >= 4) {
-                policy = Raider.Policy.ASSAULT;
+                policy = Policy.ASSAULT;
             } else if (myBattleMetric * 2.0f < villagerBattleMetric) {
-                policy = Raider.Policy.DEFENSIVE;
+                policy = Policy.DEFENSIVE;
             } else {
-                policy = Raider.Policy.EXPANSION;
+                policy = Policy.EXPANSION;
             }
 
             if (prevPolicy != policy) {
@@ -185,12 +185,12 @@ public abstract class HostileTribe extends Tribe {
             }
         }
 
-        if ((policy == Raider.Policy.EXPANSION || policy == Raider.Policy.DEFENSIVE) &&
+        if ((policy == Policy.EXPANSION || policy == Policy.DEFENSIVE) &&
                 getHeadquarterPosition() != null &&
                 getMap().getTerritory(getHeadquarterPosition()).getFaction() != getFaction()) {
             // If someone took its hq, take it back
             strategicTarget = getHeadquarterPosition();
-        } else if (policy == Raider.Policy.EXPANSION || policy == Raider.Policy.ASSAULT) {
+        } else if (policy == Policy.EXPANSION || policy == Policy.ASSAULT) {
             // First try to take shrines
             int nearestDistanceToShrine = Integer.MAX_VALUE;
             OffsetCoord nearestShrinePosition = null;
@@ -243,7 +243,7 @@ public abstract class HostileTribe extends Tribe {
             return;
         }
 
-        if (policy == Raider.Policy.EXPANSION && squad.isMoving() && (
+        if (policy == Policy.EXPANSION && squad.isMoving() && (
                 getMap().getTerritory(squad.getMapPosition()).getFaction() == Faction.NEUTRAL ||
                         getMap().getTerritory(squad.getMapPosition()).getFaction() == Faction.VILLAGER)) {
             // Wait for occupying when it's on other faction's land on expansion policy
@@ -258,7 +258,7 @@ public abstract class HostileTribe extends Tribe {
         // Recruit unit if needed
         if (squad.getUnits().size() < 3 &&
                 getMap().getTerritory(squad.getMapPosition()).getFaction() != getFaction()) {
-            squad.spawnUnit(selectUnitToSpawn(Raider.UnitSpawnType.ANY));
+            squad.spawnUnit(selectUnitToSpawn(UnitSpawnType.ANY));
         }
 
         // Find if neighbor territories have any events which need to go
@@ -366,6 +366,22 @@ public abstract class HostileTribe extends Tribe {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isControlledByAI() {
+        return controlledByAI;
+    }
+
+    /**
+     *
+     * @param controlledByAI
+     */
+    public void setControlledByAI(boolean controlledByAI) {
+        this.controlledByAI = controlledByAI;
+    }
+
     protected static final int COLLECT_UPDATE_TIME = 50;
     protected static final int POLICY_DECISION_UPDATE_TIME = 130;
     protected static final int POLICY_TRANSITION_TIME = 300;
@@ -394,4 +410,5 @@ public abstract class HostileTribe extends Tribe {
     protected int policyTransitionTimeLeft = POLICY_TRANSITION_TIME;
     protected int tacticalDecisionUpdateTime = TACTICAL_DECISION_UPDATE_TIME;
     protected int gold = STARTING_GOLD;
+    protected boolean controlledByAI = true;
 }

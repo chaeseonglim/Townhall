@@ -171,6 +171,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                         new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                                 353, 275), "기존 병력이 교체되며 \n비용이 발생합니다.\n\n진행하시겠습니까?")
                         .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                        .fontName("neodgm.ttf")
                         .build();
                 recruitingReplacementConfirmBox.show();
                 addWidget(recruitingReplacementConfirmBox);

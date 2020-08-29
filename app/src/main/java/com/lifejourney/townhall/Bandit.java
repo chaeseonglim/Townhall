@@ -1,13 +1,11 @@
 package com.lifejourney.townhall;
 
-import com.lifejourney.engine2d.OffsetCoord;
+public class Bandit extends HostileTribe {
 
-public class Raider extends HostileTribe {
+    private static final String LOG_TAG = "Bandit";
 
-    private static final String LOG_TAG = "Raider";
-
-    public Raider(Event eventHandler, GameMap map, Villager villager) {
-        super(eventHandler, Faction.RAIDER, map, villager);
+    public Bandit(Event eventHandler, GameMap map, Villager villager) {
+        super(eventHandler, Faction.BANDIT, map, villager);
 
         /*
         spawnSquad(new OffsetCoord(9, 8).toGameCoord(), getFaction(),

@@ -1,5 +1,7 @@
 package com.lifejourney.townhall;
 
+import com.lifejourney.engine2d.OffsetCoord;
+
 enum Mission {
     LV1("map/map_lv1.png",
             "굶주림",
@@ -18,16 +20,18 @@ enum Mission {
         }
 
         public void update(MainGame game) {
+            turn++;
+
             // Start the tutorial for management
-            if (++turn == 5) {
+            if (turn == 5) {
                 game.startTutorialForManagement();
             }
 
             int day = game.getDays();
             if (((Villager)game.getTribe(Tribe.Faction.VILLAGER)).getTotalPopulation() > 100) {
-                if (day <= 60) {
+                if (day <= getTimeLimit() * 0.6f) {
                     game.missionCompleted(3);
-                } else if (day <= 80) {
+                } else if (day <= getTimeLimit() * 0.8f) {
                     game.missionCompleted(2);
                 } else {
                     game.missionCompleted(1);
@@ -44,17 +48,55 @@ enum Mission {
     LV2("map/map_lv2.png",
             "조짐",
             "마을 근처에 수상한 도적들이 출몰하기 " +
-                    "시작했습니다. 마을 사람들이 불안해하고 " +
+                    "시작했습니다. 마을 사람들이 불안해 하고 " +
                     "있습니다. 당신의 병사들이 준비되었는지 " +
                     "확인해 볼 수 있는 좋은 기회입니다.",
-            "도적 본부 점령",
+            "도적 패배",
             100,
             new boolean[] { true, true, true, false, false, false, false }) {
 
         public void init(MainGame game) {
+            turn = 0;
+
+            // Prevent AI control units for this mission
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            bandit.setControlledByAI(false);
+            bandit.spawnSquad(bandit.getHeadquarterPosition().toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+
+            Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
+            villager.spawnSquad(villager.getHeadquarterPosition().toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER);
+            OffsetCoord squadMapPosition = villager.getHeadquarterPosition().clone();
+            squadMapPosition.offset(1, 0);
+            villager.spawnSquad(squadMapPosition.toGameCoord(),
+                    Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
         }
         public void update(MainGame game) {
+            turn++;
+
+            // Start the tutorial for battle
+            if (turn == 5) {
+                game.startTutorialForBattle(TutorialGuideForBattle.Step.INTRODUCTION);
+            }
+
+            int day = game.getDays();
+            if (game.getTribe(Tribe.Faction.BANDIT).isDefeated()) {
+                if (day <= getTimeLimit() * 0.6f) {
+                    game.missionCompleted(3);
+                } else if (day <= getTimeLimit() * 0.8f) {
+                    game.missionCompleted(2);
+                } else {
+                    game.missionCompleted(1);
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
+            }
         }
+
+        private int turn = 0;
     };
 
     abstract void init(MainGame game);

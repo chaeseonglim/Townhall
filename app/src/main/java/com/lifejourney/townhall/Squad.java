@@ -83,9 +83,9 @@ public class Squad extends Object implements Controllable {
                     .gridSize(4, 6).opaque(MOVING_ARROW_SPRITE_OPAQUE_NORMAL)
                     .build();
             return (Squad)new PrivateBuilder<>(listener, position, map, faction).priority(-1).layer(SPRITE_LAYER)
-                    .sprite(currentStick, true)
+                    .sprite(currentStick, false)
                     .sprite(targetStick, false)
-                    .sprite(squadIcon, true)
+                    .sprite(squadIcon, false)
                     .sprite(movingArrow, false)
                     .build();
         }
@@ -283,20 +283,18 @@ public class Squad extends Object implements Controllable {
             }
         }
 
-        // Hide if it's in fog
+        // Hide sprites if it's in fog
         if (map.getTerritory(getMapPosition()).getFogState() != Territory.FogState.CLEAR) {
-            for (Unit unit: units) {
-                unit.hide();
-            }
             for (Sprite sprite: getSprites()) {
                 sprite.hide();
             }
         } else {
-            for (Unit unit: units) {
-                if (!unit.isRecruiting()) {
-                    unit.show();
-                }
-            }
+            Sprite currentStick = getSprite("SquadStick");
+            Sprite squadIcon = getSprite("SquadIcon");
+            currentStick.setPosition(getPosition());
+            squadIcon.setPosition(getPosition());
+            currentStick.show();
+            squadIcon.show();
         }
     }
 
@@ -337,7 +335,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int getAttackDamageBonusFromTerritory() {
-
         Territory territory = map.getTerritory(getMapPosition());
         if (territory.getFaction() == faction) {
             return map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.OFFENSIVE);
@@ -351,7 +348,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int getArmorBonusFromTerritory() {
-
         Territory territory = map.getTerritory(getMapPosition());
         if (territory.getFaction() == faction) {
             return map.getTerritory(getMapPosition()).getDelta(Territory.DeltaAttribute.DEFENSIVE);
@@ -365,7 +361,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int[] collectDevelopmentBonus() {
-
         int workerCount = 0;
 
         if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
@@ -397,7 +392,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int collectGoldBonus() {
-
         int workerCount = 0;
 
         if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
@@ -416,7 +410,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int collectHappinessBonus() {
-
         int workerCount = 0;
 
         if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
@@ -439,7 +432,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int collectDefensiveBonus() {
-
         int workerCount = 0;
 
         if (!isMoving() && !isFighting() && !isOccupying() && !isSupporting()) {
@@ -758,7 +750,6 @@ public class Squad extends Object implements Controllable {
         squadIcon.addAnimationFrame(3, 0, 8);
         squadIcon.addAnimationFrame(0, 0, 8);
         squadIcon.addAnimationFrame(3, 0, 200);
-        Log.e(LOG_TAG, "AAAAAA7");
 
         this.fighting = true;
 
@@ -833,7 +824,6 @@ public class Squad extends Object implements Controllable {
      *
      */
     int handleFightResult() {
-
         int expEarned = 0;
 
         // Remove killed units
@@ -1138,7 +1128,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isOccupying() {
-
         return !isFighting() && map.getTerritory(getMapPosition()).isOccupying();
     }
 
@@ -1147,7 +1136,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isSupportable() {
-
         for (Unit unit: units) {
             if (!unit.isRecruiting() && unit.getUnitClass().isSupportable()) {
                 return true;
@@ -1161,7 +1149,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public boolean isSupporting() {
-
         if (isMoving() || isFighting() || isOccupying() || !isSupportable()) {
             return false;
         }

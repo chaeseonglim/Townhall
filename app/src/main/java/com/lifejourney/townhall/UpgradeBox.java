@@ -104,8 +104,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .name("UpgradeBtn" + i)
                             .imageSpriteAsset("unit_upgrade_btn.png")
                             .numImageSpriteSet(4)
-                            .message(" ").fontSize(22)
-                            .fontColor(Color.rgb(35, 35, 35))
+                            .message(" ").fontSize(19)
+                            .fontColor(Color.rgb(65, 65, 65))
                             .fontName("neodgm.ttf")
                             .shadow(Color.rgb(235, 235, 235), 1.0f)
                             .layer(getLayer() + 1).build();
@@ -177,12 +177,14 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                                         353, 275), "유지 비용이 발생하며\n선택시 취소할 수 없습니다.\n진행하시겠습니까?")
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                                .fontName("neodgm.ttf")
                                 .build();
                     } else {
                         upgradeConfirmBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                                         353, 275), "금화가 부족합니다!\n다음에 시도해주세요.")
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                                .fontName("neodgm.ttf")
                                 .build();
                     }
                     upgradeConfirmBox.show();

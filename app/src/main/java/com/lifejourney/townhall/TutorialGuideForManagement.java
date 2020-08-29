@@ -43,7 +43,8 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         SQUAD_BUILDING,
         SQUAD_BUILDING2,
         SQUAD_RECRUITING,
-        FINAL
+        FINAL,
+        FINISHED
     }
 
     public TutorialGuideForManagement(Event eventHandler, MainGame game) {
@@ -51,20 +52,30 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         this.eventHandler = eventHandler;
         this.game = game;
 
+        guideRectangle = new Rectangle.Builder(new RectF(Engine2D.GetInstance().fromWidgetToGame(
+                new PointF(80, 10)), new SizeF(170, 64)))
+                .color(Color.argb(255, 255, 255, 255)).lineWidth(10.0f)
+                .layer(255).visible(true).build();
+        guideRectangle.hide();
+        guideRectangle.commit();
+
         Rect viewport = Engine2D.GetInstance().getViewport();
         tutorialBox = new MessageBox.Builder(this, MessageBox.Type.PLATE,
-                new Rect(viewport.width - 340 - 20, viewport.height - 275 - 100,
-                        340, 275),
+                new Rect(viewport.width - 340 - 20, viewport.height - 240 - 90,
+                        340, 250),
                 "존경하는 촌장님!\n\n" +
                 "저는 당신의 조언가입니다. " +
                 "지금부터 마을을 운영하는 방법을 알려드리고자 합니다.\n\n\n" +
                 "아무 곳이나 터치하세요.")
-                .fontSize(24.0f).layer(50).textColor(Color.rgb(210, 210, 210))
-                .bgAsset("tutorial_box_bg.png").bgOpaque(1.0f)
+                .fontSize(24.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                .fontName("neodgm.ttf")
+                .bgAsset("tutorial_box_bg.png").bgOpaque(0.8f)
                 .build();
         tutorialBox.setFollowParentVisibility(false);
         tutorialBox.show();
         addWidget(tutorialBox);
+
+        updateGuide();
     }
 
     /**
@@ -99,16 +110,10 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
+
         int eventAction = event.getAction();
         if (eventAction == MotionEvent.ACTION_DOWN) {
-            Engine2D.GetInstance().playSoundEffect("switch33", 1.0f);
-            if (Step.values().length > step.ordinal() + 1) {
-                step = Step.values()[step.ordinal() + 1];
-                updateGuide();
-            } else {
-                // Tutorial is finished
-                eventHandler.onTutorialGuideForManagementFinished(this);
-            }
+            updateGuide();
         }
         return true;
     }
@@ -126,19 +131,28 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
      *
      */
     private void updateGuide() {
-        if (step == Step.GOLD) {
-            guideRectangle = new Rectangle.Builder(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(80, 10)), new SizeF(170, 64)))
-                    .color(Color.argb(255, 255, 255, 255)).lineWidth(10.0f)
-                    .layer(255).visible(true).build();
+        boolean goNext = true;
+        Rect viewport = Engine2D.GetInstance().getViewport();
+
+        if (step == Step.INTRODUCTION) {
+            guideRectangle.hide();
+            guideRectangle.commit();
+
+            tutorialBox.show();
+        } else if (step == Step.GOLD) {
+            guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
+                    new PointF(80, 10)), new SizeF(170, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 상단의 숫자는 마을의 금화를 나타냅니다.\n\n" +
                     "∙ 금화는 병력 모집 및 강화에 사용됩니다. 농장 개발을 통해 늘릴 수 있습니다.");
+            tutorialBox.show();
         } else if (step == Step.POPULATION) {
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(330, 10)), new SizeF(130, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
@@ -147,43 +161,39 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.HAPPINESS) {
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(270, 10)), new SizeF(60, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 상단의 표정은 마을 사람들의 행복도를 나타냅니다.\n\n" +
                     "∙ 행복도는 금화 수입에 영향을 주며 낮아지면 반란군이 발생할 가능성이 높아집니다.");
         } else if (step == Step.SPEED) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
-
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(viewport.width - 210, 10)), new SizeF(200, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 상단의 버튼은 게임의 속도를 조절합니다.\n\n" +
                     "∙ 게임은 언제든 일시 정지 혹은 속도 조절이 가능합니다.");
         } else if (step == Step.MISSION_TARGET) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
-
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(viewport.width - 320, 10)), new SizeF(100, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 상단 흰색 상자의 버튼은 현재 미션의 목표를 보여줍니다.\n");
         } else if (step == Step.HOME_BUTTON) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
-
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(20, viewport.height - 74)), new SizeF(100, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 하단 홈 버튼은 마을 전체의 상태를 보여줍니다.\n\n" +
                     "∙ 병력의 강화도 이 버튼을 통해 할 수 있습니다.");
         } else if (step == Step.HOME_UI) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
-
             game.popupHomeBox();
 
             guideRectangle.hide();
@@ -225,21 +235,21 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
 
             game.closeUpgradeBox();
 
-            Territory territory = game.getMap().getTerritory(new OffsetCoord(2, 3));
+            OffsetCoord tileMapPosition = new OffsetCoord(2,3);
+            Territory territory = game.getMap().getTerritory(tileMapPosition);
             territory.setFocus(true);
             game.onMapTerritoryFocused(territory);
-            PointF tile = new OffsetCoord(2, 3).toGameCoord();
-            guideRectangle.setRegion(new RectF(tile.clone().offset(-60, -60), new SizeF(120, 130)));
+            PointF tilePosition = tileMapPosition.toGameCoord();
+            guideRectangle.setRegion(new RectF(tilePosition.offset(-60, -60), new SizeF(120, 130)));
             guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 타일을 선택하면 다양한 추가 행동이 가능합니다.");
         } else if (step == Step.INFO_BUTTON) {
-            Rect viewport = Engine2D.GetInstance().getViewport();
-
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(140, viewport.height - 74)), new SizeF(100, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
@@ -312,9 +322,9 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.SQUAD_BUILDER_BUTTON) {
             game.closeInfoBox();
 
-            Rect viewport = Engine2D.GetInstance().getViewport();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(260, viewport.height - 74)), new SizeF(100, 64)));
+            guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
@@ -367,12 +377,22 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
                     "촌장님!\n" +
                     "마을 운영에 대한 설명을 이만 마치겠습니다.\n\n" +
                     "∙ 팁: 농장 개발에 집중하면 쉽게 미션 목표를 달성할 수 있습니다.");
+        } else if (step == Step.FINISHED) {
+            goNext = false;
+
+            // Tutorial is finished
+            eventHandler.onTutorialGuideForManagementFinished(this);
+        }
+
+        if (goNext) {
+            step = Step.values()[step.ordinal() + 1];
+            Engine2D.GetInstance().playSoundEffect("switch33", 1.0f);
         }
     }
 
     private Event eventHandler;
     private MainGame game;
     private MessageBox tutorialBox;
-    private Rectangle guideRectangle = null;
+    private Rectangle guideRectangle;
     private Step step = Step.INTRODUCTION;
 }

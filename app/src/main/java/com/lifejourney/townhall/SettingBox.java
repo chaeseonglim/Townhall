@@ -146,6 +146,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
                     new Rect((viewport.width - 355) / 2, (viewport.height - 277) / 2,
                             355, 277), "정말 나가시겠습니까?")
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(210, 210, 210))
+                    .fontName("neodgm.ttf")
                     .build();
             messageBox.setFollowParentVisibility(false);
             messageBox.show();

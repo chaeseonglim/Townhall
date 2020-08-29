@@ -12,7 +12,7 @@ public abstract class Tribe implements Squad.Event {
     enum Faction {
         NEUTRAL,
         VILLAGER,
-        RAIDER,
+        BANDIT,
         VIKING,
         REBEL;
 
@@ -22,7 +22,7 @@ public abstract class Tribe implements Squad.Event {
                     return "중립";
                 case VILLAGER:
                     return "마을";
-                case RAIDER:
+                case BANDIT:
                     return "도적";
                 case VIKING:
                     return "바이킹";
@@ -169,11 +169,10 @@ public abstract class Tribe implements Squad.Event {
     /**
      *
      * @param position
-     * @param faction
      * @param unitClass
      */
-    public Squad spawnSquad(PointF position, Faction faction, Unit.UnitClass... unitClass) {
-        Squad squad = new Squad.Builder(this, position, map, faction).build();
+    public Squad spawnSquad(PointF position, Unit.UnitClass... unitClass) {
+        Squad squad = new Squad.Builder(this, position, map, getFaction()).build();
         if (unitClass.length >= 1) {
             squad.spawnUnit(unitClass[0]);
         }

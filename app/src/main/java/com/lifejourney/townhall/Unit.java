@@ -74,8 +74,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 null,
                 1.5f,
-                1.5f,
-                3.0f,
+                2.5f,
+                5.0f,
                 false,
                 false,
                 0,
@@ -93,7 +93,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 5,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
-                new float[] {0.1f, 0.1f, 0.2f, 0.1f, 0.2f, 0.1f, 0.1f},
+                new float[] {0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.1f, 0.1f},
                 // target favor
                 new float[] {0.1f, 0.1f, 0.2f, 0.1f, 0.2f, 0.1f, 0.1f},
                 // damage attribute
@@ -142,13 +142,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new float[] {1.0f, 1.0f, 1.0f, 1.5f, 1.0f, 1.0f, 1.0f},
                 64.0f,
                 26.0f,
-                150.0f,
+                200.0f,
                 0.0f,
                 50,
                 30,
                 0,
                 2,
-                7,
+                9,
                 0,
                 5,
                 5,
@@ -158,8 +158,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 10,
                 Projectile.ProjectileType.ARROW,
                 2.0f,
-                2.0f,
-                4.0f,
+                2.5f,
+                5.0f,
                 true,
                 true,
                 100,
@@ -200,8 +200,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 30,
                 null,
                 3.5f,
-                6.0f,
-                7.0f,
+                4.5f,
+                5.0f,
                 false,
                 true,
                 200,
@@ -227,7 +227,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 10.0f,
                 26.0f,
                 0.0f,
-                150.0f,
+                200.0f,
                 0,
                 0,
                 60,
@@ -242,8 +242,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 30,
                 Projectile.ProjectileType.HEAL,
                 1.5f,
-                1.5f,
-                3.0f,
+                2.5f,
+                5.0f,
                 true,
                 false,
                 100,
@@ -284,8 +284,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 40,
                  Projectile.ProjectileType.CANNON,
                 1.5f,
-                2.0f,
-                4.0f,
+                2.5f,
+                5.0f,
                 true,
                 true,
                 0,
@@ -326,7 +326,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 40,
                 Projectile.ProjectileType.HEAL,
                 2f,
-                3.0f,
+                4.0f,
                 5.0f,
                 true,
                 true,
@@ -459,8 +459,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
         public float awareness() {
             return awareness;
         }
-        public int seekingFavorRange() {
-            return 20;
+        public float seekingFavorRange() {
+            return meleeAttackRange();
         }
         public float meleeAttackRange() {
             return meleeAttackRange;
@@ -628,7 +628,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     @Override
     public void update() {
-
         // Adjust moving speed
         if (Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction) > 0 &&
                 getUnitClass() == UnitClass.HORSE_MAN) {
@@ -1146,10 +1145,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
         float damage = Math.max(getMeleeDamage() * ((critical)?2.0f:1.0f) * buff *
                 unitClass.strengthMetric(opponent.unitClass) * (1.0f - opponent.getArmor()), 1.0f);
         if (critical) {
-            Log.e(LOG_TAG, unitClass.word + " critical damage: " + damage);
             opponent.gotCriticalDamage(damage);
         } else {
-            Log.e(LOG_TAG, unitClass.word + " damage: " + damage);
             opponent.gotDamage(damage);
         }
     }
@@ -1990,7 +1987,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
-    private final static int RECRUITING_TIME = 300;
+    private final static int RECRUITING_TIME = 200;
     private final static int RESTING_TIME = 30;
     private final static float SPLASH_DAMAGE_RANGE = 30.0f;
     private final static float SPLASH_DAMAGE_DELTA = 0.1f;

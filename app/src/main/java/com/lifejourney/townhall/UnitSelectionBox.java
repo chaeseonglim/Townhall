@@ -42,7 +42,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
-                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontSize(25).fontColor(Color.rgb(35, 35, 35))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
@@ -53,7 +53,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 138, 64);
         selectButton = new Button.Builder(this, selectButtonRegion)
                 .message("선택").imageSpriteAsset("messagebox_btn_bg.png")
-                .fontSize(25).fontColor(Color.rgb(61, 61, 61))
+                .fontSize(25).fontColor(Color.rgb(35, 35, 35))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
@@ -208,7 +208,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 textPosition.offset(35, 0);
                 addIcon("ranged_attack.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(53, 0);
-                addText("|", new SizeF(150, 40), textPosition.clone(),
+                addSymbolText("/", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
                 textPosition.offset(42, 0);
                 String meleeAttackDamageString =
@@ -228,7 +228,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 textPosition.offset(35, 0);
                 addIcon("ranged_attack_speed.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(53, 0);
-                addText("|", new SizeF(150, 40), textPosition.clone(),
+                addSymbolText("/", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
                 textPosition.offset(42, 0);
                 String attackSpeedString =
@@ -261,7 +261,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             textPosition.offset(35, 0);
             addIcon("ranged_evade.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(53, 0);
-            addText("|", new SizeF(150, 40), textPosition.clone(),
+            addSymbolText("/", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
             textPosition.offset(42, 0);
             String evasionString =
@@ -381,6 +381,24 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 2.0f)
+                .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
+                .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addSymbolText(String text, SizeF size, PointF position, int fontColor) {
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+                .fontColor(fontColor)
                 .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)

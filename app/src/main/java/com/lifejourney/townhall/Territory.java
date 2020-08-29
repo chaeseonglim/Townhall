@@ -593,7 +593,7 @@ public class Territory {
             fogSprite = new Sprite.Builder("Fog", "tiles_fog.png")
                             .position(new PointF(mapPosition.toGameCoord()))
                             .size(TileSize).gridSize(2, 1).smooth(false)
-                            .layer(SPRITE_LAYER).depth(0.7f).visible(true).build();
+                            .layer(SPRITE_FOG_LAYER).depth(0.7f).visible(true).build();
             fogSprite.setGridIndex(0, 0);
         }
     }
@@ -1171,6 +1171,7 @@ public class Territory {
     }
 
     private final static int SPRITE_LAYER = 0;
+    private final static int SPRITE_FOG_LAYER = 10;
     private final static int TERRITORY_UPDATE_COUNT = 30;
     private final static int MAX_FACILITY_LEVEL = 5;
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
@@ -1181,7 +1182,7 @@ public class Territory {
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;
     private final static int OCCUPATION_TOTAL_STEP = 5;
-    private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 60;
+    private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 30;
 
     private Event eventHandler;
     private OffsetCoord mapPosition;

@@ -123,47 +123,51 @@ public class Battle {
      */
     public void handlePostFight() {
 
-        Squad winner = null, loser = null;
+        Squad winningOne = null, losingOne = null;
         boolean eliminated = false;
         if (attacker.isEliminated() || defender.isEliminated()) {
             // If one or them is eliminated, finish battle
             if (attacker.isEliminated()) {
-                winner = defender;
-                loser = attacker;
+                winningOne = defender;
+                losingOne = attacker;
             } else if (defender.isEliminated()) {
-                winner = attacker;
-                loser = defender;
+                winningOne = attacker;
+                losingOne = defender;
             }
             eliminated = true;
         } else {
             if (attacker.isWillingToRetreat()) {
-                winner = defender;
-                loser = attacker;
+                winningOne = defender;
+                losingOne = attacker;
             } else if (defender.isWillingToRetreat()) {
-                winner = attacker;
-                loser = defender;
+                winningOne = attacker;
+                losingOne = defender;
             } else if (battleTimeLeft-- == 0) {
-                winner = defender;
-                loser = attacker;
+                winningOne = defender;
+                losingOne = attacker;
             }
         }
 
-        // If there's loser
-        if (winner != null && loser != null) {
+        // If there's a loser
+        if (winningOne != null && losingOne != null) {
             if (eliminated) {
                 attacker.endFight();
                 defender.endFight();
-                winner.addExp(WINNER_EXP);
+                winningOne.addExp(WINNER_EXP);
                 if (attacker.isEliminated()) {
                     attacker.close();
                 }
                 if (defender.isEliminated()) {
                     defender.close();
                 }
-            } else {
-                // Try retreating loser
-                ArrayList<OffsetCoord> retreatableCoords = map.findMapPositionToRetreat(loser);
-                if (retreatableCoords == null || retreatableCoords.size() == 0) {
+            } else { // Try to retreat loser
+                if (losingOne.getHealthPercentage() < RETRETABLE_HEALTH_PERCENTAGE) {
+                    // Failed to retreat
+                    return;
+                }
+
+                ArrayList<OffsetCoord> retreatableMapPositions = map.findMapPositionToRetreat(losingOne);
+                if (retreatableMapPositions == null || retreatableMapPositions.size() == 0) {
                     // Failed to retreat
                     return;
                 }
@@ -171,27 +175,27 @@ public class Battle {
                 // End fight
                 attacker.endFight();
                 defender.endFight();
-                winner.addExp(WINNER_EXP);
+                winningOne.addExp(WINNER_EXP);
 
                 // Move loser to an other tile
-                ArrayList<OffsetCoord> retreatableSameFactionCoords = new ArrayList<>();
-                ArrayList<OffsetCoord> retretableNeutralFactionCoords = new ArrayList<>();
-                for (OffsetCoord retreatableCoord: retreatableCoords) {
-                    if (map.getTerritory(retreatableCoord).getFaction() == loser.getFaction()) {
-                        retreatableSameFactionCoords.add(retreatableCoord);
-                    } else if (map.getTerritory(retreatableCoord).getFaction() == Tribe.Faction.NEUTRAL) {
-                        retretableNeutralFactionCoords.add(retreatableCoord);
+                ArrayList<OffsetCoord> retreatableSameFactionMapPosition = new ArrayList<>();
+                ArrayList<OffsetCoord> retretableNeutralFactionMapPosition = new ArrayList<>();
+                for (OffsetCoord retreatableMapPosition: retreatableMapPositions) {
+                    if (map.getTerritory(retreatableMapPosition).getFaction() == losingOne.getFaction()) {
+                        retreatableSameFactionMapPosition.add(retreatableMapPosition);
+                    } else if (map.getTerritory(retreatableMapPosition).getFaction() == Tribe.Faction.NEUTRAL) {
+                        retretableNeutralFactionMapPosition.add(retreatableMapPosition);
                     }
                 }
-                if (retreatableSameFactionCoords.size() > 0) {
-                    loser.moveTo(retreatableSameFactionCoords.get(
-                            (int)(Math.random()*retreatableSameFactionCoords.size())));
-                } else if (retretableNeutralFactionCoords.size() > 0) {
-                    loser.moveTo(retretableNeutralFactionCoords.get(
-                            (int)(Math.random()*retretableNeutralFactionCoords.size())));
+                if (retreatableSameFactionMapPosition.size() > 0) {
+                    losingOne.moveTo(retreatableSameFactionMapPosition.get(
+                            (int)(Math.random()*retreatableSameFactionMapPosition.size())));
+                } else if (retretableNeutralFactionMapPosition.size() > 0) {
+                    losingOne.moveTo(retretableNeutralFactionMapPosition.get(
+                            (int)(Math.random()*retretableNeutralFactionMapPosition.size())));
                 } else {
-                    loser.moveTo(retreatableCoords.get(
-                            (int)(Math.random()*retreatableCoords.size())));
+                    losingOne.moveTo(retreatableMapPositions.get(
+                            (int)(Math.random()*retreatableMapPositions.size())));
                 }
             }
 
@@ -227,6 +231,7 @@ public class Battle {
     private int FIGHTING_EXP = 2;
     private int SUPPORTING_EXP = 1;
     private int BATTLE_TIME_LIMIT = 1000;
+    private float RETRETABLE_HEALTH_PERCENTAGE = 0.2f;
 
     private GameMap map;
     private OffsetCoord mapPosition;

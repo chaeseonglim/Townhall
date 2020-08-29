@@ -1,7 +1,6 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.util.Log;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
@@ -14,7 +13,7 @@ import java.util.ListIterator;
 public class MainGame extends World
         implements Squad.Event, GameMap.Event, Button.Event, MessageBox.Event, DateBar.Event,
                 SpeedControl.Event, InfoBox.Event, HomeBox.Event, UpgradeBox.Event, Tribe.Event,
-                SettingBox.Event, TutorialGuideForManagement.Event {
+                SettingBox.Event, TutorialGuideForManagement.Event, TutorialGuideForBattle.Event {
 
     static final String LOG_TAG = "MainGame";
 
@@ -42,7 +41,7 @@ public class MainGame extends World
         // Build tribe
         Villager villager = new Villager(this, map);
         tribes.add(villager);
-        tribes.add(new Raider(this, map, villager));
+        tribes.add(new Bandit(this, map, villager));
         tribes.add(new Viking(this, map, villager));
 
         // Build UIs
@@ -236,6 +235,20 @@ public class MainGame extends World
 
     /**
      *
+     */
+    public void pauseForTutorial() {
+        speedControl.setPlaySpeed(0);
+    }
+
+    /**
+     *
+     */
+    public void resumeFromTutorial() {
+        speedControl.setPlaySpeed(1);
+    }
+
+    /**
+     *
      * @param territory
      */
     @Override
@@ -406,7 +419,7 @@ public class MainGame extends World
     public void onSquadFocused(Squad squad) {
         if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             Engine2D.GetInstance().playSoundEffect("villager", 1.0f);
-        } else if (squad.getFaction() == Tribe.Faction.RAIDER) {
+        } else if (squad.getFaction() == Tribe.Faction.BANDIT) {
             Engine2D.GetInstance().playSoundEffect("raiders", 1.0f);
         } else if (squad.getFaction() == Tribe.Faction.VIKING) {
             Engine2D.GetInstance().playSoundEffect("viking", 1.0f);
@@ -456,7 +469,9 @@ public class MainGame extends World
         // Refresh UI state
         if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
-            Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
+            if (getDays() > 0) {
+                Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
+            }
         }
     }
 
@@ -489,16 +504,30 @@ public class MainGame extends World
             missionMessageBox = null;
 
             resumeFromWidget();
-        } else if (messageBox == tutorialStartMessageBox) {
-            tutorialStartMessageBox.close();
-            removeWidget(tutorialStartMessageBox);
-            tutorialStartMessageBox = null;
+        } else if (messageBox == tutorialForManagementStartMessageBox) {
+            tutorialForManagementStartMessageBox.close();
+            removeWidget(tutorialForManagementStartMessageBox);
+            tutorialForManagementStartMessageBox = null;
 
             if (buttonType == MessageBox.ButtonType.YES) {
                 TutorialGuideForManagement tutorialGuideForManagement =
                         new TutorialGuideForManagement(this, this);
                 tutorialGuideForManagement.show();
                 this.addWidget(tutorialGuideForManagement);
+            } else {
+                resumeFromWidget();
+            }
+        } else if (messageBox == tutorialForBattleStartMessageBox) {
+            tutorialForBattleStartMessageBox.close();
+            removeWidget(tutorialForBattleStartMessageBox);
+            tutorialForBattleStartMessageBox = null;
+
+            if (buttonType == MessageBox.ButtonType.YES) {
+                TutorialGuideForBattle tutorialGuideForBattle =
+                        new TutorialGuideForBattle(this, this,
+                                startingStepOfTutorialGuideForBattle);
+                tutorialGuideForBattle.show();
+                this.addWidget(tutorialGuideForBattle);
             } else {
                 resumeFromWidget();
             }
@@ -532,8 +561,8 @@ public class MainGame extends World
             pauseForWidget();
 
             // Spawn a squad
-            Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapPosition().toGameCoord(),
-                    Tribe.Faction.VILLAGER);
+            Squad squad =
+                    getTribe(Tribe.Faction.VILLAGER).spawnSquad(focusedTerritory.getMapPosition().toGameCoord());
             focusedTerritory.setFocus(false);
             focusedTerritory = null;
             squad.setFocus(true);
@@ -558,6 +587,7 @@ public class MainGame extends World
                             353, 275), "승리 조건:\n" + mission.getVictoryCondition() +
                     "\n\n시간 제한:\n" + mission.getTimeLimit()+"일")
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                    .fontName("neodgm.ttf")
                     .build();
             missionMessageBox.show();
             addWidget(missionMessageBox);
@@ -716,6 +746,18 @@ public class MainGame extends World
 
     /**
      *
+     * @param tutorial
+     */
+    @Override
+    public void onTutorialGuideForBattleFinished(TutorialGuideForBattle tutorial) {
+        tutorial.close();
+        removeWidget(tutorial);
+
+        resumeFromWidget();
+    }
+
+    /**
+     *
      * @param mapPosition
      * @param radius
      * @param fogState
@@ -853,8 +895,8 @@ public class MainGame extends World
      */
     public void pressSquadBuilderButton() {
         // Spawn a squad
-        Squad squad = tribes.get(0).spawnSquad(focusedTerritory.getMapPosition().toGameCoord(),
-                Tribe.Faction.VILLAGER);
+        Squad squad =
+                getTribe(Tribe.Faction.VILLAGER).spawnSquad(focusedTerritory.getMapPosition().toGameCoord());
         focusedTerritory.setFocus(false);
         focusedTerritory = null;
         squad.setFocus(true);
@@ -968,7 +1010,8 @@ public class MainGame extends World
         gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                         353, 275), "미션을 완수했습니다!!!\n별 " + stars + "개 달성")
-                .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 0))
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                .fontName("neodgm.ttf")
                 .build();
         gameFinishMessageBox.show();
         addWidget(gameFinishMessageBox);
@@ -984,9 +1027,9 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "게임 오버!!!\n시간 내에 미션을 완수하지 못했습니다.")
-                .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 0, 0))
-                .textShadow(Color.rgb(35, 35, 35), 1.0f)
+                        353, 275), "게임 오버!!!\n시간 내에 미션을\n완수하지 못했습니다.")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                .fontName("neodgm.ttf")
                 .build();
         gameFinishMessageBox.show();
         addWidget(gameFinishMessageBox);
@@ -1002,28 +1045,48 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "게임 오버!!!\n본부가 점령되었습니다.")
-                .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 0, 0))
-                .textShadow(Color.rgb(35, 35, 35), 1.0f)
+                        353, 275), "게임 오버!!!\n본부를 점령당했습니다.")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                .fontName("neodgm.ttf")
                 .build();
         gameFinishMessageBox.show();
         addWidget(gameFinishMessageBox);
     }
 
-    /**
+    /*
      *
      */
     public void startTutorialForManagement() {
         pauseForWidget();
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        tutorialStartMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
+        tutorialForManagementStartMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
                         353, 275), "튜토리얼을 진행하시겠습니까?")
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                .fontName("neodgm.ttf")
                 .build();
-        tutorialStartMessageBox.show();
-        addWidget(tutorialStartMessageBox);
+        tutorialForManagementStartMessageBox.show();
+        addWidget(tutorialForManagementStartMessageBox);
+    }
+
+    /*
+     *
+     */
+    public void startTutorialForBattle(TutorialGuideForBattle.Step startingStep) {
+        pauseForWidget();
+
+        startingStepOfTutorialGuideForBattle = startingStep;
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        tutorialForBattleStartMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
+                new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                        353, 275), "튜토리얼을 진행하시겠습니까?")
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
+                .fontName("neodgm.ttf")
+                .build();
+        tutorialForBattleStartMessageBox.show();
+        addWidget(tutorialForBattleStartMessageBox);
     }
 
     private final static float MUSIC_VOLUME = 0.3f;
@@ -1035,7 +1098,9 @@ public class MainGame extends World
     private GameMap map;
     private Mission mission;
     private MessageBox gameFinishMessageBox;
-    private MessageBox tutorialStartMessageBox;
+    private MessageBox tutorialForManagementStartMessageBox;
+    private MessageBox tutorialForBattleStartMessageBox;
+    private TutorialGuideForBattle.Step startingStepOfTutorialGuideForBattle;
     private MessageBox missionMessageBox;
     private Button squadBuilderButton;
     private Button infoButton;
