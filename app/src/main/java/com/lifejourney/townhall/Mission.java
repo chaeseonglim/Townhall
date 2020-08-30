@@ -12,6 +12,7 @@ enum Mission {
                     "마을을 정돈하고 인구를 충분히 회복해야 " +
                     "합니다.",
             "전체 인구 100 이상",
+            250,
             100,
             new boolean[] { true, false, false, false, false, false, false }) {
 
@@ -52,6 +53,7 @@ enum Mission {
                     "있습니다. 당신의 병사들이 준비되었는지 " +
                     "확인해 볼 수 있는 좋은 기회입니다.",
             "도적 패배",
+            250,
             100,
             new boolean[] { true, true, true, false, false, false, false }) {
 
@@ -97,17 +99,61 @@ enum Mission {
         }
 
         private int turn = 0;
+    },
+    LV3("map/map_lv3.png",
+                "장사꾼",
+                "당신의 활약으로 도적들이 전부 도망쳤습니다. " +
+                        "마을은 다시 평화로워졌지만 미래의 위험에 대비하기 위해 당신은 많은 금화가 필요합니다." +
+                        " 마을 주변에 큰 시장을 만들면 도움이 될 것입니다.",
+                "시장 Lv4 1개 / 금화 4000 보유",
+                250,
+                150,
+                new boolean[] { true, true, true, false, false, false, false }) {
+
+        public void init(MainGame game) {
+            turn = 0;
+
+            Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
+            villager.spawnSquad(villager.getHeadquarterPosition().toGameCoord(),
+                    Unit.UnitClass.WORKER);
+        }
+        public void update(MainGame game) {
+            turn++;
+
+            int day = game.getDays();
+            if (((Villager)game.getTribe(Tribe.Faction.VILLAGER)).getGold() > 4000) {
+                for (Territory territory: game.getTribe(Tribe.Faction.VILLAGER).getTerritories()) {
+                    if (territory.getFacilityLevel(Territory.Facility.MARKET) >= 4) {
+                        if (day <= getTimeLimit() * 0.6f) {
+                            game.missionCompleted(3);
+                        } else if (day <= getTimeLimit() * 0.8f) {
+                            game.missionCompleted(2);
+                        } else {
+                            game.missionCompleted(1);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
+            }
+        }
+
+        private int turn = 0;
     };
 
     abstract void init(MainGame game);
     abstract void update(MainGame game);
 
-    Mission(String mapFile, String title, String description, String victoryCondition, int timeLimit,
-            boolean[] recruitAvailable) {
+    Mission(String mapFile, String title, String description, String victoryCondition,
+            int startingGold, int timeLimit, boolean[] recruitAvailable) {
         this.mapFile = mapFile;
         this.title = title;
         this.description = description;
         this.victoryCondition = victoryCondition;
+        this.startingGold = startingGold;
         this.timeLimit = timeLimit;
         this.recruitAvailable = recruitAvailable;
     }
@@ -126,6 +172,10 @@ enum Mission {
 
     public String getVictoryCondition() {
         return victoryCondition;
+    }
+
+    public int getStartingGold() {
+        return startingGold;
     }
 
     public int getTimeLimit() {
@@ -152,6 +202,7 @@ enum Mission {
     private String title;
     private String description;
     private String victoryCondition;
+    private int startingGold;
     private int timeLimit;
     private boolean unlocked = true;
     private int starRating = 0;

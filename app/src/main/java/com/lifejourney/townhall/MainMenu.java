@@ -77,7 +77,7 @@ public class MainMenu extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
 
         // Logo
-        String logoText = "마을 대전략";
+        String logoText = "마을 대전략\n1.0";
         logo = new TextSprite.Builder("logo", logoText, 120)
                 .fontColor(Color.rgb(255, 255, 0))
                 .fontName("neodgm.ttf")
@@ -85,7 +85,7 @@ public class MainMenu extends World
                 .shadow(Color.rgb(0, 0, 0), 7.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
-                .size(new SizeF(600, 220))
+                .size(new SizeF(600, 350))
                 .position(new PointF(viewport.centerX(), viewport.height * 2 / 5))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(true).build();

@@ -39,7 +39,7 @@ public class MainGame extends World
         setView(map);
 
         // Build tribe
-        Villager villager = new Villager(this, map);
+        Villager villager = new Villager(this, map, mission.getStartingGold());
         tribes.add(villager);
         tribes.add(new Bandit(this, map, villager));
         tribes.add(new Viking(this, map, villager));
@@ -314,7 +314,7 @@ public class MainGame extends World
         }
 
         if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {
-            newsBar.addNews("우리 본부가 점령되었습니다. 이제 더이상 희망이 없습니다!");
+            newsBar.addNews("우리 본부가 점령되었습니다!!!");
             missionFailed();
         } else {
             for (int i = 0; i < tribes.size(); ++i) {

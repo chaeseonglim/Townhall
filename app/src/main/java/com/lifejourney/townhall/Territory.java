@@ -406,9 +406,9 @@ public class Territory {
                 deltas[i] = developmentPolicy[i].developmentDelta() +
                         terrain.developmentDelta(Facility.values()[i]);
             }
-            deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET) +
+            deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET) * 2 +
                     terrain.goldDelta();
-            deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM) +
+            deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM) * 2 +
                     terrain.populationDelta();
             deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.happinessDelta();
             deltas[DeltaAttribute.OFFENSIVE.ordinal()] = terrain.offenseDelta();
@@ -1177,7 +1177,7 @@ public class Territory {
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
             new int[] { 500, 1000, 2000, 4000, 8000};
     private final static int FACILITY_EXP_STEP = 10;
-    private final static int GOLD_STEP = 10;
+    private final static int GOLD_STEP = 5;
     private final static int POPULATION_STEP = 5;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;

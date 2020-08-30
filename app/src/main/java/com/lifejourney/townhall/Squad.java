@@ -58,7 +58,7 @@ public class Squad extends Object implements Controllable {
         public Squad build() {
             Sprite currentStick =
                 new Sprite.Builder("SquadStick", "squad.png").layer(SPRITE_LAYER)
-                    .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
+                    .size(ICON_SPRITE_SIZE).position(position).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
                     .smooth(false).visible(true)
                     .gridSize(3, 5).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
@@ -72,7 +72,7 @@ public class Squad extends Object implements Controllable {
             targetStick.setGridIndex(0, faction.ordinal());
             Sprite squadIcon =
                 new Sprite.Builder("SquadIcon", "squad_icon.png").layer(SPRITE_LAYER)
-                    .size(ICON_SPRITE_SIZE).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
+                    .size(ICON_SPRITE_SIZE).position(position).positionOffset(ICON_SPRITE_HOTSPOT_OFFSET)
                     .smooth(false).visible(false).depth(0.1f)
                     .gridSize(8, 1).opaque(ICON_SPRITE_OPAQUE_NORMAL)
                     .build();
@@ -376,13 +376,13 @@ public class Squad extends Object implements Controllable {
 
         if (workerCount > 0) {
             deltas[Territory.Facility.FARM.ordinal()] +=
-                    Upgradable.WORKER_FARM_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+                    Upgradable.WORKER_FARM_DEVELOPMENT_SPEED.getLevel(faction) * workerCount * 2;
             deltas[Territory.Facility.MARKET.ordinal()] +=
-                    Upgradable.WORKER_MARKET_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+                    Upgradable.WORKER_MARKET_DEVELOPMENT_SPEED.getLevel(faction) * workerCount * 2;
             deltas[Territory.Facility.DOWNTOWN.ordinal()] +=
-                    Upgradable.WORKER_DOWNTOWN_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+                    Upgradable.WORKER_DOWNTOWN_DEVELOPMENT_SPEED.getLevel(faction) * workerCount * 2;
             deltas[Territory.Facility.FORTRESS.ordinal()] +=
-                    Upgradable.WORKER_FORTRESS_DEVELOPMENT_SPEED.getLevel(faction) * workerCount;
+                    Upgradable.WORKER_FORTRESS_DEVELOPMENT_SPEED.getLevel(faction) * workerCount * 2;
         }
         return deltas;
     }
@@ -459,6 +459,10 @@ public class Squad extends Object implements Controllable {
         boolean result = false;
 
         if (!isVisible()) {
+            return false;
+        }
+
+        if (map.getTerritory(getMapPosition()).getFogState() != Territory.FogState.CLEAR) {
             return false;
         }
 
@@ -675,7 +679,7 @@ public class Squad extends Object implements Controllable {
      * @param unitClass
      */
     public void spawnUnit(Unit.UnitClass unitClass) {
-        Unit unit = new Unit.Builder(unitClass, faction).position(getPosition().clone()).build();
+        Unit unit = new Unit.Builder(unitClass, faction, map).position(getPosition().clone()).build();
         unit.setVisible(isVisible());
         unit.setCompanions(units);
         unit.setFocused(focused);

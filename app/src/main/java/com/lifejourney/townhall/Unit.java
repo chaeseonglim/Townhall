@@ -48,7 +48,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 200,
                 30,
-                5,
+                10,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {1.0f, -0.5f, -0.5f, -0.5f, -0.5f, 1.0f, -0.5f},
@@ -90,7 +90,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 200,
                 50,
-                5,
+                20,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.1f, 0.1f},
@@ -132,7 +132,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 200,
                 50,
-                5,
+                20,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {-0.1f, -0.3f, -0.1f, -0.3f, -0.1f, -0.3f, -0.3f},
@@ -174,7 +174,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 500,
                 200,
-                5,
+                40,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {0.2f, 0.3f, 0.5f, 0.1f, 0.5f, 0.6f, 0.4f},
@@ -216,7 +216,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 500,
                 200,
-                10,
+                40,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {0.0f, -0.4f, 0.9f, -0.5f, 0.0f, 1.0f, -0.4f},
@@ -258,7 +258,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 1000,
                 400,
-                20,
+                80,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {0.0f, -0.4f, -0.2f, -0.5f, -0.1f, 0.0f, -0.4f},
@@ -300,7 +300,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new Shape(9.0f),
                 1000,
                 400,
-                20,
+                160,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
                 new float[] {0.1f, 0.4f, 0.2f, 0.4f, 0.2f, 0.3f, 0.1f},
@@ -543,12 +543,14 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         private UnitClass unitClass;
         private Tribe.Faction faction;
+        private GameMap map;
 
         private PointF position = new PointF();
 
-        public Builder(UnitClass unitClass, Tribe.Faction faction) {
+        public Builder(UnitClass unitClass, Tribe.Faction faction, GameMap map) {
             this.unitClass = unitClass;
             this.faction = faction;
+            this.map = map;
         }
         public Builder position(PointF position) {
             this.position = position;
@@ -570,7 +572,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             Sprite unitEffectSprite = new Sprite.Builder("effect", "unit_effect.png")
                     .gridSize(27,1).size(unitClass.spriteSize().clone().multiply(2.0f))
                     .smooth(false).opaque(0.0f).build();
-            return (Unit) new PrivateBuilder<>(position, unitClass)
+            return (Unit) new PrivateBuilder<>(position, unitClass, faction, map)
                     .sprite(unitClassSprite)
                     .sprite(unitFrameSprite)
                     .sprite(unitHealthSprite)
@@ -578,7 +580,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
                     .maxForce(unitClass.maxForce()).maxVelocity(unitClass.maxVelocity())
                     .maxAngularVelocity(0.0f).inertia(Float.MAX_VALUE)
                     .mass(unitClass.mass()).friction(unitClass.friction())
-                    .side(faction)
                     .shape(unitClass.shape()).layer(SPRITE_LAYER).build();
         }
     }
@@ -588,14 +589,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         private UnitClass unitClass;
         private Tribe.Faction faction;
+        private GameMap map;
 
-        public PrivateBuilder(PointF position, UnitClass unitClass) {
+        public PrivateBuilder(PointF position, UnitClass unitClass, Tribe.Faction faction, GameMap map) {
             super(position);
             this.unitClass = unitClass;
-        }
-        public PrivateBuilder side(Tribe.Faction faction) {
             this.faction = faction;
-            return this;
+            this.map = map;
         }
         public Unit build() {
             return new Unit(this);
@@ -603,19 +603,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
     }
 
     private Unit(PrivateBuilder builder) {
-
         super(builder);
 
         targetMapPosition = new OffsetCoord(getPosition());
         unitClass = builder.unitClass;
         faction = builder.faction;
+        map = builder.map;
         health = getUnitClass().health();
         level = 1;
     }
 
     @Override
     public void close() {
-
         super.close();
 
         for (Projectile projectile: projectiles) {
@@ -777,6 +776,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Adjust health sprite
         Sprite healthSprite = getSprite("health");
         healthSprite.setGridIndex((int) ((1.0f - health / getMaxHealth()) / 0.1275f), 0);
+
+        // Hide unit if it's in fog
+        if (!isRecruiting()) {
+            OffsetCoord mapPosition = new OffsetCoord(getPosition());
+            Territory currentTerritory = map.getTerritory(mapPosition);
+            if (currentTerritory == null ||
+                map.getTerritory(mapPosition).getFogState() != Territory.FogState.CLEAR) {
+                hide();
+            } else {
+                show();
+            }
+        }
     }
 
     /**
@@ -2012,6 +2023,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private final static int INVINCIBLE_COOLDOWN = 500;
     private final static float GUARDIAN_DAMAGE_DELTA = 0.1f;
 
+    private GameMap map;
     private UnitClass unitClass;
     private int level;
     private int exp;

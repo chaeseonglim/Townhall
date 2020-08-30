@@ -350,16 +350,24 @@ public abstract class HostileTribe extends Tribe {
             assert weakestTerritory != null;
             squad.seekTo(weakestTerritory.getMapPosition(), true);
         } else if (candidatesToExpansion.size() > 0) {
-            int nearestDistance = candidatesToExpansion.get(0).getMapPosition().getDistance(squad.getMapPosition());
-            ArrayList<Territory> nearestDistanceTerritories = new ArrayList<>();
-            for (Territory candidate: candidatesToExpansion) {
-                if (candidate.getMapPosition().getDistance(squad.getMapPosition()) == nearestDistance) {
-                    nearestDistanceTerritories.add(candidate);
+            // Go to strategic target if possible
+            if (candidatesToExpansion.contains(strategicTarget)) {
+                squad.seekTo(strategicTarget, true);
+            } else {
+                // Else expansion
+                int nearestDistance =
+                        candidatesToExpansion.get(0).getMapPosition().getDistance(squad.getMapPosition());
+                ArrayList<Territory> nearestDistanceTerritories = new ArrayList<>();
+                for (Territory candidate: candidatesToExpansion) {
+                    if (candidate.getMapPosition().getDistance(squad.getMapPosition()) == nearestDistance) {
+                        nearestDistanceTerritories.add(candidate);
+                    }
                 }
+                // Go to expand
+                Territory nearestDistanceTerritory = nearestDistanceTerritories.get(
+                        (int)(Math.random()*nearestDistanceTerritories.size()));
+                squad.seekTo(nearestDistanceTerritory.getMapPosition(), true);
             }
-            // Go to expand
-            squad.seekTo(nearestDistanceTerritories.get(
-                    (int)(Math.random()*nearestDistanceTerritories.size())).getMapPosition(), true);
         } else if (strategicTarget != null) {
             // Go to strategic target
             squad.seekTo(strategicTarget, true);
@@ -387,7 +395,7 @@ public abstract class HostileTribe extends Tribe {
     protected static final int POLICY_TRANSITION_TIME = 300;
     protected static final int SQUAD_RECRUITING_UPDATE_TIME = 70;
     protected static final int TACTICAL_DECISION_UPDATE_TIME = 90;
-    protected static final int SQUAD_CREATION_ALLOW_GOLD = 10000;
+    protected static final int SQUAD_CREATION_ALLOW_GOLD = 7000;
     protected static final int SQUAD_COUNT_LIMIT = 10;
     protected static final int INCOME_PER_TERRITORY = 20;
     protected static final int BASE_INCOME = 100;
@@ -395,7 +403,7 @@ public abstract class HostileTribe extends Tribe {
     protected static final int SQUAD_AWARENESS_RANGE = 3;
     protected static final float SQUAD_ACTIVATE_THRESHOLD = 0.8f;
     protected static final int RECRUITING_PROGRESSIVE_DELTA = 10;
-    protected static final int RECRUITING_PROGRESSIVE_THRESHOLD = 1000;
+    protected static final int RECRUITING_PROGRESSIVE_THRESHOLD = 800;
     protected static final int UPGRADING_PROGRESSIVE_THRESHOLD = 3000;
 
     protected Villager villager;

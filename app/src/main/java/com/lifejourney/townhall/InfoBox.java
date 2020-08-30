@@ -253,9 +253,15 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         addText("소속", new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(255, 255, 0));
 
-        textPosition.offset(0, 30);
-        addText(territory.getFaction().toGameString(), new SizeF(150, 40),
-                textPosition.clone(), Color.rgb(230, 230, 230));
+        if (territory.getFogState() != Territory.FogState.CLEAR) {
+            textPosition.offset(0, 30);
+            addText("모름", new SizeF(150, 40),
+                    textPosition.clone(), Color.rgb(230, 230, 230));
+        } else {
+            textPosition.offset(0, 30);
+            addText(territory.getFaction().toGameString(), new SizeF(150, 40),
+                    textPosition.clone(), Color.rgb(230, 230, 230));
+        }
 
         // Status
         textPosition.offset(-150, 30);

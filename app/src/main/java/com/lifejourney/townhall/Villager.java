@@ -4,14 +4,11 @@ public class Villager extends Tribe {
 
     private static final String LOG_TAG = "Villager";
 
-    public Villager(Tribe.Event eventHandler, GameMap map) {
+    public Villager(Tribe.Event eventHandler, GameMap map, int startingGold) {
 
         super(eventHandler, Faction.VILLAGER, map);
 
-        /*
-        spawnSquad(getHeadquarterPosition().toGameCoord(), getFaction(),
-                Unit.UnitClass.PALADIN, Unit.UnitClass.HEALER, Unit.UnitClass.HORSE_MAN);
-         */
+        this.gold = startingGold;
     }
 
     @Override
@@ -177,13 +174,12 @@ public class Villager extends Tribe {
 
 
     private final static int COLLECT_UPDATE_TIME = 60;
-    private final static int STARTING_GOLD = 250;
 
     private int collectTimeLeft = 1;
     private int totalPopulation = 0;
     private int workingPopulation = 0;
     private int idlePopulation = 0;
-    private int gold = STARTING_GOLD;
+    private int gold;
     private int income = 0;
     private int spend = 0;
     private int happiness = 50;
