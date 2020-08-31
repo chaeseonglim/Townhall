@@ -42,7 +42,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         WORKER(
                 "일꾼",
                 UnitClassType.RANGED_SUPPORTER,
-                "지역 발전 속도를 높이며\n수입에도 기여합니다.\n하지만 전투 능력이 없습니다.",
+                "지역 발전 속도를 높이며 금화 수입도 늘립니다. 하지만 전투 능력이 없으며 매우 느립니다.",
                 new Point(1, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -84,7 +84,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         FIGHTER(
                 "전사",
                 UnitClassType.MELEE_FIGHTER,
-                "균형잡힌 근접 보병입니다.\n모든 면에서 무난합니다.\n다만 기병에 약합니다.",
+                "균형잡힌 보병입니다. 모든 면에서 무난합니다만 기병에는 유독 약합니다.",
                 new Point(2, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -126,7 +126,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         ARCHER(
                 "궁수",
                 UnitClassType.RANGED_FIGHTER,
-                "원거리 공격이 가능하며\n전투 및 지원에 적합합니다.",
+                "원거리 공격이 가능하며 전투 및 지원에 적합합니다.",
                 new Point(3, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -168,7 +168,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         HORSE_MAN(
                 "기마병",
                 UnitClassType.MELEE_FIGHTER,
-                "빠른 속도의 기마병입니다.\n근접 유닛에 강하지만\n원거리 유닛의 공격에\n취약합니다.",
+                "빠른 속도의 기마병입니다. 근접 유닛에 강하지만 원거리 유닛의 공격에 취약합니다.",
                 new Point(4, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -210,7 +210,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         HEALER(
                 "치유사",
                 UnitClassType.RANGED_HEALER,
-                "주변 유닛을 치유합니다.\n하지만 전투 능력이 없습니다.",
+                "주변 유닛을 치유합니다. 하지만 전투 능력이 없습니다.",
                 new Point(5, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -252,7 +252,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         CANNON(
                 "대포병",
                 UnitClassType.RANGED_SUPPORTER,
-                "강력한 원거리 공격으로\n주변을 초토화합니다.\n하지만 근접 공격에 쉽게\n취약해집니다.",
+                "강력한 원거리 공격으로 주변을 초토화합니다. 하지만 근접 공격에 쉽게 취약해집니다.",
                 new Point(6, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),

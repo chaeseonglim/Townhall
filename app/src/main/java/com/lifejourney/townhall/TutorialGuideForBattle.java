@@ -52,15 +52,13 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
         guideRectangle = new Rectangle.Builder(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                 new PointF(80, 10)), new SizeF(170, 64)))
                 .color(Color.argb(255, 255, 255, 255)).lineWidth(10.0f)
-                .layer(255).visible(true).build();
-        guideRectangle.hide();
+                .layer(255).visible(false).build();
         guideRectangle.commit();
 
         guideRectangle2 = new Rectangle.Builder(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                 new PointF(80, 10)), new SizeF(170, 64)))
                 .color(Color.argb(255, 255, 0, 0)).lineWidth(10.0f)
-                .layer(255).visible(true).build();
-        guideRectangle2.hide();
+                .layer(255).visible(false).build();
         guideRectangle2.commit();
 
         Rect viewport = Engine2D.GetInstance().getViewport();

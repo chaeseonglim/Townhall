@@ -79,7 +79,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 100, 100);
         leftButton = new Button.Builder(this, leftButtonRegion)
                 .imageSpriteAsset("left_right_btns.png").numImageSpriteSet(2)
-                .fontSize(25).layer(getLayer()+1).build();
+                .fontSize(23).layer(getLayer()+1).build();
         leftButton.setFollowParentVisibility(false);
         addWidget(leftButton);
 
@@ -88,7 +88,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 100, 100);
         rightButton = new Button.Builder(this, rightButtonRegion)
                 .imageSpriteAsset("left_right_btns.png").numImageSpriteSet(2)
-                .fontSize(25).layer(getLayer()+1).build();
+                .fontSize(23).layer(getLayer()+1).build();
         rightButton.setFollowParentVisibility(false);
         rightButton.setImageSpriteSet(1);
         addWidget(rightButton);
@@ -122,41 +122,41 @@ public class MissionSelectionBox extends Widget implements Button.Event{
 
         // Mission title
         PointF textPosition = new PointF(0, -210);
-        addText("챕터 " + (selectedMission.ordinal() + 1) + " - " + selectedMission.getTitle(),
-                new SizeF(480, 40), textPosition.clone(), 32,
+        addTitleText("챕터 " + (selectedMission.ordinal() + 1) + " - " + selectedMission.getTitle(),
+                new SizeF(480, 40), textPosition.clone(), 34,
                 Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_CENTER,
                 Layout.Alignment.ALIGN_CENTER);
 
         // Mission description
         textPosition.setTo(0, -80);
         addText(selectedMission.getDescription(), new SizeF(460, 210), textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_CENTER,
+                23, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_CENTER,
                 Layout.Alignment.ALIGN_CENTER);
 
         // Mission victory condition
-        textPosition.setTo(0, 60);
+        textPosition.setTo(0, 56);
         addText("승리 조건:", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
+                23, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);
 
-        textPosition.setTo(0, 90);
+        textPosition.setTo(0, 86);
         addText(selectedMission.getVictoryCondition(), new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
+                23, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);
 
         // Mission time limit
-        textPosition.setTo(0, 120);
+        textPosition.setTo(0, 116);
         addText("시간 제한:", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
+                23, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);
 
-        textPosition.setTo(0, 150);
+        textPosition.setTo(0, 146);
         addText(selectedMission.getTimeLimit() + "일", new SizeF(460, 40),
                 textPosition.clone(),
-                25, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
+                23, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);
 
         // Star rating
@@ -220,9 +220,28 @@ public class MissionSelectionBox extends Widget implements Button.Event{
     private void addText(String text, SizeF size, PointF position, int fontSize, int fontColor,
                          Layout.Alignment horizontalAlignment, Layout.Alignment verticalAlignment) {
         addSprite(new TextSprite.Builder("text", text, fontSize)
-                .fontColor(fontColor).bgColor(Color.argb(0, 0, 0, 0))
+                .fontColor(fontColor)
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(0, 0, 0), 2.0f)
+                .shadow(Color.rgb(0, 0, 0), 1.0f)
+                .horizontalAlign(horizontalAlignment).verticalAlign(verticalAlignment)
+                .size(size).positionOffset(position)
+                .smooth(true).depth(0.1f)
+                .layer(getLayer()+1).visible(false).build());
+    }
+
+    /**
+     *
+     * @param text
+     * @param size
+     * @param position
+     * @param fontColor
+     */
+    private void addTitleText(String text, SizeF size, PointF position, int fontSize, int fontColor,
+                         Layout.Alignment horizontalAlignment, Layout.Alignment verticalAlignment) {
+        addSprite(new TextSprite.Builder("text", text, fontSize)
+                .fontColor(fontColor)
+                .fontName("neodgm.ttf")
+                .shadow(Color.rgb(61, 61, 61), 4.0f)
                 .horizontalAlign(horizontalAlignment).verticalAlign(verticalAlignment)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)

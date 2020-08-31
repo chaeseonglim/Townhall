@@ -29,8 +29,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         super(null, 30, 0.0f);
 
         Rect viewport = Engine2D.GetInstance().getViewport();
-        Rect boxRegion = new Rect((viewport.width - 802) / 2, (viewport.height - 452) / 2,
-                802,452);
+        Rect boxRegion = new Rect((viewport.width - 802) / 2, (viewport.height - 457) / 2,
+                802,457);
         setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
@@ -41,12 +41,12 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         backgroundSprite = new Sprite.Builder("upgrade_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(getLayer()).depth(getDepth())
-                .gridSize(2, 1).visible(false).opaque(1.0f).build();
+                .gridSize(3, 1).visible(false).opaque(1.0f).build();
         backgroundSprite.setGridIndex(0, 0);
         addSprite(backgroundSprite);
 
         // Close button
-        Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 75,
+        Rect closeButtonRegion = new Rect(getRegion().right() - 166, getRegion().bottom() - 80,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
@@ -57,7 +57,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(closeButton);
 
         // Home button
-        Rect toHomeButtonRegion = new Rect(getRegion().right() - 300, getRegion().bottom() - 75,
+        Rect toHomeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 80,
                 138, 64);
         toHomeButton = new Button.Builder(this, toHomeButtonRegion)
                 .message("홈").imageSpriteAsset("messagebox_btn_bg.png")
@@ -69,7 +69,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
         // Unit buttons
         Rect unitButtonRegion =
-                new Rect(getRegion().left() + 22, getRegion().bottom() - 73,
+                new Rect(getRegion().left() + 27, getRegion().bottom() - 78,
                         56, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
@@ -244,17 +244,19 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 upgradableButtons[i].show();
             }
 
-            PointF textPosition = new PointF(-175, -165);
+            PointF textPosition = new PointF(-173, -165);
             addTitleText(selectedUnitClass.word() + " 강화",
                     new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
             if (selectedUpgradable != null) {
-                textPosition.setTo(210, -170);
+                backgroundSprite.setGridIndex(2, 0);
+
+                textPosition.setTo(217, -167);
                 addText("구입비", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-160, 30);
-                addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+                addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
                 textPosition.offset(200, 0);
                 addText(selectedUpgradable.getPurchaseCost() + "", new SizeF(350, 40),
                         textPosition.clone(), Color.rgb(230, 230, 230));
@@ -263,7 +265,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 addText("유지비", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-160, 30);
-                addIcon("gold.png", new SizeF(35, 35), textPosition.clone());
+                addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
                 textPosition.offset(200, 0);
                 addText((selectedUpgradable.getUpkeepCost() *
                                 selectedUpgradable.getLevel(Tribe.Faction.VILLAGER)) + " (" +
@@ -275,14 +277,14 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 addText("레벨 1 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 1) ? "(현재 레벨)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 1)?
-                                Color.rgb(128, 128, 0):
+                                Color.rgb(160, 160, 0):
                                 Color.rgb(255, 255, 0)
                 );
                 textPosition.offset(0, 30);
                 addText(selectedUpgradable.getDescriptionLv1(),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 1)?
-                                Color.rgb(128, 128, 128):
+                                Color.rgb(160, 160, 160):
                                 Color.rgb(230, 230, 230)
                 );
 
@@ -290,14 +292,14 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 addText("레벨 2 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 2) ? "(현재 레벨)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 2)?
-                                Color.rgb(128, 128, 0):
+                                Color.rgb(160, 160, 0):
                                 Color.rgb(255, 255, 0)
                 );
                 textPosition.offset(0, 30);
                 addText(selectedUpgradable.getDescriptionLv2(),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 2)?
-                                Color.rgb(128, 128, 128):
+                                Color.rgb(160, 160, 160):
                                 Color.rgb(230, 230, 230)
                 );
 
@@ -305,18 +307,18 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 addText("레벨 3 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 3) ? "(현재 레벨)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 3)?
-                                Color.rgb(128, 128, 0):
+                                Color.rgb(160, 160, 0):
                                 Color.rgb(255, 255, 0)
                 );
                 textPosition.offset(0, 30);
                 addText(selectedUpgradable.getDescriptionLv3(),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 3)?
-                                Color.rgb(128, 128, 128):
+                                Color.rgb(160, 160, 160):
                                 Color.rgb(230, 230, 230)
                 );
             } else {
-                textPosition.setTo(210, -170);
+                textPosition.setTo(217, -165);
                 addText("강화할 항목을 선택하세요.", new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
@@ -326,7 +328,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 upgradableButtons[i].hide();
             }
 
-            PointF textPosition = new PointF(-185, -180);
+            PointF textPosition = new PointF(-185, -165);
             addText("강화할 클래스를 선택하세요.", new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
@@ -340,7 +342,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      * @param fontColor
      */
     private void addTitleText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text", text, 28)
+        addSprite(new TextSprite.Builder("text", text, 27)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(61, 61, 61), 2.0f)
@@ -359,10 +361,10 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text", text, 24)
+        addSprite(new TextSprite.Builder("text", text, 23)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(61, 61, 61), 2.0f)
+                .shadow(Color.rgb(61, 61, 61), 1.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(size).positionOffset(position)

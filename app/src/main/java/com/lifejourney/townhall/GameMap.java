@@ -82,6 +82,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                 demoMode = true;
                 if (demoMode) {
                     territory.setFogState(Territory.FogState.CLEAR);
+                    showTerritories = false;
                 }
 
                 territories.put(mapPosition, territory);

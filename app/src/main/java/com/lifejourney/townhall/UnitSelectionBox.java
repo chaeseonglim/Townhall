@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.text.Layout;
 import android.view.MotionEvent;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -20,9 +21,13 @@ public class UnitSelectionBox extends Widget implements Button.Event{
     }
 
     public UnitSelectionBox(Event eventHandler, Mission mission, Villager villager,
-                            Unit.UnitClass replacementClass, Rect region) {
+                            Unit.UnitClass replacementClass) {
+        super(null, 40, 0.0f);
 
-        super(region, 40, 0.0f);
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        Rect boxRegion = new Rect((viewport.width - 732) / 2, (viewport.height - 437) / 2,
+                732, 437);
+        setRegion(boxRegion);
 
         this.eventHandler = eventHandler;
         this.mission = mission;
@@ -30,14 +35,14 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         this.replacementUnitClass = replacementClass;
 
         // Background sprite
-        Sprite backgroundSprite = new Sprite.Builder("unit_selection_box.png")
+        backgroundSprite = new Sprite.Builder("unit_selection_box.png")
                 .size(new SizeF(getRegion().size()))
                 .smooth(false).layer(getLayer()).depth(getDepth())
-                .gridSize(1, 1).visible(false).opaque(1.0f).build();
+                .gridSize(2, 1).visible(false).opaque(1.0f).build();
         addSprite(backgroundSprite);
 
         // Cancel button
-        Rect cancelButtonRegion = new Rect(region.right() - 155, region.bottom() - 75,
+        Rect cancelButtonRegion = new Rect(getRegion().right() - 165, getRegion().bottom() - 80,
                 138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
                 .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
@@ -48,7 +53,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         addWidget(cancelButton);
 
         // Select button
-        Rect selectButtonRegion = new Rect(region.right() - 155, region.bottom() - 75,
+        Rect selectButtonRegion = new Rect(getRegion().right() - 165, getRegion().bottom() - 80,
                 138, 64);
         selectButton = new Button.Builder(this, selectButtonRegion)
                 .message("선택").imageSpriteAsset("messagebox_btn_bg.png")
@@ -60,7 +65,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
         // Unit button
         Rect unitButtonRegion =
-                new Rect(region.left() + 22, region.bottom() - 73,
+                new Rect(getRegion().left() + 27, getRegion().bottom() - 78,
                         56, 60);
         for (int i = 0; i < Unit.UnitClass.values().length; ++i) {
             unitButtons[i] =
@@ -112,8 +117,10 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         removeSprites("icon");
 
         if (selectedUnitClass != null) {
+            backgroundSprite.setGridIndex(1, 0);
+
             // Unit Class
-            PointF textPosition = new PointF(-240, -165);
+            PointF textPosition = new PointF(-245, -168);
             addText("클래스", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
@@ -121,7 +128,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Population
-            textPosition.offset(150, -30);
+            textPosition.offset(160, -30);
             addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
@@ -131,7 +138,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Purchase gold
-            textPosition.offset(-180, 30);
+            textPosition.offset(-190, 30);
             addText("구매 비용", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
@@ -141,7 +148,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Upkeep gold
-            textPosition.offset(120, -30);
+            textPosition.offset(130, -30);
             addText("유지 비용", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
@@ -151,7 +158,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     textPosition.clone(), Color.rgb(230, 230, 230));
 
             // Health
-            textPosition.offset(-180, 30);
+            textPosition.offset(-190, 30);
             addText("체력", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
@@ -162,7 +169,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Velocity
-            textPosition.offset(120, -30);
+            textPosition.offset(130, -30);
             addText("이동 속도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
@@ -175,7 +182,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             if (selectedUnitClass.unitClassType() == Unit.UnitClassType.MELEE_HEALER ||
                 selectedUnitClass.unitClassType() == Unit.UnitClassType.RANGED_HEALER) {
                 // Heal power
-                textPosition.offset(-180, 30);
+                textPosition.offset(-190, 30);
                 addText("치유력", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
@@ -187,7 +194,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                         Color.rgb(230, 230, 230));
 
                 // Heal speed
-                textPosition.offset(120, -30);
+                textPosition.offset(130, -30);
                 addText("치유 속도", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
@@ -199,7 +206,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                         Color.rgb(230, 230, 230));
             } else {
                 // Attack damage
-                textPosition.offset(-180, 30);
+                textPosition.offset(-190, 30);
                 addText("공격력", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
@@ -219,13 +226,13 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                         Color.rgb(230, 230, 230));
 
                 // Attack speed
-                textPosition.offset(85, -30);
+                textPosition.offset(95, -30);
                 addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
-                addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
+                addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(35, 0);
-                addIcon("ranged_attack_speed.png", new SizeF(25, 25), textPosition.clone());
+                addIcon("ranged_attack.png", new SizeF(25, 25), textPosition.clone());
                 textPosition.offset(53, 0);
                 addSymbolText("/", new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
@@ -241,7 +248,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             }
 
             // Armor
-            textPosition.offset(-180, 30);
+            textPosition.offset(-190, 30);
             addText("방어도", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
@@ -252,17 +259,12 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Evasion
-            textPosition.offset(120, -30);
+            textPosition.offset(130, -30);
             addText("회피", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("evade.png", new SizeF(25, 25), textPosition.clone());
-            textPosition.offset(35, 0);
-            addIcon("ranged_evade.png", new SizeF(25, 25), textPosition.clone());
-            textPosition.offset(53, 0);
-            addSymbolText("/", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(230, 230, 230));
-            textPosition.offset(42, 0);
+            textPosition.offset(95, 0);
             String evasionString =
                     ((selectedUnitClass.meleeEvasion() == 0) ?
                     "-":(int)selectedUnitClass.meleeEvasion()) + "/" +
@@ -272,7 +274,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                     Color.rgb(230, 230, 230));
 
             // Strong/Weakness
-            textPosition.setTo(110, -165);
+            textPosition.setTo(115, -168);
             addText("지원", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
@@ -283,12 +285,14 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             addText("설명",
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
-            textPosition.offset(75, 75);
+            textPosition.offset(70, 75);
             addLongText(selectedUnitClass.description(),
-                    new SizeF(300, 120), textPosition.clone(),
+                    new SizeF(290, 120), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         } else {
-            PointF textPosition = new PointF(-240 + 75, -165);
+            backgroundSprite.setGridIndex(0, 0);
+
+            PointF textPosition = new PointF(-245 + 75, -168);
             addText("클래스를 선택하세요.", new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
@@ -377,7 +381,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 23)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(61, 61, 61), 2.0f)
@@ -396,7 +400,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
      * @param fontColor
      */
     private void addSymbolText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text"+textIndex, text, 24)
+        addSprite(new TextSprite.Builder("text"+textIndex, text, 23)
                 .fontColor(fontColor)
                 .shadow(Color.rgb(61, 61, 61), 2.0f)
                 .horizontalAlign(Layout.Alignment.ALIGN_NORMAL)
@@ -441,6 +445,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
     private Event eventHandler;
     private Villager villager;
     private Mission mission;
+    private Sprite backgroundSprite;
     private Button cancelButton;
     private Button selectButton;
     private Button[] unitButtons = new Button[Unit.UnitClass.values().length];
