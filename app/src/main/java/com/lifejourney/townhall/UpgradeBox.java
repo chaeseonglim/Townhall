@@ -104,10 +104,10 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .name("UpgradeBtn" + i)
                             .imageSpriteAsset("unit_upgrade_btn.png")
                             .numImageSpriteSet(4)
-                            .message(" ").fontSize(19)
-                            .fontColor(Color.rgb(65, 65, 65))
+                            .message(" ").fontSize(18)
+                            .fontColor(Color.rgb(235, 235, 235))
                             .fontName("neodgm.ttf")
-                            .shadow(Color.rgb(235, 235, 235), 1.0f)
+                            .shadow(Color.rgb(35, 35, 35), 1.0f)
                             .layer(getLayer() + 1).build();
             upgradableButtons[i].hide();
             upgradableButtons[i].setFollowParentVisibility(false);

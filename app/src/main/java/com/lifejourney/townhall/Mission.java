@@ -101,10 +101,10 @@ enum Mission {
         private int turn = 0;
     },
     LV3("map/map_lv3.png",
-                "장사꾼",
-                "당신의 활약으로 도적들이 전부 도망쳤습니다. " +
-                        "마을은 다시 평화로워졌지만 미래의 위험에 대비하기 위해 당신은 많은 금화가 필요합니다." +
-                        " 마을 주변에 큰 시장을 만들면 도움이 될 것입니다.",
+                "경제 활성화",
+                "훌륭합니다! 우리 병사들이 마을 근처의 도적들을 물리쳤습니다." +
+                        " 하지만 당신은 그들이 곧 다시 나타날 것임을 압니다. 미래의 위험에 대비해 많은 금화를 모아야 합니다." +
+                        " 마을 근처에 큰 시장이 있다면 도움이 될 것입니다.",
                 "시장 Lv4 1개 / 금화 4000 보유",
                 250,
                 150,
@@ -133,6 +133,63 @@ enum Mission {
                         }
                         break;
                     }
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
+            }
+        }
+
+        private int turn = 0;
+    },
+    LV4("map/map_lv4.png",
+                "새로운 위협",
+                "당신의 예상대로 북쪽 숲 너머에서 도적들이 다시 움직이기 시작했습니다." +
+                " 하지만 당신의 마을은 시장을 통해 많은 금화를 모았습니다." +
+                " 도적들에게 달라진 마을의 힘을 보여줄 기회입니다.",
+                "도적 패배",
+                4000,
+                200,
+                new boolean[] { true, true, true, false, false, false, false }) {
+
+        public void init(MainGame game) {
+            turn = 0;
+
+            // Prevent AI control units at the beginning
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            bandit.setControlledByAI(false);
+            bandit.spawnSquad(bandit.getHeadquarterPosition().toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            OffsetCoord squadMapPosition = bandit.getHeadquarterPosition().clone();
+            squadMapPosition.offset(-1, 0);
+            bandit.spawnSquad(squadMapPosition.toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
+
+            Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
+            villager.spawnSquad(villager.getHeadquarterPosition().toGameCoord(),
+                    Unit.UnitClass.WORKER);
+        }
+        public void update(MainGame game) {
+            turn++;
+
+            int day = game.getDays();
+
+            if (turn == 1600) {
+                // Prevent AI control units at the beginning
+                Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
+                bandit.setControlledByAI(true);
+
+                game.addNews("조심하세요!! 도적들이 이제 활동을 시작합니다.");
+            }
+
+            if (game.getTribe(Tribe.Faction.BANDIT).isDefeated()) {
+                if (day <= getTimeLimit() * 0.6f) {
+                    game.missionCompleted(3);
+                } else if (day <= getTimeLimit() * 0.8f) {
+                    game.missionCompleted(2);
+                } else {
+                    game.missionCompleted(1);
                 }
             }
 

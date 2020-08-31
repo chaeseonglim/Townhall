@@ -437,7 +437,9 @@ public class Territory {
                 if (developmentPolicy[i] != DevelopmentPolicy.DETERIORATE) {
                     deltas[i] += maxDowntownLvl;
                 }
-                deltas[i] -= maxFortressLvl;
+                if (deltas[i] > 0) {
+                    deltas[i] = Math.max(deltas[i] - maxFortressLvl, 0);
+                }
             }
             deltas[DeltaAttribute.HAPPINESS.ordinal()] -= maxFortressLvl;
             deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;

@@ -12,7 +12,6 @@ public class Battle {
     private static final String LOG_TAG = "Battle";
 
     public Battle(GameMap map, Squad attacker, Squad defender) {
-
         this.map = map;
         this.attacker = attacker;
         this.defender = defender;
@@ -25,7 +24,6 @@ public class Battle {
      *
      */
     public void update() {
-
         // Collision detection between units first
         resolveCollision();
 
@@ -82,7 +80,6 @@ public class Battle {
      *
      */
     private void fight() {
-
         // Fight each others
         attacker.fight();
         defender.fight();
@@ -225,6 +222,14 @@ public class Battle {
      */
     public void addSupporter(Squad squad) {
         supporters.add(squad);
+    }
+
+    /**
+     *
+     * @param squad
+     */
+    public void removeSupporter(Squad squad) {
+        supporters.remove(squad);
     }
 
     private int WINNER_EXP = 50;

@@ -141,6 +141,13 @@ public class MainGame extends World
             ArrayList<Squad> squadsInSameMap = thisTerritory.getSquads();
             assert squadsInSameMap.size() <= 2;
             if (squadsInSameMap.size() == 2 && thisTerritory.getBattle() == null) {
+                // Remove from other battle first
+                for (Battle battle : battles) {
+                    battle.removeSupporter(squadsInSameMap.get(0));
+                    battle.removeSupporter(squadsInSameMap.get(1));
+                }
+
+                // Create new one
                 Battle battle = new Battle(map, squadsInSameMap.get(1), squadsInSameMap.get(0));
                 battles.add(battle);
                 thisTerritory.setBattle(battle);
@@ -333,11 +340,25 @@ public class MainGame extends World
                 }
             }
         }
+
+        // Notify news
         if (prevFaction != Tribe.Faction.NEUTRAL && territory.getFaction() != Tribe.Faction.NEUTRAL) {
             newsBar.addNews(territory.getFaction().toGameString() + "이 " +
                     prevFaction.toGameString() + "의 영토를 차지했습니다.");
         }
 
+        // Notify one more news if it's shrine
+        if (territory.getFaction() == Tribe.Faction.VILLAGER) {
+            if (territory.getTerrain() == Territory.Terrain.SHRINE_WIND) {
+                newsBar.addNews("바람의 제단을 점령했습니다. 이동 속도가 빨라집니다.");
+            } else if (territory.getTerrain() == Territory.Terrain.SHRINE_HEAL) {
+                newsBar.addNews("치유의 제단을 점령했습니다. 휴식 속도가 빨라집니다.");
+            } else if (territory.getTerrain() == Territory.Terrain.SHRINE_LOVE) {
+                newsBar.addNews("사랑의 제단을 점령했습니다. 인구가 늘어납니다.");
+            } else if (territory.getTerrain() == Territory.Terrain.SHRINE_PROSPER) {
+                newsBar.addNews("풍요의 제단을 점령했습니다. 금화 수입이 늘어납니다.");
+            }
+        }
     }
 
     /**
@@ -531,6 +552,10 @@ public class MainGame extends World
             } else {
                 resumeFromWidget();
             }
+        } else {
+            messageBox.close();
+            removeWidget(messageBox);
+            resumeFromWidget();
         }
     }
 
@@ -1087,6 +1112,14 @@ public class MainGame extends World
                 .build();
         tutorialForBattleStartMessageBox.show();
         addWidget(tutorialForBattleStartMessageBox);
+    }
+
+    /**
+     *
+     * @param news
+     */
+    public void addNews(String news) {
+        newsBar.addNews(news);
     }
 
     private final static float MUSIC_VOLUME = 0.3f;

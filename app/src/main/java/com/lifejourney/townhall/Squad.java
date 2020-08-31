@@ -126,7 +126,6 @@ public class Squad extends Object implements Controllable {
      */
     @Override
     public void close() {
-
         for (Unit unit: units) {
             eventHandler.onSquadUnitRemoved(this, unit);
             unit.close();
@@ -588,7 +587,6 @@ public class Squad extends Object implements Controllable {
 
         currentStick.show();
         currentStick.setOpaque(ICON_SPRITE_OPAQUE_NORMAL);
-        targetStick.show();
         targetStick.setPosition(targetMapPosition.toGameCoord());
         targetStick.setPositionOffset(ICON_SPRITE_HOTSPOT_OFFSET);
         if (isFocused()) {
@@ -803,7 +801,6 @@ public class Squad extends Object implements Controllable {
      *
      */
     void support(Squad companion, Squad opponent) {
-
         // Set companions and opponents to all units
         ArrayList<Unit> companionUnits = new ArrayList<>();
         companionUnits.addAll(companion.getUnits());
@@ -930,7 +927,6 @@ public class Squad extends Object implements Controllable {
      * @param focused
      */
     public void setFocus(boolean focused) {
-
         Sprite currentStick = getSprite("SquadStick");
         Sprite targetStick = getSprite("SquadTarget");
 

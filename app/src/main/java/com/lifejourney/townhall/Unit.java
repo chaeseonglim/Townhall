@@ -47,7 +47,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 200,
-                30,
+                20,
                 10,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -73,8 +73,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 5,
                 null,
-                1.5f,
-                2.5f,
+                1.0f,
+                2.0f,
                 5.0f,
                 false,
                 false,
@@ -89,7 +89,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 200,
-                50,
+                20,
                 20,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -116,7 +116,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 10,
                 null,
                 2.0f,
-                3.0f,
+                2.5f,
                 5.0f,
                 false,
                 true,
@@ -131,7 +131,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 200,
-                50,
+                20,
                 20,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -157,8 +157,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 10,
                 Projectile.ProjectileType.ARROW,
+                1.5f,
                 2.0f,
-                2.5f,
                 5.0f,
                 true,
                 true,
@@ -173,7 +173,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 500,
-                200,
+                40,
                 40,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -215,7 +215,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 500,
-                200,
+                40,
                 40,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -242,7 +242,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 30,
                 Projectile.ProjectileType.HEAL,
                 1.5f,
-                2.5f,
+                2.0f,
                 5.0f,
                 true,
                 false,
@@ -257,7 +257,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 1000,
-                400,
+                60,
                 80,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -283,8 +283,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 40,
                  Projectile.ProjectileType.CANNON,
-                1.5f,
-                2.5f,
+                1.0f,
+                2.0f,
                 5.0f,
                 true,
                 true,
@@ -299,7 +299,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 new SizeF(18, 18),
                 new Shape(9.0f),
                 1000,
-                400,
+                100,
                 160,
                 // Worker / Sword / Archer / Horse / Healer / Cannon / Paladin
                 // moving favor
@@ -325,8 +325,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 40,
                 Projectile.ProjectileType.HEAL,
-                2f,
-                4.0f,
+                1.5f,
+                2.0f,
                 5.0f,
                 true,
                 true,
@@ -999,7 +999,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     private Unit searchFavoredMeleeTarget() {
-
         // Find favored enemy for melee attack
         Unit targetCandidate = null;
         float highestFavor = -Float.MAX_VALUE;
@@ -1794,7 +1793,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param opponents
      */
     public void setOpponents(ArrayList<Unit> opponents) {
-
         this.opponents = opponents;
     }
 
