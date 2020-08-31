@@ -1,7 +1,6 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.text.Layout;
 import android.view.MotionEvent;
 
@@ -51,7 +50,7 @@ public class HomeBox extends Widget implements Button.Event {
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(layer + 1).build();
         addWidget(closeButton);
 
@@ -62,7 +61,7 @@ public class HomeBox extends Widget implements Button.Event {
                 .message("강화").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(layer + 1).build();
         addWidget(toUpgradeButton);
 

@@ -1,9 +1,7 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.text.Layout;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -129,7 +127,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .fontSize(25)
                     .fontColor(Color.rgb(61, 61, 61))
                     .fontName(builder.fontName)
-                    .shadow(Color.rgb(235, 235, 235), 1.0f)
+                    .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(closeButton);
         } else if (type == Type.YES_OR_NO) {
@@ -145,7 +143,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
-                    .shadow(Color.rgb(235, 235, 235), 1.0f)
+                    .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(yesButton);
 
@@ -157,7 +155,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
-                    .shadow(Color.rgb(235, 235, 235), 1.0f)
+                    .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(noButton);
         } else if (type == Type.OK_OR_CANCEL) {
@@ -173,7 +171,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
-                    .shadow(Color.rgb(235, 235, 235), 1.0f)
+                    .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(okButton);
 
@@ -185,7 +183,7 @@ public class MessageBox extends Widget implements Button.Event {
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
-                    .shadow(Color.rgb(235, 235, 235), 1.0f)
+                    .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                     .layer(getLayer()+1).build();
             addWidget(cancelButton);
         }

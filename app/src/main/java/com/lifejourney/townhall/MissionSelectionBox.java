@@ -1,7 +1,6 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.text.Layout;
 import android.view.MotionEvent;
 
@@ -60,7 +59,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 .message("뒤로").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(cancelButton);
 
@@ -71,7 +70,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 .message("시작").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(startButton);
 

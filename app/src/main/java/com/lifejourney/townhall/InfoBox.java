@@ -1,7 +1,6 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.text.Layout;
 import android.view.MotionEvent;
 
@@ -51,7 +50,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 2.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 2.0f)
                 .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
@@ -86,7 +85,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
@@ -97,7 +96,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 .message("지역").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(toTerritoryButton);
 
@@ -670,7 +669,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor) {
-        addSprite(new TextSprite.Builder("text", text, 24)
+        addSprite(new TextSprite.Builder("text", text, 23)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(61, 61, 61), 2.0f)
@@ -689,7 +688,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
      * @param fontColor
      */
     private void addText(String text, SizeF size, PointF position, int fontColor, Layout.Alignment alignment) {
-        addSprite(new TextSprite.Builder("text", text, 24)
+        addSprite(new TextSprite.Builder("text", text, 23)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(61, 61, 61), 2.0f)

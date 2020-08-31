@@ -1,7 +1,6 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.text.Layout;
 import android.view.MotionEvent;
 
@@ -36,9 +35,8 @@ public class Button extends Widget {
         private int fontColor = Color.argb(255, 255, 255, 255);
         private int layer = 0;
         private float depth = 0.0f;
-        private boolean shadow = false;
         private int shadowColor = Color.rgb(0, 0, 0);
-        private float shadowDepth = 1.0f;
+        private float shadowDepth = 0.0f;
 
         Builder(Button.Event eventHandler, Rect region) {
             this.eventHandler = eventHandler;
@@ -80,8 +78,7 @@ public class Button extends Widget {
             this.depth = depth;
             return this;
         }
-        Builder shadow(int shadowColor, float shadowDepth) {
-            this.shadow = true;
+        Builder fontShadow(int shadowColor, float shadowDepth) {
             this.shadowColor = shadowColor;
             this.shadowDepth = shadowDepth;
             return this;
@@ -101,9 +98,9 @@ public class Button extends Widget {
         fontColor = builder.fontColor;
         fontName = builder.fontName;
         layer = builder.layer;
-        shadow = builder.shadow;
-        shadowColor = builder.shadowColor;
-        shadowDepth = builder.shadowDepth;
+        fontShadowColor = builder.shadowColor;
+        fontShadowDepth = builder.shadowDepth;
+        message = builder.message;
 
         if (!builder.imageSpriteAsset.equals("")) {
             imageSprite = new Sprite.Builder(builder.imageSpriteAsset)
@@ -116,7 +113,7 @@ public class Button extends Widget {
         }
 
         if (builder.message != null) {
-            setMessage(builder.message);
+            setMessage(message);
         }
     }
 
@@ -249,35 +246,52 @@ public class Button extends Widget {
      */
     public void setMessage(String message) {
         if (messageSprite == null) {
-            if (shadow) {
-                messageSprite = new TextSprite.Builder("button" + UID++, message, fontSize)
-                        .fontColor(fontColor).fontName(fontName)
-                        .bgColor(Color.argb(0, 0, 0, 0))
-                        .shadow(shadowColor, shadowDepth)
-                        .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
-                        .verticalAlign(Layout.Alignment.ALIGN_CENTER)
-                        .size(new SizeF(getRegion().size()))
-                        .smooth(true).depth(0.3f)
-                        .layer(layer).visible(false).build();
-            } else {
-                messageSprite = new TextSprite.Builder("button" + UID++, message, fontSize)
-                        .fontColor(fontColor).fontName(fontName)
-                        .bgColor(Color.argb(0, 0, 0, 0))
-                        .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
-                        .verticalAlign(Layout.Alignment.ALIGN_CENTER)
-                        .size(new SizeF(getRegion().size()))
-                        .smooth(true).depth(0.3f)
-                        .layer(layer).visible(false).build();
-            }
+            messageSprite = new TextSprite.Builder("button" + UID++, message, fontSize)
+                    .fontColor(fontColor).fontName(fontName)
+                    .shadow(fontShadowColor, fontShadowDepth)
+                    .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                    .verticalAlign(Layout.Alignment.ALIGN_CENTER)
+                    .size(new SizeF(getRegion().size()))
+                    .smooth(true).depth(0.3f)
+                    .layer(layer).visible(false).build();
             addSprite(messageSprite);
         } else {
+            messageSprite.setFontColor(fontColor);
+            messageSprite.setShadow(fontShadowColor, fontShadowDepth);
             messageSprite.setText(message);
+        }
+    }
+
+    /**
+     *
+     * @param fontColor
+     */
+    public void setFontColor(int fontColor) {
+        this.fontColor = fontColor;
+    }
+
+    /**
+     *
+     * @param fontShadowColor
+     */
+    public void setFontShadow(int fontShadowColor, float fontShadowDepth) {
+        this.fontShadowColor = fontShadowColor;
+        this.fontShadowDepth = fontShadowDepth;
+    }
+
+    /**
+     *
+     */
+    public void redraw() {
+        if (message != null) {
+            setMessage(message);
         }
     }
 
     private static int UID = 0;
 
     private String name;
+    private String message;
     private Event eventHandler;
     private TextSprite messageSprite = null;
     private float fontSize;
@@ -288,7 +302,6 @@ public class Button extends Widget {
     private int imageSpriteSet = 0;
     private boolean pressed = false;
     private boolean disabled = false;
-    private boolean shadow;
-    private int shadowColor;
-    private float shadowDepth;
+    private int fontShadowColor;
+    private float fontShadowDepth;
 }

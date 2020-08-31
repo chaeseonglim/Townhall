@@ -96,7 +96,7 @@ public class MainMenu extends World
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
                 .message("게임 시작").fontSize(29).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
         startButton.setImageSpriteSet(0);
         startButton.show();
@@ -107,7 +107,7 @@ public class MainMenu extends World
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
                 .message("설정").fontSize(29).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
         settingButton.setImageSpriteSet(0);
         settingButton.show();

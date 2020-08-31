@@ -1,9 +1,7 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.text.Layout;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
@@ -54,7 +52,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(closeButton);
 
@@ -65,7 +63,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 .message("홈").imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(235, 235, 235), 1.0f)
+                .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .layer(getLayer() + 1).build();
         addWidget(toHomeButton);
 
@@ -105,9 +103,9 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                             .imageSpriteAsset("unit_upgrade_btn.png")
                             .numImageSpriteSet(4)
                             .message(" ").fontSize(18)
-                            .fontColor(Color.rgb(235, 235, 235))
                             .fontName("neodgm.ttf")
-                            .shadow(Color.rgb(35, 35, 35), 1.0f)
+                            .fontColor(Color.rgb(205, 205, 205))
+                            .fontShadow(Color.rgb(35, 35, 35), 1.0f)
                             .layer(getLayer() + 1).build();
             upgradableButtons[i].hide();
             upgradableButtons[i].setFollowParentVisibility(false);
@@ -232,15 +230,17 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
 
             for (int i = 0; i < 6; ++ i) {
                 Upgradable upgradable = Upgradable.values()[i+selectedUnitClass.ordinal()*6];
-                upgradableButtons[i].setMessage(upgradable.getTitle()+"\nLv."+
-                        upgradable.getLevel(Tribe.Faction.VILLAGER));
                 int alpha = (upgradable == selectedUpgradable)? 1 : 0;
                 if (upgradable.getParent() == null ||
                         upgradable.getParent().getLevel(Tribe.Faction.VILLAGER) > 0) {
                     upgradableButtons[i].setImageSpriteSet(0 + alpha);
+                    upgradableButtons[i].setFontColor(Color.rgb(61, 61, 61));
+                    upgradableButtons[i].setFontShadow(Color.rgb(235, 235, 235), 1.0f);
                 } else {
                     upgradableButtons[i].setImageSpriteSet(2 + alpha);
                 }
+                upgradableButtons[i].setMessage(upgradable.getTitle()+"\nLv."+
+                        upgradable.getLevel(Tribe.Faction.VILLAGER));
                 upgradableButtons[i].show();
             }
 
