@@ -5,7 +5,6 @@ public class Villager extends Tribe {
     private static final String LOG_TAG = "Villager";
 
     public Villager(Tribe.Event eventHandler, GameMap map, int startingGold) {
-
         super(eventHandler, Faction.VILLAGER, map);
 
         this.gold = startingGold;

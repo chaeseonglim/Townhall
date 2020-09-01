@@ -7,8 +7,7 @@ import java.util.ArrayList;
 
 public class Viking extends HostileTribe {
 
-    public Viking(Event eventHandler, GameMap map, Villager villager) {
-
-        super(eventHandler, Faction.VIKING, map, villager);
+    public Viking(Event eventHandler, GameMap map, Villager villager, Mission mission) {
+        super(eventHandler, Faction.VIKING, map, villager, mission);
     }
 }

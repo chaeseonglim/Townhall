@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public abstract class HostileTribe extends Tribe {
-
     private static final String LOG_TAG = "HostileTribe";
 
     enum Policy {
@@ -24,9 +23,11 @@ public abstract class HostileTribe extends Tribe {
         ANY
     }
 
-    public HostileTribe(Event eventHandler, Faction faction, GameMap map, Villager villager) {
+    public HostileTribe(Event eventHandler, Faction faction, GameMap map, Villager villager,
+                        Mission mission) {
         super(eventHandler, faction, map);
         this.villager = villager;
+        this.mission = mission;
     }
 
     /**
@@ -77,39 +78,40 @@ public abstract class HostileTribe extends Tribe {
      * @return
      */
     protected Unit.UnitClass selectUnitToSpawn(UnitSpawnType spawnType) {
-        int minRand = 1;
-        int maxRand = Unit.UnitClass.values().length;
-
+        int highestClassOrdinal = Unit.UnitClass.values().length;
         if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 2 && getSquads().size() < 2) {
-            maxRand -= 4;
+            highestClassOrdinal -= 4;
         } else if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 3 && getSquads().size() < 3) {
-            maxRand -= 3;
+            highestClassOrdinal -= 3;
         } else if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 5 && getSquads().size() < 5) {
-            maxRand -= 2;
+            highestClassOrdinal -= 2;
         } else if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 7 && getSquads().size() < 7) {
-            maxRand -= 1;
+            highestClassOrdinal -= 1;
         }
 
         Unit.UnitClass selectedUnitClass = null;
-        if (spawnType == UnitSpawnType.MELEE) {
-            while (selectedUnitClass == null ||
-                    selectedUnitClass.unitClassType() != Unit.UnitClassType.MELEE_FIGHTER &&
-                    selectedUnitClass.unitClassType() != Unit.UnitClassType.MELEE_HEALER &&
-                    selectedUnitClass.unitClassType() != Unit.UnitClassType.MELEE_SUPPORTER) {
-                selectedUnitClass =
-                        Unit.UnitClass.values()[(int) (Math.random() * (maxRand - minRand) + minRand)];
+        ArrayList<Unit.UnitClass> possibleUnitClasses = new ArrayList<>();
+
+        for (Unit.UnitClass unitClass: Unit.UnitClass.values()) {
+            if (mission.getRecruitAvailable()[unitClass.ordinal()] && highestClassOrdinal > unitClass.ordinal()) {
+                if (spawnType == UnitSpawnType.MELEE && (
+                    unitClass.unitClassType() == Unit.UnitClassType.MELEE_FIGHTER ||
+                            unitClass.unitClassType() == Unit.UnitClassType.MELEE_HEALER ||
+                            unitClass.unitClassType() == Unit.UnitClassType.MELEE_SUPPORTER
+                ) ) {
+                    possibleUnitClasses.add(unitClass);
+                } else if (spawnType == UnitSpawnType.RANGED && (
+                        unitClass.unitClassType() == Unit.UnitClassType.RANGED_FIGHTER ||
+                                unitClass.unitClassType() == Unit.UnitClassType.RANGED_HEALER ||
+                                unitClass.unitClassType() == Unit.UnitClassType.RANGED_SUPPORTER
+                ) ) {
+                    possibleUnitClasses.add(unitClass);
+                } else if (unitClass.unitClassType() != Unit.UnitClassType.CIVIL) {
+                    possibleUnitClasses.add(unitClass);
+                }
             }
-        } else if (spawnType == UnitSpawnType.RANGED) {
-            while (selectedUnitClass == null ||
-                    selectedUnitClass.unitClassType() != Unit.UnitClassType.RANGED_FIGHTER &&
-                    selectedUnitClass.unitClassType() != Unit.UnitClassType.RANGED_HEALER &&
-                    selectedUnitClass.unitClassType() != Unit.UnitClassType.RANGED_SUPPORTER) {
-                selectedUnitClass =
-                        Unit.UnitClass.values()[(int) (Math.random() * (maxRand - minRand) + minRand)];
-            }
-        } else {
-            selectedUnitClass = Unit.UnitClass.values()[(int)(Math.random()*(maxRand-minRand)+minRand)];
         }
+        selectedUnitClass = Unit.UnitClass.values()[(int)(Math.random()*possibleUnitClasses.size())];
 
         return selectedUnitClass;
     }
@@ -407,6 +409,7 @@ public abstract class HostileTribe extends Tribe {
     protected static final int UPGRADING_PROGRESSIVE_THRESHOLD = 3000;
 
     protected Villager villager;
+    protected Mission mission;
     protected Policy policy = Policy.EXPANSION;
     protected OffsetCoord strategicTarget = null;
 

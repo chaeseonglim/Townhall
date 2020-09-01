@@ -2,9 +2,8 @@ package com.lifejourney.townhall;
 
 public class Rebel extends HostileTribe {
 
-    public Rebel(Event eventHandler, GameMap map, Villager villager) {
-
-        super(eventHandler, Faction.REBEL, map, villager);
+    public Rebel(Event eventHandler, GameMap map, Villager villager, Mission mission) {
+        super(eventHandler, Faction.REBEL, map, villager, mission);
 
         policy = Policy.ASSAULT;
         strategicTarget = villager.getHeadquarterPosition();

@@ -41,8 +41,8 @@ public class MainGame extends World
         // Build tribe
         Villager villager = new Villager(this, map, mission.getStartingGold());
         tribes.add(villager);
-        tribes.add(new Bandit(this, map, villager));
-        tribes.add(new Viking(this, map, villager));
+        tribes.add(new Bandit(this, map, villager, mission));
+        tribes.add(new Viking(this, map, villager, mission));
 
         // Build UIs
         economyBar = new EconomyBar(villager, new Rect(20, 10, 440, 64),
