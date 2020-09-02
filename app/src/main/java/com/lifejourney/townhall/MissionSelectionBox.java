@@ -121,9 +121,9 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         }
 
         // Mission title
-        PointF textPosition = new PointF(0, -210);
-        addTitleText("챕터 " + (selectedMission.ordinal() + 1) + " - " + selectedMission.getTitle(),
-                new SizeF(480, 40), textPosition.clone(), 34,
+        PointF textPosition = new PointF(0, -208);
+        addTitleText((selectedMission.ordinal() + 1) + " - " + selectedMission.getTitle(),
+                new SizeF(480, 40), textPosition.clone(), 30,
                 Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_CENTER,
                 Layout.Alignment.ALIGN_CENTER);
 
@@ -241,7 +241,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         addSprite(new TextSprite.Builder("text", text, fontSize)
                 .fontColor(fontColor)
                 .fontName("neodgm.ttf")
-                .shadow(Color.rgb(61, 61, 61), 4.0f)
+                .shadow(Color.rgb(35, 35, 35), 2.0f)
                 .horizontalAlign(horizontalAlignment).verticalAlign(verticalAlignment)
                 .size(size).positionOffset(position)
                 .smooth(true).depth(0.1f)

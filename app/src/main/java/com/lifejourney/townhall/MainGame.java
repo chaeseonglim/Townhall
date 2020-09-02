@@ -43,6 +43,7 @@ public class MainGame extends World
         tribes.add(villager);
         tribes.add(new Bandit(this, map, villager, mission));
         tribes.add(new Viking(this, map, villager, mission));
+        tribes.add(new Rebel(this, map, villager, mission));
 
         // Build UIs
         economyBar = new EconomyBar(villager, new Rect(20, 10, 440, 64),
@@ -176,7 +177,7 @@ public class MainGame extends World
                     map.redraw(territory.getMapPosition());
                 }
             } else if (territory.getFogState() == Territory.FogState.CLEAR) {
-                territory.setFogState(Territory.FogState.MIST);
+                //territory.setFogState(Territory.FogState.MIST);
                 map.redraw(territory.getMapPosition());
             }
         }
@@ -1122,7 +1123,23 @@ public class MainGame extends World
         newsBar.addNews(news);
     }
 
-    private final static float MUSIC_VOLUME = 0.3f;
+    /**
+     *
+     * @param msg
+     */
+    public void popupMsgBox(String msg) {
+        pauseForWidget();
+
+        Rect viewport = Engine2D.GetInstance().getViewport();
+        MessageBox messageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                        353, 275), msg)
+                .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                .fontName("neodgm.ttf")
+                .build();
+        messageBox.show();
+        addWidget(messageBox);
+    }
 
     private Event eventHandler;
     private int playSpeedReturnedFromWidget = 0;

@@ -7,6 +7,7 @@ public class Rebel extends HostileTribe {
 
         policy = Policy.ASSAULT;
         strategicTarget = villager.getHeadquarterPosition();
+        retreatable = false;
     }
 
     @Override

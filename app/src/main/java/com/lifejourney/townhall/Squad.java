@@ -1409,6 +1409,21 @@ public class Squad extends Object implements Controllable {
         return deployed;
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isRetreatable() {
+        return retreatable;
+    }
+
+    /**
+     *
+     */
+    public void setRetretable(boolean retreatable) {
+        this.retreatable = retreatable;
+    }
+
     private final static int SPRITE_LAYER = 5;
     private final static float MIN_DISTANCE_START_DRAGGING = 30;
     private final static SizeF ICON_SPRITE_SIZE = new SizeF(80, 80);
@@ -1442,4 +1457,5 @@ public class Squad extends Object implements Controllable {
     private PointF firstDraggingGamePosition = null;
     private int[] shrineBonus = new int[Tribe.ShrineBonus.values().length];
     private boolean deployed = false;
+    private boolean retreatable = true;
 }

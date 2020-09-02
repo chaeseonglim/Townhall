@@ -173,6 +173,7 @@ public abstract class Tribe implements Squad.Event {
      */
     public Squad spawnSquad(PointF position, Unit.UnitClass... unitClass) {
         Squad squad = new Squad.Builder(this, position, map, getFaction()).build();
+        squad.setRetretable(retreatable);
         if (unitClass.length >= 1) {
             squad.spawnUnit(unitClass[0]);
         }
@@ -291,6 +292,24 @@ public abstract class Tribe implements Squad.Event {
         return defeated;
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean isRetreatable() {
+        return retreatable;
+    }
+
+    /**
+     *
+     */
+    public void setRetretable(boolean retreatable) {
+        this.retreatable = retreatable;
+
+        for (Squad squad: getSquads()) {
+            squad.setRetretable(retreatable);
+        }
+    }
     private Event eventHandler;
     private Faction faction;
     private GameMap map;
@@ -299,5 +318,6 @@ public abstract class Tribe implements Squad.Event {
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Territory> territories;
     private int[] shrineBonuses = new int[ShrineBonus.values().length];
-    protected boolean defeated = false;
+    protected boolean defeated;
+    protected boolean retreatable = true;
 }

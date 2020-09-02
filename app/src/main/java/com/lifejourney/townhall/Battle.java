@@ -158,7 +158,7 @@ public class Battle {
                     defender.close();
                 }
             } else { // Try to retreat loser
-                if (losingOne.getHealthPercentage() < RETRETABLE_HEALTH_PERCENTAGE) {
+                if (!losingOne.isRetreatable() && losingOne.getHealthPercentage() < RETRETABLE_HEALTH_PERCENTAGE) {
                     // Failed to retreat
                     return;
                 }
