@@ -402,7 +402,7 @@ public class MainGame extends World
         squadTerritory.addSquad(squad);
         addSquad(squad);
 
-        if (newsBar != null && squad.getFaction() != Tribe.Faction.VILLAGER) {
+        if (newsBar != null && squad.getFaction() != Tribe.Faction.VILLAGER && getDays() > 0) {
             newsBar.addNews(squad.getFaction().toGameString() + "이 새로운 부대를 만들었습니다.");
         }
     }

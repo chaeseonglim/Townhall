@@ -68,7 +68,8 @@ enum Upgradable {
             "농장 개발 +3",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.WORKER
     ),
     WORKER_DOWNTOWN_DEVELOPMENT_SPEED(
             "도시 개발",
@@ -77,7 +78,8 @@ enum Upgradable {
             "도시 개발 +3",
             WORKER_FARM_DEVELOPMENT_SPEED,
             2000,
-            200
+            200,
+            Unit.UnitClass.WORKER
     ),
     WORKER_HAPPINESS(
             "행복도",
@@ -86,7 +88,8 @@ enum Upgradable {
             "주변 타일 행복도 +15",
             WORKER_DOWNTOWN_DEVELOPMENT_SPEED,
             3000,
-            300
+            300,
+            Unit.UnitClass.WORKER
     ),
     WORKER_MARKET_DEVELOPMENT_SPEED(
             "시장 개발",
@@ -95,7 +98,8 @@ enum Upgradable {
             "시장 개발 +3",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.WORKER
     ),
     WORKER_FORTRESS_DEVELOPMENT_SPEED(
             "요새 개발",
@@ -104,7 +108,8 @@ enum Upgradable {
             "요새 개발 +3",
             WORKER_MARKET_DEVELOPMENT_SPEED,
             2000,
-            200
+            200,
+            Unit.UnitClass.WORKER
     ),
     WORKER_DEFENSE(
             "지역 방어",
@@ -113,7 +118,8 @@ enum Upgradable {
             "주변 타일 방어도 +3",
             WORKER_FORTRESS_DEVELOPMENT_SPEED,
             3000,
-            300
+            300,
+            Unit.UnitClass.WORKER
     ),
 
     FIGHTER_MELEE_DAMAGE(
@@ -123,7 +129,8 @@ enum Upgradable {
             "근접 공격력 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.FIGHTER
     ),
     FIGHTER_MELEE_ATTACK_SPEED(
             "근접 공격 속도",
@@ -132,7 +139,8 @@ enum Upgradable {
             "근접 공격 속도 +15%",
             FIGHTER_MELEE_DAMAGE,
             2000,
-            200
+            200,
+            Unit.UnitClass.FIGHTER
     ),
     FIGHTER_CRITICAL_ATTACK(
             "치명타",
@@ -141,7 +149,8 @@ enum Upgradable {
             "치명타 확률 +15%",
             FIGHTER_MELEE_ATTACK_SPEED,
             3000,
-            300
+            300,
+            Unit.UnitClass.FIGHTER
     ),
     FIGHTER_ARMOR(
             "방어",
@@ -150,7 +159,8 @@ enum Upgradable {
             "방어 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.FIGHTER
     ),
     FIGHTER_MELEE_EVASION(
             "근접 회피",
@@ -159,7 +169,8 @@ enum Upgradable {
             "근접 회피 +15%",
             FIGHTER_ARMOR,
             2000,
-            200
+            200,
+            Unit.UnitClass.FIGHTER
     ),
     FIGHTER_BUFF(
             "아군 강화",
@@ -168,7 +179,8 @@ enum Upgradable {
             "아군 공격력 +15%",
             FIGHTER_MELEE_EVASION,
             3000,
-            300
+            300,
+            Unit.UnitClass.FIGHTER
     ),
 
     ARCHER_MELEE_EVASION(
@@ -178,7 +190,8 @@ enum Upgradable {
             "근접 회피 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.ARCHER
     ),
     ARCHER_ARMOR(
             "방어",
@@ -187,7 +200,8 @@ enum Upgradable {
             "방어 +15%",
             ARCHER_MELEE_EVASION,
             2000,
-            200
+            200,
+            Unit.UnitClass.ARCHER
     ),
     ARCHER_POINT_BLANK(
             "근접 화살 공격",
@@ -196,7 +210,8 @@ enum Upgradable {
             "근접 화살 피해량 +10%",
             ARCHER_ARMOR,
             3000,
-            300
+            300,
+            Unit.UnitClass.ARCHER
     ),
     ARCHER_RANGED_ATTACK_SPEED(
             "원거리 공격 속도",
@@ -205,7 +220,8 @@ enum Upgradable {
             "원거리 공격 속도 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.ARCHER
     ),
     ARCHER_RANGED_DAMAGE(
             "원거리 공격력",
@@ -214,7 +230,8 @@ enum Upgradable {
             "원거리 공격력 +15%",
             ARCHER_RANGED_ATTACK_SPEED,
             2000,
-            200
+            200,
+            Unit.UnitClass.ARCHER
     ),
     ARCHER_POISON_ARROW(
             "독 화살",
@@ -223,7 +240,8 @@ enum Upgradable {
             "독 피해량 +20%",
             ARCHER_RANGED_DAMAGE,
             3000,
-            300
+            300,
+            Unit.UnitClass.ARCHER
     ),
 
     HORSE_MAN_RANGED_EVASION(
@@ -233,7 +251,8 @@ enum Upgradable {
             "원거리 회피 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.HORSE_MAN
     ),
     HORSE_MAN_ARMOR(
             "방어",
@@ -242,7 +261,8 @@ enum Upgradable {
             "방어 +15%",
             HORSE_MAN_RANGED_EVASION,
             2000,
-            200
+            200,
+            Unit.UnitClass.HORSE_MAN
     ),
     HORSE_MAN_MOVE_SPEED(
             "쾌속 질주",
@@ -251,7 +271,8 @@ enum Upgradable {
             "이동 속도 +30%",
             HORSE_MAN_ARMOR,
             3000,
-            300
+            300,
+            Unit.UnitClass.HORSE_MAN
     ),
     HORSE_MAN_MELEE_ATTACK_SPEED(
             "근접 공격 속도",
@@ -260,7 +281,8 @@ enum Upgradable {
             "근접 공격 속도 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.HORSE_MAN
     ),
     HORSE_MAN_MELEE_DAMAGE(
             "근접 공격력",
@@ -269,7 +291,8 @@ enum Upgradable {
             "근접 공격력 +15%",
             HORSE_MAN_MELEE_ATTACK_SPEED,
             2000,
-            200
+            200,
+            Unit.UnitClass.HORSE_MAN
     ),
     HORSE_MAN_STUN(
             "기절",
@@ -278,7 +301,8 @@ enum Upgradable {
             "기절 확률 +10%",
             HORSE_MAN_MELEE_DAMAGE,
             3000,
-            300
+            300,
+            Unit.UnitClass.HORSE_MAN
     ),
 
     HEALER_HEAL_SPEED(
@@ -288,7 +312,8 @@ enum Upgradable {
             "치유 속도 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.HEALER
     ),
     HEALER_HEAL_POWER(
             "치유력",
@@ -297,7 +322,8 @@ enum Upgradable {
             "치유력 강화 +15%",
             HEALER_HEAL_SPEED,
             2000,
-            200
+            200,
+            Unit.UnitClass.HEALER
     ),
     HEALER_DOT_HEAL(
             "기적의 치유",
@@ -306,7 +332,8 @@ enum Upgradable {
             "전체 점진적인 치유력 +20%",
             HEALER_HEAL_POWER,
             3000,
-            300
+            300,
+            Unit.UnitClass.HEALER
     ),
     HEALER_MELEE_EVASION(
             "근접 회피",
@@ -315,7 +342,8 @@ enum Upgradable {
             "근접 회피 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.HEALER
     ),
     HEALER_RANGED_EVASION(
             "원거리 회피",
@@ -324,7 +352,8 @@ enum Upgradable {
             "원거리 회피 +15%",
             HEALER_MELEE_EVASION,
             2000,
-            200
+            200,
+            Unit.UnitClass.HEALER
     ),
     HEALER_SPLASH_DAMAGE(
             "치유의 가시",
@@ -333,7 +362,8 @@ enum Upgradable {
             "치유시 범위 피해량 +20%",
             HEALER_RANGED_EVASION,
             3000,
-            300
+            300,
+            Unit.UnitClass.HEALER
     ),
 
     CANNON_RANGED_ATTACK_SPEED(
@@ -343,7 +373,8 @@ enum Upgradable {
             "원거리 공격 속도 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.CANNON
     ),
     CANNON_RANGED_DAMAGE(
             "원거리 공격력",
@@ -352,7 +383,8 @@ enum Upgradable {
             "원거리 공격력 +15%",
             CANNON_RANGED_ATTACK_SPEED,
             2000,
-            200
+            200,
+            Unit.UnitClass.CANNON
     ),
     CANNON_SPLASH_RANGE(
             "피해 범위",
@@ -361,7 +393,8 @@ enum Upgradable {
             "피해 범위 +30%",
             CANNON_RANGED_DAMAGE,
             3000,
-            300
+            300,
+            Unit.UnitClass.CANNON
     ),
     CANNON_ARMOR(
             "방어",
@@ -370,7 +403,8 @@ enum Upgradable {
             "방어 강화 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.CANNON
     ),
     CANNON_MOVE_SPEED(
             "이동 속도",
@@ -379,7 +413,8 @@ enum Upgradable {
             "이동 속도 +30%",
             CANNON_ARMOR,
             2000,
-            200
+            200,
+            Unit.UnitClass.CANNON
     ),
     CANNON_SLOWNESS(
             "끈적이 포탄",
@@ -388,7 +423,8 @@ enum Upgradable {
             "피해시 이속 -15%",
             CANNON_MOVE_SPEED,
             3000,
-            300
+            300,
+            Unit.UnitClass.CANNON
     ),
 
     PALADIN_RANGED_EVASION(
@@ -398,7 +434,8 @@ enum Upgradable {
             "원거리 회피 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.PALADIN
     ),
     PALADIN_MELEE_EVASION(
             "근접 회피",
@@ -407,7 +444,8 @@ enum Upgradable {
             "근접 회피 +15%",
             PALADIN_RANGED_EVASION,
             2000,
-            200
+            200,
+            Unit.UnitClass.PALADIN
     ),
     PALADIN_INVINCIBLE(
             "무적",
@@ -416,7 +454,8 @@ enum Upgradable {
             "무적 지속시간 +10%",
             PALADIN_RANGED_EVASION,
             3000,
-            300
+            300,
+            Unit.UnitClass.PALADIN
     ),
     PALADIN_HEALTH(
             "체력 증가",
@@ -425,7 +464,8 @@ enum Upgradable {
             "체력 +15%",
             null,
             1000,
-            100
+            100,
+            Unit.UnitClass.PALADIN
     ),
     PALADIN_MELEE_DAMAGE(
             "근접 공격력",
@@ -434,7 +474,8 @@ enum Upgradable {
             "근접 공격력 +15%",
             PALADIN_HEALTH,
             2000,
-            200
+            200,
+            Unit.UnitClass.PALADIN
     ),
     PALADIN_GUARDIAN(
             "아군 보호",
@@ -443,11 +484,12 @@ enum Upgradable {
             "아군 일반 피해 전환 +30%",
             PALADIN_MELEE_DAMAGE,
             3000,
-            300
+            300,
+            Unit.UnitClass.PALADIN
     );
 
     Upgradable(String title, String descriptionLv1, String descriptionLv2, String descriptionLv3, Upgradable parent,
-               int purchaseCost, int upkeepCost) {
+               int purchaseCost, int upkeepCost, Unit.UnitClass relatedUnitClass) {
         this.title = title;
         this.descriptionLv1 = descriptionLv1;
         this.descriptionLv2 = descriptionLv2;
@@ -455,6 +497,7 @@ enum Upgradable {
         this.parent = parent;
         this.purchaseCost = purchaseCost;
         this.upkeepCost = upkeepCost;
+        this.relatedUnitClass = relatedUnitClass;
     }
 
     String getTitle() {
@@ -493,6 +536,10 @@ enum Upgradable {
         return upkeepCost;
     }
 
+    Unit.UnitClass getRelatedUnitClass() {
+        return relatedUnitClass;
+    }
+
     static void reset() {
         for (Upgradable upgradable : Upgradable.values()) {
             Arrays.fill(upgradable.levels, 0);
@@ -516,4 +563,5 @@ enum Upgradable {
     private int purchaseCost;
     private int upkeepCost;
     private int[] levels = new int[Tribe.Faction.values().length];
+    private Unit.UnitClass relatedUnitClass;
 }

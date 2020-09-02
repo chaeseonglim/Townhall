@@ -1,6 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.core.util.Pair;
@@ -301,6 +300,14 @@ public class Squad extends Object implements Controllable {
      *
      * @return
      */
+    public int getHealthBonus() {
+        return getShrineBonus(Tribe.ShrineBonus.LOVE);
+    }
+
+    /**
+     *
+     * @return
+     */
     public int getAttackDamageBonus() {
         return getAttackDamageBonusFromTerritory();
     }
@@ -310,7 +317,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int getAttackSpeedBonus() {
-        return getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED);
+        return getShrineBonus(Tribe.ShrineBonus.WIND);
     }
 
     /**
@@ -326,7 +333,7 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int getHealPowerBonus() {
-        return getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER);
+        return getShrineBonus(Tribe.ShrineBonus.HEAL);
     }
 
     /**
@@ -480,6 +487,10 @@ public class Squad extends Object implements Controllable {
 
         if (eventAction == MotionEvent.ACTION_DOWN) {
             setTouching(true);
+            if (!isFocused()) {
+                // If it's not set to focused, set focus first
+                setFocus(true);
+            }
             result = true;
         }
         else if (isTouching()) {
@@ -631,6 +642,9 @@ public class Squad extends Object implements Controllable {
                         stopMoving();
                         return false;
                     }
+                } else {
+                    stopMoving();
+                    return false;
                 }
             } else {
                 // If there's no path to target, cancel moving

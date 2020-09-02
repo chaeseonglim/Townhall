@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.SizeF;
@@ -121,7 +119,7 @@ public class Territory {
                 10,
                 0,
                 3,
-                Tribe.ShrineBonus.UNIT_ATTACK_SPEED,
+                Tribe.ShrineBonus.WIND,
                 -2
         ),
         SHRINE_HEAL(
@@ -134,7 +132,7 @@ public class Territory {
                 10,
                 0,
                 3,
-                Tribe.ShrineBonus.UNIT_HEAL_POWER,
+                Tribe.ShrineBonus.HEAL,
                 2
         ),
         SHRINE_LOVE(
@@ -147,7 +145,7 @@ public class Territory {
                 10,
                 0,
                 3,
-                Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST,
+                Tribe.ShrineBonus.LOVE,
                 2
         ),
         SHRINE_PROSPER(
@@ -160,7 +158,7 @@ public class Territory {
                 10,
                 0,
                 3,
-                Tribe.ShrineBonus.TERRITORY_GOLD_BOOST,
+                Tribe.ShrineBonus.PROSPERITY,
                 2
         ),
         UNKNOWN(
@@ -306,7 +304,16 @@ public class Territory {
         this.facilityExps = new int[Facility.values().length];
         Arrays.fill(this.facilityExps, 0);
         this.enemyFacilityIndex = new int[3];
-        for (int i = 0; i < 3; ++i) {
+        int enemyFacilityCount = 3;
+        if (terrain == Terrain.HEADQUARTER ||
+            terrain == Terrain.RIVER ||
+            terrain == Terrain.MOUNTAIN) {
+            enemyFacilityCount = 0;
+        } else if (terrain == Terrain.FOREST ||
+            terrain == Terrain.HILL) {
+            enemyFacilityCount = 2;
+        }
+        for (int i = 0; i < enemyFacilityCount; ++i) {
             this.enemyFacilityIndex[i] = (terrain == Terrain.HEADQUARTER)? 0 : (int) (Math.random() * 6);
         }
         this.developmentPolicy = new DevelopmentPolicy[Facility.values().length];
@@ -316,7 +323,6 @@ public class Territory {
             Arrays.fill(this.developmentPolicy, DevelopmentPolicy.DETERIORATE);
         }
         this.happiness = 50;
-        //this.fogState = FogState.CLEAR;
         this.fogState = (this.faction == Tribe.Faction.VILLAGER)? FogState.CLEAR : FogState.CLOUDY;
     }
 
@@ -1179,7 +1185,7 @@ public class Territory {
     private final static int[] REQUIRED_FACILITY_EXP_FOR_LEVEL_UP =
             new int[] { 500, 1000, 2000, 4000, 8000};
     private final static int FACILITY_EXP_STEP = 10;
-    private final static int GOLD_STEP = 5;
+    private final static int GOLD_STEP = 10;
     private final static int POPULATION_STEP = 5;
     private final static int HAPPINESS_STEP = 5;
     private final static int BASE_HAPPINESS = 50;

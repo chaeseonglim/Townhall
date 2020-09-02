@@ -158,7 +158,7 @@ public class Battle {
                     defender.close();
                 }
             } else { // Try to retreat loser
-                if (!losingOne.isRetreatable() && losingOne.getHealthPercentage() < RETRETABLE_HEALTH_PERCENTAGE) {
+                if (!losingOne.isRetreatable() || losingOne.getHealthPercentage() < RETREATABLE_HEALTH_PERCENTAGE) {
                     // Failed to retreat
                     return;
                 }
@@ -236,7 +236,7 @@ public class Battle {
     private int FIGHTING_EXP = 2;
     private int SUPPORTING_EXP = 1;
     private int BATTLE_TIME_LIMIT = 1000;
-    private float RETRETABLE_HEALTH_PERCENTAGE = 0.2f;
+    private float RETREATABLE_HEALTH_PERCENTAGE = 0.2f;
 
     private GameMap map;
     private OffsetCoord mapPosition;

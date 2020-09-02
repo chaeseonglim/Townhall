@@ -35,10 +35,10 @@ public abstract class Tribe implements Squad.Event {
     }
 
     enum ShrineBonus {
-        UNIT_ATTACK_SPEED,
-        UNIT_HEAL_POWER,
-        TERRITORY_GOLD_BOOST,
-        TERRITORY_POPULATION_BOOST;
+        WIND,
+        HEAL,
+        PROSPERITY,
+        LOVE;
     }
 
     public interface Event extends Squad.Event {
@@ -77,10 +77,10 @@ public abstract class Tribe implements Squad.Event {
 
         // Set squad bonus
         for (Squad squad : squads) {
-            squad.setShrineBonus(ShrineBonus.UNIT_ATTACK_SPEED,
-                    getShrineBonus(ShrineBonus.UNIT_ATTACK_SPEED));
-            squad.setShrineBonus(ShrineBonus.UNIT_HEAL_POWER,
-                    getShrineBonus(ShrineBonus.UNIT_HEAL_POWER));
+            squad.setShrineBonus(ShrineBonus.WIND,
+                    getShrineBonus(ShrineBonus.WIND));
+            squad.setShrineBonus(ShrineBonus.HEAL,
+                    getShrineBonus(ShrineBonus.HEAL));
         }
     }
 

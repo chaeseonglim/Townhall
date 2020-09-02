@@ -5,17 +5,12 @@ import android.text.Layout;
 import android.view.MotionEvent;
 
 import com.lifejourney.engine2d.Engine2D;
-import com.lifejourney.engine2d.Line;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
-import com.lifejourney.engine2d.RectF;
-import com.lifejourney.engine2d.Rectangle;
 import com.lifejourney.engine2d.SizeF;
 import com.lifejourney.engine2d.Sprite;
 import com.lifejourney.engine2d.TextSprite;
 import com.lifejourney.engine2d.Widget;
-
-import java.util.ArrayList;
 
 public class HomeBox extends Widget implements Button.Event {
 
@@ -216,7 +211,7 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
-        if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) != 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.HEAL) != 0) {
             textPosition.offset(-65, 30);
             addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
@@ -225,7 +220,7 @@ public class HomeBox extends Widget implements Button.Event {
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
         }
-        if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) != 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.WIND) != 0) {
             textPosition.offset(-65, 30);
             addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
@@ -234,7 +229,7 @@ public class HomeBox extends Widget implements Button.Event {
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
         }
-        if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_GOLD_BOOST) != 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.PROSPERITY) != 0) {
             textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
@@ -243,7 +238,7 @@ public class HomeBox extends Widget implements Button.Event {
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
         }
-        if (villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST) != 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.LOVE) != 0) {
             textPosition.offset(-65, 30);
             addIcon("health.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
@@ -252,10 +247,10 @@ public class HomeBox extends Widget implements Button.Event {
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
         }
-        if (villager.getShrineBonus(Tribe.ShrineBonus.UNIT_HEAL_POWER) == 0 &&
-                villager.getShrineBonus(Tribe.ShrineBonus.UNIT_ATTACK_SPEED) == 0 &&
-                villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_GOLD_BOOST) == 0 &&
-                villager.getShrineBonus(Tribe.ShrineBonus.TERRITORY_POPULATION_BOOST) == 0) {
+        if (villager.getShrineBonus(Tribe.ShrineBonus.HEAL) == 0 &&
+                villager.getShrineBonus(Tribe.ShrineBonus.WIND) == 0 &&
+                villager.getShrineBonus(Tribe.ShrineBonus.PROSPERITY) == 0 &&
+                villager.getShrineBonus(Tribe.ShrineBonus.LOVE) == 0) {
             textPosition.offset(0, 30);
             addText("없음", new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),

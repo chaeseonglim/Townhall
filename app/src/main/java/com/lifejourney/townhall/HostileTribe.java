@@ -59,16 +59,13 @@ public abstract class HostileTribe extends Tribe {
      *
      */
     private void collect() {
-
         if (collectUpdateTimeLeft-- > 0) {
             return;
         }
         collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
 
         gold += BASE_INCOME;
-        for (Territory territory: getTerritories()) {
-            gold += INCOME_PER_TERRITORY;
-        }
+        gold += INCOME_PER_TERRITORY * getTerritories().size();
 
         Log.i(LOG_TAG, getFaction().toGameString() + " gold: " + gold);
     }
@@ -78,22 +75,21 @@ public abstract class HostileTribe extends Tribe {
      * @return
      */
     protected Unit.UnitClass selectUnitToSpawn(UnitSpawnType spawnType) {
-        int highestClassOrdinal = Unit.UnitClass.values().length;
-        if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 2 && getSquads().size() < 2) {
-            highestClassOrdinal -= 4;
-        } else if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 3 && getSquads().size() < 3) {
-            highestClassOrdinal -= 3;
-        } else if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 5 && getSquads().size() < 5) {
-            highestClassOrdinal -= 2;
-        } else if (recruitingProgressive / RECRUITING_PROGRESSIVE_THRESHOLD < 7 && getSquads().size() < 7) {
-            highestClassOrdinal -= 1;
+        int highestClassOrdinal;
+        int threshold = (int) (RECRUITING_PROGRESSIVE_THRESHOLD * difficultyFactor);
+        if (recruitingProgressive / threshold > 6 || getSquads().size() > 6) {
+            highestClassOrdinal = Unit.UnitClass.PALADIN.ordinal();
+        } else if (recruitingProgressive / threshold > 4 || getSquads().size() > 4) {
+            highestClassOrdinal = Unit.UnitClass.CANNON.ordinal();
+        } else if (recruitingProgressive / threshold > 2 || getSquads().size() > 2) {
+            highestClassOrdinal = Unit.UnitClass.HEALER.ordinal();
+        } else {
+            highestClassOrdinal = Unit.UnitClass.ARCHER.ordinal();
         }
 
-        Unit.UnitClass selectedUnitClass = null;
         ArrayList<Unit.UnitClass> possibleUnitClasses = new ArrayList<>();
-
         for (Unit.UnitClass unitClass: Unit.UnitClass.values()) {
-            if (mission.getRecruitAvailable()[unitClass.ordinal()] && highestClassOrdinal > unitClass.ordinal()) {
+            if (mission.getRecruitAvailable()[unitClass.ordinal()] && highestClassOrdinal >= unitClass.ordinal()) {
                 if (spawnType == UnitSpawnType.MELEE && (
                     unitClass.unitClassType() == Unit.UnitClassType.MELEE_FIGHTER ||
                             unitClass.unitClassType() == Unit.UnitClassType.MELEE_HEALER ||
@@ -111,9 +107,8 @@ public abstract class HostileTribe extends Tribe {
                 }
             }
         }
-        selectedUnitClass = Unit.UnitClass.values()[(int)(Math.random()*possibleUnitClasses.size())];
 
-        return selectedUnitClass;
+        return possibleUnitClasses.get((int)(Math.random()*possibleUnitClasses.size()));
     }
 
     /**
@@ -123,8 +118,7 @@ public abstract class HostileTribe extends Tribe {
         if (recruitingUpdateTimeLeft-- > 0) {
             return;
         }
-        recruitingUpdateTimeLeft = SQUAD_RECRUITING_UPDATE_TIME;
-
+        recruitingUpdateTimeLeft = (int) (SQUAD_RECRUITING_UPDATE_TIME * difficultyFactor);
         recruitingProgressive += RECRUITING_PROGRESSIVE_DELTA;
         Log.i(LOG_TAG, getFaction().toGameString() + " progressive: " + recruitingProgressive);
 
@@ -146,17 +140,22 @@ public abstract class HostileTribe extends Tribe {
      *
      */
     protected void upgrade() {
-        if (upgradingProgressive++ > UPGRADING_PROGRESSIVE_THRESHOLD) {
+        if (upgradingProgressive++ > UPGRADING_PROGRESSIVE_THRESHOLD * difficultyFactor) {
+            ArrayList<Upgradable> upgradableCandidateList = new ArrayList<>();
             for (Upgradable upgradable : Upgradable.values()) {
-                if (upgradable.getLevel(getFaction()) < 3 && Math.random() > 0.5f) {
-                    upgradable.setLevel(getFaction(), upgradable.getLevel(getFaction()) + 1);
-                    getEventHandler().onTribeUpgraded(this, upgradable);
-                    break;
+                if (upgradable.getLevel(getFaction()) < 3 &&
+                        mission.getRecruitAvailable()[upgradable.getRelatedUnitClass().ordinal()]) {
+                    upgradableCandidateList.add(upgradable);
                 }
             }
-            upgradingProgressive -= UPGRADING_PROGRESSIVE_THRESHOLD;
-        }
 
+            Upgradable chosenUpgradable =
+                    upgradableCandidateList.get((int)(Math.random()*upgradableCandidateList.size()));
+            chosenUpgradable.setLevel(getFaction(), chosenUpgradable.getLevel(getFaction()) + 1);
+            getEventHandler().onTribeUpgraded(this, chosenUpgradable);
+
+            upgradingProgressive -= UPGRADING_PROGRESSIVE_THRESHOLD * difficultyFactor;
+        }
     }
 
     /**
@@ -169,17 +168,17 @@ public abstract class HostileTribe extends Tribe {
         policyDecisionUpdateTimeLeft = POLICY_DECISION_UPDATE_TIME;
 
         if (policyTransitionTimeLeft-- <= 0) {
-            float villagerBattleMetric = villager.getTotalBattleMetric();
-            float myBattleMetric = getTotalBattleMetric();
-
             Policy prevPolicy = policy;
 
-            if (myBattleMetric > villagerBattleMetric * 2.0f && getSquads().size() >= 4) {
-                policy = Policy.ASSAULT;
-            } else if (myBattleMetric * 2.0f < villagerBattleMetric) {
-                policy = Policy.DEFENSIVE;
-            } else {
-                policy = Policy.EXPANSION;
+            if (policy != Policy.DEFENSIVE) {
+                float villagerBattleMetric = villager.getTotalBattleMetric();
+                float myBattleMetric = getTotalBattleMetric();
+
+                if (myBattleMetric > villagerBattleMetric * 2.0f && getSquads().size() >= 4) {
+                    policy = Policy.ASSAULT;
+                } else {
+                    policy = Policy.EXPANSION;
+                }
             }
 
             if (prevPolicy != policy) {
@@ -218,6 +217,8 @@ public abstract class HostileTribe extends Tribe {
             } else {
                 strategicTarget = villager.getHeadquarterPosition();
             }
+        } else {
+            strategicTarget = null;
         }
     }
 
@@ -241,7 +242,8 @@ public abstract class HostileTribe extends Tribe {
      */
     protected void decideASquadTactic(final Squad squad) {
         if (squad.isFighting() || squad.isOccupying() || squad.isSupporting() ||
-                squad.isRecruiting() || squad.getHealthPercentage() <= SQUAD_ACTIVATE_THRESHOLD) {
+                squad.getUnits().size() < 3 || squad.isRecruiting() ||
+                squad.getHealthPercentage() <= SQUAD_ACTIVATE_THRESHOLD) {
             return;
         }
 
@@ -353,7 +355,7 @@ public abstract class HostileTribe extends Tribe {
             squad.seekTo(weakestTerritory.getMapPosition(), true);
         } else if (candidatesToExpansion.size() > 0) {
             // Go to strategic target if possible
-            if (candidatesToExpansion.contains(strategicTarget)) {
+            if (strategicTarget != null && candidatesToExpansion.contains(strategicTarget)) {
                 squad.seekTo(strategicTarget, true);
             } else {
                 // Else expansion
@@ -392,6 +394,22 @@ public abstract class HostileTribe extends Tribe {
         this.controlledByAI = controlledByAI;
     }
 
+    /**
+     *
+     * @param difficultyFactor
+     */
+    public void setDifficultyFactor(float difficultyFactor) {
+        this.difficultyFactor = difficultyFactor;
+    }
+
+    /**
+     *
+     * @param policy
+     */
+    public void setPolicy(Policy policy) {
+        this.policy = policy;
+    }
+
     protected static final int COLLECT_UPDATE_TIME = 50;
     protected static final int POLICY_DECISION_UPDATE_TIME = 130;
     protected static final int POLICY_TRANSITION_TIME = 300;
@@ -399,24 +417,25 @@ public abstract class HostileTribe extends Tribe {
     protected static final int TACTICAL_DECISION_UPDATE_TIME = 90;
     protected static final int SQUAD_CREATION_ALLOW_GOLD = 7000;
     protected static final int SQUAD_COUNT_LIMIT = 10;
-    protected static final int INCOME_PER_TERRITORY = 20;
+    protected static final int INCOME_PER_TERRITORY = 15;
     protected static final int BASE_INCOME = 100;
     protected static final int STARTING_GOLD = 10000;
     protected static final int SQUAD_AWARENESS_RANGE = 3;
     protected static final float SQUAD_ACTIVATE_THRESHOLD = 0.8f;
     protected static final int RECRUITING_PROGRESSIVE_DELTA = 10;
-    protected static final int RECRUITING_PROGRESSIVE_THRESHOLD = 800;
+    protected static final int RECRUITING_PROGRESSIVE_THRESHOLD = 1000;
     protected static final int UPGRADING_PROGRESSIVE_THRESHOLD = 3000;
 
     protected Villager villager;
     protected Mission mission;
     protected Policy policy = Policy.EXPANSION;
     protected OffsetCoord strategicTarget = null;
+    protected float difficultyFactor = 1.0f;
 
     protected int recruitingProgressive = 0;
     protected int upgradingProgressive = 0;
     protected int collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
-    protected int recruitingUpdateTimeLeft = SQUAD_RECRUITING_UPDATE_TIME;
+    protected int recruitingUpdateTimeLeft = (int) (SQUAD_RECRUITING_UPDATE_TIME * difficultyFactor);
     protected int policyDecisionUpdateTimeLeft = POLICY_DECISION_UPDATE_TIME;
     protected int policyTransitionTimeLeft = POLICY_TRANSITION_TIME;
     protected int tacticalDecisionUpdateTime = TACTICAL_DECISION_UPDATE_TIME;

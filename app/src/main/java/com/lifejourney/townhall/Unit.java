@@ -690,14 +690,16 @@ public class Unit extends CollidableObject implements Projectile.Event {
             if (highestFavor > 0.0f && highestFavorUnit != null) {
                 if (highestFavorDistance > getUnitClass().seekingFavorRange()) {
                     seek(highestFavorUnit.getPosition(), 1.0f);
+                    wander(80.0f, 1.0f, 0.1f);
                 }
             } else if (lowestFavor < 0.0f && lowestFavorUnit != null) {
                 if (lowestFavorDistance < getUnitClass().rangedAttackRange()) {
                     flee(lowestFavorUnit.getPosition(), 1.0f);
+                    wander(80.0f, 1.0f, 0.1f);
                 }
+            } else {
+                wander(80.0f, 1.0f, 0.2f);
             }
-
-            wander(80.0f, 1.0f, 0.1f);
         } else {
             // If it's at peace, seek to target position
             PointF targetPosition = new PointF(targetMapPosition.toGameCoord());
@@ -782,7 +784,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         if (!isRecruiting()) {
             OffsetCoord mapPosition = new OffsetCoord(getPosition());
             Territory currentTerritory = map.getTerritory(mapPosition);
-            if (currentTerritory == null ||
+            if (currentTerritory != null &&
                 map.getTerritory(mapPosition).getFogState() != Territory.FogState.CLEAR) {
                 hide();
             } else {
@@ -1455,7 +1457,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param damage
      */
     private void gotSplashDamage(float damage) {
-
         if (isInvincible()) {
             return;
         }
@@ -1484,7 +1485,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param healPower
      */
     private void gotHeal(float healPower) {
-
         health = Math.min(health + healPower, getMaxHealth());
 
         // Healing effect
@@ -1499,7 +1499,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param healPower
      */
     private void gotDotHeal(float healPower, int duration) {
-
         dotDamages.add(new Pair<>(-healPower, duration));
 
         // Healing effect
@@ -1533,7 +1532,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     private float adjustBonus(float value, float bonus) {
-
         return value * (1.0f + bonus);
     }
 
@@ -1542,8 +1540,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public float getMaxHealth() {
-
-        return adjustLevel(getUnitClass().health());
+        return adjustBonus(adjustLevel(getUnitClass().health()), healthBonus);
     }
 
     /**
@@ -1551,7 +1548,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public float getHealth() {
-
         return health;
     }
 
@@ -1560,7 +1556,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param health
      */
     public void setHealth(float health) {
-
         this.health = health;
     }
 
@@ -1569,7 +1564,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     private float getMeleeDamage() {
-
         float meleeDamage =
                 adjustBonus(adjustLevel(getUnitClass().meleeAttackDamage()), attackDamageBonus);
 
@@ -1902,8 +1896,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      * @param bonus
      */
-    public void setAttackDamageBonus(float bonus) {
+    public void setHealthBonus(float bonus) {
+        this.healthBonus = bonus;
+    }
 
+    /**
+     *
+     * @param bonus
+     */
+    public void setAttackDamageBonus(float bonus) {
         this.attackDamageBonus = bonus;
     }
 
@@ -2030,6 +2031,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private ArrayList<Unit> companions;
     private ArrayList<Unit> opponents;
     private Tribe.Faction faction;
+    private float healthBonus = 0.0f;
     private float attackDamageBonus = 0.0f;
     private float attackSpeedBonus = 0.0f;
     private float healPowerBonus = 0.0f;
