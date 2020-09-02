@@ -589,7 +589,7 @@ enum Mission {
                 "촌장님, 드디어 마을을 완전히 되찾았습니다." +
                 " 남은 도적들은 뿔뿔히 흩어졌습니다." +
                 " 어제 북서쪽 숲 근처에서 정찰병들이 제단을 하나 찾았습니다. 한 번 가보셔도 좋을 듯 합니다." +
-                " \n\n새로운 재단을 방문하고 도적을 전부 물리치세요.",
+                " \n\n새로운 제단을 방문하고 도적을 전부 물리치세요.",
                 "도적 패배 / 사랑의 제단 점령",
                 5000,
                 200,
@@ -622,6 +622,8 @@ enum Mission {
                     Unit.UnitClass.HEALER, Unit.UnitClass.HEALER, Unit.UnitClass.ARCHER);
             villager.spawnSquad(new OffsetCoord(3, 5).toGameCoord(),
                     Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
+
+            game.getMap().getTerritory(new OffsetCoord(0, 2)).setFogState(Territory.FogState.MIST);
         }
 
         public void update(MainGame game) {
