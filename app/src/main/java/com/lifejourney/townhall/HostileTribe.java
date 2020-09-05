@@ -142,7 +142,8 @@ public abstract class HostileTribe extends Tribe {
             if (!squad.isFighting() && squad.getUnits().size() < 3 &&
                     getMap().getTerritory(squad.getMapPosition()).getFaction() == getFaction()) {
                 squad.spawnUnit(selectUnitToSpawn(UnitSpawnType.ANY));
-                gold -= SQUAD_CREATION_ALLOW_GOLD / 3;
+                gold -= SQUAD_CREATION_ALLOW_GOLD / 6;
+                break;
             }
         }
     }

@@ -1,6 +1,9 @@
 package com.lifejourney.townhall;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.print.PrintAttributes;
 import android.text.Layout;
 import android.view.MotionEvent;
 
@@ -15,12 +18,17 @@ import com.lifejourney.engine2d.World;
 
 public class MainMenu extends World
         implements GameMap.Event, Button.Event, SettingBox.Event, MainGame.Event,
-                   MissionSelectionBox.Event {
+                   MissionSelectionBox.Event, MessageBox.Event {
 
     static final String LOG_TAG = "MainMenu";
 
-    MainMenu() {
+    interface Event {
+        void onMainMenuAdsRequested();
+    }
+
+    MainMenu(Event eventHandler) {
         super();
+        this.eventHandler = eventHandler;
 
         // Set audio configuration
         Engine2D engine2D = Engine2D.GetInstance();
@@ -181,37 +189,10 @@ public class MainMenu extends World
 
     /**
      *
-     */
-    @Override
-    public void pauseForBackground() {
-        Engine2D.GetInstance().stopMusic();
-        super.pauseForBackground();
-
-        if (game != null) {
-            game.pauseForBackground();
-        }
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void resumeFromBackground() {
-        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
-        super.resumeFromBackground();
-
-        if (game != null) {
-            game.resumeFromBackground();
-        }
-    }
-
-    /**
-     *
      * @param territory
      */
     @Override
     public void onMapTerritoryFocused(Territory territory) {
-
     }
 
     /**
@@ -221,7 +202,6 @@ public class MainMenu extends World
      */
     @Override
     public void onMapTerritoryOccupied(Territory territory, Tribe.Faction prevFaction) {
-
     }
 
     /**
@@ -318,13 +298,43 @@ public class MainMenu extends World
             engine2D.savePreference(game.getMission().toString(), starRating);
         }
 
+        Engine2D engine2D = Engine2D.GetInstance();
+        int playCount = engine2D.loadPreference(engine2D.getString(R.string.play_count), 0);
+        engine2D.savePreference(engine2D.getString(R.string.play_count), playCount + 1);
+
         nextMission = game.getMission();
         if (starRating > 0 && nextMission.ordinal() + 1 < Mission.values().length) {
             nextMission = Mission.values()[nextMission.ordinal() + 1];
         }
 
+        // Pop-up Ads
+        eventHandler.onMainMenuAdsRequested();
+
         startMenu();
-        popupMissionSelectBox();
+
+        if (playCount == 10) {
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            ratingMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
+                    new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                            353, 275), "게임은 어떠신가요? :)\n\n게임을 평가해주시겠습니까?")
+                    .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                    .fontName("neodgm.ttf")
+                    .build();
+            ratingMessageBox.show();
+            addWidget(ratingMessageBox);
+        } else if (game.getMission() == Mission.LV10 && starRating > 0) {
+            Rect viewport = Engine2D.GetInstance().getViewport();
+            todoMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
+                    new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
+                            353, 275), "더 많은 미션이 곧 공개될 예정입니다.\n\n잠시만 기다려주세요.")
+                    .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
+                    .fontName("neodgm.ttf")
+                    .build();
+            todoMessageBox.show();
+            addWidget(todoMessageBox);
+        } else {
+            popupMissionSelectBox();
+        }
     }
 
     /**
@@ -354,12 +364,60 @@ public class MainMenu extends World
         addWidget(missionSelectionBox);
     }
 
+    /**
+     *
+     * @param messageBox
+     * @param buttonType
+     */
+    @Override
+    public void onMessageBoxButtonPressed(MessageBox messageBox, MessageBox.ButtonType buttonType) {
+        messageBox.close();
+        removeWidget(messageBox);
+
+        if (messageBox == ratingMessageBox) {
+            if (buttonType == MessageBox.ButtonType.YES) {
+                Engine2D.GetInstance().gotoUrl("http://play.google.com/store/apps/details?id=com.lifejourney.townhall");
+            }
+
+            popupMissionSelectBox();
+        }
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void pauseForBackground() {
+        Engine2D.GetInstance().stopMusic();
+        super.pauseForBackground();
+
+        if (game != null) {
+            game.pauseForBackground();
+        }
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void resumeFromBackground() {
+        Engine2D.GetInstance().playMusic(MUSIC_VOLUME);
+        super.resumeFromBackground();
+
+        if (game != null) {
+            game.resumeFromBackground();
+        }
+    }
+
     private final static float MUSIC_VOLUME = 0.3f;
 
+    private Event eventHandler;
     private MainGame game;
     private Mission nextMission = null;
     private GameMap sampleMap;
     private Sprite logo;
     private Button startButton;
     private Button settingButton;
+    private MessageBox ratingMessageBox = null;
+    private MessageBox todoMessageBox = null;
 }

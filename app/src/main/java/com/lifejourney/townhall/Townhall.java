@@ -16,6 +16,11 @@ import android.view.WindowManager;
 
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
@@ -23,7 +28,7 @@ import com.lifejourney.engine2d.World;
 import java.util.Locale;
 
 public class Townhall extends FragmentActivity
-        implements Choreographer.FrameCallback, SurfaceHolder.Callback {
+        implements Choreographer.FrameCallback, SurfaceHolder.Callback, MainMenu.Event {
 
     private static final long ONE_MS_IN_NS = 1000000;
     private static final long ONE_S_IN_NS = 1000 * ONE_MS_IN_NS;
@@ -77,6 +82,17 @@ public class Townhall extends FragmentActivity
         Log.i(LOG_TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
+
+        // Initialize MobileAds
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");   // Test Ads
+        //interstitialAd.setAdUnitId("ca-app-pub-6658893733027201/5933254932"); // Real Ads
+        interstitialAd.loadAd(new AdRequest.Builder().build());
 
         // Initialize view
         setContentView(R.layout.activity_main);
@@ -204,6 +220,18 @@ public class Townhall extends FragmentActivity
 
     /**
      *
+     */
+    @Override
+    public void onMainMenuAdsRequested() {
+        if (interstitialAd.isLoaded()) {
+            interstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+    }
+
+    /**
+     *
      * @param holder
      */
     @Override
@@ -239,7 +267,6 @@ public class Townhall extends FragmentActivity
      */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
         Engine2D.GetInstance().clearSurface();
     }
 
@@ -247,10 +274,10 @@ public class Townhall extends FragmentActivity
      *
      */
     protected void initResources() {
-
-        world = new MainMenu();
+        world = new MainMenu(this);
     }
 
+    private InterstitialAd interstitialAd;
     private World world = null;
     private boolean isRunning;
     private boolean surfacePrepared = false;
