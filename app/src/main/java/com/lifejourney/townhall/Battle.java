@@ -41,7 +41,6 @@ public class Battle {
      *
      */
     private void resolveCollision() {
-
         ArrayList<Unit> units = new ArrayList<>();
         for (Unit unit: attacker.getUnits()) {
             if (!unit.isRecruiting()) {
@@ -119,7 +118,6 @@ public class Battle {
      *
      */
     public void handlePostFight() {
-
         Squad winningOne = null, losingOne = null;
         boolean eliminated = false;
         if (attacker.isEliminated() || defender.isEliminated()) {

@@ -1,6 +1,7 @@
 package com.lifejourney.townhall;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
@@ -310,7 +311,9 @@ public class MainGame extends World
             if (prevFaction != Tribe.Faction.NEUTRAL) {
                 getTribe(prevFaction).addShrineBonus(factor, -value);
             }
-            getTribe(territory.getFaction()).addShrineBonus(factor, value);
+            if (territory.getFaction() != Tribe.Faction.NEUTRAL) {
+                getTribe(territory.getFaction()).addShrineBonus(factor, value);
+            }
         }
 
         // Check UI
@@ -387,7 +390,9 @@ public class MainGame extends World
      */
     @Override
     public void onTribeDefeated(Tribe tribe) {
-        newsBar.addNews(tribe.getFaction().toGameString() + "이 패배했습니다.");
+        if (getDays() > 0) {
+            newsBar.addNews(tribe.getFaction().toGameString() + "이 패배했습니다.");
+        }
     }
 
     /**

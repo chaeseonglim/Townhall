@@ -60,6 +60,11 @@ public class MainMenu extends World
         resourceManager.loadSoundEffect("rebel", R.raw.shade3);
         resourceManager.loadSoundEffect("move", R.raw.war_go_go_go);
 
+        // Init mission status
+        for (Mission mission: Mission.values()) {
+            mission.setStarRating(engine2D.loadPreference(mission.toString(), 0));
+        }
+
         // Init menu
         startMenu();
     }
@@ -86,7 +91,7 @@ public class MainMenu extends World
                 .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(600, 350))
-                .position(new PointF(viewport.centerX(), viewport.height * 2 / 5))
+                .position(new PointF(viewport.centerX(), viewport.height * 3 / 7))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(true).build();
 
@@ -112,7 +117,6 @@ public class MainMenu extends World
         settingButton.setImageSpriteSet(0);
         settingButton.show();
         addWidget(settingButton);
-
     }
 
     /**
@@ -310,6 +314,8 @@ public class MainMenu extends World
 
         if (game.getMission().getStarRating() < starRating) {
             game.getMission().setStarRating(starRating);
+            Engine2D engine2D = Engine2D.GetInstance();
+            engine2D.savePreference(game.getMission().toString(), starRating);
         }
 
         nextMission = game.getMission();

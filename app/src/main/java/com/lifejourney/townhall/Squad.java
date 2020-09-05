@@ -862,18 +862,12 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     boolean isWillingToRetreat() {
-
-        boolean aggressiveness = false;
         int totalUnitHealth = 0;
         for (Unit unit: units) {
             totalUnitHealth += unit.getHealth();
-            if (unit.getUnitClass().isAggressive()) {
-                aggressiveness = true;
-            }
         }
 
-        return  ((float) totalUnitHealth / totalHealthAtBeginningOfFight < RETREAT_THRESHOLD) ||
-                !aggressiveness;
+        return  ((float) totalUnitHealth / totalHealthAtBeginningOfFight < RETREAT_THRESHOLD);
     }
 
     /**
@@ -1239,7 +1233,6 @@ public class Squad extends Object implements Controllable {
      * @return
      */
     public int getShrineBonus(Tribe.ShrineBonus factor) {
-
         return shrineBonus[factor.ordinal()];
     }
 
@@ -1249,7 +1242,6 @@ public class Squad extends Object implements Controllable {
      * @param value
      */
     public void setShrineBonus(Tribe.ShrineBonus factor, int value) {
-
         shrineBonus[factor.ordinal()] = value;
     }
 
@@ -1452,7 +1444,7 @@ public class Squad extends Object implements Controllable {
     private final static float MOVING_ARROW_SPRITE_OPAQUE_NORMAL = 0.7f;
     private final static float RETREAT_THRESHOLD = 0.3f;
     private final static float UNIT_BONUS_DELTA = 0.05f;
-    private final static float REST_PERCENTAGE = 0.01f;
+    private final static float REST_PERCENTAGE = 0.02f;
 
     private Event eventHandler;
     private GameMap map;

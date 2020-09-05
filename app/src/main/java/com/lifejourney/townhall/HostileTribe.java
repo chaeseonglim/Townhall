@@ -118,21 +118,32 @@ public abstract class HostileTribe extends Tribe {
         if (recruitingUpdateTimeLeft-- > 0) {
             return;
         }
+
         recruitingUpdateTimeLeft = (int) (SQUAD_RECRUITING_UPDATE_TIME * difficultyFactor);
         recruitingProgressive += RECRUITING_PROGRESSIVE_DELTA;
         Log.i(LOG_TAG, getFaction().toGameString() + " progressive: " + recruitingProgressive);
 
         // Create squad if conditions are met
+        int squadCreationAllowGold = SQUAD_CREATION_ALLOW_GOLD * (getSquads().size() + 1);
         if (getSquads().size() < SQUAD_COUNT_LIMIT &&
-                gold >= SQUAD_CREATION_ALLOW_GOLD * (getSquads().size() + 1) &&
+                gold >= squadCreationAllowGold &&
                 getHeadquarterPosition() != null &&
                 getMap().getTerritory(getHeadquarterPosition()).getFaction() == getFaction() &&
                 getMap().getTerritory(getHeadquarterPosition()).getSquads().size() == 0) {
-            gold -= SQUAD_CREATION_ALLOW_GOLD;
+            gold -= squadCreationAllowGold;
             spawnSquad(getHeadquarterPosition().toGameCoord(),
                     selectUnitToSpawn(UnitSpawnType.MELEE),
                     selectUnitToSpawn(UnitSpawnType.ANY),
                     selectUnitToSpawn(UnitSpawnType.RANGED));
+        }
+
+        // Recruit unit if needed
+        for (Squad squad: getSquads()) {
+            if (!squad.isFighting() && squad.getUnits().size() < 3 &&
+                    getMap().getTerritory(squad.getMapPosition()).getFaction() == getFaction()) {
+                squad.spawnUnit(selectUnitToSpawn(UnitSpawnType.ANY));
+                gold -= SQUAD_CREATION_ALLOW_GOLD / 3;
+            }
         }
     }
 
@@ -241,8 +252,12 @@ public abstract class HostileTribe extends Tribe {
      * @param squad
      */
     protected void decideASquadTactic(final Squad squad) {
-        if (squad.isFighting() || squad.isOccupying() || squad.isSupporting() ||
-                squad.getUnits().size() < 3 || squad.isRecruiting() ||
+        // Don't update tactic if it's busy
+        if (squad.isFighting() || squad.isOccupying() || squad.isRecruiting()) {
+            return;
+        }
+
+        if (squad.isSupporting() || squad.getUnits().size() < 3 ||
                 squad.getHealthPercentage() <= SQUAD_ACTIVATE_THRESHOLD) {
             return;
         }
@@ -257,12 +272,6 @@ public abstract class HostileTribe extends Tribe {
 
         if (squad.isMoving()) {
             return;
-        }
-
-        // Recruit unit if needed
-        if (squad.getUnits().size() < 3 &&
-                getMap().getTerritory(squad.getMapPosition()).getFaction() != getFaction()) {
-            squad.spawnUnit(selectUnitToSpawn(UnitSpawnType.ANY));
         }
 
         // Find if neighbor territories have any events which need to go
@@ -413,7 +422,7 @@ public abstract class HostileTribe extends Tribe {
     protected static final int COLLECT_UPDATE_TIME = 50;
     protected static final int POLICY_DECISION_UPDATE_TIME = 130;
     protected static final int POLICY_TRANSITION_TIME = 300;
-    protected static final int SQUAD_RECRUITING_UPDATE_TIME = 70;
+    protected static final int SQUAD_RECRUITING_UPDATE_TIME = 140;
     protected static final int TACTICAL_DECISION_UPDATE_TIME = 90;
     protected static final int SQUAD_CREATION_ALLOW_GOLD = 7000;
     protected static final int SQUAD_COUNT_LIMIT = 10;

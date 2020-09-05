@@ -79,7 +79,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                 level = (getMapData(mapPosition) & 0x0000000F) >> 0;
                 territory.setFacilityLevel(Territory.Facility.FORTRESS, level);
 
-                boolean testMode = true;
+                boolean testMode = false;
                 if (demoMode || testMode) {
                     territory.setFogState(Territory.FogState.CLEAR);
                 }
@@ -250,7 +250,6 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param faction
      */
     public void redrawTileSprites(Tribe.Faction faction) {
-
         for (Territory territory : territoriesBySide.get(faction.ordinal())) {
             redraw(territory.getMapPosition());
         }
@@ -441,8 +440,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
      * @param faction
      * @return
      */
-    public ArrayList<Territory> getTownsBySide(Tribe.Faction faction) {
-
+    public ArrayList<Territory> getTerritoriesBySide(Tribe.Faction faction) {
         return territoriesBySide.get(faction.ordinal());
     }
 

@@ -105,19 +105,22 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         removeSprites("icon");
 
         // Set left button
-        leftButton.show();
         if (selectedMission.ordinal() == 0) {
             leftButton.hide();
-        } else if (!Mission.values()[selectedMission.ordinal() - 1].isUnlocked()) {
-            leftButton.disable();
+        } else {
+            leftButton.show();
         }
 
         // Set right button
-        rightButton.show();
         if (Mission.values().length == selectedMission.ordinal() + 1) {
             rightButton.hide();
-        } else if (!Mission.values()[selectedMission.ordinal() + 1].isUnlocked()) {
-            rightButton.disable();
+        } else {
+            rightButton.show();
+            if (selectedMission.getStarRating() == 0) {
+                rightButton.disable();
+            } else {
+                rightButton.enable();
+            }
         }
 
         // Mission title

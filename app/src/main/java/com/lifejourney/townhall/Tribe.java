@@ -52,18 +52,20 @@ public abstract class Tribe implements Squad.Event {
         this.eventHandler = eventHandler;
         this.faction = faction;
         this.map = map;
-        this.territories = map.getTownsBySide(faction);
+        this.territories = map.getTerritoriesBySide(faction);
         for (Territory territory : territories) {
             if (territory.getTerrain() == Territory.Terrain.HEADQUARTER) {
                 this.headquarterPosition = territory.getMapPosition();
-            } else if (territory.getTerrain() == Territory.Terrain.SHRINE_HEAL ||
+            }
+        }
+        for (Territory territory : map.getTerritories()) {
+            if (territory.getTerrain() == Territory.Terrain.SHRINE_HEAL ||
                     territory.getTerrain() == Territory.Terrain.SHRINE_LOVE ||
                     territory.getTerrain() == Territory.Terrain.SHRINE_PROSPER ||
                     territory.getTerrain() == Territory.Terrain.SHRINE_WIND) {
                 this.shrinePositions.add(territory.getMapPosition());
             }
         }
-        this.defeated = (getHeadquarterPosition() == null);
         Arrays.fill(this.shrineBonuses, 0);
     }
 
@@ -77,10 +79,10 @@ public abstract class Tribe implements Squad.Event {
 
         // Set squad bonus
         for (Squad squad : squads) {
-            squad.setShrineBonus(ShrineBonus.WIND,
-                    getShrineBonus(ShrineBonus.WIND));
-            squad.setShrineBonus(ShrineBonus.HEAL,
-                    getShrineBonus(ShrineBonus.HEAL));
+            squad.setShrineBonus(ShrineBonus.WIND, getShrineBonus(ShrineBonus.WIND));
+            squad.setShrineBonus(ShrineBonus.HEAL, getShrineBonus(ShrineBonus.HEAL));
+            squad.setShrineBonus(ShrineBonus.LOVE, getShrineBonus(ShrineBonus.LOVE));
+            squad.setShrineBonus(ShrineBonus.PROSPERITY, getShrineBonus(ShrineBonus.PROSPERITY));
         }
     }
 
@@ -318,6 +320,6 @@ public abstract class Tribe implements Squad.Event {
     private ArrayList<Squad> squads = new ArrayList<>();
     private ArrayList<Territory> territories;
     private int[] shrineBonuses = new int[ShrineBonus.values().length];
-    protected boolean defeated;
+    protected boolean defeated = false;
     protected boolean retreatable = true;
 }

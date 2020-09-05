@@ -280,8 +280,8 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             squad.seekTo(squadTargetMapPosition, false);
 
             tutorialBox.setMessage(
-                    "∙ 이번엔 제가 직접 이동시켜 드리겠습니다.\n\n" +
-                    "∙ 부대가 빨간 상자의 위치로 이동 중입니다. 잠시 기다려주세요.");
+                    "∙ 이번엔 제가 직접 이동시켜 드리겠습니다." +
+                    "∙ 부대가 빨간 상자의 위치로 이동 중입니다. \n\n잠시 기다려주세요..");
         } else if (step == Step.FOG) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -294,7 +294,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
                     "∙ 부대가 이동함에 따라서 주위의 안개가 걷히는 것을 볼 수 있습니다.");
         } else if (step == Step.OCCUPYING_TERRITORY) {
             tutorialBox.setMessage(
-                    "∙ 부대가 위치한 곳이 아군의 영토가 아니라면 점령을 시작합니다.\n잠시 기다려주세요.");
+                    "∙ 부대가 위치한 곳이 아군의 영토가 아니라면 점령을 시작합니다.\n\n잠시 기다려주세요..");
         } else if (step == Step.MOVE_SQUAD3) {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(0);
             OffsetCoord squadMapPosition = squad.getMapPosition();
@@ -379,12 +379,14 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle2.commit();
 
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(0);
+            squad.setFocus(true);
+            game.onSquadFocused(squad);
             Squad bandit = game.getTribe(Tribe.Faction.BANDIT).getSquads().get(0);
             squad.seekTo(bandit.getMapPosition(), false);
 
             tutorialBox.setMessage(
                     "∙ 이번에는 제가 부대를 움직여보겠습니다.\n\n" +
-                    "∙ 잠시 전투를 감상하세요.");
+                    "∙ 잠시 전투를 감상하세요..");
         } else if (step == Step.SUPPORT) {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(1);
             OffsetCoord squadMapPosition = squad.getMapPosition();
@@ -410,8 +412,8 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             squad.seekTo(targetMapPosition, false);
 
             tutorialBox.setMessage(
-                    "∙ 아군 부대를 전투가 벌어지는 타일 옆에 놓으면 전투를 지원합니다.\n\n" +
-                    "∙ 이번에는 제가 직접 옮겨보겠습니다. 잠시 기다려주세요.");
+                    "∙ 아군 부대를 전투가 벌어지는 타일 옆에 놓으면 전투를 지원합니다. " +
+                    "∙ 이번에는 제가 직접 옮겨보겠습니다.\n\n잠시 기다려주세요..");
         } else if (step == Step.SUPPORT3) {
             guideRectangle.hide();
             guideRectangle.commit();

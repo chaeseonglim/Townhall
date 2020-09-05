@@ -616,8 +616,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                                     .numImageSpriteSet(Unit.UnitClass.values().length + 1)
                                     .layer(layer + 1).build();
                     unitButtons[i].setImageSpriteSet(0);
-                    if (squad.isMoving() || squad.isSupporting() || squad.isOccupying() ||
-                            squad.isFighting()) {
+                    if (squad.isMoving() || squad.isOccupying() || squad.isFighting()) {
                         unitButtons[i].disable();
                     }
                     addWidget(unitButtons[i]);

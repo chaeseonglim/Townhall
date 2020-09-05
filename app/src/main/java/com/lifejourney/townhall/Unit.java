@@ -74,8 +74,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 5,
                 null,
-                1.0f,
                 2.0f,
+                2.5f,
                 5.0f,
                 false,
                 false,
@@ -116,8 +116,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 10,
                 null,
-                2.0f,
                 2.5f,
+                3.5f,
                 5.0f,
                 false,
                 true,
@@ -158,8 +158,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 10,
                 Projectile.ProjectileType.ARROW,
-                1.5f,
                 2.0f,
+                3.0f,
                 5.0f,
                 true,
                 true,
@@ -234,7 +234,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 60,
                 0,
                 0,
-                3,
+                9,
                 0,
                 5,
                 0,
@@ -242,8 +242,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 30,
                 Projectile.ProjectileType.HEAL,
-                1.5f,
                 2.0f,
+                2.5f,
                 5.0f,
                 true,
                 false,
@@ -284,7 +284,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 40,
                  Projectile.ProjectileType.CANNON,
-                1.0f,
+                1.5f,
                 2.0f,
                 5.0f,
                 true,
@@ -318,7 +318,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 90,
                 8,
                 0,
-                3,
+                7,
                 10,
                 10,
                 30,
@@ -326,8 +326,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 1,
                 40,
                 Projectile.ProjectileType.HEAL,
-                1.5f,
                 2.0f,
+                3.5f,
                 5.0f,
                 true,
                 true,
@@ -616,11 +616,11 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     @Override
     public void close() {
-        super.close();
-
         for (Projectile projectile: projectiles) {
             projectile.close();
         }
+
+        super.close();
     }
 
     /**
@@ -785,7 +785,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             OffsetCoord mapPosition = new OffsetCoord(getPosition());
             Territory currentTerritory = map.getTerritory(mapPosition);
             if (currentTerritory != null &&
-                map.getTerritory(mapPosition).getFogState() != Territory.FogState.CLEAR) {
+                map.getTerritory(targetMapPosition).getFogState() != Territory.FogState.CLEAR) {
                 hide();
             } else {
                 show();
@@ -925,7 +925,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      */
     public void fight() {
-
         if (isRecruiting() || isStunned()) {
             return;
         }
@@ -1029,7 +1028,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     private Unit searchFavoredRangedTarget() {
-
         if (getUnitClass().rangedAttackRange() == 0.0f) {
             return null;
         }
@@ -1093,7 +1091,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      */
     public void endFight() {
-
         for (Projectile projectile: projectiles) {
             projectile.close();
         }
@@ -1761,7 +1758,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public ArrayList<Unit> getCompanions() {
-
         return companions;
     }
 
@@ -1770,7 +1766,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param companions
      */
     public void setCompanions(ArrayList<Unit> companions) {
-
         this.companions = companions;
     }
 
@@ -1779,7 +1774,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public ArrayList<Unit> getOpponents() {
-
         return opponents;
     }
 
@@ -1852,7 +1846,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public boolean isRecruiting() {
-
         return recruitingTimeLeft > 0;
     }
 
@@ -1861,7 +1854,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public boolean isFighting() {
-
         return opponents != null;
     }
 
@@ -1870,7 +1862,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getGoldUpkeep() {
-
         return unitClass.costUpkeep();
     }
 
@@ -1879,7 +1870,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public int getPopulationUpkeep() {
-
         return unitClass.population();
     }
 
@@ -1888,7 +1878,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public Tribe.Faction getFaction() {
-
         return faction;
     }
 
@@ -1913,7 +1902,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param bonus
      */
     public void setAttackSpeedBonus(float bonus) {
-
         this.attackSpeedBonus = bonus;
     }
 
@@ -1922,7 +1910,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param bonus
      */
     public void setHealPowerBonus(float bonus) {
-
         this.healPowerBonus = bonus;
     }
 
@@ -1931,7 +1918,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param bonus
      */
     public void setArmorBonus(float bonus) {
-
         this.armorBonus = bonus;
     }
 
@@ -1940,7 +1926,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @param percentage
      */
     public void rest(float percentage) {
-
         if (health < getMaxHealth() && restingTimeLeft-- == 0) {
             health = Math.min(health + getMaxHealth() * percentage, getMaxHealth());
 
@@ -1998,7 +1983,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     private final static int MAX_LEVEL = 10;
     private final static int SPRITE_LAYER = 7;
-    private final static int RECRUITING_TIME = 200;
+    private final static int RECRUITING_TIME = 120;
     private final static int RESTING_TIME = 30;
     private final static float SPLASH_DAMAGE_RANGE = 30.0f;
     private final static float SPLASH_DAMAGE_DELTA = 0.1f;
@@ -2020,7 +2005,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private final static float INVINCIBLE_DURATION_DELTA = 0.05f;
     private final static float INVINCIBLE_HEALTH_THRESHOLD = 0.2f;
     private final static int INVINCIBLE_DURATION = 120;
-    private final static int INVINCIBLE_COOLDOWN = 500;
+    private final static int INVINCIBLE_COOLDOWN = 400;
     private final static float GUARDIAN_DAMAGE_DELTA = 0.1f;
 
     private GameMap map;
