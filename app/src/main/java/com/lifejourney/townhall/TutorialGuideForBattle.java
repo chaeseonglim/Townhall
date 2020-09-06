@@ -230,14 +230,14 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
         } else if (step == Step.FOCUS_SQUAD2) {
             tutorialBox.setMessage(
                     "∙ 각 부대는 3개의 유닛을 보유할 수 있습니다.\n\n" +
-                    "∙ 현재 유닛을 모집 중인 상태입니다. 잠시 기다려주세요.");
+                    "∙ 현재 유닛을 모집 중인 상태입니다. 잠시 기다려주세요...");
         } else if (step == Step.UNIT) {
             guideRectangle.hide();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
                     "∙ 유닛 모집이 완료 되었습니다.\n\n" +
-                    "∙ 부대에 속한 유닛이 지도 상에 작은 원으로 나타납니다.");
+                    "∙ 부대에 속한 유닛이 지도 상에 작은 원으로 나타납니다. 아무 곳이나 터치하세요.");
         } else if (step == Step.INFO_SQUAD) {
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(140, viewport.height - 74)), new SizeF(100, 64)));

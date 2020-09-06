@@ -169,7 +169,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
                     "∙ 행복도는 금화 수입에 영향을 주며 낮아지면 반란군이 발생할 가능성이 높아집니다.");
         } else if (step == Step.SPEED) {
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(viewport.width - 210, 10)), new SizeF(200, 64)));
+                    new PointF(viewport.width - 200, 10)), new SizeF(180, 64)));
             guideRectangle.show();
             guideRectangle.commit();
 
@@ -206,12 +206,12 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
             Rect boxRegion = game.getHomeBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(boxRegion.right() - 310, boxRegion.bottom() - 79)),
-                    new SizeF(150, 64)));
+                    new SizeF(140, 64)));
             guideRectangle.show();
             guideRectangle.commit();
 
             tutorialBox.setMessage(
-                    "∙ 하단 강화하기 버튼을 누르면 병력 강화를 진행할 수 있습니다.");
+                    "∙ 강화 버튼을 누르면 병력 강화를 진행할 수 있습니다.");
         } else if (step == Step.UPGRADE_UI) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -221,7 +221,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
 
             Rect boxRegion = game.getUpgradeBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 15, boxRegion.bottom() - 79)),
+                    new PointF(boxRegion.left() + 20, boxRegion.bottom() - 79)),
                     new SizeF(430, 64)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -240,7 +240,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
             territory.setFocus(true);
             game.onMapTerritoryFocused(territory);
             PointF tilePosition = tileMapPosition.toGameCoord();
-            guideRectangle.setRegion(new RectF(tilePosition.offset(-60, -60), new SizeF(120, 130)));
+            guideRectangle.setRegion(new RectF(tilePosition.offset(-60, -60), new SizeF(120, 120)));
             guideRectangle.show();
             guideRectangle.commit();
 
@@ -267,7 +267,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 30, boxRegion.top() + 190)),
+                    new PointF(boxRegion.left() + 35, boxRegion.top() + 190)),
                     new SizeF(280, 70)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -278,7 +278,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY2) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 30, boxRegion.top() + 190)),
+                    new PointF(boxRegion.left() + 35, boxRegion.top() + 190)),
                     new SizeF(65, 70)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -289,7 +289,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY3) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 105, boxRegion.top() + 190)),
+                    new PointF(boxRegion.left() + 110, boxRegion.top() + 190)),
                     new SizeF(65, 70)));
             guideRectangle.show();
             guideRectangle.commit();
@@ -311,7 +311,7 @@ public class TutorialGuideForManagement extends Widget implements MessageBox.Eve
         } else if (step == Step.INFO_FACILITY5) {
             Rect boxRegion = game.getInfoBoxRegion();
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
-                    new PointF(boxRegion.left() + 245, boxRegion.top() + 190)),
+                    new PointF(boxRegion.left() + 250, boxRegion.top() + 190)),
                     new SizeF(65, 70)));
             guideRectangle.show();
             guideRectangle.commit();

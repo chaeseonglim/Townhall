@@ -98,10 +98,10 @@ enum Mission {
             }
 
             // Hints
-            if (turn == 500 || turn == 1500) {
+            if (turn == 1500) {
                 game.addNews("힌트: 후퇴한 적은 바로 추격해서 공격 가능합니다.");
-            } else if (turn == 1000 || turn == 2000) {
-                game.addNews("힌트: 전투가 유리하지 않다면 추가 부대를 모집할 수 있습니다.");
+            } else if (turn == 1000) {
+                game.addNews("힌트: 전투가 불리하면 추가 부대를 모집하세요.");
             } else if (turn == 3000) {
                 game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
             }

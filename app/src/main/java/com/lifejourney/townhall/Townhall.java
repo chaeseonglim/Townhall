@@ -17,6 +17,7 @@ import android.view.WindowManager;
 
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -107,6 +108,16 @@ public class Townhall extends FragmentActivity
         interstitialAd = new InterstitialAd(this);
         //interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");   // Test Ads
         interstitialAd.setAdUnitId("ca-app-pub-6658893733027201/5933254932"); // Real Ads
+
+        // Set an AdListener.
+        interstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                AdRequest adRequest = new AdRequest.Builder().build();
+                interstitialAd.loadAd(adRequest);
+            }
+        });
+
         AdRequest adRequest = new AdRequest.Builder().build();
         if (adRequest.isTestDevice(this)) {
             Log.e(LOG_TAG, "Test device detected!!!");
