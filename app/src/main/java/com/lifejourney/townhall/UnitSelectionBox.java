@@ -329,6 +329,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         } else if (button == selectButton) {
             // Select button
             eventHandler.onUnitBuilderBoxSelected(this, selectedUnitClass);
+            Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
         } else {
             // Unit selection buttons
             Unit.UnitClass pressedUnitClass = null;

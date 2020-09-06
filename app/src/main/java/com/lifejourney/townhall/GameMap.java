@@ -79,7 +79,7 @@ class GameMap extends HexTileMap implements View, Territory.Event {
                 level = (getMapData(mapPosition) & 0x0000000F) >> 0;
                 territory.setFacilityLevel(Territory.Facility.FORTRESS, level);
 
-                boolean testMode = false;
+                boolean testMode = true;
                 if (demoMode || testMode) {
                     territory.setFogState(Territory.FogState.CLEAR);
                 }

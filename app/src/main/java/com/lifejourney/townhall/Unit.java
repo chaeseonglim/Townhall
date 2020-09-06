@@ -1718,7 +1718,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     private float getArmor() {
-
         float armor = adjustBonus(adjustLevel(getUnitClass().armor() / 100), armorBonus);
 
         // Apply upgrade

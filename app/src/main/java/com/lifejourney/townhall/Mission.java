@@ -814,7 +814,7 @@ enum Mission {
             } else if (turn == 1000) {
                 game.addNews("힌트: 여전히 도적이 많습니다. 병력을 준비해두세요.");
             } else if (turn == 2000) {
-                game.addNews("힌트: 사원은 도적을 어느 정도 제압하고 가도 좋습니다.");
+                game.addNews("힌트: 사원은 천천히 가도 될 것 같습니다.");
             } else if (turn == 2500) {
                 game.addNews("힌트: 약간의 업그레이드는 전투에 도움이 됩니다.");
             } else if (turn == 3000) {
@@ -829,6 +829,109 @@ enum Mission {
                 if (day <= getTimeLimit() * 0.6f) {
                     game.missionCompleted(3);
                 } else if (day <= getTimeLimit() * 0.8f) {
+                    game.missionCompleted(2);
+                } else {
+                    game.missionCompleted(1);
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
+            }
+        }
+
+        private int turn = 0;
+    },
+    LV11("map/map_lv11.png",
+                 "폭죽 소리",
+                 "마을은 다시 번화해지고 있습니다." +
+                 " 마을에는 곡식과 금화가 넘치고 사람들은 쉬지 않고 축제를 엽니다." +
+                 " 축제가 무르익자 어디선가 기쁨의 폭죽 소리가 들리기 시작합니다." +
+                 " \n\n잠시만요.. 그런데 대체 누가 폭죽을 쏘고 있는거죠??",
+                 "바이킹 본부 점령 / 도적 패배",
+                 10000,
+                 250,
+                 new boolean[] { true, true, true, true, true, false, false }) {
+
+        public void init(MainGame game) {
+            turn = 0;
+
+            // Prevent AI control units at the beginning
+            Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
+            game.getMap().getTerritory(viking.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            viking.setControlledByAI(false);
+            viking.spawnSquad(new OffsetCoord(1, 7).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER);
+            viking.spawnSquad(new OffsetCoord(2, 8).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER);
+            viking.spawnSquad(new OffsetCoord(2, 9).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER);
+            viking.spawnSquad(new OffsetCoord(0, 7).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER);
+            viking.spawnSquad(new OffsetCoord(0, 9).toGameCoord(),
+                    Unit.UnitClass.CANNON, Unit.UnitClass.CANNON, Unit.UnitClass.CANNON);
+            viking.spawnSquad(new OffsetCoord(0, 8).toGameCoord(),
+                    Unit.UnitClass.CANNON, Unit.UnitClass.CANNON, Unit.UnitClass.CANNON);
+            viking.spawnSquad(new OffsetCoord(0, 10).toGameCoord(),
+                    Unit.UnitClass.CANNON, Unit.UnitClass.CANNON, Unit.UnitClass.CANNON);
+
+            // Prevent AI control units at the beginning
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            game.getMap().getTerritory(bandit.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            bandit.setControlledByAI(false);
+            bandit.spawnSquad(new OffsetCoord(0, 1).toGameCoord(),
+                    Unit.UnitClass.ARCHER, Unit.UnitClass.HEALER, Unit.UnitClass.HEALER);
+            bandit.spawnSquad(new OffsetCoord(0, 0).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN);
+
+            Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
+            villager.spawnSquad(new OffsetCoord(6, 5).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.HORSE_MAN);
+            villager.spawnSquad(new OffsetCoord(7, 8).toGameCoord(),
+                    Unit.UnitClass.HEALER, Unit.UnitClass.HEALER, Unit.UnitClass.ARCHER);
+            villager.spawnSquad(new OffsetCoord(3, 3).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
+        }
+
+        public void update(MainGame game) {
+            turn++;
+
+            int day = game.getDays();
+
+            Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            if (turn == 1500) {
+                viking.setControlledByAI(true);
+                game.addNews("조심하세요!! 바이킹이 이제 활동을 시작합니다.");
+            } else if (turn == 3000) {
+                bandit.setControlledByAI(true);
+                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+            }
+
+            // Hints
+            if (turn == 500) {
+                game.addNews("힌트: 남쪽에 바이킹이 나타났습니다. 폭죽 소리와 함께요.");
+            } else if (turn == 1000) {
+                game.addNews("힌트: 바이킹은 처음보는 무기를 가져왔습니다. 조심하세요!");
+            } else if (turn == 2000) {
+                game.addNews("힌트: 적은 강합니다. 철저히 대비해야 합니다.");
+            } else if (turn == 2500) {
+                game.addNews("힌트: 대포병에게 지원을 허용하면 병력이 순식간에 녹습니다.");
+            } else if (turn == 3500) {
+                game.addNews("힌트: 바이킹과 강 근처에서 전투는 매우 불리합니다.");
+            } else if (turn == 4000) {
+                game.addNews("힌트: 너무 많은 업그레이드는 파산의 지름길입니다.");
+            } else if (turn == 4500) {
+                game.addNews("힌트: 가능하다면 사원을 점령하세요.");
+            } else if (turn == 5000) {
+                game.addNews("힌트: 바이킹 본부는 강 너머 건너편에 있습니다.");
+            }
+
+            // Check if vikings are defeated
+            if (viking.isDefeated() && bandit.isDefeated()) {
+                if (day <= getTimeLimit() * 0.7f) {
+                    game.missionCompleted(3);
+                } else if (day <= getTimeLimit() * 0.85f) {
                     game.missionCompleted(2);
                 } else {
                     game.missionCompleted(1);

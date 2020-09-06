@@ -496,9 +496,6 @@ public class MainGame extends World
         // Refresh UI state
         if (squad.getFaction() == Tribe.Faction.VILLAGER && economyBar != null) {
             economyBar.refresh();
-            if (getDays() > 0) {
-                Engine2D.GetInstance().playSoundEffect("coin1", 1.0f);
-            }
         }
     }
 

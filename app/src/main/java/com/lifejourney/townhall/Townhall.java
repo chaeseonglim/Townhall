@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Trace;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Choreographer;
 import android.view.Display;
@@ -19,12 +20,15 @@ import androidx.fragment.app.FragmentActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class Townhall extends FragmentActivity
@@ -87,12 +91,27 @@ public class Townhall extends FragmentActivity
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
+                Log.i(LOG_TAG, "Ads loaded!!!");
             }
         });
+
+        List<String> testDevices = new ArrayList<>();
+        testDevices.add(AdRequest.DEVICE_ID_EMULATOR);
+        testDevices.add("673768DE6553B0103FB0B8CF2D7A99E3");
+        RequestConfiguration requestConfiguration
+                = new RequestConfiguration.Builder()
+                .setTestDeviceIds(testDevices)
+                .build();
+        MobileAds.setRequestConfiguration(requestConfiguration);
+
         interstitialAd = new InterstitialAd(this);
-        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");   // Test Ads
-        //interstitialAd.setAdUnitId("ca-app-pub-6658893733027201/5933254932"); // Real Ads
-        interstitialAd.loadAd(new AdRequest.Builder().build());
+        //interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");   // Test Ads
+        interstitialAd.setAdUnitId("ca-app-pub-6658893733027201/5933254932"); // Real Ads
+        AdRequest adRequest = new AdRequest.Builder().build();
+        if (adRequest.isTestDevice(this)) {
+            Log.e(LOG_TAG, "Test device detected!!!");
+        }
+        interstitialAd.loadAd(adRequest);
 
         // Initialize view
         setContentView(R.layout.activity_main);
