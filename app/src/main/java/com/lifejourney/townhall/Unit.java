@@ -1,7 +1,5 @@
 package com.lifejourney.townhall;
 
-import android.util.Log;
-
 import androidx.core.util.Pair;
 
 import com.lifejourney.engine2d.CollidableObject;
@@ -509,7 +507,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
             return (int) (bountyExp * (1.0 + level * 0.2));
         }
         public int requiredExpToLevelUp(int level) {
-            return 1000*level;
+            return 300*level;
         }
         public Projectile.ProjectileType projectileType() {
             return projectileType;
@@ -1152,7 +1150,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         // Deal damage
-        float damage = Math.max(getMeleeDamage() * ((critical)?2.0f:1.0f) * buff *
+        float damage = Math.max(getMeleeDamage() * ((critical)?3.0f:1.0f) * buff *
                 unitClass.strengthMetric(opponent.unitClass) * (1.0f - opponent.getArmor()), 1.0f);
         if (critical) {
             opponent.gotCriticalDamage(damage);
@@ -1417,7 +1415,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
         if (Upgradable.PALADIN_GUARDIAN.getLevel(faction) > 0) {
             float guardianDelta =
-                    damage * DAMAGE_UPGRADE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
+                    damage * MELEE_DAMAGE_UPGRADE_DELTA * Upgradable.PALADIN_GUARDIAN.getLevel(faction);
             for (Unit companion: companions) {
                 if (companion != this && companion.getUnitClass() == UnitClass.PALADIN) {
                     damage -= guardianDelta;
@@ -1537,7 +1535,12 @@ public class Unit extends CollidableObject implements Projectile.Event {
      * @return
      */
     public float getMaxHealth() {
-        return adjustBonus(adjustLevel(getUnitClass().health()), healthBonus);
+        float maxHealth = adjustBonus(adjustLevel(getUnitClass().health()), healthBonus);
+        if (Upgradable.PALADIN_HEALTH.getLevel(faction) > 0 && getUnitClass() == UnitClass.PALADIN) {
+            maxHealth *= 1.0f + Upgradable.PALADIN_HEALTH.getLevel(faction) * HEALTH_UPGRADE_DELTA;
+        }
+
+        return maxHealth;
     }
 
     /**
@@ -1567,13 +1570,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Apply upgrade
         if (getUnitClass() == UnitClass.FIGHTER) {
             meleeDamage = adjustBonus(meleeDamage,
-                    Upgradable.FIGHTER_MELEE_DAMAGE.getLevel(faction) * DAMAGE_UPGRADE_DELTA);
+                    Upgradable.FIGHTER_MELEE_DAMAGE.getLevel(faction) * RANGED_DAMAGE_UPGRADE_DELTA);
         } else if (getUnitClass() == UnitClass.HORSE_MAN) {
             meleeDamage = adjustBonus(meleeDamage,
-                    Upgradable.HORSE_MAN_MELEE_DAMAGE.getLevel(faction) * DAMAGE_UPGRADE_DELTA);
+                    Upgradable.HORSE_MAN_MELEE_DAMAGE.getLevel(faction) * RANGED_DAMAGE_UPGRADE_DELTA);
         } else if (getUnitClass() == UnitClass.PALADIN) {
             meleeDamage = adjustBonus(meleeDamage,
-                    Upgradable.PALADIN_MELEE_DAMAGE.getLevel(faction) * DAMAGE_UPGRADE_DELTA);
+                    Upgradable.PALADIN_MELEE_DAMAGE.getLevel(faction) * RANGED_DAMAGE_UPGRADE_DELTA);
         }
         return meleeDamage;
     }
@@ -1590,10 +1593,10 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Apply upgrade
         if (getUnitClass() == UnitClass.ARCHER) {
             rangedDamage = adjustBonus(rangedDamage,
-                    Upgradable.ARCHER_RANGED_DAMAGE.getLevel(faction) * DAMAGE_UPGRADE_DELTA);
+                    Upgradable.ARCHER_RANGED_DAMAGE.getLevel(faction) * MELEE_DAMAGE_UPGRADE_DELTA);
         } else if (getUnitClass() == UnitClass.CANNON) {
             rangedDamage = adjustBonus(rangedDamage,
-                    Upgradable.CANNON_RANGED_DAMAGE.getLevel(faction) * DAMAGE_UPGRADE_DELTA);
+                    Upgradable.CANNON_RANGED_DAMAGE.getLevel(faction) * MELEE_DAMAGE_UPGRADE_DELTA);
         }
         return rangedDamage;
     }
@@ -1815,7 +1818,6 @@ public class Unit extends CollidableObject implements Projectile.Event {
      *
      */
     public void addExp(int expEarned) {
-
         if (isRecruiting()) {
             return;
         }
@@ -1987,18 +1989,20 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private final static float SPLASH_DAMAGE_RANGE = 30.0f;
     private final static float SPLASH_DAMAGE_DELTA = 0.1f;
     private final static float SPLASH_DAMAGE_RANGE_DELTA = 0.1f;
-    private final static float DAMAGE_UPGRADE_DELTA = 0.05f;
-    private final static float ATTACK_SPEED_UPGRADE_DELTA = 0.05f;
+    private final static float MELEE_DAMAGE_UPGRADE_DELTA = 0.05f;
+    private final static float RANGED_DAMAGE_UPGRADE_DELTA = 0.03f;
+    private final static float ATTACK_SPEED_UPGRADE_DELTA = 0.03f;
     private final static float HEAL_POWER_UPGRADE_DELTA = 0.05f;
-    private final static float EVASION_UPGRADE_DELTA = 0.05f;
-    private final static float ARMOR_UPGRADE_DELTA = 0.05f;
+    private final static float EVASION_UPGRADE_DELTA = 0.03f;
+    private final static float ARMOR_UPGRADE_DELTA = 0.03f;
     private final static float CRITICAL_ATTACK_RATE_DELTA = 0.05f;
-    private final static float BUFF_DELTA = 0.05f;
-    private final static float DOT_DELTA = 0.1f;
+    private final static float BUFF_DELTA = 0.03f;
+    private final static float DOT_DELTA = 0.01f;
     private final static float MOVE_SPEED_DELTA = 0.1f;
-    private final static float STUN_DELTA = 0.05f;
-    private final static float SLOW_DELTA = 0.05f;
-    private final static int DOT_DURATION = 60;
+    private final static float STUN_DELTA = 0.03f;
+    private final static float SLOW_DELTA = 0.03f;
+    private final static float HEALTH_UPGRADE_DELTA = 0.03f;
+    private final static int DOT_DURATION = 30;
     private final static int STUN_DURATION = 60;
     private final static int SLOW_DURATION = 60;
     private final static float INVINCIBLE_DURATION_DELTA = 0.05f;

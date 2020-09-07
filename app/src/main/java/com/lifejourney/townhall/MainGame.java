@@ -320,8 +320,6 @@ public class MainGame extends World
         if (focusedTerritory == territory && focusedTerritory.getFaction() == Tribe.Faction.VILLAGER &&
                 focusedTerritory.getSquads().isEmpty()) {
             squadBuilderButton.show();
-        } else {
-            squadBuilderButton.hide();
         }
 
         if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {

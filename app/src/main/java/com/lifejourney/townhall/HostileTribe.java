@@ -119,12 +119,12 @@ public abstract class HostileTribe extends Tribe {
             return;
         }
 
-        recruitingUpdateTimeLeft = (int) (SQUAD_RECRUITING_UPDATE_TIME * difficultyFactor);
+        recruitingUpdateTimeLeft = SQUAD_RECRUITING_UPDATE_TIME;
         recruitingProgressive += RECRUITING_PROGRESSIVE_DELTA;
         Log.i(LOG_TAG, getFaction().toGameString() + " progressive: " + recruitingProgressive);
 
         // Create squad if conditions are met
-        int squadCreationAllowGold = SQUAD_CREATION_ALLOW_GOLD * (getSquads().size() + 1);
+        int squadCreationAllowGold = (int) (SQUAD_CREATION_ALLOW_GOLD * (getSquads().size() + 1) * difficultyFactor);
         if (getSquads().size() < SQUAD_COUNT_LIMIT &&
                 gold >= squadCreationAllowGold &&
                 getHeadquarterPosition() != null &&
@@ -139,7 +139,7 @@ public abstract class HostileTribe extends Tribe {
 
         // Recruit unit if needed
         for (Squad squad: getSquads()) {
-            if (Math.random() < 0.2f && !squad.isFighting() && squad.getUnits().size() < 3 &&
+            if (Math.random() < 0.3f && !squad.isFighting() && squad.getUnits().size() < 3 &&
                     getMap().getTerritory(squad.getMapPosition()).getFaction() == getFaction()) {
                 squad.spawnUnit(selectUnitToSpawn(UnitSpawnType.ANY));
                 break;
@@ -424,7 +424,7 @@ public abstract class HostileTribe extends Tribe {
     protected static final int POLICY_TRANSITION_TIME = 300;
     protected static final int SQUAD_RECRUITING_UPDATE_TIME = 140;
     protected static final int TACTICAL_DECISION_UPDATE_TIME = 90;
-    protected static final int SQUAD_CREATION_ALLOW_GOLD = 7000;
+    protected static final int SQUAD_CREATION_ALLOW_GOLD = 6000;
     protected static final int SQUAD_COUNT_LIMIT = 10;
     protected static final int INCOME_PER_TERRITORY = 15;
     protected static final int BASE_INCOME = 100;
@@ -433,7 +433,7 @@ public abstract class HostileTribe extends Tribe {
     protected static final float SQUAD_ACTIVATE_THRESHOLD = 0.8f;
     protected static final int RECRUITING_PROGRESSIVE_DELTA = 10;
     protected static final int RECRUITING_PROGRESSIVE_THRESHOLD = 1000;
-    protected static final int UPGRADING_PROGRESSIVE_THRESHOLD = 3000;
+    protected static final int UPGRADING_PROGRESSIVE_THRESHOLD = 1500;
 
     protected Villager villager;
     protected Mission mission;
@@ -444,7 +444,7 @@ public abstract class HostileTribe extends Tribe {
     protected int recruitingProgressive = 0;
     protected int upgradingProgressive = 0;
     protected int collectUpdateTimeLeft = COLLECT_UPDATE_TIME;
-    protected int recruitingUpdateTimeLeft = (int) (SQUAD_RECRUITING_UPDATE_TIME * difficultyFactor);
+    protected int recruitingUpdateTimeLeft = SQUAD_RECRUITING_UPDATE_TIME;
     protected int policyDecisionUpdateTimeLeft = POLICY_DECISION_UPDATE_TIME;
     protected int policyTransitionTimeLeft = POLICY_TRANSITION_TIME;
     protected int tacticalDecisionUpdateTime = TACTICAL_DECISION_UPDATE_TIME;

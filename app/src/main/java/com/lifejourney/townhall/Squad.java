@@ -924,7 +924,6 @@ public class Squad extends Object implements Controllable {
      * @param expEarned
      */
     public void addExp(int expEarned) {
-
         for (Unit unit: units) {
             unit.addExp(expEarned);
         }

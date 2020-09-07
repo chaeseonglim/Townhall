@@ -34,9 +34,9 @@ public class Villager extends Tribe {
         if (getTerritories().size() > 0) {
             for (Territory territory : getTerritories()) {
                 income += (float) territory.getTax() *
-                        (1.0f + getShrineBonus(ShrineBonus.PROSPERITY));
+                        (1.0f + SHRINE_FACTOR * getShrineBonus(ShrineBonus.PROSPERITY));
                 totalPopulation += territory.getPopulation() *
-                        (1.0f + getShrineBonus(ShrineBonus.LOVE));
+                        (1.0f + SHRINE_FACTOR * getShrineBonus(ShrineBonus.LOVE));
                 happiness += territory.getHappiness();
             }
             happiness /= getTerritories().size();
@@ -173,6 +173,7 @@ public class Villager extends Tribe {
 
 
     private final static int COLLECT_UPDATE_TIME = 60;
+    private final static float SHRINE_FACTOR = 0.2f;
 
     private int collectTimeLeft = 1;
     private int totalPopulation = 0;

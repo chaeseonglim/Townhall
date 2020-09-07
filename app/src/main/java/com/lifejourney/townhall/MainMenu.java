@@ -90,7 +90,7 @@ public class MainMenu extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
 
         // Logo
-        String logoText = "마을 대전략\n1.0";
+        String logoText = "마을\n대전략\n1.0";
         logo = new TextSprite.Builder("logo", logoText, 120)
                 .fontColor(Color.rgb(255, 255, 0))
                 .fontName("neodgm.ttf")
@@ -322,7 +322,7 @@ public class MainMenu extends World
                     .build();
             ratingMessageBox.show();
             addWidget(ratingMessageBox);
-        } else if (game.getMission() == Mission.LV10 && starRating > 0) {
+        } else if (game.getMission().ordinal() == Mission.values().length - 1 && starRating > 0) {
             Rect viewport = Engine2D.GetInstance().getViewport();
             todoMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,

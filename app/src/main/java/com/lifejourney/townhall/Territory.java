@@ -410,12 +410,17 @@ public class Territory {
             // Calculate delta from this territory
             for (int i = 0; i < Facility.values().length; ++i) {
                 deltas[i] = developmentPolicy[i].developmentDelta() +
-                        terrain.developmentDelta(Facility.values()[i]);
+                        ((developmentPolicy[i] != DevelopmentPolicy.DETERIORATE) ?
+                        terrain.developmentDelta(Facility.values()[i]) : 0);
             }
-            deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET) * 2 +
-                    terrain.goldDelta();
-            deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM) * 2 +
-                    terrain.populationDelta();
+            if (getFacilityLevel(Facility.MARKET) > 0 || terrain == Terrain.HEADQUARTER) {
+                deltas[DeltaAttribute.GOLD.ordinal()] = getFacilityLevel(Facility.MARKET) * 2 +
+                        terrain.goldDelta();
+            }
+            if (getFacilityLevel(Facility.FARM) > 0 || terrain == Terrain.HEADQUARTER) {
+                deltas[DeltaAttribute.POPULATION.ordinal()] = getFacilityLevel(Facility.FARM) * 2 +
+                        terrain.populationDelta();
+            }
             deltas[DeltaAttribute.HAPPINESS.ordinal()] = terrain.happinessDelta();
             deltas[DeltaAttribute.OFFENSIVE.ordinal()] = terrain.offenseDelta();
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] = getFacilityLevel(Facility.FORTRESS) * 2 +
@@ -449,24 +454,39 @@ public class Territory {
                 }
                  */
             }
+            deltas[DeltaAttribute.HAPPINESS.ordinal()] += maxDowntownLvl;
             deltas[DeltaAttribute.HAPPINESS.ordinal()] -= maxFortressLvl;
-            deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
-            deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
+            if (getFacilityLevel(Facility.MARKET) > 0 || terrain == Terrain.HEADQUARTER) {
+                deltas[DeltaAttribute.GOLD.ordinal()] += maxDowntownLvl;
+            }
+            if (getFacilityLevel(Facility.FARM) > 0 || terrain == Terrain.HEADQUARTER) {
+                deltas[DeltaAttribute.POPULATION.ordinal()] += maxDowntownLvl;
+            }
             deltas[DeltaAttribute.DEFENSIVE.ordinal()] += maxFortressLvl;
 
             // Calculate delta from squads
             for (Squad squad: squads) {
                 if (squad.getFaction() == faction) {
                     int[] developmentDeltasFromSquad = squad.collectDevelopmentBonus();
-                    deltas[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()] +=
-                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()];
-                    deltas[DeltaAttribute.DEVELOPMENT_FARM.ordinal()] +=
-                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FARM.ordinal()];
-                    deltas[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()] +=
-                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()];
-                    deltas[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()] +=
-                            developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()];
-                    deltas[DeltaAttribute.GOLD.ordinal()] += squad.collectGoldBonus();
+                    if (developmentPolicy[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()] != DevelopmentPolicy.DETERIORATE) {
+                        deltas[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()] +=
+                                developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_DOWNTOWN.ordinal()];
+                    }
+                    if (developmentPolicy[DeltaAttribute.DEVELOPMENT_FARM.ordinal()] != DevelopmentPolicy.DETERIORATE) {
+                        deltas[DeltaAttribute.DEVELOPMENT_FARM.ordinal()] +=
+                                developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FARM.ordinal()];
+                    }
+                    if (developmentPolicy[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()] != DevelopmentPolicy.DETERIORATE) {
+                        deltas[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()] +=
+                                developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_MARKET.ordinal()];
+                    }
+                    if (developmentPolicy[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()] != DevelopmentPolicy.DETERIORATE) {
+                        deltas[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()] +=
+                                developmentDeltasFromSquad[DeltaAttribute.DEVELOPMENT_FORTRESS.ordinal()];
+                    }
+                    if (getFacilityLevel(Facility.MARKET) > 0 || terrain == Terrain.HEADQUARTER) {
+                        deltas[DeltaAttribute.GOLD.ordinal()] += squad.collectGoldBonus();
+                    }
                     deltas[DeltaAttribute.HAPPINESS.ordinal()] += squad.collectHappinessBonus();
                     deltas[DeltaAttribute.DEFENSIVE.ordinal()] += squad.collectDefensiveBonus();
                     break;
@@ -1189,7 +1209,7 @@ public class Territory {
     private final static int FACILITY_EXP_STEP = 10;
     private final static int GOLD_STEP = 10;
     private final static int POPULATION_STEP = 5;
-    private final static int HAPPINESS_STEP = 5;
+    private final static int HAPPINESS_STEP = 10;
     private final static int BASE_HAPPINESS = 50;
     private final static int OCCUPATION_TOTAL_STEP = 5;
     private final static int OCCUPATION_UPDATE_TIME_FOR_EACH_STEP = 30;
