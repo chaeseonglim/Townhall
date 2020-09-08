@@ -383,6 +383,7 @@ enum Mission {
 
         public void init(MainGame game) {
             turn = 0;
+            shrineTaken = false;
 
             // Prevent AI control units at the beginning
             Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
@@ -971,16 +972,18 @@ enum Mission {
     LV12("map/map_lv12.png",
                  "누가 더 잘 쏘나?",
                  "바이킹이 몰고 온 대포는 정말 무시무시한 무기입니다." +
-                 "가까스로 버텨내고 있지만 바이킹은 코 앞까지 몰려든 상태입니다." +
-                 " 장인들이 말합니다. \"똑같은 대포를 만들려면 금화가 20000개 필요합니다.\"" +
-                 " \n\n자, 금화 20000개만 모으면 적에게 포탄 세례를 퍼부을 수 있습니다.",
+                 " 가까스로 버텨내고 있지만 바이킹은 코 앞까지 몰려든 상태입니다." +
+                 " 장인들이 말합니다. \"똑같은 대포를 만들려면 금화가 2만개 필요합니다.\"" +
+                 " \n\n자, 금화 2만개만 모으면 적에게 포탄 세례를 퍼부을 수 있습니다.",
                  "바이킹 본부 점령 / 도적 패배",
                  1000,
-                 160,
+                 180,
                  new boolean[] { true, true, true, true, true, false, false }) {
 
         public void init(MainGame game) {
             turn = 0;
+            cannonAllowed = false;
+            shrineTaken = false;
 
             setRecruitAvailable(new boolean[] { true, true, true, true, true, false, false });
 
@@ -1023,13 +1026,17 @@ enum Mission {
                     Unit.UnitClass.ARCHER, Unit.UnitClass.HEALER, Unit.UnitClass.HEALER);
             bandit.spawnSquad(new OffsetCoord(0, 0).toGameCoord(),
                     Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN);
+            bandit.spawnSquad(new OffsetCoord(9, 0).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            bandit.spawnSquad(new OffsetCoord(8, 0).toGameCoord(),
+                    Unit.UnitClass.ARCHER, Unit.UnitClass.HEALER, Unit.UnitClass.HEALER);
 
             Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
-            villager.spawnSquad(new OffsetCoord(6, 5).toGameCoord(),
-                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.HORSE_MAN);
+            villager.spawnSquad(new OffsetCoord(7, 5).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
             villager.spawnSquad(new OffsetCoord(7, 8).toGameCoord(),
                     Unit.UnitClass.HEALER, Unit.UnitClass.HEALER, Unit.UnitClass.ARCHER);
-            villager.spawnSquad(new OffsetCoord(3, 3).toGameCoord(),
+            villager.spawnSquad(new OffsetCoord(4, 3).toGameCoord(),
                     Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
 
             game.getMap().getTerritory(new OffsetCoord(6, 0)).setFogState(Territory.FogState.MIST);
@@ -1077,10 +1084,10 @@ enum Mission {
             }
 
             Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
-            if (!cannonAllowd && villager.getGold() >= 20000) {
+            if (!cannonAllowed && villager.getGold() >= 20000) {
                 game.popupMsgBox("드디어 장인들이 대포 기술을 개발했습니다.\n당장 모집해서 본때를 보여줍시다.");
                 setRecruitAvailable(new boolean[] { true, true, true, true, true, true, false });
-                cannonAllowd = true;
+                cannonAllowed = true;
             }
 
             // Check if vikings are defeated
@@ -1100,8 +1107,167 @@ enum Mission {
         }
 
         private int turn = 0;
-        private boolean cannonAllowd = false;
+        private boolean cannonAllowed = false;
         private boolean shrineTaken = false;
+    },
+    LV13("map/map_lv13.png",
+                 "잠자는 예배당의 사자",
+                 "바이킹에게 매서운 대포 맛을 보여줬습니다." +
+                 " 하지만 여전히 사방은 적들로 가득합니다." +
+                 " 동쪽에서는 반란군들이, 서쪽에서는 도적과 바이킹이 공격하고 있습니다." +
+                 " \n\n이번에도 기적이 필요합니다. 모든 사원을 다 점령하세요.",
+                 "도적 패배 / 반란군 패배",
+                 1000,
+                 180,
+                 new boolean[] { true, true, true, true, true, true, false }) {
+
+        public void init(MainGame game) {
+            turn = 0;
+
+            setRecruitAvailable(new boolean[] { true, true, true, true, true, true, false });
+
+            Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
+            game.getMap().getTerritory(viking.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            viking.setDifficultyFactor(0.5f);
+            viking.setControlledByAI(false);
+            viking.spawnSquad(new OffsetCoord(1, 7).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.CANNON);
+            viking.spawnSquad(new OffsetCoord(2, 8).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            viking.spawnSquad(new OffsetCoord(2, 9).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.CANNON);
+            viking.spawnSquad(new OffsetCoord(1, 8).toGameCoord(),
+                    Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER, Unit.UnitClass.CANNON);
+            viking.spawnSquad(new OffsetCoord(3, 10).toGameCoord(),
+                Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HEALER);
+
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            game.getMap().getTerritory(bandit.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            bandit.setDifficultyFactor(0.5f);
+            bandit.setControlledByAI(false);
+            bandit.spawnSquad(new OffsetCoord(1, 1).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            bandit.spawnSquad(new OffsetCoord(1, 2).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            bandit.spawnSquad(new OffsetCoord(1, 0).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
+            bandit.spawnSquad(new OffsetCoord(0, 1).toGameCoord(),
+                    Unit.UnitClass.ARCHER, Unit.UnitClass.HEALER, Unit.UnitClass.HEALER);
+            bandit.spawnSquad(new OffsetCoord(0, 0).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN);
+            bandit.spawnSquad(new OffsetCoord(2, 2).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+
+            Rebel rebel = (Rebel)game.getTribe(Tribe.Faction.REBEL);
+            game.getMap().getTerritory(rebel.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            rebel.setDifficultyFactor(0.5f);
+            rebel.setControlledByAI(false);
+            rebel.spawnSquad(new OffsetCoord(10, 0).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            rebel.spawnSquad(new OffsetCoord(11, 0).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.FIGHTER, Unit.UnitClass.HEALER);
+            rebel.spawnSquad(new OffsetCoord(12, 0).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HEALER);
+            rebel.spawnSquad(new OffsetCoord(12, 1).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.ARCHER, Unit.UnitClass.ARCHER);
+
+            Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
+            villager.spawnSquad(new OffsetCoord(7, 6).toGameCoord(),
+                    Unit.UnitClass.FIGHTER, Unit.UnitClass.FIGHTER, Unit.UnitClass.ARCHER);
+            villager.spawnSquad(new OffsetCoord(7, 8).toGameCoord(),
+                    Unit.UnitClass.HEALER, Unit.UnitClass.HEALER, Unit.UnitClass.ARCHER);
+            villager.spawnSquad(new OffsetCoord(5, 5).toGameCoord(),
+                    Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN, Unit.UnitClass.HORSE_MAN);
+        }
+
+        public void update(MainGame game) {
+            turn++;
+
+            int day = game.getDays();
+
+            Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            Rebel rebel = (Rebel)game.getTribe(Tribe.Faction.REBEL);
+            if (turn == 700) {
+                bandit.setControlledByAI(true);
+                rebel.setControlledByAI(true);
+                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews("조심하세요!! 반란군이 이제 활동을 시작합니다.");
+            } else if (turn == 1100) {
+                viking.setControlledByAI(true);
+                game.addNews("조심하세요!! 바이킹이 이제 활동을 시작합니다.");
+            }
+
+            // Hints
+            if (turn == 500) {
+                game.addNews("힌트: 모든 사원을 다 점령하면 언젠가 기적이 일어납니다.");
+            } else if (turn == 1000) {
+                game.addNews("힌트: 사방에 적이 있습니다. 주의하세요.");
+            } else if (turn == 1500) {
+                game.addNews("힌트: 전투는 최대한 지원 하에 이루어져야 합니다.");
+            } else if (turn == 2000) {
+                game.addNews("힌트: 피해를 입은 유닛은 휴식이 필요합니다.");
+            } else if (turn == 3000) {
+                game.addNews("힌트: 적의 본부를 공략하는 방법도 있습니다.");
+            } else if (turn == 4000) {
+                game.addNews("힌트: 곧 기적이 벌어집니다!!!");
+            } else if (turn == 5000) {
+                game.addNews("힌트: 가능하면 일꾼을 꾸준히 만들어 새로운 영토를 넓히세요.");
+            } else if (turn == 5500) {
+                game.addNews("힌트: 여러가지 공략 방법이 있을 수 있습니다.");
+            }
+
+            Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
+            if (turn == 4200 &&
+                game.getMap().getTerritory(new OffsetCoord(11, 11)).getFaction() ==
+                        Tribe.Faction.VILLAGER) {
+                game.addNews("치유의 신이 당신의 기도에 응답했습니다.");
+                game.popupMsgBox("치유의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                villager.spawnSquad(new OffsetCoord(10, 11).toGameCoord(),
+                        Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
+            }
+            if (turn == 4300 &&
+                    game.getMap().getTerritory(new OffsetCoord(10, 4)).getFaction() ==
+                            Tribe.Faction.VILLAGER) {
+                game.addNews("바람의 신이 당신의 기도에 응답했습니다.");
+                game.popupMsgBox("바람의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                villager.spawnSquad(new OffsetCoord(9, 4).toGameCoord(),
+                        Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
+            }
+            if (turn == 4400 &&
+                    game.getMap().getTerritory(new OffsetCoord(7, 1)).getFaction() ==
+                            Tribe.Faction.VILLAGER) {
+                game.addNews("풍요의 신이 당신의 기도에 응답했습니다.");
+                game.popupMsgBox("풍요의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                villager.spawnSquad(new OffsetCoord(6, 0).toGameCoord(),
+                        Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
+            }
+            if (turn == 4500 &&
+                    game.getMap().getTerritory(new OffsetCoord(3, 5)).getFaction() ==
+                            Tribe.Faction.VILLAGER) {
+                game.addNews("사랑의 신이 당신의 기도에 응답했습니다.");
+                game.popupMsgBox("사랑의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                villager.spawnSquad(new OffsetCoord(3, 4).toGameCoord(),
+                        Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
+            }
+
+            // Check if vikings are defeated
+            if (viking.isDefeated() && bandit.isDefeated()) {
+                if (day <= getTimeLimit() * 0.7f) {
+                    game.missionCompleted(3);
+                } else if (day <= getTimeLimit() * 0.85f) {
+                    game.missionCompleted(2);
+                } else {
+                    game.missionCompleted(1);
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
+            }
+        }
+
+        private int turn = 0;
     };
 
     abstract void init(MainGame game);

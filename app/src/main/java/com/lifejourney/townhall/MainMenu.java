@@ -99,7 +99,7 @@ public class MainMenu extends World
                 .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
                 .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                 .size(new SizeF(600, 350))
-                .position(new PointF(viewport.centerX(), viewport.height * 3 / 7))
+                .position(new PointF(viewport.centerX(), viewport.y + viewport.height * 2 / 5))
                 .smooth(true).depth(0.1f)
                 .layer(20).visible(true).build();
 

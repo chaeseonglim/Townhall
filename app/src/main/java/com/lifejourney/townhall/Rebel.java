@@ -11,11 +11,6 @@ public class Rebel extends HostileTribe {
     }
 
     @Override
-    protected Unit.UnitClass selectUnitToSpawn(UnitSpawnType spawnType) {
-        return null;
-    }
-
-    @Override
     protected void decidePolicy() {
     }
 }
