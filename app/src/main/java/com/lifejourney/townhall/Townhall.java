@@ -99,6 +99,7 @@ public class Townhall extends FragmentActivity
         List<String> testDevices = new ArrayList<>();
         testDevices.add(AdRequest.DEVICE_ID_EMULATOR);
         testDevices.add("673768DE6553B0103FB0B8CF2D7A99E3");
+        testDevices.add("E23E0850367D68E359C48B446DFE6509");
         RequestConfiguration requestConfiguration
                 = new RequestConfiguration.Builder()
                 .setTestDeviceIds(testDevices)

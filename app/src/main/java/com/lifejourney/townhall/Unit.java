@@ -1150,7 +1150,7 @@ public class Unit extends CollidableObject implements Projectile.Event {
         }
 
         // Deal damage
-        float damage = Math.max(getMeleeDamage() * ((critical)?3.0f:1.0f) * buff *
+        float damage = Math.max(getMeleeDamage() * ((critical)?4.0f:1.0f) * buff *
                 unitClass.strengthMetric(opponent.unitClass) * (1.0f - opponent.getArmor()), 1.0f);
         if (critical) {
             opponent.gotCriticalDamage(damage);

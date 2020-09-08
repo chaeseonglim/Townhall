@@ -1028,13 +1028,15 @@ public class Territory {
 
         // Add/remove facility slot
         int slotDelta = newNeededSlotCount - currentNeededSlotCount;
-        if (facilitySlots.size() + slotDelta <= terrain.facilitySlots()) {
-            for (int i = 0; i < Math.abs(slotDelta); ++i) {
-                if (slotDelta > 0) {
-                    facilitySlots.add(facility);
-                } else {
-                    facilitySlots.remove(facility);
-                }
+        if (facilitySlots.size() + slotDelta > terrain.facilitySlots()) {
+            return;
+        }
+
+        for (int i = 0; i < Math.abs(slotDelta); ++i) {
+            if (slotDelta > 0) {
+                facilitySlots.add(facility);
+            } else {
+                facilitySlots.remove(facility);
             }
         }
 
