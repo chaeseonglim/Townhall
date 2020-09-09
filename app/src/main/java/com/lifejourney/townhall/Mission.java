@@ -1282,8 +1282,6 @@ enum Mission {
         public void init(MainGame game) {
             turn = 0;
 
-            setRecruitAvailable(new boolean[] { true, true, true, true, true, true, false });
-
             Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
             game.getMap().getTerritory(viking.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
             viking.setControlledByAI(true);
