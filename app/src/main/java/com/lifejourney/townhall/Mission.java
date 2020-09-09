@@ -1226,7 +1226,7 @@ enum Mission {
                 villager.spawnSquad(new OffsetCoord(10, 11).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
-            if (turn == 4300 &&
+            if (turn == 4400 &&
                     game.getMap().getTerritory(new OffsetCoord(10, 4)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
                 game.addNews("바람의 신이 당신의 기도에 응답했습니다.");
@@ -1234,7 +1234,7 @@ enum Mission {
                 villager.spawnSquad(new OffsetCoord(9, 4).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
-            if (turn == 4400 &&
+            if (turn == 4600 &&
                     game.getMap().getTerritory(new OffsetCoord(7, 1)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
                 game.addNews("풍요의 신이 당신의 기도에 응답했습니다.");
@@ -1242,7 +1242,7 @@ enum Mission {
                 villager.spawnSquad(new OffsetCoord(6, 0).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
-            if (turn == 4500 &&
+            if (turn == 4800 &&
                     game.getMap().getTerritory(new OffsetCoord(3, 5)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
                 game.addNews("사랑의 신이 당신의 기도에 응답했습니다.");
@@ -1253,6 +1253,60 @@ enum Mission {
 
             // Check if vikings are defeated
             if (viking.isDefeated() && bandit.isDefeated()) {
+                if (day <= getTimeLimit() * 0.7f) {
+                    game.missionCompleted(3);
+                } else if (day <= getTimeLimit() * 0.85f) {
+                    game.missionCompleted(2);
+                } else {
+                    game.missionCompleted(1);
+                }
+            }
+
+            if (day > getTimeLimit()) {
+                game.missionTimeout();
+            }
+        }
+
+        private int turn = 0;
+    },
+    FREE_LV1("map/map_free_lv1.png",
+                 "자유 게임 1",
+                 "자유 게임입니다.\n\n" +
+                 " 적과 동등한 조건에서 싸워 이기세요." +
+                 " 모든 유닛과 업그레이드를 사용 가능합니다.",
+                 "모든 적 패배",
+                 2000,
+                 1000,
+                 new boolean[] { true, true, true, true, true, true, true }) {
+
+        public void init(MainGame game) {
+            turn = 0;
+
+            setRecruitAvailable(new boolean[] { true, true, true, true, true, true, false });
+
+            Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
+            game.getMap().getTerritory(viking.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            viking.setControlledByAI(true);
+
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            game.getMap().getTerritory(bandit.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            bandit.setControlledByAI(true);
+
+            Rebel rebel = (Rebel)game.getTribe(Tribe.Faction.REBEL);
+            game.getMap().getTerritory(rebel.getHeadquarterPosition()).setFogState(Territory.FogState.MIST);
+            rebel.setControlledByAI(true);
+        }
+
+        public void update(MainGame game) {
+            turn++;
+
+            int day = game.getDays();
+
+            // Check if vikings are defeated
+            Viking viking = (Viking)game.getTribe(Tribe.Faction.VIKING);
+            Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
+            Rebel rebel = (Rebel)game.getTribe(Tribe.Faction.REBEL);
+            if (viking.isDefeated() && bandit.isDefeated() && rebel.isDefeated()) {
                 if (day <= getTimeLimit() * 0.7f) {
                     game.missionCompleted(3);
                 } else if (day <= getTimeLimit() * 0.85f) {
