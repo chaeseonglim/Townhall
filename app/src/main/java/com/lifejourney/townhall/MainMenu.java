@@ -133,6 +133,11 @@ public class MainMenu extends World
     public void close() {
         super.close();
 
+        if (logo != null) {
+            logo.close();
+            logo = null;
+        }
+
         if (sampleMap != null) {
             sampleMap.close();
             sampleMap = null;

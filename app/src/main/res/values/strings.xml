@@ -215,7 +215,7 @@
     But they will come again. We need to gather as much gold as possible.\n\n
     It will help to gather gold if there is a big market near the town.
     </string>
-    <string name="lv3_victory">Build a market above Lv4 / Gather 3000 gold</string>
+    <string name="lv3_victory">Build a market above Lv4</string>
     <string name="lv3_hint1">Hint: Markets are grown faster on badlands.</string>
     <string name="lv3_hint2">Hint: You can build facilities up to total Lv5 in a land.</string>
     <string name="lv3_hint3">Hint: You can increase the income by taking lands.</string>

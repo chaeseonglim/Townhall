@@ -177,18 +177,16 @@ enum Mission {
 
             // Victory condition
             int day = game.getDays();
-            if (((Villager)game.getTribe(Tribe.Faction.VILLAGER)).getGold() > 3000) {
-                for (Territory territory: game.getTribe(Tribe.Faction.VILLAGER).getTerritories()) {
-                    if (territory.getFacilityLevel(Territory.Facility.MARKET) >= 4) {
-                        if (day <= getTimeLimit() * 0.6f) {
-                            game.missionCompleted(3);
-                        } else if (day <= getTimeLimit() * 0.8f) {
-                            game.missionCompleted(2);
-                        } else {
-                            game.missionCompleted(1);
-                        }
-                        break;
+            for (Territory territory: game.getTribe(Tribe.Faction.VILLAGER).getTerritories()) {
+                if (territory.getFacilityLevel(Territory.Facility.MARKET) >= 4) {
+                    if (day <= getTimeLimit() * 0.6f) {
+                        game.missionCompleted(3);
+                    } else if (day <= getTimeLimit() * 0.8f) {
+                        game.missionCompleted(2);
+                    } else {
+                        game.missionCompleted(1);
                     }
+                    break;
                 }
             }
 

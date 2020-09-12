@@ -218,7 +218,7 @@
     하지만 그들은 다시 올 것입니다. 만약을 대비해 많은 금화를 모아야 합니다.
     \n\n마을 근처에 큰 시장이 있다면 도움이 될 것입니다.
     </string>
-    <string name="lv3_victory">시장 Lv4 이상 1개 / 금화 3000 보유</string>
+    <string name="lv3_victory">시장 Lv4 이상 1개 보유</string>
     <string name="lv3_hint1">시장은 황무지에서 빠르게 성장합니다.</string>
     <string name="lv3_hint2">지역 전체 시설의 Lv 합은 5를 넘지 못합니다.</string>
     <string name="lv3_hint3">영토를 정복하면 수입을 쉽게 늘릴 수 있습니다.</string>

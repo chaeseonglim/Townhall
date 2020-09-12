@@ -4,14 +4,12 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Trace;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Choreographer;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -25,6 +23,7 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.lifejourney.engine2d.Engine2D;
+import com.lifejourney.engine2d.Engine2DSurfaceView;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.World;
 
@@ -33,7 +32,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class Townhall extends FragmentActivity
-        implements Choreographer.FrameCallback, SurfaceHolder.Callback, MainMenu.Event {
+        implements Choreographer.FrameCallback, SurfaceHolder.Callback, MainMenu.Event,
+            Engine2DSurfaceView.Event {
 
     private static final long ONE_MS_IN_NS = 1000000;
     private static final long ONE_S_IN_NS = 1000 * ONE_MS_IN_NS;
@@ -51,7 +51,8 @@ public class Townhall extends FragmentActivity
         Log.i(LOG_TAG, String.format("Refresh rate: %.1f Hz", refreshRateHz));
 
         // Initialize the surfaceView
-        SurfaceView surfaceView = findViewById(R.id.surfaceView);
+        Engine2DSurfaceView surfaceView = (Engine2DSurfaceView) findViewById(R.id.surfaceView);
+        surfaceView.setEventHandler(this);
         surfaceView.getHolder().addCallback(this);
 
         Log.i(LOG_TAG, "Engine initialized: " + Engine2D.GetInstance().isInitialized());
@@ -244,8 +245,7 @@ public class Townhall extends FragmentActivity
      * @return
      */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
+    public boolean onViewTouchEvent(MotionEvent event) {
         return world.onTouchEvent(event);
     }
 
@@ -285,7 +285,7 @@ public class Townhall extends FragmentActivity
         Engine2D.GetInstance().setSurface(surface, width, height);
 
         if (!surfacePrepared) {
-            Log.i(LOG_TAG, "surfaceChanged");
+            Log.e(LOG_TAG, "surfaceChanged " + width + " " + height);
 
             onEngine2DPrepared();
             surfacePrepared = true;
@@ -298,6 +298,8 @@ public class Townhall extends FragmentActivity
      */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        Log.i(LOG_TAG, "surfaceDestroyed");
+
         Engine2D.GetInstance().clearSurface();
     }
 
