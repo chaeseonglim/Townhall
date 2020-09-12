@@ -1,5 +1,6 @@
 package com.lifejourney.townhall;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.SizeF;
@@ -19,7 +20,7 @@ public class Territory {
 
     enum Terrain {
         GRASS(
-                "초원",
+                Engine2D.GetInstance().getString(R.string.grass),
                 3,
                  new boolean[] { true, true, true, true, true },
                  new int[] {1, 1, 0, -1},
@@ -32,7 +33,7 @@ public class Territory {
                 0
         ),
         BADLANDS(
-                "황무지",
+                Engine2D.GetInstance().getString(R.string.badlands),
                 3,
                 new boolean[] { true, true, true, true, true },
                 new int[] {1, 0, 1, -1},
@@ -45,7 +46,7 @@ public class Territory {
                 0
         ),
         FOREST(
-                "숲",
+                Engine2D.GetInstance().getString(R.string.forest),
                 2,
                 new boolean[] { true, true, true, true, true },
                 new int[] {-1, 1, -1, 1},
@@ -58,7 +59,7 @@ public class Territory {
                 0
         ),
         HILL(
-                "언덕",
+                Engine2D.GetInstance().getString(R.string.hill),
                 2,
                 new boolean[] { true, true, true, true, true },
                 new int[] {-1, -1, 1, 2},
@@ -71,7 +72,7 @@ public class Territory {
                 0
         ),
         MOUNTAIN(
-                "산",
+                Engine2D.GetInstance().getString(R.string.mountain),
                 0,
                 new boolean[] { false, false, false, false, false },
                 new int[] {0, 0, 0, 0},
@@ -84,7 +85,7 @@ public class Territory {
                 0
         ),
         RIVER(
-                "강",
+                Engine2D.GetInstance().getString(R.string.river),
                 0,
                 new boolean[] { false, false, false, true, false },
                 new int[] {0, 0, 0, 0},
@@ -97,7 +98,7 @@ public class Territory {
                 0
         ),
         HEADQUARTER(
-                "지휘 본부",
+                Engine2D.GetInstance().getString(R.string.headquarter),
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -110,7 +111,7 @@ public class Territory {
                 0
         ),
         SHRINE_WIND(
-                "바람의 제단",
+                Engine2D.GetInstance().getString(R.string.wind_shrine),
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -123,7 +124,7 @@ public class Territory {
                 -2
         ),
         SHRINE_HEAL(
-                "치유의 제단",
+                Engine2D.GetInstance().getString(R.string.healing_shrine),
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -136,7 +137,7 @@ public class Territory {
                 2
         ),
         SHRINE_LOVE(
-                "사랑의 제단",
+                Engine2D.GetInstance().getString(R.string.love_shrine),
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -149,7 +150,7 @@ public class Territory {
                 2
         ),
         SHRINE_PROSPER(
-                "풍요의 제단",
+                Engine2D.GetInstance().getString(R.string.prosper_shrine),
                 0,
                 new boolean[] { true, true, true, true, true },
                 new int[] {0, 0, 0, 0},
@@ -162,7 +163,7 @@ public class Territory {
                 2
         ),
         UNKNOWN(
-                "모름",
+                Engine2D.GetInstance().getString(R.string.unknown),
                 0,
                 new boolean[] { false, false, false, false, false },
                 new int[] {0, 0, 0, 0},

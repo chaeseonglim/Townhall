@@ -47,7 +47,8 @@ public class HomeBox extends Widget implements Button.Event {
         Rect closeButtonRegion = new Rect(getRegion().right() - 166, getRegion().bottom() - 81,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.close))
+                .imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -58,7 +59,8 @@ public class HomeBox extends Widget implements Button.Event {
         Rect toUpgradeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 81,
                 138, 64);
         toUpgradeButton = new Button.Builder(this, toUpgradeButtonRegion)
-                .message("강화").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.upgrade))
+                .imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -105,7 +107,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // Population
         PointF textPosition = new PointF(-231, -145);
-        addText("전체 인구", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.total_population),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(31, 31, 0), 2.0f);
 
@@ -117,7 +120,8 @@ public class HomeBox extends Widget implements Button.Event {
                 Color.rgb(35, 35, 35), 1.0f);
 
         textPosition.offset(125, -30);
-        addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.used_population),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(31, 31, 0), 2.0f);
 
@@ -131,7 +135,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // Income
         textPosition.offset(-195, 30);
-        addText("금화 수입", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.total_income),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -144,7 +149,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // Spend
         textPosition.offset(125, -30);
-        addText("금화 소비", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.total_spend),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -158,7 +164,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // Happiness
         textPosition.offset(-195, 30);
-        addText("행복도", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.happiness),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -181,7 +188,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // The number of towns
         textPosition.setTo(115, -145);
-        addText("마을 수", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.number_of_territory),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -194,7 +202,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // The number of squads
         textPosition.offset(125, -30);
-        addText("부대 수", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.number_of_squad),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -207,7 +216,8 @@ public class HomeBox extends Widget implements Button.Event {
 
         // Occupying shrine
         textPosition.offset(-195, 30);
-        addText("소유 제단", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.occupied_shrine),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -215,7 +225,8 @@ public class HomeBox extends Widget implements Button.Event {
             textPosition.offset(-65, 30);
             addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("치유의 제단", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.healing_shrine),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
@@ -224,7 +235,8 @@ public class HomeBox extends Widget implements Button.Event {
             textPosition.offset(-65, 30);
             addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("바람의 제단", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.wind_shrine),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
@@ -233,7 +245,8 @@ public class HomeBox extends Widget implements Button.Event {
             textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("풍요의 제단", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.prosper_shrine),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
@@ -242,7 +255,8 @@ public class HomeBox extends Widget implements Button.Event {
             textPosition.offset(-65, 30);
             addIcon("health.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("사랑의 제단", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.love_shrine),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(-35, 0);
@@ -252,7 +266,8 @@ public class HomeBox extends Widget implements Button.Event {
                 villager.getShrineBonus(Tribe.ShrineBonus.PROSPERITY) == 0 &&
                 villager.getShrineBonus(Tribe.ShrineBonus.LOVE) == 0) {
             textPosition.offset(0, 30);
-            addText("없음", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.none),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
         }

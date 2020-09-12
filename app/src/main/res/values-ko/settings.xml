@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="music_enable">music_enable</string>
+    <string name="sound_effect_enable">sound_effect_enable</string>
+    <string name="play_count">play_count</string>
+</resources>

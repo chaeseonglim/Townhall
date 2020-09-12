@@ -57,7 +57,8 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(musicButton);
 
         PointF textPosition = new PointF(50, -95);
-        addText("음악 On/Off", new SizeF(200, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.music_on_off),
+                new SizeF(200, 40), textPosition.clone(),
                 Color.rgb(35, 35, 35));
 
         // Sound Effect button
@@ -75,7 +76,8 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(soundEffectButton);
 
         textPosition = new PointF(50, -32);
-        addText("효과음 On/Off", new SizeF(200, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.sound_on_off),
+                new SizeF(200, 40), textPosition.clone(),
                 Color.rgb(35, 35, 35));
 
         // Exit button
@@ -89,7 +91,8 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(exitButton);
 
         textPosition = new PointF(50, 31);
-        addText("종료하기", new SizeF(200, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.exit),
+                new SizeF(200, 40), textPosition.clone(),
                 Color.rgb(35, 35, 35));
 
         // Close button
@@ -103,7 +106,8 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
         addWidget(closeButton);
 
         textPosition = new PointF(50, 94);
-        addText("돌아가기", new SizeF(200, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.back), new SizeF(200, 40),
+                textPosition.clone(),
                 Color.rgb(35, 35, 35));
     }
 
@@ -144,7 +148,7 @@ public class SettingBox extends Widget implements Button.Event, MessageBox.Event
             Rect viewport = Engine2D.GetInstance().getViewport();
             MessageBox messageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                     new Rect((viewport.width - 355) / 2, (viewport.height - 277) / 2,
-                            355, 277), "정말 나가시겠습니까?")
+                            355, 277), Engine2D.GetInstance().getString(R.string.confirm_exit))
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(210, 210, 210))
                     .fontName("neodgm.ttf")
                     .build();

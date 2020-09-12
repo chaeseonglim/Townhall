@@ -45,7 +45,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         Rect cancelButtonRegion = new Rect(getRegion().right() - 165, getRegion().bottom() - 80,
                 138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
-                .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.cancel)).imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(35, 35, 35))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -56,7 +56,7 @@ public class UnitSelectionBox extends Widget implements Button.Event{
         Rect selectButtonRegion = new Rect(getRegion().right() - 165, getRegion().bottom() - 80,
                 138, 64);
         selectButton = new Button.Builder(this, selectButtonRegion)
-                .message("선택").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.select)).imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(35, 35, 35))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -121,7 +121,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Unit Class
             PointF textPosition = new PointF(-245, -168);
-            addText("클래스", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.unit_class),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
             addText(selectedUnitClass.word(), new SizeF(150, 40), textPosition.clone(),
@@ -129,7 +130,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Population
             textPosition.offset(160, -30);
-            addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.used_population),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("people.png", new SizeF(30, 30), textPosition.clone());
@@ -139,7 +141,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Purchase gold
             textPosition.offset(-190, 30);
-            addText("구매 비용", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.purchase_cost),
+                        new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
@@ -149,7 +152,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Upkeep gold
             textPosition.offset(130, -30);
-            addText("유지 비용", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.upkeep),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
@@ -159,7 +163,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Health
             textPosition.offset(-190, 30);
-            addText("체력", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.health),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("health.png", new SizeF(25, 25), textPosition.clone());
@@ -170,7 +175,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Velocity
             textPosition.offset(130, -30);
-            addText("이동 속도", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.move_speed),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("speed.png", new SizeF(25, 25), textPosition.clone());
@@ -183,7 +189,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
                 selectedUnitClass.unitClassType() == Unit.UnitClassType.RANGED_HEALER) {
                 // Heal power
                 textPosition.offset(-190, 30);
-                addText("치유력", new SizeF(150, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.heal_power),
+                        new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
                 addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
@@ -195,7 +202,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
                 // Heal speed
                 textPosition.offset(130, -30);
-                addText("치유 속도", new SizeF(150, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.heal_speed),
+                        new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
                 addIcon("heal_speed.png", new SizeF(25, 25), textPosition.clone());
@@ -207,7 +215,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             } else {
                 // Attack damage
                 textPosition.offset(-190, 30);
-                addText("공격력", new SizeF(150, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.damage),
+                        new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
                 addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
@@ -227,7 +236,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
                 // Attack speed
                 textPosition.offset(95, -30);
-                addText("공격 속도", new SizeF(150, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.attack_speed),
+                        new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-65, 30);
                 addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
@@ -249,7 +259,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Armor
             textPosition.offset(-190, 30);
-            addText("방어도", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.armor),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
@@ -260,7 +271,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Evasion
             textPosition.offset(130, -30);
-            addText("회피", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.evade),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(-65, 30);
             addIcon("evade.png", new SizeF(25, 25), textPosition.clone());
@@ -275,14 +287,16 @@ public class UnitSelectionBox extends Widget implements Button.Event{
 
             // Strong/Weakness
             textPosition.setTo(115, -168);
-            addText("지원", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.support),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(0, 30);
-            addText(selectedUnitClass.isSupportable()?"가능":"불가",
+            addText(selectedUnitClass.isSupportable()? Engine2D.GetInstance().getString(R.string.yes):
+                            Engine2D.GetInstance().getString(R.string.no),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
             textPosition.offset(0, 30);
-            addText("설명",
+            addText(Engine2D.GetInstance().getString(R.string.description),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
             textPosition.offset(70, 75);
@@ -293,7 +307,8 @@ public class UnitSelectionBox extends Widget implements Button.Event{
             backgroundSprite.setGridIndex(0, 0);
 
             PointF textPosition = new PointF(-245 + 75, -168);
-            addText("클래스를 선택하세요.", new SizeF(300, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.select_class),
+                    new SizeF(300, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
     }

@@ -49,7 +49,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         Rect closeButtonRegion = new Rect(getRegion().right() - 166, getRegion().bottom() - 80,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.close)).imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -60,7 +60,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
         Rect toHomeButtonRegion = new Rect(getRegion().right() - 310, getRegion().bottom() - 80,
                 138, 64);
         toHomeButton = new Button.Builder(this, toHomeButtonRegion)
-                .message("홈").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.home)).imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -173,14 +173,16 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                     if (villager.isAffordable(selectedUpgradable)) {
                         upgradeConfirmBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                                        353, 275), "유지 비용이 발생하며\n선택시 취소할 수 없습니다.\n진행하시겠습니까?")
+                                        353, 275),
+                                Engine2D.GetInstance().getString(R.string.confirm_upgrade))
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                                 .fontName("neodgm.ttf")
                                 .build();
                     } else {
                         upgradeConfirmBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                                        353, 275), "금화가 부족합니다!\n다음에 시도해주세요.")
+                                        353, 275),
+                                Engine2D.GetInstance().getString(R.string.no_money_for_upgrade))
                                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                                 .fontName("neodgm.ttf")
                                 .build();
@@ -245,7 +247,7 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
             }
 
             PointF textPosition = new PointF(-173, -165);
-            addTitleText(selectedUnitClass.word() + " 강화",
+            addTitleText(selectedUnitClass.word() + " " + Engine2D.GetInstance().getString(R.string.upgrade),
                     new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(255, 255, 0));
 
@@ -253,7 +255,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 backgroundSprite.setGridIndex(2, 0);
 
                 textPosition.setTo(217, -167);
-                addText("구입비", new SizeF(350, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.purchase_cost),
+                        new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-160, 30);
                 addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
@@ -262,19 +265,21 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                         textPosition.clone(), Color.rgb(230, 230, 230));
 
                 textPosition.offset(-40, 30);
-                addText("유지비", new SizeF(350, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.upkeep),
+                        new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(255, 255, 0));
                 textPosition.offset(-160, 30);
                 addIcon("gold.png", new SizeF(30, 30), textPosition.clone());
                 textPosition.offset(200, 0);
                 addText((selectedUpgradable.getUpkeepCost() *
                                 selectedUpgradable.getLevel(Tribe.Faction.VILLAGER)) + " (" +
-                                selectedUpgradable.getUpkeepCost() + " x 레벨)",
+                                selectedUpgradable.getUpkeepCost() + " x Lv)",
                         new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
 
                 textPosition.offset(-40, 30);
-                addText("레벨 1 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 1) ? "(현재 레벨)":""),
+                addText(Engine2D.GetInstance().getString(R.string.level) + " 1 "+
+                                ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 1) ? "(*)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 1)?
                                 Color.rgb(160, 160, 0):
@@ -289,7 +294,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 );
 
                 textPosition.offset(0, 30);
-                addText("레벨 2 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 2) ? "(현재 레벨)":""),
+                addText(Engine2D.GetInstance().getString(R.string.level) + " 2 "+
+                                ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 2) ? "(*)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 2)?
                                 Color.rgb(160, 160, 0):
@@ -304,7 +310,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 );
 
                 textPosition.offset(0, 30);
-                addText("레벨 3 "+ ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 3) ? "(현재 레벨)":""),
+                addText(Engine2D.GetInstance().getString(R.string.level) + " 3 " +
+                                ((selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) == 3) ? "(*)":""),
                         new SizeF(350, 40), textPosition.clone(),
                         (selectedUpgradable.getLevel(Tribe.Faction.VILLAGER) < 3)?
                                 Color.rgb(160, 160, 0):
@@ -319,7 +326,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
                 );
             } else {
                 textPosition.setTo(217, -165);
-                addText("강화할 항목을 선택하세요.", new SizeF(350, 40), textPosition.clone(),
+                addText(Engine2D.GetInstance().getString(R.string.choose_upgrade_lv),
+                        new SizeF(350, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230));
             }
         } else {
@@ -329,7 +337,8 @@ public class UpgradeBox extends Widget implements Button.Event, MessageBox.Event
             }
 
             PointF textPosition = new PointF(-185, -165);
-            addText("강화할 클래스를 선택하세요.", new SizeF(350, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.choose_upgrade_class),
+                    new SizeF(350, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230));
         }
     }

@@ -323,7 +323,7 @@ public class MainGame extends World
         }
 
         if (territory.getMapPosition().equals(tribes.get(0).getHeadquarterPosition())) {
-            newsBar.addNews("우리 본부가 점령되었습니다!!!");
+            newsBar.addNews(Engine2D.GetInstance().getString(R.string.our_headquarter_down));
             missionFailed();
         } else {
             for (int i = 0; i < tribes.size(); ++i) {
@@ -331,13 +331,16 @@ public class MainGame extends World
                 if (territory.getMapPosition().equals(tribes.get(i).getHeadquarterPosition()) &&
                     territory.getFaction() == Tribe.Faction.VILLAGER &&
                         prevFaction == tribes.get(i).getFaction()) {
-                    newsBar.addNews("우리가 " + tribes.get(i).getFaction().toGameString() + "의 본부를 점령했습니다.");
+                    newsBar.addNews(Engine2D.GetInstance().getString(R.string.enemy_headquarter_down_pre)+ " " +
+                            tribes.get(i).getFaction().toGameString() +
+                            Engine2D.GetInstance().getString(R.string.enemy_headquarter_down_post));
                     if (tribes.get(i).getSquads().size() > 0) {
                         for (Squad squad : tribes.get(i).getSquads()) {
                             squad.berserk();
                         }
-                        newsBar.addNews("조심하세요! 남은 " + tribes.get(i).getFaction().toGameString() +
-                                "의 병력들이 강해집니다.");
+                        newsBar.addNews(Engine2D.GetInstance().getString(R.string.enemy_squad_getting_powerful_pre) + " " +
+                                tribes.get(i).getFaction().toGameString() +
+                                Engine2D.GetInstance().getString(R.string.enemy_squad_getting_powerful_post));
                     }
                 }
             }
@@ -345,20 +348,23 @@ public class MainGame extends World
 
         // Notify news
         if (prevFaction != Tribe.Faction.NEUTRAL && territory.getFaction() != Tribe.Faction.NEUTRAL) {
-            newsBar.addNews(territory.getFaction().toGameString() + "이 " +
-                    prevFaction.toGameString() + "의 영토를 차지했습니다.");
+            newsBar.addNews(Engine2D.GetInstance().getString(R.string.occupied_territory_pre)+ " " +
+                    territory.getFaction().toGameString() + " " +
+                    Engine2D.GetInstance().getString(R.string.occupied_territory_mid)+ " " +
+                    prevFaction.toGameString() + " " +
+                    Engine2D.GetInstance().getString(R.string.occupied_territory_post));
         }
 
         // Notify one more news if it's shrine
         if (territory.getFaction() == Tribe.Faction.VILLAGER) {
             if (territory.getTerrain() == Territory.Terrain.SHRINE_WIND) {
-                newsBar.addNews("바람의 제단을 점령했습니다. 이동 속도가 빨라집니다.");
+                newsBar.addNews(Engine2D.GetInstance().getString(R.string.occupied_wind_shrine));
             } else if (territory.getTerrain() == Territory.Terrain.SHRINE_HEAL) {
-                newsBar.addNews("치유의 제단을 점령했습니다. 휴식 속도가 빨라집니다.");
+                newsBar.addNews(Engine2D.GetInstance().getString(R.string.occupied_heal_shrine));
             } else if (territory.getTerrain() == Territory.Terrain.SHRINE_LOVE) {
-                newsBar.addNews("사랑의 제단을 점령했습니다. 인구가 늘어납니다.");
+                newsBar.addNews(Engine2D.GetInstance().getString(R.string.occupied_love_shrine));
             } else if (territory.getTerrain() == Territory.Terrain.SHRINE_PROSPER) {
-                newsBar.addNews("풍요의 제단을 점령했습니다. 금화 수입이 늘어납니다.");
+                newsBar.addNews(Engine2D.GetInstance().getString(R.string.occupied_prosper_shrine));
             }
         }
     }
@@ -379,7 +385,8 @@ public class MainGame extends World
      */
     @Override
     public void onTribeUpgraded(Tribe tribe, Upgradable upgradable) {
-        newsBar.addNews(tribe.getFaction().toGameString() + "이 새로운 기술을 습득했습니다.");
+        newsBar.addNews(tribe.getFaction().toGameString() +
+                Engine2D.GetInstance().getString(R.string.learned_new_upgrade));
     }
 
     /**
@@ -389,7 +396,8 @@ public class MainGame extends World
     @Override
     public void onTribeDefeated(Tribe tribe) {
         if (getDays() > 0) {
-            newsBar.addNews(tribe.getFaction().toGameString() + "이 패배했습니다.");
+            newsBar.addNews(tribe.getFaction().toGameString() +
+                    Engine2D.GetInstance().getString(R.string.defeated));
         }
     }
 
@@ -406,7 +414,8 @@ public class MainGame extends World
         addSquad(squad);
 
         if (newsBar != null && squad.getFaction() != Tribe.Faction.VILLAGER && getDays() > 0) {
-            newsBar.addNews(squad.getFaction().toGameString() + "이 새로운 부대를 만들었습니다.");
+            newsBar.addNews(squad.getFaction().toGameString() +
+                    Engine2D.GetInstance().getString(R.string.made_new_squad));
         }
     }
 
@@ -432,7 +441,8 @@ public class MainGame extends World
         }
 
         if (newsBar != null && squad.isDeployed()) {
-            newsBar.addNews(squad.getFaction().toGameString() + "의 부대가 제거되었습니다.");
+            newsBar.addNews(squad.getFaction().toGameString() +
+                    Engine2D.GetInstance().getString(R.string.removed_a_squad));
         }
     }
 
@@ -610,8 +620,11 @@ public class MainGame extends World
             Rect viewport = Engine2D.GetInstance().getViewport();
             missionMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                            353, 275), "승리 조건:\n" + mission.getVictoryCondition() +
-                    "\n\n시간 제한:\n" + mission.getTimeLimit()+"일")
+                            353, 275),
+                    Engine2D.GetInstance().getString(R.string.victory_condition) + "\n" +
+                            mission.getVictoryCondition() +
+                    "\n\n" + Engine2D.GetInstance().getString(R.string.time_limit) + "\n" +
+                            mission.getTimeLimit() + Engine2D.GetInstance().getString(R.string.day))
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                     .fontName("neodgm.ttf")
                     .build();
@@ -1035,7 +1048,9 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "미션을 완수했습니다!!!\n별 " + stars + "개 달성")
+                        353, 275),
+                Engine2D.GetInstance().getString(R.string.mission_completed_pre) + " " +
+                        stars + Engine2D.GetInstance().getString(R.string.mission_completed_post))
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
                 .fontName("neodgm.ttf")
                 .build();
@@ -1053,7 +1068,8 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "게임 오버!!!\n시간 내에 미션을\n완수하지 못했습니다.")
+                        353, 275),
+                Engine2D.GetInstance().getString(R.string.game_over_time_limit))
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
                 .fontName("neodgm.ttf")
                 .build();
@@ -1071,7 +1087,7 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         gameFinishMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "게임 오버!!!\n본부를 점령당했습니다.")
+                        353, 275), Engine2D.GetInstance().getString(R.string.game_over_headquarter_down))
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
                 .fontName("neodgm.ttf")
                 .build();
@@ -1088,7 +1104,7 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         tutorialForManagementStartMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "튜토리얼을 진행하시겠습니까?")
+                        353, 275), Engine2D.GetInstance().getString(R.string.would_you_like_tutorial))
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                 .fontName("neodgm.ttf")
                 .build();
@@ -1107,7 +1123,7 @@ public class MainGame extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
         tutorialForBattleStartMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                 new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                        353, 275), "튜토리얼을 진행하시겠습니까?")
+                        353, 275), Engine2D.GetInstance().getString(R.string.would_you_like_tutorial))
                 .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                 .fontName("neodgm.ttf")
                 .build();

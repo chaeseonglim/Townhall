@@ -30,7 +30,8 @@ public class NewsBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(backgroundSprite);
 
-        textSprite = new TextSprite.Builder("dateText", "안녕하세요. 마을 주민들이 당신에게 인사합니다!", 24)
+        textSprite = new TextSprite.Builder("dateText",
+                Engine2D.GetInstance().getString(R.string.say_hi), 24)
                 .fontColor(Color.rgb(230, 230, 230))
                 .bgColor(Color.argb(0, 0, 0, 0))
                 .fontName("neodgm.ttf")

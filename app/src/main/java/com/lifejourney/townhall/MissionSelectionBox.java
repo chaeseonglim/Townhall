@@ -56,7 +56,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         Rect cancelButtonRegion = new Rect(getRegion().right() - 392, getRegion().bottom() - 77,
                 138, 64);
         cancelButton = new Button.Builder(this, cancelButtonRegion)
-                .message("뒤로").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.short_back)).imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -67,7 +67,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
         Rect startButtonRegion = new Rect(getRegion().right() - 246, getRegion().bottom() - 77,
                 138, 64);
         startButton = new Button.Builder(this, startButtonRegion)
-                .message("시작").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.start)).imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -88,7 +88,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
                 100, 100);
         rightButton = new Button.Builder(this, rightButtonRegion)
                 .imageSpriteAsset("left_right_btns.png").numImageSpriteSet(2)
-                .fontSize(23).layer(getLayer()+1).build();
+                .fontSize(22).layer(getLayer()+1).build();
         rightButton.setFollowParentVisibility(false);
         rightButton.setImageSpriteSet(1);
         addWidget(rightButton);
@@ -138,7 +138,7 @@ public class MissionSelectionBox extends Widget implements Button.Event{
 
         // Mission victory condition
         textPosition.setTo(0, 56);
-        addText("승리 조건:", new SizeF(460, 40),
+        addText(Engine2D.GetInstance().getString(R.string.victory_condition), new SizeF(460, 40),
                 textPosition.clone(),
                 23, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);
@@ -151,13 +151,14 @@ public class MissionSelectionBox extends Widget implements Button.Event{
 
         // Mission time limit
         textPosition.setTo(0, 116);
-        addText("시간 제한:", new SizeF(460, 40),
+        addText(Engine2D.GetInstance().getString(R.string.time_limit), new SizeF(460, 40),
                 textPosition.clone(),
                 23, Color.rgb(235, 235, 0), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);
 
         textPosition.setTo(0, 146);
-        addText(selectedMission.getTimeLimit() + "일", new SizeF(460, 40),
+        addText(selectedMission.getTimeLimit() + Engine2D.GetInstance().getString(R.string.day),
+                new SizeF(460, 40),
                 textPosition.clone(),
                 23, Color.rgb(235, 235, 235), Layout.Alignment.ALIGN_NORMAL,
                 Layout.Alignment.ALIGN_CENTER);

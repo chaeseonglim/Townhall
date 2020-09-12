@@ -65,10 +65,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
         tutorialBox = new MessageBox.Builder(this, MessageBox.Type.PLATE,
                 new Rect(viewport.width - 340 - 20, viewport.height - 240 - 90,
                         340, 250),
-                "존경하는 촌장님!\n\n" +
-                "저는 당신의 조언가입니다. " +
-                "지금부터 부대를 운영하는 방법을 알려드리고자 합니다.\n\n\n" +
-                "아무 곳이나 터치하세요.")
+                Engine2D.GetInstance().getString(R.string.tutorial_battle_1))
                 .fontSize(24.0f).layer(50).textColor(Color.rgb(235, 235, 235))
                 .fontName("neodgm.ttf")
                 .bgAsset("tutorial_box_bg.png").bgOpaque(0.8f)
@@ -224,20 +221,14 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle.show();
             guideRectangle.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 당신은 두 개의 부대를 이미 보유하고 있습니다.\n\n" +
-                    "∙ 부대의 위치는 타일 중앙에 아이콘으로 표시됩니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_2));
         } else if (step == Step.FOCUS_SQUAD2) {
-            tutorialBox.setMessage(
-                    "∙ 각 부대는 3개의 유닛을 보유할 수 있습니다.\n\n" +
-                    "∙ 현재 유닛을 모집 중인 상태입니다. 잠시 기다려주세요...");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_3));
         } else if (step == Step.UNIT) {
             guideRectangle.hide();
             guideRectangle.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 유닛 모집이 완료 되었습니다.\n\n" +
-                    "∙ 부대에 속한 유닛이 지도 상에 작은 원으로 나타납니다. 아무 곳이나 터치하세요.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_4));
         } else if (step == Step.INFO_SQUAD) {
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(140, viewport.height - 74)), new SizeF(100, 64)));
@@ -247,9 +238,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(0);
             game.popupInfoBox(squad);
 
-            tutorialBox.setMessage(
-                    "∙ 하단의 정보 버튼을 눌러 부대의 정보를 확인 가능합니다. \n\n" +
-                    "∙ 추가 효과에 나타난 것처럼 다양한 지역/시설이 부대에 영향을 주게 됩니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_5));
         } else if (step == Step.MOVE_SQUAD) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -264,9 +253,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle.show();
             guideRectangle.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 이제 부대를 이동해 보겠습니다.\n\n" +
-                    "∙ 부대 아이콘을 드래그해서 다른 타일에 옮기면 부대가 이동합니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_6));
         } else if (step == Step.MOVE_SQUAD2) {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(0);
             OffsetCoord squadTargetMapPosition = squad.getMapPosition().clone();
@@ -279,9 +266,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
 
             squad.seekTo(squadTargetMapPosition, false);
 
-            tutorialBox.setMessage(
-                    "∙ 이번엔 제가 직접 이동시켜 드리겠습니다." +
-                    "∙ 부대가 빨간 상자의 위치로 이동 중입니다. \n\n잠시 기다려주세요..");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_7));
         } else if (step == Step.FOG) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -289,12 +274,9 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle2.hide();
             guideRectangle2.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 자 이제 부대 이동이 완료되었습니다.\n\n" +
-                    "∙ 부대가 이동함에 따라서 주위의 안개가 걷히는 것을 볼 수 있습니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_8));
         } else if (step == Step.OCCUPYING_TERRITORY) {
-            tutorialBox.setMessage(
-                    "∙ 부대가 위치한 곳이 아군의 영토가 아니라면 점령을 시작합니다.\n\n잠시 기다려주세요..");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_9));
         } else if (step == Step.MOVE_SQUAD3) {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(0);
             OffsetCoord squadMapPosition = squad.getMapPosition();
@@ -314,9 +296,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
 
             squad.seekTo(squadTargetMapPosition, false);
 
-            tutorialBox.setMessage(
-                    "∙ 자 이제 새로운 영토를 점령했습니다.\n\n" +
-                    "∙ 분명 도적이 이 근처에 있을 것입니다. 유닛을 더 이동해보겠습니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_10));
         } else if (step == Step.ENEMY_SQUAD_INFO) {
             Squad squad = game.getTribe(Tribe.Faction.BANDIT).getSquads().get(0);
             OffsetCoord squadMapPosition = squad.getMapPosition();
@@ -329,9 +309,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle2.hide();
             guideRectangle2.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 드디어 도적을 발견했습니다.\n\n" +
-                    "∙ 도적 부대는 현재 본부에 주둔 중입니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_11));
         } else if (step == Step.ENEMY_SQUAD_INFO2) {
             guideRectangle.setRegion(new RectF(Engine2D.GetInstance().fromWidgetToGame(
                     new PointF(140, viewport.height - 74)), new SizeF(100, 64)));
@@ -343,9 +321,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             game.onSquadFocused(squad);
             game.popupInfoBox(squad);
 
-            tutorialBox.setMessage(
-                    "∙ 도적 부대를 선택 후 하단 정보 버튼을 누르면 정보를 보여줍니다.\n\n" +
-                    "∙ 도적은 본부에 주둔하고 있어 방어도 추가 효과를 누리고 있습니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_12));
         } else if (step == Step.BATTLE) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -368,9 +344,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle2.show();
             guideRectangle2.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 이제 도적을 제거할 시간입니다.\n\n" +
-                    "∙ 전투를 시작하기 위해서는 부대를 적 부대 위치로 드래그 해야 합니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_13));
         } else if (step == Step.BATTLE2) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -384,9 +358,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             Squad bandit = game.getTribe(Tribe.Faction.BANDIT).getSquads().get(0);
             squad.seekTo(bandit.getMapPosition(), false);
 
-            tutorialBox.setMessage(
-                    "∙ 이번에는 제가 부대를 움직여보겠습니다.\n\n" +
-                    "∙ 잠시 전투를 감상하세요..");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_14));
         } else if (step == Step.SUPPORT) {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(1);
             OffsetCoord squadMapPosition = squad.getMapPosition();
@@ -396,9 +368,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle.show();
             guideRectangle.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 우리 부대는 잘 싸우고 있지만 도움이 필요할 것 같습니다.\n\n" +
-                    "∙ 나머지 부대를 움직여 아군을 지원하도록 하겠습니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_15));
         } else if (step == Step.SUPPORT2) {
             Squad squad = game.getTribe(Tribe.Faction.VILLAGER).getSquads().get(1);
             OffsetCoord targetMapPosition = squad.getMapPosition().clone();
@@ -411,9 +381,7 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
 
             squad.seekTo(targetMapPosition, false);
 
-            tutorialBox.setMessage(
-                    "∙ 아군 부대를 전투가 벌어지는 타일 옆에 놓으면 전투를 지원합니다. " +
-                    "∙ 이번에는 제가 직접 옮겨보겠습니다.\n\n잠시 기다려주세요..");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_16));
         } else if (step == Step.SUPPORT3) {
             guideRectangle.hide();
             guideRectangle.commit();
@@ -421,24 +389,17 @@ public class TutorialGuideForBattle extends Widget implements MessageBox.Event {
             guideRectangle2.hide();
             guideRectangle2.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 이제 아군 부대가 전투를 지원하기 시작했습니다.\n\n" +
-                    "∙ 지원은 불리한 전황을 바꿀 수 있는 핵심적인 전략입니다. 현명하게 사용하세요.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_17));
         } else if (step == Step.SUPPORT4) {
             guideRectangle.hide();
             guideRectangle.commit();
 
-            tutorialBox.setMessage(
-                    "∙ 참고로 모든 유닛이 다 지원이 가능하지는 않습니다.\n\n" +
-                    "∙ 따라서 직접 전투할 부대와 지원할 부대를 신중하게 선택해야 합니다.");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_18));
         } else if (step == Step.FINAL) {
             guideRectangle.hide();
             guideRectangle.commit();
 
-            tutorialBox.setMessage(
-                    "촌장님!\n" +
-                    "부대 운영에 대한 설명을 이만 마치겠습니다.\n\n" +
-                    "∙ 팁: 이제 도적 부대를 박살내세요!");
+            tutorialBox.setMessage(Engine2D.GetInstance().getString(R.string.tutorial_battle_19));
         } else if (step == Step.FINISHED) {
             eventHandler.onTutorialGuideForBattleFinished(this);
         }

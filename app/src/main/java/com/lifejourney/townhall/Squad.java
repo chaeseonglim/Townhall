@@ -449,7 +449,7 @@ public class Squad extends Object implements Controllable {
         }
 
         if (workerCount > 0) {
-            workerCount = Upgradable.WORKER_DEFENSE.getLevel(faction) * workerCount;
+            workerCount = Upgradable.WORKER_DEFENSE.getLevel(faction) * workerCount * 2;
         }
 
         return workerCount;

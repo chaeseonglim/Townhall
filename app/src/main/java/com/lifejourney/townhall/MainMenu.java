@@ -1,9 +1,6 @@
 package com.lifejourney.townhall;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.print.PrintAttributes;
 import android.text.Layout;
 import android.view.MotionEvent;
 
@@ -90,7 +87,7 @@ public class MainMenu extends World
         Rect viewport = Engine2D.GetInstance().getViewport();
 
         // Logo
-        String logoText = "마을\n대전략\n1.0";
+        String logoText = Engine2D.GetInstance().getString(R.string.logo_text);
         logo = new TextSprite.Builder("logo", logoText, 120)
                 .fontColor(Color.rgb(255, 255, 0))
                 .fontName("neodgm.ttf")
@@ -107,7 +104,8 @@ public class MainMenu extends World
         startButton = new Button.Builder(this,
                 new Rect((viewport.width - 300) / 2,  viewport.height - 200, 302, 64))
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("게임 시작").fontSize(29).fontColor(Color.rgb(0, 0, 0))
+                .message(Engine2D.GetInstance().getString(R.string.game_start))
+                .fontSize(29).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
@@ -118,7 +116,8 @@ public class MainMenu extends World
         settingButton = new Button.Builder(this,
                 new Rect((viewport.width - 300) / 2,  viewport.height - 120, 302, 64))
                 .imageSpriteAsset("main_menu_btn.png").numImageSpriteSet(1).layer(20)
-                .message("설정").fontSize(29).fontColor(Color.rgb(0, 0, 0))
+                .message(Engine2D.GetInstance().getString(R.string.setting_btn))
+                .fontSize(29).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
                 .build();
@@ -316,7 +315,7 @@ public class MainMenu extends World
             Rect viewport = Engine2D.GetInstance().getViewport();
             ratingMessageBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                            353, 275), "게임은 어떠신가요? :)\n\n게임을 평가해주시겠습니까?")
+                            353, 275), Engine2D.GetInstance().getString(R.string.how_about_game))
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
                     .fontName("neodgm.ttf")
                     .build();
@@ -326,7 +325,7 @@ public class MainMenu extends World
             Rect viewport = Engine2D.GetInstance().getViewport();
             todoMessageBox = new MessageBox.Builder(this, MessageBox.Type.CLOSE,
                     new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                            353, 275), "더 많은 미션이 곧 공개될 예정입니다.\n\n잠시만 기다려주세요.")
+                            353, 275), Engine2D.GetInstance().getString(R.string.expect_more_mission))
                     .fontSize(25.0f).layer(50).textColor(Color.rgb(235, 235, 235))
                     .fontName("neodgm.ttf")
                     .build();

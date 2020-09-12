@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.Layout;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.PointF;
 import com.lifejourney.engine2d.Rect;
 import com.lifejourney.engine2d.SizeF;
@@ -32,7 +33,8 @@ public class DateBar extends Widget {
                 .layer(20).visible(false).build();
         addSprite(background);
 
-        dateTextSprite = new TextSprite.Builder("dateText", "0 일", 27)
+        dateTextSprite = new TextSprite.Builder("dateText",
+                "0 " + Engine2D.GetInstance().getString(R.string.day), 27)
                 .fontColor(Color.rgb(235, 235, 235))
                 .fontName("neodgm.ttf")
                 .shadow(Color.rgb(61, 61, 61), 2.0f)
@@ -56,7 +58,7 @@ public class DateBar extends Widget {
         // Update date
         if (!paused && --updateTimeLeft == 0) {
             days++;
-            dateTextSprite.setText(days + " 일");
+            dateTextSprite.setText(days + " " + Engine2D.GetInstance().getString(R.string.day));
             eventHandler.onDateBarPassed(days);
             updateTimeLeft = DATE_UPDATE_PERIOD;
         }

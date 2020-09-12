@@ -139,7 +139,7 @@ public class MessageBox extends Widget implements Button.Event {
             Rect yesButtonRegion = new Rect(getRegion().left() + 33, getRegion().bottom() - 71,
                     138, 64);
             yesButton = new Button.Builder(this, yesButtonRegion)
-                    .message("예").imageSpriteAsset("messagebox_btn_bg.png")
+                    .message(Engine2D.GetInstance().getString(R.string.yes)).imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
@@ -151,7 +151,7 @@ public class MessageBox extends Widget implements Button.Event {
             Rect noButtonRegion = new Rect(getRegion().left() + 177, getRegion().bottom() - 71,
                     138, 64);
             noButton = new Button.Builder(this, noButtonRegion)
-                    .message("아니오").imageSpriteAsset("messagebox_btn_bg.png")
+                    .message(Engine2D.GetInstance().getString(R.string.no)).imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
@@ -167,7 +167,7 @@ public class MessageBox extends Widget implements Button.Event {
             Rect okButtonRegion = new Rect(getRegion().left() + 35, getRegion().bottom() - 71,
                     138, 64);
             okButton = new Button.Builder(this, okButtonRegion)
-                    .message("확인").imageSpriteAsset("messagebox_btn_bg.png")
+                    .message(Engine2D.GetInstance().getString(R.string.ok)).imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
@@ -179,7 +179,7 @@ public class MessageBox extends Widget implements Button.Event {
             Rect cancelButtonRegion = new Rect(getRegion().left() + 177, getRegion().bottom() - 71,
                     138, 64);
             cancelButton = new Button.Builder(this, cancelButtonRegion)
-                    .message("취소").imageSpriteAsset("messagebox_btn_bg.png")
+                    .message(Engine2D.GetInstance().getString(R.string.cancel)).imageSpriteAsset("messagebox_btn_bg.png")
                     .fontSize(25)
                     .fontColor(Color.rgb(0, 0, 0))
                     .fontName(builder.fontName)
@@ -198,7 +198,7 @@ public class MessageBox extends Widget implements Button.Event {
                             .fontColor(builder.textColor)
                             .fontName(builder.fontName)
                             .shadow(shadowColor, shadowDepth)
-                            .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                            .horizontalAlign((type == Type.PLATE)?Layout.Alignment.ALIGN_NORMAL:Layout.Alignment.ALIGN_CENTER)
                             .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                             .size(textSize)
                             .positionOffset(new PointF(0, (textSize.height - getRegion().height) / 2 + TEXT_MARGIN))
@@ -209,7 +209,7 @@ public class MessageBox extends Widget implements Button.Event {
                     new TextSprite.Builder("messagebox", builder.message, builder.fontSize)
                             .fontColor(builder.textColor)
                             .fontName(builder.fontName)
-                            .horizontalAlign(Layout.Alignment.ALIGN_CENTER)
+                            .horizontalAlign((type == Type.PLATE)?Layout.Alignment.ALIGN_NORMAL:Layout.Alignment.ALIGN_CENTER)
                             .verticalAlign(Layout.Alignment.ALIGN_CENTER)
                             .size(textSize)
                             .positionOffset(new PointF(0, (textSize.height - getRegion().height) / 2 + TEXT_MARGIN))

@@ -1,17 +1,13 @@
 package com.lifejourney.townhall;
 
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 
 enum Mission {
     LV1("map/map_lv1.png",
-            "굶주림 (튜토리얼)",
-            "당신은 어느 작은 마을의 촌장입니다.\n\n" +
-                    "유난히 혹독했던 지난 겨울, 당신은 많은 " +
-                    "친구들을 잃었습니다. 하지만 이제 애도를 " +
-                    "마치고 다시 일어설 때입니다. \n\n미래를 대비해 " +
-                    "마을을 정돈하고 인구를 충분히 회복해야 " +
-                    "합니다.",
-            "전체 인구 65 이상",
+            Engine2D.GetInstance().getString(R.string.lv1_title),
+            Engine2D.GetInstance().getString(R.string.lv1_desc),
+            Engine2D.GetInstance().getString(R.string.lv1_victory),
             250,
             40,
             new boolean[] { true, false, false, false, false, false, false }
@@ -31,13 +27,13 @@ enum Mission {
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 농장은 인구를 늘려줍니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv1_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 일꾼을 뽑아 영토를 늘리는 방법도 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv1_hint2));
             } else if (turn == 1500) {
-                game.addNews("힌트: 이번 미션에 시장과 요새는 불필요합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv1_hint3));
             } else if (turn == 2000) {
-                game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv1_hint4));
             }
 
             // Game clear check
@@ -60,11 +56,9 @@ enum Mission {
         private int turn = 0;
     },
     LV2("map/map_lv2.png",
-            "조짐 (튜토리얼)",
-            "마을 근처에 도적들이 접근하고 있습니다." +
-                    "마을 사람들이 불안해 하기 전에 처리해야 합니다." +
-                    "\n\n당신의 전술적 지식을 확인해 볼 수 있는 좋은 기회입니다.",
-            "도적 패배",
+            Engine2D.GetInstance().getString(R.string.lv2_title),
+            Engine2D.GetInstance().getString(R.string.lv2_desc),
+            Engine2D.GetInstance().getString(R.string.lv2_victory),
             250,
             50,
             new boolean[] { true, true, true, false, false, false, false }
@@ -99,11 +93,11 @@ enum Mission {
 
             // Hints
             if (turn == 1500) {
-                game.addNews("힌트: 후퇴한 적은 바로 추격해서 공격 가능합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv2_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 전투가 불리하면 추가 부대를 모집하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv2_hint2));
             } else if (turn == 3000) {
-                game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv2_hint3));
             }
 
             int day = game.getDays();
@@ -125,11 +119,9 @@ enum Mission {
         private int turn = 0;
     },
     LV3("map/map_lv3.png",
-                "당근 시장",
-                "훌륭합니다!\n우리 병사들이 마을 근처에 접근한 도적들을 물리쳤습니다." +
-                        " 하지만 그들은 다시 올 것입니다. 만약을 대비해 많은 금화를 모아야 합니다." +
-                        " \n\n마을 근처에 큰 시장이 있다면 도움이 될 것입니다.",
-                "시장 Lv4 이상 1개 / 금화 5000 보유",
+                Engine2D.GetInstance().getString(R.string.lv3_title),
+                Engine2D.GetInstance().getString(R.string.lv3_desc),
+                Engine2D.GetInstance().getString(R.string.lv3_victory),
                 250,
                 120,
                 new boolean[] { true, true, true, false, false, false, false }
@@ -157,35 +149,35 @@ enum Mission {
                 // Prevent AI control units at the beginning
                 Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 시장은 황무지에서 빠르게 성장합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 지역 전체 시설의 Lv 합은 5를 넘지 못합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint2));
             } else if (turn == 1500) {
-                game.addNews("힌트: 영토를 정복하면 수입을 쉽게 늘릴 수 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint3));
             } else if (turn == 2000) {
-                game.addNews("힌트: 일꾼이 있는 지역은 빠르게 개발이 진행됩니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint4));
             } else if (turn == 2500) {
-                game.addNews("힌트: 시장은 황무지에서 빠르게 성장합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint1));
             } else if (turn == 3000) {
-                game.addNews("힌트: 한 시설을 Lv4이상 만드려면 개발도를 조정해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint5));
             } else if (turn == 4000) {
-                game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint6));
             } else if (turn == 4500) {
-                game.addNews("힌트: 지역 전체 시설의 Lv 합은 5를 넘지 못합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint2));
             } else if (turn == 5000) {
-                game.addNews("힌트: 일꾼이 있는 지역은 빠르게 개발이 진행됩니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint4));
             } else if (turn == 5500) {
-                game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv3_hint6));
             }
 
             // Victory condition
             int day = game.getDays();
-            if (((Villager)game.getTribe(Tribe.Faction.VILLAGER)).getGold() > 5000) {
+            if (((Villager)game.getTribe(Tribe.Faction.VILLAGER)).getGold() > 3000) {
                 for (Territory territory: game.getTribe(Tribe.Faction.VILLAGER).getTerritories()) {
                     if (territory.getFacilityLevel(Territory.Facility.MARKET) >= 4) {
                         if (day <= getTimeLimit() * 0.6f) {
@@ -208,11 +200,9 @@ enum Mission {
         private int turn = 0;
     },
     LV4("map/map_lv4.png",
-                "금화 맛",
-                "당신의 예상대로 북쪽 숲 너머에서 도적들이 다시 움직이기 시작했습니다." +
-                " 하지만 시장이 활성화 되면서 마을은 많은 금화를 모았습니다." +
-                " \n\n도적들에게 당신의 힘을 보여줄 기회입니다.",
-                "도적 패배",
+                Engine2D.GetInstance().getString(R.string.lv4_title),
+                Engine2D.GetInstance().getString(R.string.lv4_desc),
+                Engine2D.GetInstance().getString(R.string.lv4_victory),
                 3500,
                 150,
                 new boolean[] { true, true, true, false, false, false, false }) {
@@ -247,22 +237,22 @@ enum Mission {
                 // Prevent AI control units at the beginning
                 Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 돈은 충분합니다. 부대를 모집하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv4_hint1));
             } else if (turn == 1500) {
-                game.addNews("힌트: 유지비를 감당할 수 있다면 업그레이드도 좋습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv4_hint2));
             } else if (turn == 2000) {
-                game.addNews("힌트: 영토를 정복하면 수입을 쉽게 늘릴 수 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv4_hint3));
             } else if (turn == 2500) {
-                game.addNews("힌트: 전투는 지원 병력을 최대한 활용하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv4_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 적의 영토가 많아지면 부대도 빨리 늘어납니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv4_hint5));
             } else if (turn == 5000) {
-                game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv4_hint6));
             }
 
             if (game.getTribe(Tribe.Faction.BANDIT).isDefeated()) {
@@ -283,11 +273,9 @@ enum Mission {
         private int turn = 0;
     },
     LV5("map/map_lv5.png",
-                "내 꿈은 시장님",
-                "마을 근처의 시장은 매우 번창하고 있습니다. 많은 사람들이 당신을 우러러봅니다." +
-                " 여전히 도적들이 근처에 출몰하고 있지만 별 문제는 아닐 것입니다." +
-                " \n\n마을을 더 키워 큰 도시로 만들어주세요.",
-                "마을 & 시장 각각 Lv5 1개 이상 보유",
+                Engine2D.GetInstance().getString(R.string.lv5_title),
+                Engine2D.GetInstance().getString(R.string.lv5_desc),
+                Engine2D.GetInstance().getString(R.string.lv5_victory),
                 1000,
                 150,
                 new boolean[] { true, true, true, false, false, false, false }) {
@@ -325,22 +313,22 @@ enum Mission {
                 // Prevent AI control units at the beginning
                 Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 돈은 충분합니다. 일꾼을 모집하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv5_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 일꾼은 시설을 Lv5로 올리는데 도움을 줄 것입니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv5_hint2));
             } else if (turn == 2000) {
-                game.addNews("힌트: Lv5 시설을 만들 지역은 신중하게 고려하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv5_hint3));
             } else if (turn == 2500) {
-                game.addNews("힌트: 마을은 주위 영토에 많은 도움을 줍니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv5_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: Lv5 시설을 만들 지역에 일꾼 부대를 파견해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv5_hint5));
             } else if (turn == 8000 && game.getTribe(Tribe.Faction.BANDIT).isDefeated()) {
-                game.addNews("힌트: 지루하면 게임 속도를 빠르게 해보세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv5_hint6));
             }
 
             boolean marketDone = false, downtownDone = false;
@@ -371,12 +359,9 @@ enum Mission {
         private int turn = 0;
     },
     LV6("map/map_lv6.png",
-                "병원 개원",
-                "마을이 매우 번창해지자 흩어져있던 도적들이 다시 모이기 시작했습니다." +
-                " 이번에는 도적의 규모가 지금까지와는 다릅니다." +
-                " 위기의 순간 당신은 남쪽에 치유사들이 모여 사는 제단이 있다는 소문을 떠올립니다. " +
-                " \n\n도적을 물리치고 마을을 지켜내야 합니다.",
-                "도적 패배",
+                Engine2D.GetInstance().getString(R.string.lv6_title),
+                Engine2D.GetInstance().getString(R.string.lv6_desc),
+                Engine2D.GetInstance().getString(R.string.lv6_victory),
                 3000,
                 150,
                 new boolean[] { true, true, true, false, false, false, false }) {
@@ -426,24 +411,24 @@ enum Mission {
             if (turn == 2500) {
                 Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 가능하면 도적이 나타나기 전에 사원을 방문하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 사원에 갈때는 충분한 병력을 데려가야합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint2));
             } else if (turn == 1500) {
-                game.addNews("힌트: 이번 도적은 규모가 만만치 않습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint3));
             } else if (turn == 2000) {
-                game.addNews("힌트: 언덕을 요새로 변경하면 방어에 도움이 될지 모릅니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 적은 쉴 틈을 주면 빠르게 회복합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint5));
             } else if (turn == 4000) {
-                game.addNews("힌트: 일꾼은 후방에서 경제 활동을 계속 하는 것이 좋습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint6));
             } else if (turn == 5000) {
-                game.addNews("힌트: 본부가 점령되면 신규 적 부대가 안나옵니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_hint7));
             }
 
             // Check if shrine is taken
@@ -451,8 +436,8 @@ enum Mission {
                     game.getMap().getTerritory(new OffsetCoord(8, 8)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
                 shrineTaken = true;
-                game.addNews("치유사들이 지금부터 당신을 돕기로 결정했습니다.");
-                game.popupMsgBox("당신은 치유사들에게 고개를 숙여 마을을 돕기를 청합니다..\n\n그들은 잠시의 침묵 후 당신을 따라 나섭니다..");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv6_healer_news));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv6_healer_popup));
 
                 // spawn a bonus healer squad
                 Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
@@ -480,11 +465,9 @@ enum Mission {
         private boolean shrineTaken = false;
     },
     LV7("map/map_lv7.png",
-                "바이킹 등장",
-                "당신은 치유사들의 도움으로 계속해서 몰려드는 도적들을 간신히 막아냈습니다." +
-                " 하지만 한숨 돌리기도 전에 남서쪽 강 너머에서 나팔 소리가 들려옵니다." +
-                " \n\n촌장님, 바이킹입니다!",
-                "100일간 생존",
+                Engine2D.GetInstance().getString(R.string.lv7_title),
+                Engine2D.GetInstance().getString(R.string.lv7_desc),
+                Engine2D.GetInstance().getString(R.string.lv7_victory),
                 2000,
                 100,
                 new boolean[] { true, true, true, false, true, false, false }) {
@@ -540,29 +523,29 @@ enum Mission {
                 // Prevent AI control units at the beginning
                 Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             } else if (turn == 1600) {
                 // Prevent AI control units at the beginning
                 Viking viking = (Viking) game.getTribe(Tribe.Faction.VIKING);
                 viking.setControlledByAI(true);
-                game.addNews("조심하세요!! 바이킹이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.viking_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 이번에는 일정 시간 버티면 미션이 종료됩니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 일꾼이 필요치 않다면 다른 유닛으로 변경하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint2));
             } else if (turn == 1500) {
-                game.addNews("힌트: 기존 시설을 요새로 변경하는 방법도 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint3));
             } else if (turn == 2000) {
-                game.addNews("힌트: 바이킹은 강을 건너 넘어올 수 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 치유사는 때로는 지루하지만 버티기에 적합합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint5));
             } else if (turn == 4000) {
-                game.addNews("힌트: 도적의 본부는 점령 가능합니다만...");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint6));
             } else if (turn == 7000) {
-                game.addNews("힌트: 조금만 더 버티면 됩니다!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv7_hint7));
             }
 
             if (day > getTimeLimit()) {
@@ -573,17 +556,16 @@ enum Mission {
         private int turn = 0;
     },
     LV8("map/map_lv8.png",
-                "바람의 신",
-                "바이킹은 우리의 모든 것을 불태웠습니다. 당신과 생존자들은 치유의 제단 근처로 가까스로 대피했습니다." +
-                " 도적은 여전히 남아서 우리의 터전을 약탈하고 있습니다." +
-                " \n\n이곳에서 북으로 올라가면 바람의 제단이 있습니다. 그곳에서부터 실마리를 찾아야 합니다.",
-                "도적 패배",
+                Engine2D.GetInstance().getString(R.string.lv8_title),
+                Engine2D.GetInstance().getString(R.string.lv8_desc),
+                Engine2D.GetInstance().getString(R.string.lv8_victory),
                 1000,
                 150,
                 new boolean[] { true, true, true, false, true, false, false }) {
 
         public void init(MainGame game) {
             turn = 0;
+            shrineTaken = false;
 
             // Prevent AI control units at the beginning
             Bandit bandit = (Bandit)game.getTribe(Tribe.Faction.BANDIT);
@@ -630,20 +612,20 @@ enum Mission {
                 // Prevent AI control units at the beginning
                 bandit.setControlledByAI(true);
                 bandit.setPolicy(HostileTribe.Policy.EXPANSION);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 선택지가 많지 않습니다. 북쪽으로 달리세요!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv8_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 사원을 빠르게 제압해야 합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv8_hint2));
             } else if (turn == 3500) {
-                game.addNews("힌트: 기마병은 빠르지만 원거리 공격에 매우 취약합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv8_hint3));
             } else if (turn == 4500) {
-                game.addNews("힌트: 기마병은 적을 따돌리기 적합합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv8_hint4));
             } else if (turn == 5500) {
-                game.addNews("힌트: 기마병은 치유사의 지원을 받으면 매우 강해집니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv8_hint5));
             }
 
             // Check if shrine is taken
@@ -651,8 +633,8 @@ enum Mission {
                     game.getMap().getTerritory(new OffsetCoord(7, 1)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
                 shrineTaken = true;
-                game.addNews("바람의 신은 당신의 기도에 응답했습니다.");
-                game.popupMsgBox("당신은 제단에 기도를 올립니다..\n\n어느새 날이 어두워지고 돌아서는 찰나 어디선가 동물의 울음소리가 들려옵니다..");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv8_wind_news));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv8_wind_popup));
 
                 // spawn a bonus healer squad
                 Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
@@ -682,11 +664,9 @@ enum Mission {
         private boolean shrineTaken = false;
     },
     LV9("map/map_lv9.png",
-                "마을 탈환",
-                "우리의 기마병은 도적의 선봉을 완전히 격파했습니다." +
-                        " 이대로 밀어붙여 남아있는 도적으로부터 마을을 되찾아야 합니다." +
-                " \n\n마을을 복구하려면 많은 노력이 필요할 것입니다.",
-                "도적 패배 / 인구 500 이상",
+                Engine2D.GetInstance().getString(R.string.lv9_title),
+            Engine2D.GetInstance().getString(R.string.lv9_desc),
+            Engine2D.GetInstance().getString(R.string.lv9_victory),
                 3000,
                 150,
                 new boolean[] { true, true, true, true, true, false, false }) {
@@ -725,24 +705,24 @@ enum Mission {
             Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
             if (turn == 1000) {
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 적을 물리치는 것도 중요하지만 인구를 늘려야합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint1));
             } else if (turn == 1500) {
-                game.addNews("힌트: 기마병은 원거리 공격에 매우 약합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint2));
             } else if (turn == 2000) {
-                game.addNews("힌트: 기마병은 치유사의 지원 하에 굉장히 강해집니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint3));
             } else if (turn == 2500) {
-                game.addNews("힌트: 승리를 거둔 다음 너무 많은 시간을 주면 쉽게 회복합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 인구 500을 만드려면 시간이 부족할 수도 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint5));
             } else if (turn == 3500) {
-                game.addNews("힌트: 성장을 위해 불필요한 요새는 제거하는 것이 좋습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint6));
             } else if (turn == 4000) {
-                game.addNews("힌트: 어느 정도 승기를 잡았다면 일꾼을 늘려도 좋습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv9_hint7));
             }
 
             // Check if bandits are defeated
@@ -765,12 +745,9 @@ enum Mission {
         private int turn = 0;
     },
     LV10("map/map_lv10.png",
-                "도적 소탕",
-                "촌장님, " +
-                        "드디어 마을을 완전히 되찾았습니다." +
-                " 남은 도적들은 뿔뿔히 흩어졌습니다. 두 번 다시 마을을 넘보지 못하게 본때를 보여줍시다." +
-                " \n\n추가로 정찰병에 따르면 북서쪽 숲 근처에서 제단을 발견했다고 합니다. 방문하면 도움이 될지 모르겠습니다.",
-                "도적 패배 / 사랑의 제단 점령",
+                Engine2D.GetInstance().getString(R.string.lv10_title),
+                Engine2D.GetInstance().getString(R.string.lv10_desc),
+                Engine2D.GetInstance().getString(R.string.lv10_victory),
                 4000,
                 150,
                 new boolean[] { true, true, true, true, true, false, false }) {
@@ -826,22 +803,22 @@ enum Mission {
             Bandit bandit = (Bandit) game.getTribe(Tribe.Faction.BANDIT);
             if (turn == 1500) {
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 도적은 여기저기 흩어져 있습니다만 조심해야 합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv10_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 여전히 도적이 많습니다. 병력을 준비해두세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv10_hint2));
             } else if (turn == 2000) {
-                game.addNews("힌트: 사원은 천천히 가도 될 것 같습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv10_hint3));
             } else if (turn == 2500) {
-                game.addNews("힌트: 약간의 업그레이드는 전투에 도움이 됩니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv10_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 적 본부를 점령하면 남은 병력은 매우 강해집니다. 주의하세요!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv10_hint5));
             } else if (turn == 3500) {
-                game.addNews("힌트: 너무 많은 업그레이드는 파산의 지름길입니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv10_hint6));
             }
 
             // Check if bandits are defeated
@@ -864,12 +841,9 @@ enum Mission {
         private int turn = 0;
     },
     LV11("map/map_lv11.png",
-                 "폭죽 소리",
-                 "마을은 다시 번화해지고 있습니다." +
-                 " 마을에는 곡식과 금화가 넘치고 사람들은 쉬지 않고 축제를 엽니다." +
-                 " 축제가 무르익자 어디선가 기쁨의 폭죽 소리가 들리기 시작합니다." +
-                 " \n\n잠시만요.. 그런데 대체 누가 폭죽을 쏘고 있는거죠??",
-                 "바이킹 본부 점령 / 도적 패배",
+                 Engine2D.GetInstance().getString(R.string.lv11_title),
+                 Engine2D.GetInstance().getString(R.string.lv11_desc),
+                 Engine2D.GetInstance().getString(R.string.lv11_victory),
                  1000,
                  160,
                  new boolean[] { true, true, true, true, true, false, false }) {
@@ -928,27 +902,27 @@ enum Mission {
             if (turn == 700) {
                 viking.setControlledByAI(true);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 바이킹이 이제 활동을 시작합니다.");
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.viking_activated));
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 남쪽에 바이킹이 나타났습니다. 폭죽 소리와 함께요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint1));
             } else if (turn == 1500) {
-                game.addNews("힌트: 바이킹은 처음보는 무기를 가져왔습니다. 조심하세요!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint2));
             } else if (turn == 2000) {
-                game.addNews("힌트: 적은 강합니다. 철저히 대비해야 합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint3));
             } else if (turn == 2500) {
-                game.addNews("힌트: 대포병에게 지원을 허용하면 병력이 순식간에 녹습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint4));
             } else if (turn == 3500) {
-                game.addNews("힌트: 바이킹과 강 근처에서 전투는 매우 불리합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint5));
             } else if (turn == 4000) {
-                game.addNews("힌트: 너무 많은 업그레이드는 파산의 지름길입니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint6));
             } else if (turn == 4500) {
-                game.addNews("힌트: 가능하다면 최대한 사원을 점령하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint7));
             } else if (turn == 5000) {
-                game.addNews("힌트: 바이킹 본부는 강 너머 건너편에 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv11_hint8));
             }
 
             // Check if vikings are defeated
@@ -970,12 +944,9 @@ enum Mission {
         private int turn = 0;
     },
     LV12("map/map_lv12.png",
-                 "누가 더 잘 쏘나?",
-                 "바이킹이 몰고 온 대포는 정말 무시무시한 무기입니다." +
-                 " 가까스로 버텨내고 있지만 바이킹은 코 앞까지 몰려든 상태입니다." +
-                 " 장인들이 말합니다. \"똑같은 대포를 만들려면 금화가 2만개 필요합니다.\"" +
-                 " \n\n자, 금화 2만개만 모으면 적에게 포탄 세례를 퍼부을 수 있습니다.",
-                 "바이킹 본부 점령 / 도적 패배",
+                 Engine2D.GetInstance().getString(R.string.lv12_title),
+                 Engine2D.GetInstance().getString(R.string.lv12_desc),
+                 Engine2D.GetInstance().getString(R.string.lv12_victory),
                  1000,
                  180,
                  new boolean[] { true, true, true, true, true, false, false }) {
@@ -1052,40 +1023,40 @@ enum Mission {
             if (turn == 700) {
                 viking.setControlledByAI(true);
                 bandit.setControlledByAI(true);
-                game.addNews("조심하세요!! 바이킹이 이제 활동을 시작합니다.");
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.viking_activated));
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 북쪽 어딘가 새로운 사원이 있다고 합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 대포는 잘 쓰면 정말 강력한 무기입니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint2));
             } else if (turn == 1500) {
-                game.addNews("힌트: 전투는 최대한 지원 하에 이루어져야 합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint3));
             } else if (turn == 2000) {
-                game.addNews("힌트: 대포병은 매우 매우 느립니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 바이킹과 강 근처에서 전투는 매우 불리합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint5));
             } else if (turn == 4000) {
-                game.addNews("힌트: 너무 많은 업그레이드는 파산의 지름길입니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint6));
             } else if (turn == 4500) {
-                game.addNews("힌트: 가능하다면 사원을 최대한 점령하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint7));
             } else if (turn == 5000) {
-                game.addNews("힌트: 바이킹 본부는 강 너머 건너편에 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_hint8));
             }
 
             if (!shrineTaken &&
                     game.getMap().getTerritory(new OffsetCoord(6, 0)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
                 shrineTaken = true;
-                game.addNews("풍요의 신은 당신의 기도에 응답했습니다.");
-                game.popupMsgBox("당신은 제단에 기도를 올립니다..\n\n당신의 주머니에서 짤랑거리는 소리가 들립니다. 바지가 내려갈 것 같습니다!!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv12_prosper_news));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv12_prosper_popup));
             }
 
             Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
             if (!cannonAllowed && villager.getGold() >= 20000) {
-                game.popupMsgBox("드디어 장인들이 대포 기술을 개발했습니다.\n당장 모집해서 본때를 보여줍시다.");
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv12_cannon_popup));
                 setRecruitAvailable(new boolean[] { true, true, true, true, true, true, false });
                 cannonAllowed = true;
             }
@@ -1111,12 +1082,9 @@ enum Mission {
         private boolean shrineTaken = false;
     },
     LV13("map/map_lv13.png",
-                 "잠자는 예배당의 사자",
-                 "바이킹에게 매서운 대포 맛을 보여줬습니다." +
-                 " 하지만 여전히 사방은 적들로 가득합니다." +
-                 " 동쪽에서는 반란군들이, 서쪽에서는 도적과 바이킹이 공격하고 있습니다." +
-                 " \n\n이번에도 기적이 필요합니다. 모든 사원을 다 점령하세요.",
-                 "도적 패배 / 반란군 패배",
+                Engine2D.GetInstance().getString(R.string.lv13_title),
+                Engine2D.GetInstance().getString(R.string.lv13_desc),
+                Engine2D.GetInstance().getString(R.string.lv13_victory),
                  1000,
                  180,
                  new boolean[] { true, true, true, true, true, true, false }) {
@@ -1191,62 +1159,62 @@ enum Mission {
             if (turn == 700) {
                 bandit.setControlledByAI(true);
                 rebel.setControlledByAI(true);
-                game.addNews("조심하세요!! 도적이 이제 활동을 시작합니다.");
-                game.addNews("조심하세요!! 반란군이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.bandit_activated));
+                game.addNews(Engine2D.GetInstance().getString(R.string.rebel_activated));
             } else if (turn == 1100) {
                 viking.setControlledByAI(true);
-                game.addNews("조심하세요!! 바이킹이 이제 활동을 시작합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.viking_activated));
             }
 
             // Hints
             if (turn == 500) {
-                game.addNews("힌트: 모든 사원을 다 점령하면 언젠가 기적이 일어납니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint1));
             } else if (turn == 1000) {
-                game.addNews("힌트: 사방에 적이 있습니다. 주의하세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint2));
             } else if (turn == 1500) {
-                game.addNews("힌트: 전투는 최대한 지원 하에 이루어져야 합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint3));
             } else if (turn == 2000) {
-                game.addNews("힌트: 피해를 입은 유닛은 휴식이 필요합니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint4));
             } else if (turn == 3000) {
-                game.addNews("힌트: 적의 본부를 공략하는 방법도 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint5));
             } else if (turn == 4000) {
-                game.addNews("힌트: 곧 기적이 벌어집니다!!!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint6));
             } else if (turn == 5000) {
-                game.addNews("힌트: 가능하면 일꾼을 꾸준히 만들어 새로운 영토를 넓히세요.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint7));
             } else if (turn == 5500) {
-                game.addNews("힌트: 여러가지 공략 방법이 있을 수 있습니다.");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_hint8));
             }
 
             Villager villager = (Villager)game.getTribe(Tribe.Faction.VILLAGER);
             if (turn == 4200 &&
                 game.getMap().getTerritory(new OffsetCoord(11, 11)).getFaction() ==
                         Tribe.Faction.VILLAGER) {
-                game.addNews("치유의 신이 당신의 기도에 응답했습니다.");
-                game.popupMsgBox("치유의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_news1));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv13_popup1));
                 villager.spawnSquad(new OffsetCoord(10, 11).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
             if (turn == 4400 &&
                     game.getMap().getTerritory(new OffsetCoord(10, 4)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
-                game.addNews("바람의 신이 당신의 기도에 응답했습니다.");
-                game.popupMsgBox("바람의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_news2));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv13_popup2));
                 villager.spawnSquad(new OffsetCoord(9, 4).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
             if (turn == 4600 &&
                     game.getMap().getTerritory(new OffsetCoord(7, 1)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
-                game.addNews("풍요의 신이 당신의 기도에 응답했습니다.");
-                game.popupMsgBox("풍요의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_news3));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv13_popup3));
                 villager.spawnSquad(new OffsetCoord(6, 0).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
             if (turn == 4800 &&
                     game.getMap().getTerritory(new OffsetCoord(3, 5)).getFaction() ==
                             Tribe.Faction.VILLAGER) {
-                game.addNews("사랑의 신이 당신의 기도에 응답했습니다.");
-                game.popupMsgBox("사랑의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다.!!");
+                game.addNews(Engine2D.GetInstance().getString(R.string.lv13_news4));
+                game.popupMsgBox(Engine2D.GetInstance().getString(R.string.lv13_popup4));
                 villager.spawnSquad(new OffsetCoord(3, 4).toGameCoord(),
                         Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN, Unit.UnitClass.PALADIN);
             }
@@ -1270,12 +1238,10 @@ enum Mission {
         private int turn = 0;
     },
     FREE_LV1("map/map_free_lv1.png",
-                 "자유 게임 1",
-                 "자유 게임입니다.\n\n" +
-                 " 적과 동등한 조건에서 싸워 이기세요." +
-                 " 모든 유닛과 업그레이드를 사용 가능합니다.",
-                 "모든 적 패배",
-                 2000,
+                 Engine2D.GetInstance().getString(R.string.free_lv1_title),
+                Engine2D.GetInstance().getString(R.string.free_lv1_desc),
+                Engine2D.GetInstance().getString(R.string.free_lv1_victory),
+                 1000,
                  1000,
                  new boolean[] { true, true, true, true, true, true, true }) {
 

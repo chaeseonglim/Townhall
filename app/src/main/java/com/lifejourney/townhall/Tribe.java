@@ -1,4 +1,5 @@
 package com.lifejourney.townhall;
+import com.lifejourney.engine2d.Engine2D;
 import com.lifejourney.engine2d.OffsetCoord;
 import com.lifejourney.engine2d.PointF;
 
@@ -19,15 +20,15 @@ public abstract class Tribe implements Squad.Event {
         String toGameString() {
             switch(this) {
                 case NEUTRAL:
-                    return "중립";
+                    return Engine2D.GetInstance().getString(R.string.neutral);
                 case VILLAGER:
-                    return "마을";
+                    return Engine2D.GetInstance().getString(R.string.villager);
                 case BANDIT:
-                    return "도적";
+                    return Engine2D.GetInstance().getString(R.string.bandit);
                 case VIKING:
-                    return "바이킹";
+                    return Engine2D.GetInstance().getString(R.string.viking);
                 case REBEL:
-                    return "반란군";
+                    return Engine2D.GetInstance().getString(R.string.rebel);
                 default:
                     return "";
             }

@@ -1,3 +1,628 @@
 <resources>
-    <string name="app_name">마을 대전략 1.0</string>
+    <string name="app_name">Town Strategy 1.0</string>
+
+    <string name="logo_text">Town\nStrategy\n1.0</string>
+    <string name="game_start">Start</string>
+    <string name="setting_btn">Setting</string>
+    <string name="expect_more_mission">More missions will come soon.\n\nPlease wait for a moment.</string>
+    <string name="how_about_game">How\'s the game? :)\n\nPlease rate this game.</string>
+
+    <string name="music_on_off">Music On/Off</string>
+    <string name="sound_on_off">Effect On/Off</string>
+    <string name="exit">Exit</string>
+    <string name="back">Return</string>
+    <string name="confirm_exit">Do you really exit?</string>
+
+    <string name="close">Close</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="total_population">Total pop</string>
+    <string name="used_population">Used pop</string>
+    <string name="total_income">Gold income</string>
+    <string name="total_spend">Gold spend</string>
+    <string name="happiness">Happiness</string>
+    <string name="number_of_territory">Lands</string>
+    <string name="number_of_squad">Squads</string>
+    <string name="occupied_shrine">Shrines</string>
+    <string name="healing_shrine">Shrine of Heal</string>
+    <string name="wind_shrine">Shrine of Wind</string>
+    <string name="prosper_shrine">Shrine of Gold</string>
+    <string name="love_shrine">Shrine of Love</string>
+    <string name="none">None</string>
+    <string name="upkeep">Upkeep</string>
+    <string name="damage">Damage</string>
+    <string name="attack_speed">Attack speed</string>
+    <string name="armor">Armor</string>
+    <string name="heal_power">Heal power</string>
+
+    <string name="territory">Land</string>
+    <string name="confirm_replacement_unit">This will replace the existing unit with a cost.\n\nDo you want to proceed it?</string>
+    <string name="faction">Faction</string>
+    <string name="unknown">Unknown</string>
+    <string name="status">Status</string>
+    <string name="on_battle">On battle</string>
+    <string name="on_occupying">On occupying</string>
+    <string name="on_developing">On developing</string>
+    <string name="facility">Facility</string>
+    <string name="farm">Farm</string>
+    <string name="market">Market</string>
+    <string name="downtown">Town</string>
+    <string name="fortress">Fortress</string>
+    <string name="fort">Fort</string>
+    <string name="population">Population</string>
+    <string name="income">Income</string>
+    <string name="defense">Defense</string>
+    <string name="bonus_effect">Bonus effect</string>
+    <string name="worker_bonus">Worker bonus</string>
+    <string name="on_moving">On moving</string>
+    <string name="on_supporting">On supporting</string>
+    <string name="on_idle">On idle</string>
+    <string name="unit">Unit</string>
+    <string name="no_unit">There\'s no unit.\nPress buttons below to recruit them.</string>
+    <string name="recruiting">(Recruit)</string>
+
+    <string name="home">Home</string>
+    <string name="confirm_upgrade">It adds an upkeep and can\'t cancel it after upgrades.\nWill you proceed it?</string>
+    <string name="no_money_for_upgrade">Not enough gold for this upgrade!\nPlease try it later.</string>
+    <string name="purchase_cost">Cost</string>
+    <string name="level">Level</string>
+    <string name="choose_upgrade_lv">Select the button which you want to upgrade.</string>
+    <string name="choose_upgrade_class">Select the class which you want to upgrade.</string>
+
+    <string name="farm_development">Farm</string>
+    <string name="farm_development_lv1">Farm development +1</string>
+    <string name="farm_development_lv2">Farm development +2</string>
+    <string name="farm_development_lv3">Farm development +3</string>
+    <string name="downtown_development">Town</string>
+    <string name="downtown_development_lv1">Town development +1</string>
+    <string name="downtown_development_lv2">Town development +2</string>
+    <string name="downtown_development_lv3">Town development +3</string>
+    <string name="happiness_lv1">Neighbor happiness +5</string>
+    <string name="happiness_lv2">Neighbor happiness +10</string>
+    <string name="happiness_lv3">Neighbor hapiness +15</string>
+    <string name="market_development">Market</string>
+    <string name="market_development_lv1">Market development +1</string>
+    <string name="market_development_lv2">Market development +2</string>
+    <string name="market_development_lv3">Market development +3</string>
+    <string name="fortress_development">Fortress</string>
+    <string name="fortress_development_lv1">Fortress development +1</string>
+    <string name="fortress_development_lv2">Fortress development +2</string>
+    <string name="fortress_development_lv3">Fortress development +3</string>
+    <string name="defense_development">Defense</string>
+    <string name="defense_development_lv1">Neighbor defense +2</string>
+    <string name="defense_development_lv2">Neighbor defense +4</string>
+    <string name="defense_development_lv3">Nrighbor defense +6</string>
+    <string name="melee_damage">Melee Damage</string>
+    <string name="melee_damage_lv1">Melee damage +5%</string>
+    <string name="melee_damage_lv2">Melee damage +10%</string>
+    <string name="melee_damage_lv3">Melee damage +15%</string>
+    <string name="melee_attack_speed">Attack Spd</string>
+    <string name="melee_attack_speed_lv1">Attack speed +5%</string>
+    <string name="melee_attack_speed_lv2">Attack speed +10%</string>
+    <string name="melee_attack_speed_lv3">Attack speed +15%</string>
+    <string name="melee_critical_attack">Critical Attack</string>
+    <string name="melee_critical_attack_lv1">Critical attack +5%</string>
+    <string name="melee_critical_attack_lv2">Critical attack +10%</string>
+    <string name="melee_critical_attack_lv3">Critical attack +15%</string>
+    <string name="melee_armor">Armor</string>
+    <string name="melee_armor_lv1">Armor +3%</string>
+    <string name="melee_armor_lv2">Armor +6%</string>
+    <string name="melee_armor_lv3">Armor +9%</string>
+    <string name="melee_evade">Melee Evade</string>
+    <string name="melee_evade_lv1">Melee evade +3%</string>
+    <string name="melee_evade_lv2">Melee evade +6%</string>
+    <string name="melee_evade_lv3">Melee evade +9%</string>
+    <string name="buff">Buff</string>
+    <string name="buff_lv1">Friendly damage +3%</string>
+    <string name="buff_lv2">Friendly damage +6%</string>
+    <string name="buff_lv3">Friendly damage +9%</string>
+    <string name="point_blank">Point Blank</string>
+    <string name="point_blank_lv1">Melee ranged arrow attack</string>
+    <string name="point_blank_lv2">Damage +3%</string>
+    <string name="point_blank_lv3">Damage +6%</string>
+    <string name="ranged_attack_speed">Attack Speed</string>
+    <string name="ranged_attack_speed_lv1">Attack speed +3%</string>
+    <string name="ranged_attack_speed_lv2">Attack speed +6%</string>
+    <string name="ranged_attack_speed_lv3">Attack speed +9%</string>
+    <string name="ranged_damage">Damage</string>
+    <string name="ranged_damage_lv1">Damage +3%</string>
+    <string name="ranged_damage_lv2">Damage +6%</string>
+    <string name="ranged_damage_lv3">Damage +9%</string>
+    <string name="poison_arrow">Poison Arrow</string>
+    <string name="poison_arrow_lv1">Poison arrow applied</string>
+    <string name="poison_arrow_lv2">Damage increased</string>
+    <string name="poison_arrow_lv3">Damage increased</string>
+    <string name="ranged_evade">Ranged Evade</string>
+    <string name="ranged_evade_lv1">Ranged evade +3%</string>
+    <string name="ranged_evade_lv2">Ranged evade +6%</string>
+    <string name="ranged_evade_lv3">Ranged evade +9%</string>
+    <string name="move_speed_upgrade">Moving Spd</string>
+    <string name="move_speed_upgrade_lv1">Moving speed +5%</string>
+    <string name="move_speed_upgrade_lv2">Moving speed +10%</string>
+    <string name="move_speed_upgrade_lv3">Moving speed +15%</string>
+    <string name="stun">Stun</string>
+    <string name="stun_lv1">Stun on hit</string>
+    <string name="stun_lv2">Stun rate +3%</string>
+    <string name="stun_lv3">Stun rate +6%</string>
+    <string name="heal_speed_upgrade">Healing Speed</string>
+    <string name="heal_speed_upgrade_lv1">Healing speed +3%</string>
+    <string name="heal_speed_upgrade_lv2">Healing speed +6%</string>
+    <string name="heal_speed_upgrade_lv3">Healing speed +9%</string>
+    <string name="heal_power_upgrade">Healing Power</string>
+    <string name="heal_power_upgrade_lv1">Healing power +5%</string>
+    <string name="heal_power_upgrade_lv2">Healing power +10%</string>
+    <string name="heal_power_upgrade_lv3">Healing power +15%</string>
+    <string name="dot_heal">Miracle Shower</string>
+    <string name="dot_heal_lv1">Global dot heal</string>
+    <string name="dot_heal_lv2">Dot heal power increased</string>
+    <string name="dot_heal_lv3">Dot heal power increased</string>
+    <string name="spike_heal">Heal Spike</string>
+    <string name="spike_heal_lv1">Splash damage on heal</string>
+    <string name="spike_heal_lv2">Splash damage increased</string>
+    <string name="spike_heal_lv3">Splash damage increased</string>
+    <string name="splash_radius">Splash Range</string>
+    <string name="splash_radius_lv1">Splash range +5%</string>
+    <string name="splash_radius_lv2">Splash range +10%</string>
+    <string name="splash_radius_lv3">Splash range +15%</string>
+    <string name="cannon_move_speed_upgrade">Moving Speed</string>
+    <string name="cannon_move_speed_upgrade_lv1">Moving speed +10%</string>
+    <string name="cannon_move_speed_upgrade_lv2">Moving speed +20%</string>
+    <string name="cannon_move_speed_upgrade_lv3">Moving speed +30%</string>
+    <string name="sticky_cannon">Sticky Cannon</string>
+    <string name="sticky_cannon_lv1">Slow on hit -3%</string>
+    <string name="sticky_cannon_lv2">Slow on hit -6%</string>
+    <string name="sticky_cannon_lv3">Slow on hit -9%</string>
+    <string name="invincible">Invincible</string>
+    <string name="invincible_lv1">Invincible when low health</string>
+    <string name="invincible_lv2">Invincible duration increased</string>
+    <string name="invincible_lv3">Invincible duration increased</string>
+    <string name="health_upgrade">Health Up</string>
+    <string name="health_upgrade_lv1">Health up +3%</string>
+    <string name="health_upgrade_lv2">Health up +6%</string>
+    <string name="health_upgrade_lv3">Health up +9%</string>
+    <string name="guardian">Guardian</string>
+    <string name="guardian_lv1">Transfer friendly damage 10%</string>
+    <string name="guardian_lv2">Transfer friendly damage 20%</string>
+    <string name="guardian_lv3">Transfer friendly damage 30%</string>
+
+    <string name="short_back">Back</string>
+    <string name="start">Start</string>
+
+    <string name="lv1_title">Starving (Tutorial)</string>
+    <string name="lv1_desc">
+    You are the chief of a small town.\n\n
+    At last winter, you lost many friends. But it\'s time to stop mourning and need to go forward.\n\n
+    Keep your town managed and boost the population again.
+    </string>
+    <string name="lv1_victory">Gather more than 65 population</string>
+    <string name="lv1_hint1">Hint: Farm increased the population.</string>
+    <string name="lv1_hint2">Hint: You can recruit worker to take more land.</string>
+    <string name="lv1_hint3">Hint: This mission doesn\'t require any market or fortress.</string>
+    <string name="lv1_hint4">Hint: Make it fast forward if you are bored.</string>
+
+    <string name="lv2_title">Portent (Tutorial)"</string>
+    <string name="lv2_desc">
+    Bandits are approaching to the town.
+    You need to take care before villagers are worried.\n\n
+    This is a good change to prove your tactical skills.
+    </string>
+    <string name="lv2_victory">Defeat bandits</string>
+    <string name="lv2_hint1">Hint: You can attack the retreating enemy.</string>
+    <string name="lv2_hint2">Hint: You can recruit more squads.</string>
+    <string name="lv2_hint3">Hint: Make it fast forward if you are bored.</string>
+    <string name="lv3_title">Carrot Market</string>
+    <string name="lv3_desc">
+    Great!\nOur soldiers defeated the bandits near the town.
+    But they will come again. We need to gather as much gold as possible.\n\n
+    It will help to gather gold if there is a big market near the town.
+    </string>
+    <string name="lv3_victory">Build a market above Lv4 / Gather 3000 gold</string>
+    <string name="lv3_hint1">Hint: Markets are grown faster on badlands.</string>
+    <string name="lv3_hint2">Hint: You can build facilities up to total Lv5 in a land.</string>
+    <string name="lv3_hint3">Hint: You can increase the income by taking lands.</string>
+    <string name="lv3_hint4">Hint: Worker boost the development speed of a land.</string>
+    <string name="lv3_hint5">Hint: You need to adjust the development policy to get Lv4 facility.</string>
+    <string name="lv3_hint6">Hint: Make it fast forward if you are bored.</string>
+
+    <string name="bandit_activated">Beware!! Bandits are now crawling.</string>
+    <string name="viking_activated">Beware!! Vikings are now crawling.</string>
+    <string name="rebel_activated">Beware!! Rebels are now crawling.</string>
+
+    <string name="lv4_title">The taste of gold</string>
+    <string name="lv4_desc">
+    As you anticipated, a group of bandits are gathered in the north forest.
+    You have a lump of gold from the market.\n\n
+    Show your money to bandits!!!
+    </string>
+    <string name="lv4_victory">Defeat bandits</string>
+    <string name="lv4_hint1">Hint: You have enough money. Recruit many squads.</string>
+    <string name="lv4_hint2">Hint: If you are afford to upkeep, upgrade your units.</string>
+    <string name="lv4_hint3">Hint: You can increase the income by taking lands.</string>
+    <string name="lv4_hint4">Hint: Utilize the supporting squads during battle.</string>
+    <string name="lv4_hint5">Hint: If they have more lands, they will make more squads.</string>
+    <string name="lv4_hint6">Hint: Make it fast forward if you are bored.</string>
+
+    <string name="lv5_title">My dream of Mayor</string>
+    <string name="lv5_desc">
+    Market is now very flourished and many villagers look up to you.
+    There are still bunch of bandits around but shouldn\'t give us a big headache.
+    \n\nMake your town even bigger!
+    </string>
+    <string name="lv5_victory">Have each Lv5 town and Lv5 market</string>
+    <string name="lv5_hint1">Hint: You have enough money. Recruit workers.</string>
+    <string name="lv5_hint2">Hint: Workers will be helpful to make Lv5 facility.</string>
+    <string name="lv5_hint3">Hint: Decide carefully where you build Lv5 facility.</string>
+    <string name="lv5_hint4">Hint: Town boost many things of the neighbor lands.</string>
+    <string name="lv5_hint5">Hint: Keep your workers onto land which you build Lv5 facility.</string>
+    <string name="lv5_hint6">Hint: Make it fast forward if you are bored.</string>
+
+    <string name="lv6_title">Hospital Open</string>
+    <string name="lv6_desc">
+    As the town is getting bigger and bigger, more bandits are approaching.
+    This time, bandits are much powerful than before.
+    You just recall there is a shrine which many healers stop by.\n\n
+    Keep your town from bandits.
+    </string>
+    <string name="lv6_victory">Defeat bandits</string>
+    <string name="lv6_hint1">Hint: Visit the shrine before bandits comes if possible.</string>
+    <string name="lv6_hint2">Hint: You need to bring enough force to the shrine.</string>
+    <string name="lv6_hint3">Hint: Bandits are huge!</string>
+    <string name="lv6_hint4">Hint: You can build a fortress in a hill for defense.</string>
+    <string name="lv6_hint5">Hint: Enemy will regain power if they earn times to rest.</string>
+    <string name="lv6_hint6">Hint: Workers can continue working behind the scene.</string>
+    <string name="lv6_hint7">Hint: If you take enemy headquarter, they will stop recruiting new squad.</string>
+    <string name="lv6_healer_news">Healers decide to help you from now on.</string>
+    <string name="lv6_healer_popup">
+    You bow to healers to ask their aids..\n\nAfter some silence, they follows you..
+    </string>
+
+    <string name="lv7_title">Vikings!</string>
+    <string name="lv7_desc">
+    You were managed to keep your town from bandits.
+    But before taking a breath, you heard a horn sound from the south river.\n\n
+    Chief, It\'s vikings!!!
+    </string>
+    <string name="lv7_victory">Survive for 100 days</string>
+    <string name="lv7_hint1">Hint: Mission will be accomplished if you keep alive for the certain time.</string>
+    <string name="lv7_hint2">Hint: If you don\'t need workers, replace them into other units.</string>
+    <string name="lv7_hint3">Hint: You can build fortresses for defense.</string>
+    <string name="lv7_hint4">Hint: Viking can cross the river.</string>
+    <string name="lv7_hint5">Hint: Healers are boring but make you sustained for a long time.</string>
+    <string name="lv7_hint6">Hint: Bandit\'s headquarter can be taken...</string>
+    <string name="lv7_hint7">Hint: Hold a little more and you win!!!</string>
+
+    <string name="lv8_title">God of Wind</string>
+    <string name="lv8_desc">
+    Viking burned everything. You and survivors retreated to the Shrine of healing.
+    Bandits still left and plunder our lands.\n\n
+    There is the Shrine of Wind at the north from here. You should find a clue from there.
+    </string>
+    <string name="lv8_victory">Defeat bandits</string>
+    <string name="lv8_hint1">Hint: You don\t have many choices. Run to north!</string>
+    <string name="lv8_hint2">Hint: Take shrine as fast as you can.</string>
+    <string name="lv8_hint3">Hint: Horseman is fast but very weak to ranged attacks.</string>
+    <string name="lv8_hint4">Hint: Horseman and healers are good combination on battle.</string>
+    <string name="lv8_hint5">Hint: Horseman can outrun your enemy.</string>
+    <string name="lv8_wind_news">God of Wind accept your prayer.</string>
+    <string name="lv8_wind_popup">You have prayed to the shrine..\n\nAfter sun sets, you suddenly heard an animal sound from somewhere..</string>
+
+    <string name="lv9_title">Back to your town</string>
+    <string name="lv9_desc">
+    Our horseman completely defeat bandit\'s front squads.
+    You should push them now.\n\n
+    And you need to rebuild everything you lost.
+    </string>
+    <string name="lv9_victory">Defeat bandits / Gather 500 population</string>
+    <string name="lv9_hint1">Hint: You should defeat enemy and gather populations.</string>
+    <string name="lv9_hint2">Hint: Horseman is very weak to the ranged attack.</string>
+    <string name="lv9_hint3">Hint: Horseman can be very strong if healers support them.</string>
+    <string name="lv9_hint4">Hint: Enemy can regain units quickly if you give them a time to rest.</string>
+    <string name="lv9_hint5">Hint: You may not have time to gather 500 population.</string>
+    <string name="lv9_hint6">Hint: Remove fortress if you don\'t need them.</string>
+    <string name="lv9_hint7">Hint: Recruit more workers if you are winning on battle.</string>
+
+    <string name="lv10_title">Sweeping Bandits</string>
+    <string name="lv10_desc">
+    Chief, we finally regain the town completely.
+        Bandits are all scattered and we need to sweep them for revenge.
+        \n\nAdditionally a scout reported that there is a shrine in north west forest. It might be helpful to visit there.
+    </string>
+    <string name="lv10_victory">Defeat bandits / Take Shrine of Love</string>
+    <string name="lv10_hint1">Hint: Bandits are scattered but be careful.</string>
+    <string name="lv10_hint2">Hint: Bandits are still remained powerful. Need some squads.</string>
+    <string name="lv10_hint3">Hint: You don\'t need to be hurry about a shrine.</string>
+    <string name="lv10_hint4">Hint: Upgrade will help you win battles.</string>
+    <string name="lv10_hint5">Hint: If you take enemy\'s headquarter, remained enemy will be on berserk.</string>
+    <string name="lv10_hint6">Hint: Too many upgrade is the short-cut to the bankruptcy.</string>
+
+    <string name="lv11_title">Fireworks</string>
+    <string name="lv11_desc">
+    Town is getting rich again.
+    There are foods and golds everywhere and big festivals are held in town.
+    We can hear even the firework sound from somewhere.\n\n
+    Wait.. Who shot the fireworks?
+    </string>
+    <string name="lv11_victory">Take Viking\'s headquarter / Defeat bandits</string>
+    <string name="lv11_hint1">Hint: Vikings are coming from the south with a firework sound.</string>
+    <string name="lv11_hint2">Hint: Vikings bring new weapons. Beware!</string>
+    <string name="lv11_hint3">Hint: You should prepare as the enemies are very strong.</string>
+    <string name="lv11_hint4">Hint: You shouldn\'t allow supports to enemy\'s cannon.</string>
+    <string name="lv11_hint5">Hint: Battle against Vikings near the river is not good.</string>
+    <string name="lv11_hint6">Hint: Too many upgrades lead to the bankruptcy. </string>
+    <string name="lv11_hint7">Hint: Take shrines if possible.</string>
+    <string name="lv11_hint8">Hint: Viking\s headquarter lies across the river.</string>
+
+    <string name="lv12_title">Who is the better shooter?</string>
+    <string name="lv12_desc">
+    Cannon which Vikings bring is very devastating weapon.
+    Vikings approached to the front gate of town.
+    An artisan told you. \"I need 20,000 golds for copying their weapon\"\n\n
+    That means if you have 20,000 golds, you can shoot them as they did to you.
+    </string>
+    <string name="lv12_victory">Take Vikings\' headquarter / Defeat bandits</string>
+    <string name="lv12_hint1">Hint: There is a new shrine at the nort of town.</string>
+    <string name="lv12_hint2">Hint: Cannon is very powerful weapon if you can use it properly.</string>
+    <string name="lv12_hint3">Hint: You should do battle with supporting squads.</string>
+    <string name="lv12_hint4">Hint: Cannon is very very slow.</string>
+    <string name="lv12_hint5">Hint: Don\'t fight with Vikings near the river.</string>
+    <string name="lv12_hint6">Hint: Too many upgrades lead to the bankruptcy.</string>
+    <string name="lv12_hint7">Hint: Take shrines if possible.</string>
+    <string name="lv12_hint8">Hint: Vikings\' headquarter is across the river.</string>
+    <string name="lv12_prosper_news">God of Gold accepts your prayer.</string>
+    <string name="lv12_prosper_popup">You have prayed to the shrine..\n\nYour pulse is fluttering and your pants are getting heavier!!</string>
+    <string name="lv12_cannon_popup">Finally an artisan made a cannon.\nShow your cannon to them!</string>
+
+    <string name="lv13_title">Sleeping lions in shrines</string>
+    <string name="lv13_desc">
+    You showed your hot pepper cannon ball to Vikings.
+    Still there are full of enemies around. Rebels are coming from the east and Bandits and Vikings coming from the west.
+    \n\nYou need a miracle. Pray on every shrines!
+    </string>
+    <string name="lv13_victory">Defeat bandits / Defeat rebels</string>
+    <string name="lv13_hint1">Hint: Miracle shall happen when all shrines are taken.</string>
+    <string name="lv13_hint2">Hint: Enemies everywhere. Beware!</string>
+    <string name="lv13_hint3">Hint: You shouldn\'t fight without supporting.</string>
+    <string name="lv13_hint4">Hint: Your units sometimes need a rest.</string>
+    <string name="lv13_hint5">Hint: You can flank enemies\' headquarters.</string>
+    <string name="lv13_hint6">Hint: Miracle soon!!!</string>
+    <string name="lv13_hint7">Hint: Expand your border using workers.</string>
+    <string name="lv13_hint8">Hint: There are multiple ways to finish this mission.</string>
+    <string name="lv13_news1">God of Heal accepts your prayer.</string>
+    <string name="lv13_popup1">Mysterious warriors arise near Shrine of Healing...\n\nThey will help you!!</string>
+    <string name="lv13_news2">God of Wind accepts your prayer.</string>
+    <string name="lv13_popup2">Mysterious warriors arise near Shrine of Wind...\n\nThey will help you!!</string>
+    <string name="lv13_news3">God of Gold accepts your prayer.</string>
+    <string name="lv13_popup3">Mysterious warriors arise near Shrine of Gold...\n\nThey will help you!!</string>
+    <string name="lv13_news4">God of Love accepts your prayer.</string>
+    <string name="lv13_popup4">Mysterious warriors arise near Shrine of Love...\n\nThey will help you!!</string>
+
+    <string name="free_lv1_title">Free Game 1</string>
+    <string name="free_lv1_desc">
+    It\'s a free game.\n\n
+    Fight your enemy on same conditions.
+    All units and upgrades are unlocked.
+    </string>
+    <string name="free_lv1_victory">Defeat all enemy</string>
+
+    <string name="say_hi">Hello. Villagers bow to you!</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="day">day</string>
+
+    <string name="our_headquarter_down">Our headquarter is taken down!!!</string>
+    <string name="enemy_headquarter_down_pre">We took\u0020</string>
+    <string name="enemy_headquarter_down_post">\u0020\'s headquarter.</string>
+    <string name="enemy_squad_getting_powerful_pre">Beware!\u0020</string>
+    <string name="enemy_squad_getting_powerful_post">\'s remained force will go berserk.</string>
+    <string name="occupied_territory_pre"> </string>
+    <string name="occupied_territory_mid">\u0020took\u0020</string>
+    <string name="occupied_territory_post">\'s land.</string>
+    <string name="occupied_wind_shrine">You took Shrine of Wind. Moving speed is increased.</string>
+    <string name="occupied_heal_shrine">You took Shrine of Healing. Resting is more efficient.</string>
+    <string name="occupied_love_shrine">You took Shrine of Love. Population is increased.</string>
+    <string name="occupied_prosper_shrine">You took Shrine of Gold. Incomd is increased.</string>
+    <string name="learned_new_upgrade">\u0020learned new upgrade.</string>
+    <string name="defeated">\u0020is defeated.</string>
+    <string name="made_new_squad">\'s squad is created.</string>
+    <string name="removed_a_squad">\'s squad is removed.</string>
+    <string name="victory_condition">Victory Condition:</string>
+    <string name="time_limit">Time Limit:</string>
+    <string name="mission_completed_pre">Mission accomplished!!!\n</string>
+    <string name="mission_completed_post">\u0020 stars achieved</string>
+    <string name="game_over_time_limit">Game Over!!!\nTime limit is over.</string>
+    <string name="game_over_headquarter_down">Game Over!!!\nHeadquarter is taken down.</string>
+    <string name="would_you_like_tutorial">Do you want to proceed Tutorial?</string>
+
+    <string name="select">Select</string>
+    <string name="unit_class">Class</string>
+    <string name="health">Health</string>
+    <string name="move_speed">Moving Speed</string>
+    <string name="heal_speed">Healing Speed</string>
+    <string name="evade">Evade</string>
+    <string name="support">Support</string>
+    <string name="description">Description</string>
+    <string name="select_class">Select an unit class</string>
+
+    <string name="tutorial_battle_1">
+    Chief!\n\nI\'m your adviser. Now I will teach you how to manage squads.\n\n\nTouch anywhere.
+    </string>
+    <string name="tutorial_battle_2">
+    ∙ You already have two squads.\n\n∙ Their location is showing as icon at the middle of tiles.
+    </string>
+    <string name="tutorial_battle_3">
+    ∙ Each squad can have at most 3 units.\n\n∙ Units are recruiting. Please wait for a while...
+    </string>
+    <string name="tutorial_battle_4">
+    ∙ Recruiting is done.\n\n∙ Units are represented as a small circle on map. Touch anywhere.
+    </string>
+    <string name="tutorial_battle_5">
+    ∙ You can check the info of squad by pressing the below info button. \n\n∙ As bonus effects said, various tils and facility can affect to squads.
+    </string>
+    <string name="tutorial_battle_6">
+    ∙ Not let\'s move the squad.\n\n∙ You can move the squad by dragging the squad icon.
+    </string>
+    <string name="tutorial_battle_7">
+    ∙ Let me move the squad this time.\n\n∙ Now the squad is moving to the red area. \n\nPlease wait for a moment..
+    </string>
+    <string name="tutorial_battle_8">
+    ∙ Now moving the squad is finished.\n\n∙ As the squad moves to the new place, you can see some of fog areas are revealed.
+    </string>
+    <string name="tutorial_battle_9">
+    ∙ You can take the land by locating the squad to other faction\'s land.\n\nPlease wait for a moment..
+    </string>
+    <string name="tutorial_battle_10">
+    ∙ Now you take new land.\n\n∙ Maybe a bandit is around the land. Let me move the squad again.
+    </string>
+    <string name="tutorial_battle_11">
+    ∙ Finally you found a bandit.\n\n∙ A bandit is on the headquarter.
+    </string>
+    <string name="tutorial_battle_12">
+    ∙ If you choose the bandit squad, you can see their information.\n\n∙ Bandit have a armor bonus from the headquarter.
+    </string>
+    <string name="tutorial_battle_13">
+    ∙ Now it\'s time to remove a bandit.\n\n∙ You can start a battle by dragging your squad to the enemy.
+    </string>
+    <string name="tutorial_battle_14">
+    ∙ Let me move the squad this time.\n\n∙ Let\'s see what happened during battle..
+    </string>
+    <string name="tutorial_battle_15">
+    ∙ Our squad is fighting well but need a help.\n\n∙ Let\'s move another squad to support your squad.
+    </string>
+    <string name="tutorial_battle_16">
+    ∙ If you move your squad into the next tile of battle, it will start supporting the battle.\n\n∙ Let me move this time.\n\nPlease wait for a moment..
+    </string>
+    <string name="tutorial_battle_17">
+    ∙ Now our squad starts to support the battle.\n\n∙ Supporting is the key factor to make your battle win. Use it wisely.
+    </string>
+    <string name="tutorial_battle_18">
+    ∙ FYI, not all units can support others.\n\n∙ Choose wisely who to fight and who to support.
+    </string>
+    <string name="tutorial_battle_19">
+    Chief!\n
+    Now I will finish the tutorial now.\n\n∙ Tip: Crash the bandit squad now!
+    </string>
+
+    <string name="tutorial_management_1">
+    Chief!\n\nI\'m your adviser. Now I will teach you how to manage the town.\n\n\nTouch anywhere.
+    </string>
+    <string name="tutorial_management_2">
+    ∙ This number shows the amount of gold in town.\n\n∙ Gold can be used for recruiting and upgrades. The market increases the income.
+    </string>
+    <string name="tutorial_management_3">
+    ∙ This number shows the usable population.\n\n∙ Population can be used for recruiting and the farm increases it.
+    </string>
+    <string name="tutorial_management_4">
+    ∙ The face shows the happiness of villager.\n\n∙ Happiness affects to the income.
+    </string>
+    <string name="tutorial_management_5">
+    ∙ Buttons control the speed of game.\n\n∙ You can pause or control speed any time.
+    </string>
+    <string name="tutorial_management_6">
+    ∙ You can check the mission goal by using this button.\n
+    </string>
+    <string name="tutorial_management_7">
+    ∙ You can see the status of town by pressing the home button.\n\n∙ You can upgrade the unit also.
+    </string>
+    <string name="tutorial_management_8">
+    ∙ It\'s the dialog poping up when the home button is pressed.\n\n∙ You can see the stats of town.
+    </string>
+    <string name="tutorial_management_9">
+    ∙ You can upgrade by pressing the upgrade button.
+    </string>
+    <string name="tutorial_management_10">
+    ∙ This is the upgrade dialog. You can select the button to choose the unit class which you want to upgrade.\n\n∙ Upgrade will cost upkeep and can not cancel after upgrading it.
+    </string>
+    <string name="tutorial_management_11">
+    ∙ You can choose tile to do further actions.
+    </string>
+    <string name="tutorial_management_12">
+    ∙ You can see the information of your squad or land by pressing the information button.
+    </string>
+    <string name="tutorial_management_13">
+    ∙ It\'s the dialog which shows the information of land.\n\n∙ You can check the income or population of land here.
+    </string>
+    <string name="tutorial_management_14">
+    ∙ Those buttons can control the development policy of facilities.\n\n∙ Total level sum of facilities are limit to 5 in a land.
+    </string>
+    <string name="tutorial_management_15">
+    ∙ Farm increases the population.\n\n∙ Farm grows quickly at the grass and the badlands while slowly at the forest and the hill.
+    </string>
+    <string name="tutorial_management_16">
+    ∙ Market increases the income.\n\n∙ Market grows quickly at the grass and the forest while slowly at the hills.
+    </string>
+    <string name="tutorial_management_17">
+    ∙ Town increase the efficiency of nearby farms and markets.\n\n∙ Town grows quickly at the badlands and the hills while slowly at the forest.
+    </string>
+    <string name="tutorial_management_18">
+    ∙ Fortress increase the defense of land but decrease the happiness of nearby lands.\n\n∙ Fortress grows quickly at the forest and the hills while slowly at the grass and the badlands.
+    </string>
+    <string name="tutorial_management_19">
+    ∙ You can recruit new squad by pressing the recruiting button.\n\n∙ This button only shows up when it\'s available.
+    </string>
+    <string name="tutorial_management_20">
+    ∙ If you press the unit button, you can add units to your squad.\n\n∙ If you don\'t add any units, squad will be removed.
+    </string>
+    <string name="tutorial_management_21">
+    ∙ You can add at most 3 units to a squad.
+    </string>
+    <string name="tutorial_management_22">
+    ∙ It\'s the dialog when you pressed the unit button.\n\n∙ You can choose the unit class by pressing the below buttons.
+    </string>
+    <string name="tutorial_management_23">
+    Chief!\nTutorial for management is now finished.\n\n∙ Tip: If you focus on farm development, you can easily finish the mission.
+    </string>
+
+    <string name="melee_fighter">Melee fighter</string>
+    <string name="melee_supporter">Melee supporter</string>
+    <string name="melee_healer">Melee healer</string>
+    <string name="ranged_fighter">Ranged fighter</string>
+    <string name="ranged_supporter">Ranged supporter</string>
+    <string name="ranged_healer">Ranged healer</string>
+    <string name="civil">Non combat</string>
+
+    <string name="worker">Worker</string>
+    <string name="worker_desc">
+    It accelerates the development of land and increase the income also. But there\'s no fighting skills and slow.
+    </string>
+    <string name="fighter">Fighter</string>
+    <string name="fighter_desc">
+    It\'s a well balanced melee soldier. It\'s weak to the horseman.
+    </string>
+    <string name="archer">Archer</string>
+    <string name="archer_desc">
+    It\'s possible to do the ranged attack and support. But it\'s useless if enemy is too close to them.
+    </string>
+    <string name="horse_man">Horseman</string>
+    <string name="horse_man_desc">
+    It\'s very fast and powerful. But it is vulnerable to the ranged attack.
+    </string>
+    <string name="healer">Healer</string>
+    <string name="healer_desc">
+    It can heal units in battle. But it doesn\'t have fighting skills.
+    </string>
+    <string name="cannon">Cannon</string>
+    <string name="cannon_desc">
+    It has very powerful ranged attack and splash damage. But it\'s useless if enemy is too close to them.
+    </string>
+    <string name="paladin">Paladin</string>
+    <string name="paladin_desc">
+    It can attack melee and heal at the same time. It\'s powerful but expensive.
+    </string>
+
+    <string name="grass">Grass</string>
+    <string name="badlands">Badlands</string>
+    <string name="forest">Forest</string>
+    <string name="hill">Hill</string>
+    <string name="mountain">Mountain</string>
+    <string name="river">River</string>
+    <string name="headquarter">Headquarter</string>
+
+    <string name="neutral">Neutral</string>
+    <string name="villager">Villager</string>
+    <string name="bandit">Bandit</string>
+    <string name="viking">Viking</string>
+    <string name="rebel">Rebel</string>
+
 </resources>

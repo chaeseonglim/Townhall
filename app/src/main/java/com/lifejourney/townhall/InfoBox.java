@@ -52,7 +52,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 81,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.close))
+                .imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 2.0f)
@@ -92,7 +93,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         Rect closeButtonRegion = new Rect(getRegion().right() - 156, getRegion().bottom() - 81,
                 138, 64);
         closeButton = new Button.Builder(this, closeButtonRegion)
-                .message("닫기").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.close))
+                .imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -103,7 +105,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         Rect toTownButtonRegion = new Rect(getRegion().right() - 300, getRegion().bottom() - 81,
                 138, 64);
         toTerritoryButton = new Button.Builder(this, toTownButtonRegion)
-                .message("지역").imageSpriteAsset("messagebox_btn_bg.png")
+                .message(Engine2D.GetInstance().getString(R.string.territory))
+                .imageSpriteAsset("messagebox_btn_bg.png")
                 .fontSize(25).fontColor(Color.rgb(0, 0, 0))
                 .fontName("neodgm.ttf")
                 .fontShadow(Color.rgb(235, 235, 235), 1.0f)
@@ -178,7 +181,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Rect viewport = Engine2D.GetInstance().getViewport();
                 recruitingReplacementConfirmBox = new MessageBox.Builder(this, MessageBox.Type.YES_OR_NO,
                         new Rect((viewport.width - 353) / 2, (viewport.height - 275) / 2,
-                                353, 275), "기존 병력이 교체되며 \n비용이 발생합니다.\n\n진행하시겠습니까?")
+                                353, 275),
+                        Engine2D.GetInstance().getString(R.string.confirm_replacement_unit))
                         .fontSize(25.0f).layer(50).textColor(Color.rgb(230, 230, 230))
                         .fontName("neodgm.ttf")
                         .build();
@@ -251,7 +255,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         // Tile type
         PointF textPosition = new PointF(-230, -145);
-        addText("지형", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.territory),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -261,13 +266,14 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 Color.rgb(35, 35, 35), 1.0f);
 
         textPosition.offset(150, -30);
-        addText("소속", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.faction),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
         if (territory.getFogState() != Territory.FogState.CLEAR) {
             textPosition.offset(0, 30);
-            addText("모름", new SizeF(150, 40),
+            addText(Engine2D.GetInstance().getString(R.string.unknown), new SizeF(150, 40),
                     textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
@@ -281,19 +287,20 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         // Status
         textPosition.offset(-150, 30);
-        addText("상태", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.status),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
-        String status = "없음";
+        String status = Engine2D.GetInstance().getString(R.string.none);
         if (territory.getBattle() != null) {
-            status = "전투중";
+            status = Engine2D.GetInstance().getString(R.string.on_battle);
         } else if (territory.isOccupying()) {
-            status = "점령중";
+            status = Engine2D.GetInstance().getString(R.string.on_occupying);
         } else if (territory.getFaction() == Tribe.Faction.VILLAGER &&
             territory.getTotalFacilityLevel() < 5 &&
             territory.getTerrain().facilitySlots() > 0) {
-            status = "개발중";
+            status = Engine2D.GetInstance().getString(R.string.on_developing);
         }
         textPosition.offset(0, 30);
         addText(status, new SizeF(150, 40), textPosition.clone(),
@@ -302,14 +309,16 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         // Facility
         textPosition.offset(0, 30);
-        addText("시설", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.facility),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
         if (territory.getTerrain().facilitySlots() == 0 ||
                 territory.getFaction() != Tribe.Faction.VILLAGER) {
             textPosition.offset(0, 30);
-            addText("없음", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.none),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
         } else { // Development buttons status
@@ -372,22 +381,26 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             addWidget(fortressDevelopmentButton);
 
             textPosition.offset(-48, 100);
-            addText("농장", new SizeF(100, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.farm),
+                    new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f,
                     Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(71, 0);
-            addText("시장", new SizeF(100, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.market),
+                    new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f,
                     Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(71, 0);
-            addText("마을", new SizeF(100, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.downtown),
+                    new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f,
                     Layout.Alignment.ALIGN_CENTER);
             textPosition.offset(71, 0);
-            addText("요새", new SizeF(100, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.fort),
+                    new SizeF(100, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f,
                     Layout.Alignment.ALIGN_CENTER);
@@ -421,7 +434,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         if (territory.getFaction() == Tribe.Faction.VILLAGER) {
             // Population
             textPosition.setTo(116, -145);
-            addText("인구", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.population), new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(-65, 30);
@@ -434,7 +447,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             // Income
             textPosition.offset(150 - 30, -30);
-            addText("수입", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.income),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(-65, 30);
@@ -447,7 +461,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             // Happiness
             textPosition.offset(-190, 30);
-            addText("행복도", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.happiness),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(-65, 30);
@@ -470,7 +485,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             // Defense
             textPosition.offset(120, -30);
-            addText("방어도", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.defense),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(-65, 30);
@@ -483,7 +499,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
             // Bonus
             textPosition.offset(-190, 30);
-            addText("추가 효과", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.bonus_effect),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(0, 30);
@@ -495,19 +512,19 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 }
             }
             if (isSquadWorking) {
-                addText("일꾼 개발",
+                addText(Engine2D.GetInstance().getString(R.string.worker_bonus),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230),
                         Color.rgb(35, 35, 35), 1.0f);
             } else {
-                addText("없음",
+                addText(Engine2D.GetInstance().getString(R.string.none),
                         new SizeF(150, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230),
                         Color.rgb(35, 35, 35), 1.0f);
             }
         } else {
             textPosition.setTo(116, -148);
-            addText("지역 방어도",
+            addText(Engine2D.GetInstance().getString(R.string.defense),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
@@ -533,7 +550,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         removeSprites("icon");
 
         PointF textPosition = new PointF(-230, -145);
-        addText("소속", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.faction),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
@@ -545,21 +563,22 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         // Status
         textPosition.offset(150, -30);
-        addText("상태", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.status),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
         String status;
         if (squad.isMoving()) {
-            status = "이동중";
+            status = Engine2D.GetInstance().getString(R.string.on_moving);
         } else if (squad.isFighting()) {
-            status = "전투중";
+            status = Engine2D.GetInstance().getString(R.string.on_battle);
         } else if (squad.isSupporting()) {
-            status = "지원중";
+            status = Engine2D.GetInstance().getString(R.string.on_supporting);
         } else if (squad.isOccupying()) {
-            status = "점령중";
+            status = Engine2D.GetInstance().getString(R.string.on_occupying);
         } else {
-            status = "대기중";
+            status = Engine2D.GetInstance().getString(R.string.on_idle);
         }
         textPosition.offset(0, 30);
         addText(status, new SizeF(150, 40), textPosition.clone(),
@@ -568,14 +587,16 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         // Unit information
         textPosition.offset(-150, 30);
-        addText("유닛", new SizeF(150, 40), textPosition.clone(),
+        addText(Engine2D.GetInstance().getString(R.string.unit),
+                new SizeF(150, 40), textPosition.clone(),
                 Color.rgb(235, 235, 0),
                 Color.rgb(35, 35, 35), 2.0f);
 
         textPosition.offset(75, 0);
         if (squad.getUnits().isEmpty()) {
             textPosition.offset(0, 55);
-            addText("유닛이 없습니다.\n하단 버튼을 눌러 모집해주세요.", new SizeF(300, 80), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.no_unit),
+                    new SizeF(300, 80), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
             textPosition.offset(0, 25);
@@ -584,7 +605,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                 textPosition.offset(0, 30);
                 String unitInfoStr = unit.getUnitClass().word() + " Lv." + unit.getLevel();
                 if (unit.isRecruiting()) {
-                    unitInfoStr += " (모집중)";
+                    unitInfoStr += " " + Engine2D.GetInstance().getString(R.string.recruiting);
                 }
                 addText(unitInfoStr, new SizeF(300, 40), textPosition.clone(),
                         Color.rgb(230, 230, 230),
@@ -638,7 +659,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         // Stats
         if (squad.getFaction() == Tribe.Faction.VILLAGER) {
             textPosition.setTo(116, -145);
-            addText("소모 인구", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.used_population),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(-65, 30);
@@ -650,7 +672,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
                     Color.rgb(35, 35, 35), 1.0f);
 
             textPosition.offset(110, -30);
-            addText("유지비", new SizeF(150, 40), textPosition.clone(),
+            addText(Engine2D.GetInstance().getString(R.string.upkeep),
+                    new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(235, 235, 0),
                     Color.rgb(35, 35, 35), 2.0f);
             textPosition.offset(-65, 30);
@@ -672,10 +695,10 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
         int armorBonus = squad.getArmorBonus();
         int healPowerBonus = squad.getHealPowerBonus();
 
-            addText("추가 효과", new SizeF(150, 40), textPosition.clone(),
-                    Color.rgb(235, 235, 0),
-                    Color.rgb(35, 35, 35), 2.0f);
-
+        addText(Engine2D.GetInstance().getString(R.string.bonus_effect),
+                new SizeF(150, 40), textPosition.clone(),
+                Color.rgb(235, 235, 0),
+                Color.rgb(35, 35, 35), 2.0f);
 
         textPosition.offset(30, 0);
 
@@ -683,7 +706,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(-95, 30);
             addIcon("attack.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("공격력 " + ((attackDamageBonus > 0) ? "+" : "") + attackDamageBonus,
+            addText(Engine2D.GetInstance().getString(R.string.damage) + " " +
+                            ((attackDamageBonus > 0) ? "+" : "") + attackDamageBonus,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
@@ -694,7 +718,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(-95, 30);
             addIcon("wind.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("공격 속도 " + ((attackSpeedBonus < 0) ? "+" : "") + (-attackSpeedBonus),
+            addText(Engine2D.GetInstance().getString(R.string.attack_speed) + " " +
+                            ((attackSpeedBonus < 0) ? "+" : "") + (-attackSpeedBonus),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
@@ -705,7 +730,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(-95, 30);
             addIcon("armor.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("방어도 " + ((armorBonus>0)?"+":"") + armorBonus,
+            addText(Engine2D.GetInstance().getString(R.string.armor) + " " +
+                            ((armorBonus>0)?"+":"") + armorBonus,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
@@ -716,7 +742,8 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
             textPosition.offset(-95, 30);
             addIcon("heal.png", new SizeF(25, 25), textPosition.clone());
             textPosition.offset(100, 0);
-            addText("치유량 " + ((healPowerBonus>0)?"+":"") + healPowerBonus,
+            addText(Engine2D.GetInstance().getString(R.string.heal_power) + " " +
+                            ((healPowerBonus>0)?"+":"") + healPowerBonus,
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);
@@ -725,7 +752,7 @@ public class InfoBox extends Widget implements Button.Event, MessageBox.Event,
 
         if (attackDamageBonus == 0 && attackSpeedBonus == 0 && armorBonus == 0 && healPowerBonus == 0) {
             textPosition.offset(-30, 30);
-            addText("없음",
+            addText(Engine2D.GetInstance().getString(R.string.none),
                     new SizeF(150, 40), textPosition.clone(),
                     Color.rgb(230, 230, 230),
                     Color.rgb(35, 35, 35), 1.0f);

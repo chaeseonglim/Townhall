@@ -18,13 +18,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private static final String LOG_TAG = "Unit";
 
     enum UnitClassType {
-        MELEE_FIGHTER("근접 전투형"),
-        MELEE_SUPPORTER("근접 지원형"),
-        MELEE_HEALER("근접 회복형"),
-        RANGED_FIGHTER("원거리 전투형"),
-        RANGED_SUPPORTER("원거리 지원형"),
-        RANGED_HEALER("원거리 회복형"),
-        CIVIL("비전투형");
+        MELEE_FIGHTER(Engine2D.GetInstance().getString(R.string.melee_fighter)),
+        MELEE_SUPPORTER(Engine2D.GetInstance().getString(R.string.melee_supporter)),
+        MELEE_HEALER(Engine2D.GetInstance().getString(R.string.melee_healer)),
+        RANGED_FIGHTER(Engine2D.GetInstance().getString(R.string.ranged_fighter)),
+        RANGED_SUPPORTER(Engine2D.GetInstance().getString(R.string.ranged_supporter)),
+        RANGED_HEALER(Engine2D.GetInstance().getString(R.string.ranged_healer)),
+        CIVIL(Engine2D.GetInstance().getString(R.string.civil));
 
         private String word;
 
@@ -39,9 +39,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
 
     enum UnitClass {
         WORKER(
-                "일꾼",
+                Engine2D.GetInstance().getString(R.string.worker),
                 UnitClassType.CIVIL,
-                "지역 개발을 가속하며 해당 지역의 금화 수입도 늘려줍니다. 하지만 전투 능력이 없으며 매우 느립니다.",
+                Engine2D.GetInstance().getString(R.string.worker_desc),
                 new Point(1, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -81,9 +81,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0
         ),
         FIGHTER(
-                "전사",
+                Engine2D.GetInstance().getString(R.string.fighter),
                 UnitClassType.MELEE_FIGHTER,
-                "균형잡힌 보병입니다. 모든 면에서 무난합니다만 기병에는 유독 약합니다.",
+                Engine2D.GetInstance().getString(R.string.fighter_desc),
                 new Point(2, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -123,9 +123,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0
         ),
         ARCHER(
-                "궁수",
+                Engine2D.GetInstance().getString(R.string.archer),
                 UnitClassType.RANGED_FIGHTER,
-                "원거리 공격이 가능하며 전투와 지원이 모두 가능합니다만 근접 공격에 취약합니다.",
+                Engine2D.GetInstance().getString(R.string.archer_desc),
                 new Point(3, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -165,9 +165,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 200
         ),
         HORSE_MAN(
-                "기마병",
+                Engine2D.GetInstance().getString(R.string.horse_man),
                 UnitClassType.MELEE_FIGHTER,
-                "빠른 속도로 기습에 적합한 기마병입니다. 근접 유닛에 대체로 강하지만 원거리 유닛의 공격에 취약합니다.",
+                Engine2D.GetInstance().getString(R.string.horse_man_desc),
                 new Point(4, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -188,13 +188,13 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 30,
                 0,
                 0,
-                15,
+                17,
                 0,
                 0,
                 20,
                 0,
                 10,
-                200,
+                220,
                 1,
                 30,
                 null,
@@ -207,9 +207,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 0
         ),
         HEALER(
-                "치유사",
+                Engine2D.GetInstance().getString(R.string.healer),
                 UnitClassType.RANGED_HEALER,
-                "전장 및 지원시 아군 유닛을 치유합니다. 공격에 취약하여 보호가 필요합니다.",
+                Engine2D.GetInstance().getString(R.string.healer_desc),
                 new Point(5, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -249,9 +249,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 300
                 ),
         CANNON(
-                "대포병",
+                Engine2D.GetInstance().getString(R.string.cannon),
                 UnitClassType.RANGED_SUPPORTER,
-                "강력한 원거리 공격으로 주변을 초토화합니다. 근접 공격에 취약하므로 주로 지원 용도로 사용하게 됩니다.",
+                Engine2D.GetInstance().getString(R.string.cannon_desc),
                 new Point(6, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -291,9 +291,9 @@ public class Unit extends CollidableObject implements Projectile.Event {
                 300
                 ),
         PALADIN(
-                "성기사",
+                Engine2D.GetInstance().getString(R.string.paladin),
                 UnitClassType.MELEE_SUPPORTER,
-                "근접 공격과 치유를 동시에 할 수 있습니다. 비싸지만 그만큼 강력합니다.",
+                Engine2D.GetInstance().getString(R.string.paladin_desc),
                 new Point(7, 0),
                 new SizeF(18, 18),
                 new Shape(9.0f),
@@ -629,15 +629,15 @@ public class Unit extends CollidableObject implements Projectile.Event {
         // Adjust moving speed
         if (Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction) > 0 &&
                 getUnitClass() == UnitClass.HORSE_MAN) {
-            setMaxVelocity(getUnitClass().maxVelocity() * (1.0f + MOVE_SPEED_DELTA *
+            setMaxVelocity(getUnitClass().maxVelocity() * (1.0f + HORSEMAN_MOVE_SPEED_DELTA *
                     Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction)));
-            setMaxForce(getUnitClass().maxForce() * (1.0f + MOVE_SPEED_DELTA *
+            setMaxForce(getUnitClass().maxForce() * (1.0f + HORSEMAN_MOVE_SPEED_DELTA *
                     Upgradable.HORSE_MAN_MOVE_SPEED.getLevel(faction)));
         } else if (Upgradable.CANNON_MOVE_SPEED.getLevel(faction) > 0 &&
                 getUnitClass() == UnitClass.CANNON) {
-            setMaxVelocity(getUnitClass().maxVelocity() * (1.0f + MOVE_SPEED_DELTA *
+            setMaxVelocity(getUnitClass().maxVelocity() * (1.0f + CANNON_MOVE_SPEED_DELTA *
                     Upgradable.CANNON_MOVE_SPEED.getLevel(faction)));
-            setMaxForce(getUnitClass().maxForce() * (1.0f + MOVE_SPEED_DELTA *
+            setMaxForce(getUnitClass().maxForce() * (1.0f + CANNON_MOVE_SPEED_DELTA *
                     Upgradable.CANNON_MOVE_SPEED.getLevel(faction)));
         } else {
             setMaxVelocity(getUnitClass().maxVelocity());
@@ -1230,8 +1230,8 @@ public class Unit extends CollidableObject implements Projectile.Event {
      */
     private void slowed() {
 
-        setMaxVelocity(getMaxVelocity() * (1.0f - MOVE_SPEED_DELTA * slowness));
-        setMaxForce(getMaxForce() * (1.0f - MOVE_SPEED_DELTA * slowness));
+        setMaxVelocity(getMaxVelocity() * (1.0f - HORSEMAN_MOVE_SPEED_DELTA * slowness));
+        setMaxForce(getMaxForce() * (1.0f - HORSEMAN_MOVE_SPEED_DELTA * slowness));
 
         Sprite effectSprite = getSprite("effect");
         if (--slowTimeLeft > 0) {
@@ -1988,17 +1988,18 @@ public class Unit extends CollidableObject implements Projectile.Event {
     private final static int RESTING_TIME = 30;
     private final static float SPLASH_DAMAGE_RANGE = 30.0f;
     private final static float SPLASH_DAMAGE_DELTA = 0.1f;
-    private final static float SPLASH_DAMAGE_RANGE_DELTA = 0.1f;
+    private final static float SPLASH_DAMAGE_RANGE_DELTA = 0.05f;
     private final static float MELEE_DAMAGE_UPGRADE_DELTA = 0.05f;
     private final static float RANGED_DAMAGE_UPGRADE_DELTA = 0.03f;
-    private final static float ATTACK_SPEED_UPGRADE_DELTA = 0.03f;
+    private final static float ATTACK_SPEED_UPGRADE_DELTA = 0.05f;
     private final static float HEAL_POWER_UPGRADE_DELTA = 0.05f;
     private final static float EVASION_UPGRADE_DELTA = 0.03f;
     private final static float ARMOR_UPGRADE_DELTA = 0.03f;
     private final static float CRITICAL_ATTACK_RATE_DELTA = 0.05f;
     private final static float BUFF_DELTA = 0.03f;
     private final static float DOT_DELTA = 0.01f;
-    private final static float MOVE_SPEED_DELTA = 0.1f;
+    private final static float HORSEMAN_MOVE_SPEED_DELTA = 0.05f;
+    private final static float CANNON_MOVE_SPEED_DELTA = 0.1f;
     private final static float STUN_DELTA = 0.03f;
     private final static float SLOW_DELTA = 0.03f;
     private final static float HEALTH_UPGRADE_DELTA = 0.03f;

@@ -1,0 +1,631 @@
+<resources>
+    <string name="app_name">마을 대전략 1.0</string>
+
+    <string name="logo_text">마을\n대전략\n1.0</string>
+    <string name="game_start">게임 시작</string>
+    <string name="setting_btn">설정</string>
+    <string name="expect_more_mission">더 많은 미션이 곧 공개될 예정입니다.\n\n잠시만 기다려주세요.</string>
+    <string name="how_about_game">게임은 어떠신가요? :)\n\n게임을 평가해주시겠습니까?</string>
+
+    <string name="music_on_off">음악 On/Off</string>
+    <string name="sound_on_off">효과음 On/Off</string>
+    <string name="exit">종료하기</string>
+    <string name="back">돌아가기</string>
+    <string name="confirm_exit">정말 나가시겠습니까?</string>
+
+    <string name="close">닫기</string>
+    <string name="upgrade">강화</string>
+    <string name="total_population">전체 인구</string>
+    <string name="used_population">소모 인구</string>
+    <string name="total_income">금화 수입</string>
+    <string name="total_spend">금화 소비</string>
+    <string name="happiness">행복도</string>
+    <string name="number_of_territory">영토 수</string>
+    <string name="number_of_squad">부대 수</string>
+    <string name="occupied_shrine">소유 제단</string>
+    <string name="healing_shrine">치유의 제단</string>
+    <string name="wind_shrine">바람의 제단</string>
+    <string name="prosper_shrine">풍요의 제단</string>
+    <string name="love_shrine">사랑의 제단</string>
+    <string name="none">없음</string>
+    <string name="upkeep">유지비</string>
+    <string name="damage">공격력</string>
+    <string name="attack_speed">공격 속도</string>
+    <string name="armor">방어도</string>
+    <string name="heal_power">치유량</string>
+
+    <string name="territory">지역</string>
+    <string name="confirm_replacement_unit">기존 병력이 교체되며\n비용이 발생합니다.\n\n진행하시겠습니까?</string>
+    <string name="faction">소속</string>
+    <string name="unknown">모름</string>
+    <string name="status">상태</string>
+    <string name="on_battle">전투중</string>
+    <string name="on_occupying">점령중</string>
+    <string name="on_developing">개발중</string>
+    <string name="facility">시설</string>
+    <string name="farm">농장</string>
+    <string name="market">시장</string>
+    <string name="downtown">마을</string>
+    <string name="fortress">요새</string>
+    <string name="fort">요새</string>
+    <string name="population">인구</string>
+    <string name="income">수입</string>
+    <string name="defense">방어도</string>
+    <string name="bonus_effect">추가 효과</string>
+    <string name="worker_bonus">일꾼 개발</string>
+    <string name="on_moving">이동중</string>
+    <string name="on_supporting">지원중</string>
+    <string name="on_idle">대기중</string>
+    <string name="unit">유닛</string>
+    <string name="no_unit">유닛이 없습니다.\n하단 버튼을 눌러 모집해주세요.</string>
+    <string name="recruiting">(모집중)</string>
+
+    <string name="home">홈</string>
+    <string name="confirm_upgrade">유지 비용이 발생하며\n선택시 취소할 수 없습니다.\n진행하시겠습니까?</string>
+    <string name="no_money_for_upgrade">강화에 필요한 금화가 부족합니다!\n다음에 시도해주세요.</string>
+    <string name="purchase_cost">구입비</string>
+    <string name="level">레벨</string>
+    <string name="choose_upgrade_lv">강화할 항목을 선택하세요.</string>
+    <string name="choose_upgrade_class">강화할 클래스를 선택하세요.</string>
+
+    <string name="farm_development">농장 개발</string>
+    <string name="farm_development_lv1">농장 개발 +1</string>
+    <string name="farm_development_lv2">농장 개발 +2</string>
+    <string name="farm_development_lv3">농장 개발 +3</string>
+    <string name="downtown_development">마을 개발</string>
+    <string name="downtown_development_lv1">마을 개발 +1</string>
+    <string name="downtown_development_lv2">마을 개발 +2</string>
+    <string name="downtown_development_lv3">마을 개발 +3</string>
+    <string name="happiness_lv1">주변 타일 행복도 +5</string>
+    <string name="happiness_lv2">주변 타일 행복도 +10</string>
+    <string name="happiness_lv3">주변 타일 행복도 +15</string>
+    <string name="market_development">시장 개발</string>
+    <string name="market_development_lv1">시장 개발 +1</string>
+    <string name="market_development_lv2">시장 개발 +2</string>
+    <string name="market_development_lv3">시장 개발 +3</string>
+    <string name="fortress_development">요새 개발</string>
+    <string name="fortress_development_lv1">요새 개발 +1</string>
+    <string name="fortress_development_lv2">요새 개발 +2</string>
+    <string name="fortress_development_lv3">요새 개발 +3</string>
+    <string name="defense_development">지역 방어</string>
+    <string name="defense_development_lv1">주변 타일 방어도 +2</string>
+    <string name="defense_development_lv2">주변 타일 방어도 +4</string>
+    <string name="defense_development_lv3">주변 타일 방어도 +6</string>
+    <string name="melee_damage">근접 공격력</string>
+    <string name="melee_damage_lv1">근접 공격력 +5%</string>
+    <string name="melee_damage_lv2">근접 공격력 +10%</string>
+    <string name="melee_damage_lv3">근접 공격력 +15%</string>
+    <string name="melee_attack_speed">근접 공격 속도</string>
+    <string name="melee_attack_speed_lv1">근접 공격 속도 +5%</string>
+    <string name="melee_attack_speed_lv2">근접 공격 속도 +10%</string>
+    <string name="melee_attack_speed_lv3">근접 공격 속도 +15%</string>
+    <string name="melee_critical_attack">치명타</string>
+    <string name="melee_critical_attack_lv1">치명타 확률 +5%</string>
+    <string name="melee_critical_attack_lv2">치명타 확률 +10%</string>
+    <string name="melee_critical_attack_lv3">치명타 확률 +15%</string>
+    <string name="melee_armor">방어</string>
+    <string name="melee_armor_lv1">방어 +3%</string>
+    <string name="melee_armor_lv2">방어 +6%</string>
+    <string name="melee_armor_lv3">방어 +9%</string>
+    <string name="melee_evade">근접 회피</string>
+    <string name="melee_evade_lv1">근접 회피 +3%</string>
+    <string name="melee_evade_lv2">근접 회피 +6%</string>
+    <string name="melee_evade_lv3">근접 회피 +9%</string>
+    <string name="buff">아군 강화</string>
+    <string name="buff_lv1">아군 공격력 +3%</string>
+    <string name="buff_lv2">아군 공격력 +6%</string>
+    <string name="buff_lv3">아군 공격력 +9%</string>
+    <string name="point_blank">근접 화살 공격</string>
+    <string name="point_blank_lv1">근접 화살 공격 가능</string>
+    <string name="point_blank_lv2">근접 화살 피해량 +3%</string>
+    <string name="point_blank_lv3">근접 화살 피해량 +6%</string>
+    <string name="ranged_attack_speed">원거리 공격 속도</string>
+    <string name="ranged_attack_speed_lv1">원거리 공격 속도 +3%</string>
+    <string name="ranged_attack_speed_lv2">원거리 공격 속도 +6%</string>
+    <string name="ranged_attack_speed_lv3">원거리 공격 속도 +9%</string>
+    <string name="ranged_damage">원거리 공격력</string>
+    <string name="ranged_damage_lv1">원거리 공격력 +3%</string>
+    <string name="ranged_damage_lv2">원거리 공격력 +6%</string>
+    <string name="ranged_damage_lv3">원거리 공격력 +9%</string>
+    <string name="poison_arrow">독 화살</string>
+    <string name="poison_arrow_lv1">독 화살 피해 추가</string>
+    <string name="poison_arrow_lv2">독 화살 피해량 증가</string>
+    <string name="poison_arrow_lv3">독 화살 피해량 증가</string>
+    <string name="ranged_evade">원거리 회피</string>
+    <string name="ranged_evade_lv1">원거리 회피 +3%</string>
+    <string name="ranged_evade_lv2">원거리 회피 +6%</string>
+    <string name="ranged_evade_lv3">원거리 회피 +9%</string>
+    <string name="move_speed_upgrade">이동 속도</string>
+    <string name="move_speed_upgrade_lv1">이동 속도 +5%</string>
+    <string name="move_speed_upgrade_lv2">이동 속도 +10%</string>
+    <string name="move_speed_upgrade_lv3">이동 속도 +15%</string>
+    <string name="stun">기절</string>
+    <string name="stun_lv1">공격시 기절 확률 추가</string>
+    <string name="stun_lv2">기절 확률 +3%</string>
+    <string name="stun_lv3">기절 확률 +6%</string>
+    <string name="heal_speed_upgrade">치유 속도</string>
+    <string name="heal_speed_upgrade_lv1">치유 속도 +3%</string>
+    <string name="heal_speed_upgrade_lv2">치유 속도 +6%</string>
+    <string name="heal_speed_upgrade_lv3">치유 속도 +9%</string>
+    <string name="heal_power_upgrade">치유력</string>
+    <string name="heal_power_upgrade_lv1">치유력 +5%</string>
+    <string name="heal_power_upgrade_lv2">치유력 +10%</string>
+    <string name="heal_power_upgrade_lv3">치유력 +15%</string>
+    <string name="dot_heal">기적의 치유</string>
+    <string name="dot_heal_lv1">전체 점진적인 치유 추가</string>
+    <string name="dot_heal_lv2">점진적인 치유량 증가</string>
+    <string name="dot_heal_lv3">점진적인 치유량 증가</string>
+    <string name="spike_heal">치유의 가시</string>
+    <string name="spike_heal_lv1">치유시 범위 피해 추가</string>
+    <string name="spike_heal_lv2">치유시 범위 피해량 증가</string>
+    <string name="spike_heal_lv3">치유시 범위 피해량 증가</string>
+    <string name="splash_radius">피해 범위</string>
+    <string name="splash_radius_lv1">피해 범위 +5%</string>
+    <string name="splash_radius_lv2">피해 범위 +10%</string>
+    <string name="splash_radius_lv3">피해 범위 +15%</string>
+    <string name="cannon_move_speed_upgrade">이동 속도</string>
+    <string name="cannon_move_speed_upgrade_lv1">이동 속도 +10%</string>
+    <string name="cannon_move_speed_upgrade_lv2">이동 속도 +20%</string>
+    <string name="cannon_move_speed_upgrade_lv3">이동 속도 +30%</string>
+    <string name="sticky_cannon">끈적이 포탄</string>
+    <string name="sticky_cannon_lv1">피해시 이속 -3%</string>
+    <string name="sticky_cannon_lv2">피해시 이속 -6%</string>
+    <string name="sticky_cannon_lv3">피해시 이속 -9%</string>
+    <string name="invincible">무적</string>
+    <string name="invincible_lv1">체력 저하시 무적 상태</string>
+    <string name="invincible_lv2">무적 지속시간 증가</string>
+    <string name="invincible_lv3">무적 지속시간 증가</string>
+    <string name="health_upgrade">체력 증가</string>
+    <string name="health_upgrade_lv1">체력 증가 +3%</string>
+    <string name="health_upgrade_lv2">체력 증가 +6%</string>
+    <string name="health_upgrade_lv3">체력 증가 +9%</string>
+    <string name="guardian">아군 보호</string>
+    <string name="guardian_lv1">아군 피해 10% 전환</string>
+    <string name="guardian_lv2">아군 피해 20% 전환</string>
+    <string name="guardian_lv3">아군 피해 30% 전환</string>
+
+    <string name="short_back">뒤로</string>
+    <string name="start">시작</string>
+
+    <string name="lv1_title">굶주림 (튜토리얼)</string>
+    <string name="lv1_desc">
+    당신은 어느 작은 마을의 촌장입니다.\n\n
+    유난히 혹독했던 지난 겨울, 당신은 많은
+    친구들을 잃었습니다. 하지만 이제 애도를
+    마치고 다시 일어설 때입니다. \n\n미래를 대비해
+    마을을 정돈하고 인구를 충분히 회복해야
+    합니다.
+    </string>
+    <string name="lv1_victory">전체 인구 65 이상 확보</string>
+    <string name="lv1_hint1">힌트: 농장은 인구를 늘려줍니다.</string>
+    <string name="lv1_hint2">힌트: 일꾼을 뽑아 영토를 늘리는 방법도 있습니다.</string>
+    <string name="lv1_hint3">힌트: 이번 미션은 시장과 요새가 불필요합니다.</string>
+    <string name="lv1_hint4">힌트: 지루하면 게임 속도를 빠르게 해보세요.</string>
+
+    <string name="lv2_title">조짐 (튜토리얼)"</string>
+    <string name="lv2_desc">
+    마을 근처에 도적들이 접근하고 있습니다.
+    마을 사람들이 불안해 하기 전에 처리해야 합니다.
+    \n\n당신의 전술적 지식을 확인해 볼 수 있는 좋은 기회입니다.
+    </string>
+    <string name="lv2_victory">도적 패배</string>
+    <string name="lv2_hint1">힌트: 후퇴한 적은 바로 추격해서 공격 가능합니다.</string>
+    <string name="lv2_hint2">힌트: 전투가 불리하면 추가 부대를 모집하세요.</string>
+    <string name="lv2_hint3">힌트: 지루하면 게임 속도를 빠르게 해보세요.</string>
+    <string name="lv3_title">당근 시장</string>
+    <string name="lv3_desc">
+    훌륭합니다!\n우리 병사들이 마을 근처에 접근한 도적들을 물리쳤습니다.
+    하지만 그들은 다시 올 것입니다. 만약을 대비해 많은 금화를 모아야 합니다.
+    \n\n마을 근처에 큰 시장이 있다면 도움이 될 것입니다.
+    </string>
+    <string name="lv3_victory">시장 Lv4 이상 1개 / 금화 3000 보유</string>
+    <string name="lv3_hint1">시장은 황무지에서 빠르게 성장합니다.</string>
+    <string name="lv3_hint2">지역 전체 시설의 Lv 합은 5를 넘지 못합니다.</string>
+    <string name="lv3_hint3">영토를 정복하면 수입을 쉽게 늘릴 수 있습니다.</string>
+    <string name="lv3_hint4">일꾼이 있는 지역은 빠르게 개발이 진행됩니다.</string>
+    <string name="lv3_hint5">한 시설을 Lv4이상 만드려면 개발도를 조정해보세요.</string>
+    <string name="lv3_hint6">지루하면 게임 속도를 빠르게 해보세요.</string>
+
+    <string name="bandit_activated">조심하세요!! 도적이 이제 활동을 시작합니다.</string>
+    <string name="viking_activated">조심하세요!! 바이킹이 이제 활동을 시작합니다.</string>
+    <string name="rebel_activated">조심하세요!! 반란군이 이제 활동을 시작합니다.</string>
+
+    <string name="lv4_title">금화 맛</string>
+    <string name="lv4_desc">
+    당신의 예상대로 북쪽 숲 너머에서 도적들이 다시 움직이기 시작했습니다.
+    하지만 시장이 활성화 되면서 마을은 많은 금화를 모았습니다.
+    \n\n도적들에게 당신의 힘을 보여줄 기회입니다.
+    </string>
+    <string name="lv4_victory">도적 패배</string>
+    <string name="lv4_hint1">힌트: 돈은 충분합니다. 부대를 모집하세요.</string>
+    <string name="lv4_hint2">힌트: 유지비를 감당할 수 있다면 업그레이드도 좋습니다.</string>
+    <string name="lv4_hint3">힌트: 영토를 정복하면 수입을 쉽게 늘릴 수 있습니다.</string>
+    <string name="lv4_hint4">힌트: 전투는 지원 병력을 최대한 활용하세요.</string>
+    <string name="lv4_hint5">힌트: 적의 영토가 많아지면 부대도 빨리 늘어납니다.</string>
+    <string name="lv4_hint6">힌트: 지루하면 게임 속도를 빠르게 해보세요.</string>
+
+    <string name="lv5_title">내 꿈은 시장님</string>
+    <string name="lv5_desc">
+    마을 근처의 시장은 매우 번창하고 있습니다. 많은 사람들이 당신을 우러러봅니다.
+    여전히 도적들이 근처에 출몰하고 있지만 별 문제는 아닐 것입니다.
+    \n\n마을을 더 키워 큰 도시로 만들어주세요.
+    </string>
+    <string name="lv5_victory">마을과 시장 각각 Lv5 1개 이상 보유</string>
+    <string name="lv5_hint1">힌트: 돈은 충분합니다. 일꾼을 모집하세요.</string>
+    <string name="lv5_hint2">힌트: 일꾼은 시설을 Lv5로 올리는데 도움을 줄 것입니다.</string>
+    <string name="lv5_hint3">힌트: Lv5 시설을 만들 지역은 신중하게 고려하세요.</string>
+    <string name="lv5_hint4">힌트: 마을은 주위 영토에 많은 도움을 줍니다.</string>
+    <string name="lv5_hint5">힌트: Lv5 시설을 만들 지역에 일꾼 부대를 파견해보세요.</string>
+    <string name="lv5_hint6">힌트: 지루하면 게임 속도를 빠르게 해보세요.</string>
+
+    <string name="lv6_title">병원 개원</string>
+    <string name="lv6_desc">마을이 매우 번창해지자 흩어져있던 도적들이 다시 모이기 시작했습니다.
+    이번에는 도적의 규모가 지금까지와는 다릅니다.
+    위기의 순간 당신은 남쪽에 치유사들이 모여 사는 제단이 있다는 소문을 떠올립니다.
+    \n\n도적을 물리치고 마을을 지켜내야 합니다.
+    </string>
+    <string name="lv6_victory">도적 패배</string>
+    <string name="lv6_hint1">힌트: 가능하면 도적이 나타나기 전에 사원을 방문하세요.</string>
+    <string name="lv6_hint2">힌트: 사원에 갈때는 충분한 병력을 데려가야합니다.</string>
+    <string name="lv6_hint3">힌트: 이번 도적은 규모가 만만치 않습니다.</string>
+    <string name="lv6_hint4">힌트: 언덕을 요새로 변경하면 방어에 도움이 될지 모릅니다.</string>
+    <string name="lv6_hint5">힌트: 적은 쉴 틈을 주면 빠르게 회복합니다.</string>
+    <string name="lv6_hint6">힌트: 일꾼은 후방에서 경제 활동을 계속 하는 것이 좋습니다.</string>
+    <string name="lv6_hint7">힌트: 본부가 점령되면 신규 적 부대가 안나옵니다.</string>
+    <string name="lv6_healer_news">치유사들이 지금부터 당신을 돕기로 결정했습니다.</string>
+    <string name="lv6_healer_popup">
+    당신은 치유사들에게 고개를 숙여 마을을 돕기를 청합니다..\n\n그들은 잠시의 침묵 후 당신을 따라 나섭니다..
+    </string>
+
+    <string name="lv7_title">바이킹 등장</string>
+    <string name="lv7_desc">
+    당신은 치유사들의 도움으로 계속해서 몰려드는 도적들을 간신히 막아냈습니다.
+    하지만 한숨 돌리기도 전에 남서쪽 강 너머에서 나팔 소리가 들려옵니다.
+    \n\n촌장님 바이킹입니다!
+    </string>
+    <string name="lv7_victory">100일간 생존</string>
+    <string name="lv7_hint1">힌트: 이번에는 일정 시간 버티면 미션이 종료됩니다.</string>
+    <string name="lv7_hint2">힌트: 일꾼이 필요치 않다면 다른 유닛으로 변경하세요.</string>
+    <string name="lv7_hint3">힌트: 기존 시설을 요새로 변경하는 방법도 있습니다.</string>
+    <string name="lv7_hint4">힌트: 바이킹은 강을 건너 넘어올 수 있습니다.</string>
+    <string name="lv7_hint5">힌트: 치유사는 때로는 지루하지만 버티기에 적합합니다.</string>
+    <string name="lv7_hint6">힌트: 도적의 본부는 점령 가능합니다만...</string>
+    <string name="lv7_hint7">힌트: 조금만 더 버티면 됩니다!</string>
+
+    <string name="lv8_title">바람의 신</string>
+    <string name="lv8_desc">
+    바이킹은 우리의 모든 것을 불태웠습니다. 당신과 생존자들은 치유의 제단 근처로 가까스로 대피했습니다.
+    도적은 여전히 남아서 우리의 터전을 약탈하고 있습니다.
+    \n\n이곳에서 북으로 올라가면 바람의 제단이 있습니다. 그곳에서부터 실마리를 찾아야 합니다.
+    </string>
+    <string name="lv8_victory">도적 패배</string>
+    <string name="lv8_hint1">힌트: 선택지가 많지 않습니다. 북쪽으로 달리세요!</string>
+    <string name="lv8_hint2">힌트: 사원을 빠르게 제압해야 합니다.</string>
+    <string name="lv8_hint3">힌트: 기마병은 빠르지만 원거리 공격에 매우 취약합니다.</string>
+    <string name="lv8_hint4">힌트: 기마병은 치유사의 지원을 받으면 매우 강해집니다.</string>
+    <string name="lv8_hint5">힌트: 기마병은 적을 따돌리기 적합합니다.</string>
+    <string name="lv8_wind_news">바람의 신이 당신의 기도에 응답했습니다.</string>
+    <string name="lv8_wind_popup">당신은 제단에 기도를 올립니다..\n\n어느새 날이 어두워지고 돌아서는 찰나 어디선가 동물의 울음소리가 들려옵니다..</string>
+
+    <string name="lv9_title">마을 탈환</string>
+    <string name="lv9_desc">
+    우리의 기마병은 도적의 선봉을 완전히 격파했습니다.
+     이대로 밀어붙여 남아있는 도적으로부터 마을을 되찾아야 합니다.
+     \n\n마을을 복구하려면 많은 노력이 필요할 것입니다.
+    </string>
+    <string name="lv9_victory">도적 패배 / 인구 500 이상</string>
+    <string name="lv9_hint1">힌트: 적을 물리치는 것도 중요하지만 인구를 늘려야합니다.</string>
+    <string name="lv9_hint2">힌트: 기마병은 원거리 공격에 매우 약합니다.</string>
+    <string name="lv9_hint3">힌트: 기마병은 치유사의 지원 하에 굉장히 강해집니다.</string>
+    <string name="lv9_hint4">힌트: 승리를 거둔 다음 너무 많은 시간을 주면 쉽게 회복합니다.</string>
+    <string name="lv9_hint5">힌트: 인구 500을 만드려면 시간이 부족할 수도 있습니다.</string>
+    <string name="lv9_hint6">힌트: 성장을 위해 불필요한 요새는 제거하는 것이 좋습니다.</string>
+    <string name="lv9_hint7">힌트: 어느 정도 승기를 잡았다면 일꾼을 늘려도 좋습니다.</string>
+
+    <string name="lv10_title">도적 소탕</string>
+    <string name="lv10_desc">
+    촌장님
+    드디어 마을을 완전히 되찾았습니다.
+    남은 도적들은 뿔뿔히 흩어졌습니다. 두 번 다시 마을을 넘보지 못하게 본때를 보여줍시다.
+    \n\n추가로 정찰병에 따르면 북서쪽 숲 근처에서 제단을 발견했다고 합니다. 방문하면 도움이 될지 모르겠습니다.
+    </string>
+    <string name="lv10_victory">도적 패배 / 사랑의 제단 점령</string>
+    <string name="lv10_hint1">힌트: 도적은 여기저기 흩어져 있습니다만 조심해야 합니다.</string>
+    <string name="lv10_hint2">힌트: 여전히 도적이 많습니다. 병력을 준비해두세요.</string>
+    <string name="lv10_hint3">힌트: 사원은 천천히 가도 될 것 같습니다.</string>
+    <string name="lv10_hint4">힌트: 약간의 업그레이드는 전투에 도움이 됩니다.</string>
+    <string name="lv10_hint5">힌트: 적 본부를 점령하면 남은 병력은 매우 강해집니다. 주의하세요!</string>
+    <string name="lv10_hint6">힌트: 너무 많은 업그레이드는 파산의 지름길입니다.</string>
+
+    <string name="lv11_title">폭죽 소리</string>
+    <string name="lv11_desc">
+    마을은 다시 번화해지고 있습니다.
+    마을에는 곡식과 금화가 넘치고 사람들은 쉬지 않고 축제를 엽니다.
+    축제가 무르익자 어디선가 기쁨의 폭죽 소리가 들리기 시작합니다.
+    \n\n잠시만요.. 그런데 대체 누가 폭죽을 쏘고 있는거죠??
+    </string>
+    <string name="lv11_victory">바이킹 본부 점령 / 도적 패배</string>
+    <string name="lv11_hint1">힌트: 남쪽에 바이킹이 나타났습니다. 폭죽 소리와 함께요.</string>
+    <string name="lv11_hint2">힌트: 바이킹은 처음보는 무기를 가져왔습니다. 조심하세요!</string>
+    <string name="lv11_hint3">힌트: 적은 강합니다. 철저히 대비해야 합니다.</string>
+    <string name="lv11_hint4">힌트: 대포병에게 지원을 허용하면 병력이 순식간에 녹습니다.</string>
+    <string name="lv11_hint5">힌트: 바이킹과 강 근처에서 전투는 매우 불리합니다.</string>
+    <string name="lv11_hint6">힌트: 너무 많은 업그레이드는 파산의 지름길입니다.</string>
+    <string name="lv11_hint7">힌트: 가능하다면 최대한 사원을 점령하세요.</string>
+    <string name="lv11_hint8">힌트: 바이킹 본부는 강 너머 건너편에 있습니다.</string>
+
+    <string name="lv12_title">누가 누가 잘 쏘나?</string>
+    <string name="lv12_desc">
+    바이킹이 몰고 온 대포는 정말 무시무시한 무기입니다.
+    가까스로 버텨내고 있지만 바이킹은 코 앞까지 몰려든 상태입니다.
+    장인들이 말합니다. \"똑같은 대포를 만들려면 금화가 2만개 필요합니다.\"
+    \n\n자 금화 2만개만 모으면 적에게 포탄 세례를 퍼부을 수 있습니다.
+    </string>
+    <string name="lv12_victory">바이킹 본부 점령 / 도적 패배</string>
+    <string name="lv12_hint1">힌트: 북쪽 어딘가 새로운 사원이 있다고 합니다.</string>
+    <string name="lv12_hint2">힌트: 대포는 잘 쓰면 정말 강력한 무기입니다.</string>
+    <string name="lv12_hint3">힌트: 전투는 최대한 지원 하에 이루어져야 합니다.</string>
+    <string name="lv12_hint4">힌트: 대포병은 매우 매우 느립니다.</string>
+    <string name="lv12_hint5">힌트: 바이킹과 강 근처에서 전투는 매우 불리합니다.</string>
+    <string name="lv12_hint6">힌트: 너무 많은 업그레이드는 파산의 지름길입니다.</string>
+    <string name="lv12_hint7">힌트: 가능하다면 사원을 최대한 점령하세요.</string>
+    <string name="lv12_hint8">힌트: 바이킹 본부는 강 너머 건너편에 있습니다.</string>
+    <string name="lv12_prosper_news">풍요의 신은 당신의 기도에 응답했습니다.</string>
+    <string name="lv12_prosper_popup">당신은 제단에 기도를 올립니다..\n\n당신의 주머니에서 짤랑거리는 소리가 들립니다. 바지가 내려갈 것 같습니다!!</string>
+    <string name="lv12_cannon_popup">드디어 장인들이 대포 기술을 개발했습니다.\n당장 모집해서 본때를 보여줍시다.</string>
+
+    <string name="lv13_title">잠자는 예배당의 사자</string>
+    <string name="lv13_desc">
+    바이킹에게 매서운 대포 맛을 보여줬습니다.
+    하지만 여전히 사방은 적들로 가득합니다.
+    동쪽에서는 반란군들이 서쪽에서는 도적과 바이킹이 공격하고 있습니다.
+    \n\n이번에도 기적이 필요합니다. 모든 사원에서 기도를 드리세요.
+    </string>
+    <string name="lv13_victory">도적 패배 / 반란군 패배</string>
+    <string name="lv13_hint1">힌트: 모든 사원을 다 점령하면 언젠가 기적이 일어납니다.</string>
+    <string name="lv13_hint2">힌트: 사방에 적이 있습니다. 주의하세요.</string>
+    <string name="lv13_hint3">힌트: 전투는 최대한 지원 하에 이루어져야 합니다.</string>
+    <string name="lv13_hint4">힌트: 피해를 입은 유닛은 휴식이 필요합니다.</string>
+    <string name="lv13_hint5">힌트: 적의 본부를 공략하는 방법도 있습니다.</string>
+    <string name="lv13_hint6">힌트: 곧 기적이 벌어집니다!!!</string>
+    <string name="lv13_hint7">힌트: 가능하면 일꾼을 꾸준히 만들어 새로운 영토를 넓히세요.</string>
+    <string name="lv13_hint8">힌트: 여러가지 공략 방법이 있을 수 있습니다.</string>
+    <string name="lv13_news1">치유의 신이 당신의 기도에 응답했습니다.</string>
+    <string name="lv13_popup1">치유의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다!!</string>
+    <string name="lv13_news2">바람의 신이 당신의 기도에 응답했습니다.</string>
+    <string name="lv13_popup2">바람의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다!!</string>
+    <string name="lv13_news3">풍요의 신이 당신의 기도에 응답했습니다.</string>
+    <string name="lv13_popup3">풍요의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다!!</string>
+    <string name="lv13_news4">사랑의 신이 당신의 기도에 응답했습니다.</string>
+    <string name="lv13_popup4">사랑의 제단 옆에 신비한 전사들이 나타났습니다...\n\n그들은 당신을 도울 것입니다!!</string>
+
+    <string name="free_lv1_title">자유 게임 1</string>
+    <string name="free_lv1_desc">
+    자유 게임입니다.\n\n
+    적과 동등한 조건에서 싸워 이기세요.\n
+    모든 유닛과 업그레이드를 사용 가능합니다.
+    </string>
+    <string name="free_lv1_victory">모든 적 패배</string>
+
+    <string name="say_hi">안녕하세요. 마을 주민들이 당신에게 인사합니다!</string>
+    <string name="yes">예</string>
+    <string name="no">아니오</string>
+    <string name="ok">확인</string>
+    <string name="cancel">취소</string>
+
+    <string name="day">일</string>
+
+    <string name="our_headquarter_down">우리 본부가 점령되었습니다!!!</string>
+    <string name="enemy_headquarter_down_pre">우리가</string>
+    <string name="enemy_headquarter_down_post">의 본부를 점령했습니다.</string>
+    <string name="enemy_squad_getting_powerful_pre">조심하세요! 남은</string>
+    <string name="enemy_squad_getting_powerful_post">의 병력들이 강해집니다.</string>
+    <string name="occupied_territory_pre"> </string>
+    <string name="occupied_territory_mid">이</string>
+    <string name="occupied_territory_post">의 영토를 차지했습니다.</string>
+    <string name="occupied_wind_shrine">바람의 제단을 점령했습니다. 이동 속도가 빨라집니다.</string>
+    <string name="occupied_heal_shrine">치유의 제단을 점령했습니다. 휴식 속도가 빨라집니다.</string>
+    <string name="occupied_love_shrine">사랑의 제단을 점령했습니다. 인구가 늘어납니다.</string>
+    <string name="occupied_prosper_shrine">풍요의 제단을 점령했습니다. 금화 수입이 늘어납니다.</string>
+    <string name="learned_new_upgrade">이 새로운 기술을 습득했습니다.</string>
+    <string name="defeated">이 패배했습니다.</string>
+    <string name="made_new_squad">이 새로운 부대를 만들었습니다.</string>
+    <string name="removed_a_squad">의 부대가 제거되었습니다.</string>
+    <string name="victory_condition">승리 조건:</string>
+    <string name="time_limit">시간 제한:</string>
+    <string name="mission_completed_pre">미션을 완수했습니다!!!\n별</string>
+    <string name="mission_completed_post">개 달성</string>
+    <string name="game_over_time_limit">게임 오버!!!\n시간 내에 미션을\n완수하지 못했습니다.</string>
+    <string name="game_over_headquarter_down">게임 오버!!!\n본부를 점령당했습니다.</string>
+    <string name="would_you_like_tutorial">튜토리얼을 진행하시겠습니까?</string>
+
+    <string name="select">선택</string>
+    <string name="unit_class">클래스</string>
+    <string name="health">체력</string>
+    <string name="move_speed">이동 속도</string>
+    <string name="heal_speed">치유 속도</string>
+    <string name="evade">회피</string>
+    <string name="support">지원</string>
+    <string name="description">설명</string>
+    <string name="select_class">클래스를 선택하세요.</string>
+
+    <string name="tutorial_battle_1">
+    존경하는 촌장님!\n\n저는 당신의 조언가입니다. 지금부터 부대를 운영하는 방법을 알려드리고자 합니다.\n\n\n아무 곳이나 터치하세요.
+    </string>
+    <string name="tutorial_battle_2">
+    ∙ 당신은 두 개의 부대를 이미 보유하고 있습니다.\n\n∙ 부대의 위치는 타일 중앙에 아이콘으로 표시됩니다.
+    </string>
+    <string name="tutorial_battle_3">
+    ∙ 각 부대는 3개의 유닛을 보유할 수 있습니다.\n\n∙ 현재 유닛을 모집 중인 상태입니다. 잠시 기다려주세요...
+    </string>
+    <string name="tutorial_battle_4">
+    ∙ 유닛 모집이 완료 되었습니다.\n\n∙ 부대에 속한 유닛이 지도 상에 작은 원으로 나타납니다. 아무 곳이나 터치하세요.
+    </string>
+    <string name="tutorial_battle_5">
+    ∙ 하단의 정보 버튼을 눌러 부대의 정보를 확인 가능합니다. \n\n∙ 추가 효과에 나타난 것처럼 다양한 지역/시설이 부대에 영향을 주게 됩니다.
+    </string>
+    <string name="tutorial_battle_6">
+    ∙ 이제 부대를 이동해 보겠습니다.\n\n∙ 부대 아이콘을 드래그해서 다른 타일에 옮기면 부대가 이동합니다.
+    </string>
+    <string name="tutorial_battle_7">
+    ∙ 이번엔 제가 직접 이동시켜 드리겠습니다.∙ 부대가 빨간 상자의 위치로 이동 중입니다. \n\n잠시 기다려주세요..
+    </string>
+    <string name="tutorial_battle_8">
+    ∙ 자 이제 부대 이동이 완료되었습니다.\n\n∙ 부대가 이동함에 따라서 주위의 안개가 걷히는 것을 볼 수 있습니다.
+    </string>
+    <string name="tutorial_battle_9">
+    ∙ 부대가 위치한 곳이 아군의 영토가 아니라면 점령을 시작합니다.\n\n잠시 기다려주세요..
+    </string>
+    <string name="tutorial_battle_10">
+    ∙ 자 이제 새로운 영토를 점령했습니다.\n\n∙ 분명 도적이 이 근처에 있을 것입니다. 유닛을 더 이동해보겠습니다.
+    </string>
+    <string name="tutorial_battle_11">
+    ∙ 드디어 도적을 발견했습니다.\n\n∙ 도적 부대는 현재 본부에 주둔 중입니다.
+    </string>
+    <string name="tutorial_battle_12">
+    ∙ 도적 부대를 선택 후 하단 정보 버튼을 누르면 정보를 보여줍니다.\n\n∙ 도적은 본부에 주둔하고 있어 방어도 추가 효과를 누리고 있습니다.
+    </string>
+    <string name="tutorial_battle_13">
+    ∙ 이제 도적을 제거할 시간입니다.\n\n∙ 전투를 시작하기 위해서는 부대를 적 부대 위치로 드래그 해야 합니다.
+    </string>
+    <string name="tutorial_battle_14">
+    ∙ 이번에는 제가 부대를 움직여보겠습니다.\n\n∙ 잠시 전투를 감상하세요..
+    </string>
+    <string name="tutorial_battle_15">
+    ∙ 우리 부대는 잘 싸우고 있지만 도움이 필요할 것 같습니다.\n\n∙ 나머지 부대를 움직여 아군을 지원하도록 하겠습니다.
+    </string>
+    <string name="tutorial_battle_16">
+    ∙ 아군 부대를 전투가 벌어지는 타일 옆에 놓으면 전투를 지원합니다.\n\n∙ 이번에는 제가 직접 옮겨보겠습니다.\n\n잠시 기다려주세요..
+    </string>
+    <string name="tutorial_battle_17">
+    ∙ 이제 아군 부대가 전투를 지원하기 시작했습니다.\n\n∙ 지원은 불리한 전황을 바꿀 수 있는 핵심적인 전략입니다. 현명하게 사용하세요.
+    </string>
+    <string name="tutorial_battle_18">
+    ∙ 참고로 모든 유닛이 다 지원이 가능하지는 않습니다.\n\n∙ 따라서 직접 전투할 부대와 지원할 부대를 신중하게 선택해야 합니다.
+    </string>
+    <string name="tutorial_battle_19">
+    촌장님!\n부대 운영에 대한 설명을 이만 마치겠습니다.\n\n∙ 팁: 이제 도적 부대를 박살내세요!
+    </string>
+
+    <string name="tutorial_management_1">
+    존경하는 촌장님!\n\n저는 당신의 조언가입니다. 지금부터 마을을 운영하는 방법을 알려드리고자 합니다.\n\n\n아무 곳이나 터치하세요.
+    </string>
+    <string name="tutorial_management_2">
+    ∙ 상단의 숫자는 마을의 금화를 나타냅니다.\n\n∙ 금화는 병력 모집 및 강화에 사용됩니다. 시장 개발을 통해 늘릴 수 있습니다.
+    </string>
+    <string name="tutorial_management_3">
+    ∙ 상단의 숫자는 마을의 인구를 나타냅니다.\n\n∙ 인구는 병력 모집에 사용되며 농장 개발을 통해 늘릴 수 있습니다.
+    </string>
+    <string name="tutorial_management_4">
+    ∙ 상단의 표정은 마을 사람들의 행복도를 나타냅니다.\n\n∙ 행복도는 금화 수입에 영향을 주며 낮아지면 반란군이 발생할 가능성이 높아집니다.
+    </string>
+    <string name="tutorial_management_5">
+    ∙ 상단의 버튼은 게임의 속도를 조절합니다.\n\n∙ 게임은 언제든 일시 정지 혹은 속도 조절이 가능합니다.
+    </string>
+    <string name="tutorial_management_6">
+    ∙ 상단 흰색 상자의 버튼은 현재 미션의 목표를 보여줍니다.\n
+    </string>
+    <string name="tutorial_management_7">
+    ∙ 하단 홈 버튼은 마을 전체의 상태를 보여줍니다.\n\n∙ 병력의 강화도 이 버튼을 통해 할 수 있습니다.
+    </string>
+    <string name="tutorial_management_8">
+    ∙ 홈 버튼을 누르면 나오는 화면입니다.\n\n∙ 마을 전체의 통계가 한눈에 보입니다.
+    </string>
+    <string name="tutorial_management_9">
+    ∙ 강화 버튼을 누르면 병력 강화를 진행할 수 있습니다.
+    </string>
+    <string name="tutorial_management_10">
+    ∙ 병력 강화 화면입니다. 상자 하단 버튼을 눌러 강화할 클래스를 선택할 수 있습니다.\n\n∙ 병력을 강화하면 유지비가 발생하며 취소할 수 없습니다.
+    </string>
+    <string name="tutorial_management_11">
+    ∙ 타일을 선택하면 다양한 추가 행동이 가능합니다.
+    </string>
+    <string name="tutorial_management_12">
+    ∙ 하단 정보 버튼을 선택하면 선택된 타일 혹은 병력의 정보를 보여줍니다.
+    </string>
+    <string name="tutorial_management_13">
+    ∙ 타일 정보를 보여주는 화면입니다.\n\n∙ 각 타일의 수입이나 인구 등의 정보를 파악 가능합니다.
+    </string>
+    <string name="tutorial_management_14">
+    ∙ 각 시설별 버튼을 통해 개발 방향을 정할 수 있습니다.\n\n∙ 시설의 전체 레벨 합이 5로 제한되어 있으므로 적절하게 조정하는 것이 중요합니다.
+    </string>
+    <string name="tutorial_management_15">
+    ∙ 농장은 인구를 늘려줍니다.\n\n∙ 농장은 초원과 황무지에서 빠르게 성장하는 반면 숲과 언덕에서는 느립니다.
+    </string>
+    <string name="tutorial_management_16">
+    ∙ 시장은 금화 수입을 늘려줍니다.\n\n∙ 시장은 초원과 숲에서 빠르게 성장하는 반면 언덕에서는 성장이 느립니다.
+    </string>
+    <string name="tutorial_management_17">
+    ∙ 마을은 인접 타일의 농장 및 시장의 효율을 높여줍니다.\n\n∙ 마을은 황무지와 언덕에서 빠르게 성장하는 반면 숲에서는 성장이 느립니다.
+    </string>
+    <string name="tutorial_management_18">
+    ∙ 요새는 지역 방어도를 올리지만 인접 타일의 개발과 행복도에 악영향을 줍니다.\n\n∙ 요새는 숲과 언덕에서 빠르게 성장하지만 평지와 황무지에서는 성장이 느립니다.
+    </string>
+    <string name="tutorial_management_19">
+    ∙ 하단 부대 모집 버튼을 눌러 신규 부대를 생성할 수 있습니다.\n\n∙ 이 버튼은 부대 생성이 가능한 타일을 선택한 경우에만 활성화됩니다.
+    </string>
+    <string name="tutorial_management_20">
+    ∙ 부대 모집 버튼을 누르면 부대가 즉시 소집되고 병력을 추가할 수 있습니다.\n\n∙ 만약 병력을 추가하지 않으면 부대 소집은 취소됩니다.
+    </string>
+    <string name="tutorial_management_21">
+    ∙ 병력 추가 버튼을 눌러서 병력을 추가할 수 있습니다.\n\n∙ 부대 별로 최대 3개의 병력을 추가할 수 있습니다.
+    </string>
+    <string name="tutorial_management_22">
+    ∙ 병력 추가 버튼을 누르면 나오는 화면입니다.\n\n∙ 하단 클래스 버튼을 선택하여 추가할 병력을 선택할 수 있습니다.
+    </string>
+    <string name="tutorial_management_23">
+    촌장님!\n마을 운영에 대한 설명을 이만 마치겠습니다.\n\n∙ 팁: 농장 개발에 집중하면 쉽게 미션 목표를 달성할 수 있습니다.
+    </string>
+
+    <string name="melee_fighter">근접 전투형</string>
+    <string name="melee_supporter">근접 지원형</string>
+    <string name="melee_healer">근접 회복형</string>
+    <string name="ranged_fighter">원거리 전투형</string>
+    <string name="ranged_supporter">원거리 지원형</string>
+    <string name="ranged_healer">원거리 회복형</string>
+    <string name="civil">비전투형</string>
+
+    <string name="worker">일꾼</string>
+    <string name="worker_desc">
+    지역 개발을 가속하며 해당 지역의 금화 수입도 늘려줍니다. 하지만 전투 능력이 없으며 매우 느립니다.
+    </string>
+    <string name="fighter">전사</string>
+    <string name="fighter_desc">
+    균형잡힌 보병입니다. 모든 면에서 무난합니다만 기병에는 유독 약합니다.
+    </string>
+    <string name="archer">궁수</string>
+    <string name="archer_desc">
+    원거리 공격이 가능하며 전투와 지원이 모두 가능합니다만 근접 공격에 취약합니다.
+    </string>
+    <string name="horse_man">기마병</string>
+    <string name="horse_man_desc">
+    빠른 속도로 기습에 적합한 기마병입니다. 근접 유닛에 대체로 강하지만 원거리 유닛의 공격에 취약합니다.
+    </string>
+    <string name="healer">치유사</string>
+    <string name="healer_desc">
+    전장 및 지원시 아군 유닛을 치유합니다. 공격에 취약하여 보호가 필요합니다.
+    </string>
+    <string name="cannon">대포병</string>
+    <string name="cannon_desc">
+    강력한 원거리 공격으로 주변을 초토화합니다. 근접 공격에 취약하므로 주로 지원 용도로 사용하게 됩니다.
+    </string>
+    <string name="paladin">성기사</string>
+    <string name="paladin_desc">
+    근접 공격과 치유를 동시에 할 수 있습니다. 비싸지만 그만큼 강력합니다.
+    </string>
+
+    <string name="grass">초원</string>
+    <string name="badlands">황무지</string>
+    <string name="forest">숲</string>
+    <string name="hill">언덕</string>
+    <string name="mountain">산</string>
+    <string name="river">강</string>
+    <string name="headquarter">본부</string>
+
+    <string name="neutral">중립</string>
+    <string name="villager">마을</string>
+    <string name="bandit">도적</string>
+    <string name="viking">바이킹</string>
+    <string name="rebel">반란군</string>
+
+</resources>
