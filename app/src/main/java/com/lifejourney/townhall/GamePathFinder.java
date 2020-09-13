@@ -41,7 +41,7 @@ public class GamePathFinder extends PathFinder {
     @Override
     public ArrayList<Waypoint> findOptimalPath() {
         ArrayList<Waypoint> optimalPath = super.findOptimalPath();
-        if (useNextMapPositionOfSquad) {
+        if (optimalPath != null && useNextMapPositionOfSquad) {
             OffsetCoord squadMapPosition = squad.getMapPosition();
             optimalPath.add(0,
                     new Waypoint(new Point(squadMapPosition.getX(), squadMapPosition.getY()),

@@ -144,6 +144,11 @@ public class MainMenu extends World
             setView(null);
         }
 
+        if (game != null) {
+            game.close();
+            game = null;
+        }
+
         // Unload sound
         Engine2D.GetInstance().stopMusic();
         Engine2D.GetInstance().getResourceManager().unloadSoundEffects();
